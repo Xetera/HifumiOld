@@ -7,6 +7,7 @@ TODO:
 - [ ] Close open mysql connections that cause problems when left open
 - [ ] Fix eval 
 - [ ] Refactor commands 
+- [x] Crucial life lesson learned from super cool anime-justice-hacker-senpais incredibly complex token search script
 - [x] Use a database to regularly upload updated commands and compare them with ThiccBot.py's
 
 API: 

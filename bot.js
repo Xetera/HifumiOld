@@ -575,6 +575,14 @@ function UserFunctions() {
         }
         message.channel.send(finalMessage)
     };
+    this.nick = (message, leftover_args) => {
+      bot.user.setUsername(leftover_args)
+          .then(user => {
+              message.channel.send(`Changed my name to ${user.username}`)
+          }).catch(error => {
+              console.log(error);
+      })
+    };
     this.eval = (message, leftover_args) => {
         return; //too easy to break atm
         if (!message.author.id === bot.server_owner) {

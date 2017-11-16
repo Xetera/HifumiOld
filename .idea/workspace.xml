@@ -5,7 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="03e4b6a4-1876-4ccb-9805-227d81e72e7b" name="Default" comment="catching certain errors">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.gitattributes" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bot.js" afterPath="$PROJECT_DIR$/bot.js" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -28,8 +29,8 @@
       <file leaf-file-name="bot.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/bot.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="365">
-              <caret line="588" column="83" lean-forward="false" selection-start-line="588" selection-start-column="78" selection-end-line="588" selection-end-column="83" />
+            <state relative-caret-position="563">
+              <caret line="583" column="8" lean-forward="true" selection-start-line="583" selection-start-column="8" selection-end-line="583" selection-end-column="8" />
               <folding />
             </state>
           </provider>
@@ -166,8 +167,8 @@
         <option value="$PROJECT_DIR$/DiscordGameTracker/debug.log" />
         <option value="$PROJECT_DIR$/DiscordGameTracker/Logging.js" />
         <option value="$PROJECT_DIR$/swag.js" />
-        <option value="$PROJECT_DIR$/bot.js" />
         <option value="$PROJECT_DIR$/DiscordGameTracker/index.js" />
+        <option value="$PROJECT_DIR$/bot.js" />
       </list>
     </option>
   </component>
@@ -195,7 +196,7 @@
     <handled-path value="$PROJECT_DIR$/DiscordGameTracker/node_modules" />
     <handled-path value="$PROJECT_DIR$/node_modules" />
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="326" />
     <option name="y" value="112" />
     <option name="width" value="1400" />
@@ -301,7 +302,7 @@
       <workItem from="1509484178986" duration="19684000" />
       <workItem from="1509954857556" duration="85901000" />
       <workItem from="1510716671494" duration="1000" />
-      <workItem from="1510716705480" duration="10341000" />
+      <workItem from="1510716705480" duration="11571000" />
     </task>
     <task id="LOCAL-00001" summary=".brawlhalla adjusting for accounts with &lt; 20 chars playing">
       <created>1509104442026</created>
@@ -328,10 +329,10 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="259043000" />
+    <option name="totallyTimeSpent" value="260273000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1337953" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -706,8 +707,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/bot.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="365">
-          <caret line="588" column="83" lean-forward="false" selection-start-line="588" selection-start-column="78" selection-end-line="588" selection-end-column="83" />
+        <state relative-caret-position="563">
+          <caret line="583" column="8" lean-forward="true" selection-start-line="583" selection-start-column="8" selection-end-line="583" selection-end-column="8" />
           <folding />
         </state>
       </provider>
