@@ -5,7 +5,7 @@ require('docstring');
 
 let bot = new Discord.Client();
 let login = bot.login(config.TOKEN);
-bot.server_owner = 140862798832861184;  //Gives specific permissions to
+bot.owner = 140862798832861184;  //Gives specific permissions to me
 
 class CustomUserError extends Error {
     constructor(msg, messageObject) {
@@ -91,6 +91,7 @@ class Func {
             console.log('Duplicate key found');
         });
     }
+
     static commandLoop(message, commandCalled){ //updates database on every call of a function that doesn't exist
         let commands = new UserFunctions();
         let functions = Object.getOwnPropertyNames(commands);
@@ -173,10 +174,8 @@ bot.on("guildDelete", async(guild) => {
 bot.on("guildMemberAdd", async(member) => {
     const welcome = member.guild.channels.find('name', 'welcome');
     if (!welcome) {
-        console.log("A new member was added but a welcome channel doesn't exist");
-        return;
+        return console.log("A new member was added but a welcome channel doesn't exist");
     }
-
     let embed = new Discord.RichEmbed()
         .setAuthor(member.displayName, member.user.displayAvatarURL)
         .setTimestamp()
@@ -199,8 +198,8 @@ bot.on("guildMemberRemove", async(member) => {
 bot.on("channelCreate", (channel) => {
     try {
     let guildName = channel.guild;
-    this.logs = guildName.channels.find('name', 'logs');
-    if (!logs) {
+    let logChannel = guildName.channels.find('name', 'logs');
+    if (!logChannel) {
         return console.log("A new channel was created but 'logs' channel doesn't exist for me to log it.")
     }
     } catch (err) {
@@ -220,7 +219,7 @@ bot.on("channelCreate", (channel) => {
             }
 
             let sendmessage = `${sender} created a new ${type} '${channel.name}' at ${channel.createdAt}`;
-            this.logs.send(`\`\`\`nginx\n${sendmessage}\n\`\`\``)
+            logChannel.send(`\`\`\`nginx\n${sendmessage}\n\`\`\``)
         });
 });
 bot.on("channelDelete", (channel) => {
@@ -269,10 +268,13 @@ bot.on("message", async (message) => {
 
 function UserFunctions() {
     this.ping = async (message) => {
-        message.channel.send("pong");
+		 let embed = new Discord.RichEmbed()
+            
+        message.channel.send(embed);
     };
     this.userinfo = async (message, leftover_args) => {
         if (leftover_args) {
+            // very shitty way to do this
             let mentionedUser = message.mentions.users.first();
             let mentionedMember = message.mentions.members.first();
             this.user_username = mentionedUser.username;
@@ -387,7 +389,7 @@ function UserFunctions() {
                     let userMentionedName = message.mentions.users.first().username;
                     console.log(userMentionedID);
                     mySql.Connect().then((conn) => {
-                        let result = connection.query(`SELECT steamID FROM steam WHERE discordID=${userMentionedID}`);
+                        let result = conn.query(`SELECT steamID FROM steam WHERE discordID=${userMentionedID}`);
                         conn.end();
                         return result;
                     }).then((row) => {
@@ -576,16 +578,18 @@ function UserFunctions() {
         message.channel.send(finalMessage)
     };
     this.nick = (message, leftover_args) => {
-      bot.user.setUsername(leftover_args)
-          .then(user => {
-              message.channel.send(`Changed my name to ${user.username}`)
-          }).catch(error => {
-              console.log(error);
-      })
+		if (message.author.id !== bot.owner) {
+			return message.channel.send('Only <@$(bot.owner)> has permission to use this command');
+		}
+         bot.user.setUsername(leftover_args).then(user => {
+			message.channel.send(`Changed my name to ${user.username}`)
+		}).catch(error => {
+			console.log(error);
+		})
     };
     this.eval = (message, leftover_args) => {
         return; //too easy to break atm
-        if (!message.author.id === bot.server_owner) {
+        if (!message.author.id === bot.owner) {
             return message.channel.send(`You do not have permission to use the eval function`)
         }
         if (!leftover_args) {

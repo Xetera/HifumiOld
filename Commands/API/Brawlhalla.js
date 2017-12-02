@@ -12,7 +12,6 @@ class Brawlhalla {
 }
 
 function getUser(steam64 ,callback) {
-    console.log("first function runing.");
     let totalURL = baseUserSearchURL + steam64 + config.brawlhalla_api_key;
     console.log(totalURL);
     request.get(totalURL, (error, response, body) =>
@@ -21,7 +20,6 @@ function getUser(steam64 ,callback) {
             console.log('GetUser.error:', error);
             return false
         }
-        console.log("GetUser.statusCode:", response && response.statusCode);
         let brawlJSON = JSON.parse(body);
        // console.log('body:', brawlJSON);
         let id = brawlJSON.brawlhalla_id;
@@ -35,15 +33,10 @@ function getUser(steam64 ,callback) {
 
 
 function findUserData(userObject, callback) {
-    console.log('second func running');
     URL = `https://api.brawlhalla.com/player/${userObject.id}/stats?`;
-    console.log("URL: " + URL);
     request.get(URL  + config.brawlhalla_api_key, (error, response, body) => {
         let JSONresponse = JSON.parse(body);
-        if (error){
-            console.log('findUserData.error: ' + error);
-        }
-        console.log("findUserData.response: " + response && response.statusCode);
+
         //console.log(JSONresponse);
         if (error) {
             callback(error)
@@ -58,10 +51,6 @@ function findRankedData(steamID, callback) {
     let URL = `https://api.brawlhalla.com/player/${trace.id}/ranked`;
     request.get(URL + config.brawlhalla_api_key, (error, response, body) => {
         let JSONresponse = JSON.parse(body);
-        if (error){
-            console.log('findUserData.error: ' + error);
-        }
-        console.log("findUserData.response: " + response && response.statusCode);
         //console.log(JSONresponse);
         if (error) {
             callback(error)
@@ -76,8 +65,6 @@ function callData(steamID, trace) {
     getUser(steamID, (callback) => {
         findUserData(callback, (response) => {
             callback.userdata = response;
-            console.log(callback.userdata);
-            console.log("Brawlhalla user data successfully got");
             trace(response);
         });
     });

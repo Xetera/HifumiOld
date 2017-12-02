@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/bot.js" line="92" />
+    <bookmark url="file://$PROJECT_DIR$/bot.js" line="96" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="03e4b6a4-1876-4ccb-9805-227d81e72e7b" name="Default" comment="catching certain errors">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bot.js" afterPath="$PROJECT_DIR$/bot.js" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -23,14 +22,15 @@
     <fileColor scope="Non-Project Files (Material Darker)" color="323232" />
     <fileColor scope="Non-Project Files (Material Lighter)" color="eae8e8" />
     <fileColor scope="Non-Project Files (Material Palenight)" color="2f2e43" />
+    <fileColor scope="Non-Project Files (Material Oceanic)" color="2E3C43" />
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file leaf-file-name="bot.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/bot.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="563">
-              <caret line="583" column="8" lean-forward="true" selection-start-line="583" selection-start-column="8" selection-end-line="583" selection-end-column="8" />
+            <state relative-caret-position="116">
+              <caret line="276" column="41" lean-forward="false" selection-start-line="276" selection-start-column="41" selection-end-line="276" selection-end-column="41" />
               <folding />
             </state>
           </provider>
@@ -59,9 +59,16 @@
       <file leaf-file-name="Brawlhalla.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Commands/API/Brawlhalla.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="808">
-              <caret line="95" column="47" lean-forward="false" selection-start-line="95" selection-start-column="47" selection-end-line="95" selection-end-column="47" />
-              <folding />
+            <state relative-caret-position="674">
+              <caret line="82" column="47" lean-forward="true" selection-start-line="82" selection-start-column="47" selection-end-line="82" selection-end-column="47" />
+              <folding>
+                <marker date="1511566971229" expanded="true" signature="459:566" ph="{...}" />
+                <marker date="1511566971229" expanded="true" signature="1031:1076" ph="{...}" />
+                <marker date="1511566971229" expanded="true" signature="1295:1365" ph="{...}" />
+                <marker date="1511566971229" expanded="true" signature="1443:1488" ph="{...}" />
+                <marker date="1511566971229" expanded="true" signature="1754:1786" ph="{...}" />
+                <marker date="1511566971229" expanded="true" signature="1992:2005" ph="{...}" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -69,18 +76,22 @@
       <file leaf-file-name="index.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DiscordGameTracker/index.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
+            <state relative-caret-position="23">
               <caret line="146" column="0" lean-forward="false" selection-start-line="146" selection-start-column="0" selection-end-line="146" selection-end-column="0" />
-              <folding />
+              <folding>
+                <marker date="1510804791924" expanded="true" signature="629:647" ph="{...}" />
+                <marker date="1510804791924" expanded="true" signature="2994:3010" ph="{...}" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file leaf-file-name="debug.log" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DiscordGameTracker/debug.log">
-          <provider selected="true" editor-type-id="LogFileEditorProvider">
+          <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="0">
               <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -98,13 +109,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>mention</find>
-      <find>.first()</find>
-      <find>.uptime</find>
-      <find>get(</find>
-      <find>clearSteam</find>
-      <find>.query</find>
-      <find>setSteam</find>
       <find>input</find>
       <find>DUP</find>
       <find>conn.query</find>
@@ -128,6 +132,13 @@
       <find>.close</find>
       <find>password</find>
       <find>token</find>
+      <find>trace.length</find>
+      <find>brawlhalla</find>
+      <find>delete</find>
+      <find>delete(</find>
+      <find>this.logs</find>
+      <find>Channe</find>
+      <find>userinfo</find>
     </findStrings>
     <replaceStrings>
       <replace>send</replace>
@@ -168,6 +179,8 @@
         <option value="$PROJECT_DIR$/DiscordGameTracker/Logging.js" />
         <option value="$PROJECT_DIR$/swag.js" />
         <option value="$PROJECT_DIR$/DiscordGameTracker/index.js" />
+        <option value="$PROJECT_DIR$/Commands/API/Brawlhalla.js" />
+        <option value="$PROJECT_DIR$/Commands/API/Twitter.js" />
         <option value="$PROJECT_DIR$/bot.js" />
       </list>
     </option>
@@ -184,7 +197,6 @@
   <component name="JsFlowSettings">
     <service-enabled>true</service-enabled>
     <exe-path />
-    <annotation-enable>false</annotation-enable>
     <other-services-enabled>true</other-services-enabled>
     <auto-save>true</auto-save>
   </component>
@@ -196,7 +208,7 @@
     <handled-path value="$PROJECT_DIR$/DiscordGameTracker/node_modules" />
     <handled-path value="$PROJECT_DIR$/node_modules" />
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="326" />
     <option name="y" value="112" />
     <option name="width" value="1400" />
@@ -218,6 +230,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -229,17 +242,15 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
       <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../DiscordGameTracker" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Programs/Battlerite API Wrapper" />
     <property name="nodejs_interpreter_path" value="D:/Program Files/nodejs/node" />
-    <property name="settings.editor.selected.configurable" value="configurable.group.appearance" />
+    <property name="settings.editor.selected.configurable" value="Settings.JavaScript" />
     <property name="javascript.nodejs.core.library.configured.version" value="7.10.0" />
-    <property name="JavaScriptPreferStrict" value="false" />
     <property name="JavaScriptWeakerCompletionTypeGuess" value="true" />
     <property name="HbShouldOpenHtmlAsHb" value="" />
     <property name="restartRequiresConfirmation" value="false" />
@@ -264,12 +275,12 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Node.js.swag.js">
-    <configuration name="BrawlhallaTest.js" type="NodeJSConfigurationType" factoryName="Node.js" temporary="true" path-to-node="project" path-to-js-file="$PROJECT_DIR$/Commands/API/Brawlhalla.js" working-dir="$PROJECT_DIR$" />
-    <configuration name="Twitter.js" type="NodeJSConfigurationType" factoryName="Node.js" temporary="true" path-to-node="project" path-to-js-file="$PROJECT_DIR$/Commands/API/Twitter.js" working-dir="$PROJECT_DIR$" />
-    <configuration name="index.js (1)" type="NodeJSConfigurationType" factoryName="Node.js" temporary="true" path-to-node="project" path-to-js-file="index.js" working-dir="$PROJECT_DIR$/DiscordGameTracker" />
-    <configuration name="index.js" type="NodeJSConfigurationType" factoryName="Node.js" temporary="true" path-to-node="project" path-to-js-file="$PROJECT_DIR$/bot.js" working-dir="$PROJECT_DIR$" />
-    <configuration name="swag.js" type="NodeJSConfigurationType" factoryName="Node.js" temporary="true" path-to-node="project" path-to-js-file="swag.js" working-dir="$PROJECT_DIR$" />
+  <component name="RunManager" selected="Node.js.index.js">
+    <configuration name="BrawlhallaTest.js" type="NodeJSConfigurationType" factoryName="Node.js" temporary="true" path-to-js-file="$PROJECT_DIR$/Commands/API/Brawlhalla.js" working-dir="$PROJECT_DIR$" />
+    <configuration name="Twitter.js" type="NodeJSConfigurationType" factoryName="Node.js" temporary="true" path-to-js-file="$PROJECT_DIR$/Commands/API/Twitter.js" working-dir="$PROJECT_DIR$" />
+    <configuration name="index.js (1)" type="NodeJSConfigurationType" factoryName="Node.js" temporary="true" path-to-js-file="index.js" working-dir="$PROJECT_DIR$/DiscordGameTracker" />
+    <configuration name="index.js" type="NodeJSConfigurationType" factoryName="Node.js" temporary="true" path-to-js-file="$PROJECT_DIR$/bot.js" working-dir="$PROJECT_DIR$" />
+    <configuration name="swag.js" type="NodeJSConfigurationType" factoryName="Node.js" temporary="true" path-to-js-file="swag.js" working-dir="$PROJECT_DIR$" />
     <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Node.js.index.js" />
       <item index="1" class="java.lang.String" itemvalue="Node.js.BrawlhallaTest.js" />
@@ -279,16 +290,19 @@
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Node.js.swag.js" />
-        <item index="1" class="java.lang.String" itemvalue="Node.js.index.js (1)" />
-        <item index="2" class="java.lang.String" itemvalue="Node.js.Twitter.js" />
-        <item index="3" class="java.lang.String" itemvalue="Node.js.BrawlhallaTest.js" />
-        <item index="4" class="java.lang.String" itemvalue="Node.js.index.js" />
+        <item index="0" class="java.lang.String" itemvalue="Node.js.index.js" />
+        <item index="1" class="java.lang.String" itemvalue="Node.js.swag.js" />
+        <item index="2" class="java.lang.String" itemvalue="Node.js.index.js (1)" />
+        <item index="3" class="java.lang.String" itemvalue="Node.js.Twitter.js" />
+        <item index="4" class="java.lang.String" itemvalue="Node.js.BrawlhallaTest.js" />
       </list>
     </recent_temporary>
   </component>
   <component name="ShelveChangesManager" show_recycled="false">
     <option name="remove_strategy" value="false" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -302,7 +316,11 @@
       <workItem from="1509484178986" duration="19684000" />
       <workItem from="1509954857556" duration="85901000" />
       <workItem from="1510716671494" duration="1000" />
-      <workItem from="1510716705480" duration="11571000" />
+      <workItem from="1510716705480" duration="11828000" />
+      <workItem from="1511111272140" duration="60000" />
+      <workItem from="1511111347970" duration="201000" />
+      <workItem from="1511564331048" duration="7394000" />
+      <workItem from="1512192590420" duration="5383000" />
     </task>
     <task id="LOCAL-00001" summary=".brawlhalla adjusting for accounts with &lt; 20 chars playing">
       <created>1509104442026</created>
@@ -329,22 +347,23 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="260273000" />
+    <option name="totallyTimeSpent" value="273568000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="7" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1337953" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13432837" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32979852" sideWeight="0.50208336" order="1" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24040511" sideWeight="0.49791667" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.32934782" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24307036" sideWeight="0.49791667" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="npm" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32934782" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32934782" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.49784482" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32928178" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.49784482" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32979852" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -379,7 +398,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1615">
           <caret line="95" column="47" lean-forward="false" selection-start-line="95" selection-start-column="47" selection-end-line="95" selection-end-column="47" />
-          <folding />
+          <folding>
+            <marker date="1511566971229" expanded="true" signature="459:566" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1031:1076" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1295:1365" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1443:1488" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1754:1786" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1992:2005" ph="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -403,7 +429,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="595">
           <caret line="35" column="0" lean-forward="true" selection-start-line="35" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
-          <folding />
+          <folding>
+            <marker date="1510804791924" expanded="true" signature="629:647" ph="{...}" />
+            <marker date="1510804791924" expanded="true" signature="2994:3010" ph="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -427,7 +456,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1288">
           <caret line="56" column="4" lean-forward="false" selection-start-line="56" selection-start-column="4" selection-end-line="56" selection-end-column="4" />
-          <folding />
+          <folding>
+            <marker date="1511566971229" expanded="true" signature="459:566" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1031:1076" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1295:1365" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1443:1488" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1754:1786" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1992:2005" ph="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -438,13 +474,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1357">
-          <caret line="59" column="31" lean-forward="false" selection-start-line="59" selection-start-column="31" selection-end-line="59" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/test.js" />
     <entry file="file://$PROJECT_DIR$/config0.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="322">
@@ -464,7 +494,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1288">
           <caret line="56" column="4" lean-forward="false" selection-start-line="56" selection-start-column="4" selection-end-line="56" selection-end-column="4" />
-          <folding />
+          <folding>
+            <marker date="1511566971229" expanded="true" signature="459:566" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1031:1076" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1295:1365" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1443:1488" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1754:1786" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1992:2005" ph="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -482,13 +519,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1357">
-          <caret line="59" column="31" lean-forward="false" selection-start-line="59" selection-start-column="31" selection-end-line="59" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/test.js" />
     <entry file="file://$PROJECT_DIR$/bot.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -501,7 +532,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1288">
           <caret line="56" column="4" lean-forward="false" selection-start-line="56" selection-start-column="4" selection-end-line="56" selection-end-column="4" />
-          <folding />
+          <folding>
+            <marker date="1511566971229" expanded="true" signature="459:566" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1031:1076" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1295:1365" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1443:1488" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1754:1786" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1992:2005" ph="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -512,13 +550,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1357">
-          <caret line="59" column="31" lean-forward="false" selection-start-line="59" selection-start-column="31" selection-end-line="59" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/test.js" />
     <entry file="file://$PROJECT_DIR$/config0.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="230">
@@ -617,14 +649,6 @@
       </provider>
     </entry>
     <entry file="jar://$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/lib/JavaScriptLanguage.jar!/com/intellij/lang/javascript/index/predefined/EcmaScript.js" />
-    <entry file="file://$PROJECT_DIR$/Commands/API/Twitter.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="276">
-          <caret line="12" column="3" lean-forward="false" selection-start-line="12" selection-start-column="3" selection-end-line="12" selection-end-column="3" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/package.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="460">
@@ -639,20 +663,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/_output-taskill.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-103">
-          <caret line="59" column="31" lean-forward="false" selection-start-line="59" selection-start-column="31" selection-end-line="59" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/_output-taskill.txt" />
+    <entry file="file://$PROJECT_DIR$/test.js" />
     <entry file="file://$PROJECT_DIR$/DiscordGameTracker/Logging.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -660,31 +672,45 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DiscordGameTracker/debug.log">
-      <provider editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="116" />
-          <folding />
-        </state>
-      </provider>
-      <provider selected="true" editor-type-id="LogFileEditorProvider">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+    <entry file="file://$PROJECT_DIR$/swag.js" />
+    <entry file="file://$PROJECT_DIR$/DiscordGameTracker/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="23">
+          <caret line="146" column="0" lean-forward="false" selection-start-line="146" selection-start-column="0" selection-end-line="146" selection-end-column="0" />
+          <folding>
+            <marker date="1510804791924" expanded="true" signature="629:647" ph="{...}" />
+            <marker date="1510804791924" expanded="true" signature="2994:3010" ph="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/swag.js">
+    <entry file="file://$PROJECT_DIR$/DiscordGameTracker/debug.log">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="115">
-          <caret line="5" column="25" lean-forward="true" selection-start-line="5" selection-start-column="25" selection-end-line="5" selection-end-column="25" />
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Commands/API/Brawlhalla.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="808">
-          <caret line="95" column="47" lean-forward="false" selection-start-line="95" selection-start-column="47" selection-end-line="95" selection-end-column="47" />
+        <state relative-caret-position="674">
+          <caret line="82" column="47" lean-forward="true" selection-start-line="82" selection-start-column="47" selection-end-line="82" selection-end-column="47" />
+          <folding>
+            <marker date="1511566971229" expanded="true" signature="459:566" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1031:1076" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1295:1365" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1443:1488" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1754:1786" ph="{...}" />
+            <marker date="1511566971229" expanded="true" signature="1992:2005" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Commands/API/Twitter.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="276">
+          <caret line="12" column="3" lean-forward="false" selection-start-line="12" selection-start-column="3" selection-end-line="12" selection-end-column="3" />
           <folding />
         </state>
       </provider>
@@ -697,18 +723,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DiscordGameTracker/index.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="146" column="0" lean-forward="false" selection-start-line="146" selection-start-column="0" selection-end-line="146" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/bot.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="563">
-          <caret line="583" column="8" lean-forward="true" selection-start-line="583" selection-start-column="8" selection-end-line="583" selection-end-column="8" />
+        <state relative-caret-position="116">
+          <caret line="276" column="41" lean-forward="false" selection-start-line="276" selection-start-column="41" selection-end-line="276" selection-end-column="41" />
           <folding />
         </state>
       </provider>
