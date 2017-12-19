@@ -37,7 +37,7 @@ function findUserData(userObject, callback) {
     request.get(URL  + config.brawlhalla_api_key, (error, response, body) => {
         let JSONresponse = JSON.parse(body);
 
-        //console.log(JSONresponse);
+        //console.log(JSONResponse);
         if (error) {
             callback(error)
         }

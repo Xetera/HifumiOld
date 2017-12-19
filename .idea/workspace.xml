@@ -29,8 +29,8 @@
       <file leaf-file-name="bot.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/bot.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="116">
-              <caret line="276" column="41" lean-forward="false" selection-start-line="276" selection-start-column="41" selection-end-line="276" selection-end-column="41" />
+            <state relative-caret-position="14099">
+              <caret line="613" column="19" lean-forward="false" selection-start-line="613" selection-start-column="19" selection-end-line="613" selection-end-column="19" />
               <folding />
             </state>
           </provider>
@@ -59,15 +59,15 @@
       <file leaf-file-name="Brawlhalla.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Commands/API/Brawlhalla.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="674">
-              <caret line="82" column="47" lean-forward="true" selection-start-line="82" selection-start-column="47" selection-end-line="82" selection-end-column="47" />
+            <state relative-caret-position="368">
+              <caret line="16" column="45" lean-forward="false" selection-start-line="16" selection-start-column="45" selection-end-line="16" selection-end-column="45" />
               <folding>
-                <marker date="1511566971229" expanded="true" signature="459:566" ph="{...}" />
-                <marker date="1511566971229" expanded="true" signature="1031:1076" ph="{...}" />
-                <marker date="1511566971229" expanded="true" signature="1295:1365" ph="{...}" />
-                <marker date="1511566971229" expanded="true" signature="1443:1488" ph="{...}" />
-                <marker date="1511566971229" expanded="true" signature="1754:1786" ph="{...}" />
-                <marker date="1511566971229" expanded="true" signature="1992:2005" ph="{...}" />
+                <marker date="1512207035421" expanded="true" signature="459:566" ph="{...}" />
+                <marker date="1512207035421" expanded="true" signature="1031:1076" ph="{...}" />
+                <marker date="1512207035421" expanded="true" signature="1295:1365" ph="{...}" />
+                <marker date="1512207035421" expanded="true" signature="1443:1488" ph="{...}" />
+                <marker date="1512207035421" expanded="true" signature="1754:1786" ph="{...}" />
+                <marker date="1512207035421" expanded="true" signature="1992:2005" ph="{...}" />
               </folding>
             </state>
           </provider>
@@ -76,7 +76,7 @@
       <file leaf-file-name="index.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DiscordGameTracker/index.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="23">
+            <state relative-caret-position="3358">
               <caret line="146" column="0" lean-forward="false" selection-start-line="146" selection-start-column="0" selection-end-line="146" selection-end-column="0" />
               <folding>
                 <marker date="1510804791924" expanded="true" signature="629:647" ph="{...}" />
@@ -109,8 +109,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>input</find>
-      <find>DUP</find>
       <find>conn.query</find>
       <find>conn.quer</find>
       <find>INSERT INTO</find>
@@ -139,6 +137,8 @@
       <find>this.logs</find>
       <find>Channe</find>
       <find>userinfo</find>
+      <find>embed</find>
+      <find>welcome</find>
     </findStrings>
     <replaceStrings>
       <replace>send</replace>
@@ -179,8 +179,8 @@
         <option value="$PROJECT_DIR$/DiscordGameTracker/Logging.js" />
         <option value="$PROJECT_DIR$/swag.js" />
         <option value="$PROJECT_DIR$/DiscordGameTracker/index.js" />
-        <option value="$PROJECT_DIR$/Commands/API/Brawlhalla.js" />
         <option value="$PROJECT_DIR$/Commands/API/Twitter.js" />
+        <option value="$PROJECT_DIR$/Commands/API/Brawlhalla.js" />
         <option value="$PROJECT_DIR$/bot.js" />
       </list>
     </option>
@@ -230,7 +230,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -243,6 +242,7 @@
         </subPane>
       </pane>
       <pane id="Scratches" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -320,7 +320,8 @@
       <workItem from="1511111272140" duration="60000" />
       <workItem from="1511111347970" duration="201000" />
       <workItem from="1511564331048" duration="7394000" />
-      <workItem from="1512192590420" duration="5383000" />
+      <workItem from="1512192590420" duration="9466000" />
+      <workItem from="1513645328765" duration="2074000" />
     </task>
     <task id="LOCAL-00001" summary=".brawlhalla adjusting for accounts with &lt; 20 chars playing">
       <created>1509104442026</created>
@@ -347,18 +348,18 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="273568000" />
+    <option name="totallyTimeSpent" value="279725000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13432837" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13382508" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32979852" sideWeight="0.50208336" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.32934782" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24307036" sideWeight="0.49791667" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24307036" sideWeight="0.49791667" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="npm" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32928178" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -399,12 +400,12 @@
         <state relative-caret-position="1615">
           <caret line="95" column="47" lean-forward="false" selection-start-line="95" selection-start-column="47" selection-end-line="95" selection-end-column="47" />
           <folding>
-            <marker date="1511566971229" expanded="true" signature="459:566" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1031:1076" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1295:1365" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1443:1488" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1754:1786" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1992:2005" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="459:566" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1031:1076" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1295:1365" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1443:1488" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1754:1786" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1992:2005" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -457,12 +458,12 @@
         <state relative-caret-position="1288">
           <caret line="56" column="4" lean-forward="false" selection-start-line="56" selection-start-column="4" selection-end-line="56" selection-end-column="4" />
           <folding>
-            <marker date="1511566971229" expanded="true" signature="459:566" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1031:1076" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1295:1365" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1443:1488" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1754:1786" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1992:2005" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="459:566" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1031:1076" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1295:1365" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1443:1488" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1754:1786" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1992:2005" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -495,12 +496,12 @@
         <state relative-caret-position="1288">
           <caret line="56" column="4" lean-forward="false" selection-start-line="56" selection-start-column="4" selection-end-line="56" selection-end-column="4" />
           <folding>
-            <marker date="1511566971229" expanded="true" signature="459:566" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1031:1076" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1295:1365" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1443:1488" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1754:1786" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1992:2005" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="459:566" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1031:1076" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1295:1365" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1443:1488" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1754:1786" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1992:2005" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -533,12 +534,12 @@
         <state relative-caret-position="1288">
           <caret line="56" column="4" lean-forward="false" selection-start-line="56" selection-start-column="4" selection-end-line="56" selection-end-column="4" />
           <folding>
-            <marker date="1511566971229" expanded="true" signature="459:566" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1031:1076" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1295:1365" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1443:1488" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1754:1786" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1992:2005" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="459:566" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1031:1076" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1295:1365" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1443:1488" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1754:1786" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1992:2005" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -675,7 +676,7 @@
     <entry file="file://$PROJECT_DIR$/swag.js" />
     <entry file="file://$PROJECT_DIR$/DiscordGameTracker/index.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="23">
+        <state relative-caret-position="3358">
           <caret line="146" column="0" lean-forward="false" selection-start-line="146" selection-start-column="0" selection-end-line="146" selection-end-column="0" />
           <folding>
             <marker date="1510804791924" expanded="true" signature="629:647" ph="{...}" />
@@ -692,18 +693,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Commands/API/Brawlhalla.js">
+    <entry file="file://$PROJECT_DIR$/config0.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="674">
-          <caret line="82" column="47" lean-forward="true" selection-start-line="82" selection-start-column="47" selection-end-line="82" selection-end-column="47" />
-          <folding>
-            <marker date="1511566971229" expanded="true" signature="459:566" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1031:1076" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1295:1365" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1443:1488" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1754:1786" ph="{...}" />
-            <marker date="1511566971229" expanded="true" signature="1992:2005" ph="{...}" />
-          </folding>
+        <state relative-caret-position="115">
+          <caret line="5" column="31" lean-forward="false" selection-start-line="5" selection-start-column="31" selection-end-line="5" selection-end-column="31" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -715,18 +709,25 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/config0.json">
+    <entry file="file://$PROJECT_DIR$/Commands/API/Brawlhalla.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="115">
-          <caret line="5" column="31" lean-forward="false" selection-start-line="5" selection-start-column="31" selection-end-line="5" selection-end-column="31" />
-          <folding />
+        <state relative-caret-position="368">
+          <caret line="16" column="45" lean-forward="false" selection-start-line="16" selection-start-column="45" selection-end-line="16" selection-end-column="45" />
+          <folding>
+            <marker date="1512207035421" expanded="true" signature="459:566" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1031:1076" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1295:1365" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1443:1488" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1754:1786" ph="{...}" />
+            <marker date="1512207035421" expanded="true" signature="1992:2005" ph="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/bot.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="116">
-          <caret line="276" column="41" lean-forward="false" selection-start-line="276" selection-start-column="41" selection-end-line="276" selection-end-column="41" />
+        <state relative-caret-position="14099">
+          <caret line="613" column="19" lean-forward="false" selection-start-line="613" selection-start-column="19" selection-end-line="613" selection-end-column="19" />
           <folding />
         </state>
       </provider>

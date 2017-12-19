@@ -1,7 +1,7 @@
 const Discord = require("discord.js");
 const config = require("./config0.json");
-let mysql = require('promise-mysql');
-require('docstring');
+const mysql = require('promise-mysql');
+const request = require('request');
 
 let bot = new Discord.Client();
 let login = bot.login(config.TOKEN);
@@ -268,7 +268,7 @@ bot.on("message", async (message) => {
 
 function UserFunctions() {
     this.ping = async (message) => {
-		 let embed = new Discord.RichEmbed()
+		 let embed = new Discord.RichEmbed();
             
         message.channel.send(embed);
     };
@@ -611,5 +611,29 @@ function UserFunctions() {
         });
 
     };
+	this.bitcoin = (message) => {
+		request("https://api.coindesk.com/v1/bpi/currentprice.json", function(error, response, body) {
+		    if (error)
+                console.log('Error: ', error);
+            if (response.statusCode !== 200) {
+                return message.channel.send(`There was a problem contacting Bitcoin Price Index.\nCode: 
+                ${response.statusCode}: ${response.statusMessage}`)
+            }
+
+            let embed = new Discord.RichEmbed();
+            let parsed = JSON.parse(body);
+
+            let time =  parsed["time"]["updated"];
+            let price = parsed["bpi"]["USD"]['rate'];
+
+            embed.setAuthor("Bitcoin Price", "https://bitcoin.org/img/icons/opengraph.png")
+                .setTitle(":dollar: " + price.toString());
+                //.setTimestamp(time.toISOString());
+
+            message.channel.send(embed);
+
+
+        });
+	}
 
 }
