@@ -29,8 +29,8 @@
       <file leaf-file-name="bot.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/bot.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="14099">
-              <caret line="613" column="19" lean-forward="false" selection-start-line="613" selection-start-column="19" selection-end-line="613" selection-end-column="19" />
+            <state relative-caret-position="138">
+              <caret line="6" column="24" lean-forward="true" selection-start-line="6" selection-start-column="24" selection-end-line="6" selection-end-column="24" />
               <folding />
             </state>
           </provider>
@@ -209,9 +209,9 @@
     <handled-path value="$PROJECT_DIR$/node_modules" />
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="326" />
-    <option name="y" value="112" />
-    <option name="width" value="1400" />
+    <option name="x" value="110" />
+    <option name="y" value="17" />
+    <option name="width" value="974" />
     <option name="height" value="1000" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -247,7 +247,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Programs/Battlerite API Wrapper" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Programs" />
     <property name="nodejs_interpreter_path" value="D:/Program Files/nodejs/node" />
     <property name="settings.editor.selected.configurable" value="Settings.JavaScript" />
     <property name="javascript.nodejs.core.library.configured.version" value="7.10.0" />
@@ -321,7 +321,7 @@
       <workItem from="1511111347970" duration="201000" />
       <workItem from="1511564331048" duration="7394000" />
       <workItem from="1512192590420" duration="9466000" />
-      <workItem from="1513645328765" duration="2074000" />
+      <workItem from="1513645328765" duration="8391000" />
     </task>
     <task id="LOCAL-00001" summary=".brawlhalla adjusting for accounts with &lt; 20 chars playing">
       <created>1509104442026</created>
@@ -348,7 +348,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="279725000" />
+    <option name="totallyTimeSpent" value="286042000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -378,6 +378,11 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
+    <option name="exactExcludedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/../Programs/Typescript/example.js" />
+      </list>
+    </option>
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
@@ -726,8 +731,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/bot.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="14099">
-          <caret line="613" column="19" lean-forward="false" selection-start-line="613" selection-start-column="19" selection-end-line="613" selection-end-column="19" />
+        <state relative-caret-position="138">
+          <caret line="6" column="24" lean-forward="true" selection-start-line="6" selection-start-column="24" selection-end-line="6" selection-end-column="24" />
           <folding />
         </state>
       </provider>

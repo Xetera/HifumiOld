@@ -4,7 +4,7 @@ const mysql = require('promise-mysql');
 const request = require('request');
 
 let bot = new Discord.Client();
-let login = bot.login(config.TOKEN);
+bot.login(config.TOKEN);
 bot.owner = 140862798832861184;  //Gives specific permissions to me
 
 class CustomUserError extends Error {
