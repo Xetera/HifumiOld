@@ -2,6 +2,8 @@ const Discord = require("discord.js");
 const config = require("./config0.json");
 const mysql = require('promise-mysql');
 const request = require('request');
+const brawlDB = require('./Commands/API/Brawlhalla.js');
+
 
 let bot = new Discord.Client();
 bot.login(config.TOKEN);
@@ -372,22 +374,23 @@ function UserFunctions() {
         }
         message.channel.send(`I have been online for ` + this.uptimeMessage)
     };
+
     this.brawlhalla = async (message, leftover_args) => {
 
-        this.input = leftover_args;
-        if (!this.input) {
+        let username = leftover_args || null;
+        if (!username) {
             let response = await message.channel.send(`Usage:\n${config.prefix}brawlhalla [STEAM64] or [@user]`
                 + `\n sends brawlhalla stats when a user is @mentioned or a steamID is entered`);
             response.delete(20 * 1000);
             return;
         }
-        if (isNaN(this.input)) {
+        if (isNaN(username)) {
             if (message.mentions.users) {
                 try {
-                    console.log(message.mentions.users.first());
+
                     let userMentionedID = message.mentions.users.first().id;
                     let userMentionedName = message.mentions.users.first().username;
-                    console.log(userMentionedID);
+
                     mySql.Connect().then((conn) => {
                         let result = conn.query(`SELECT steamID FROM steam WHERE discordID=${userMentionedID}`);
                         conn.end();
@@ -398,9 +401,9 @@ function UserFunctions() {
                             throw new CustomUserError(`${userMentionedName} does not have their steamID saved on discord.` +
                                 `\nUse ${config.prefix}setSteam [steamID] to save your steamID.`, message);
                         }
-                        console.log(row[0]['steamID']);
-                        this.input = row[0]['steamID'];
-                        console.log(this.input);
+
+                        username = row[0]['steamID'];
+
 
                     }).catch((error) => {
                         if (error instanceof CustomUserError)
@@ -408,7 +411,7 @@ function UserFunctions() {
                         return console.log(error);
                     });
                 } catch (err) {
-                    console.log("here:  " + err);
+
                     if (err instanceof CustomUserError) {
                         return;
                     }
@@ -416,77 +419,63 @@ function UserFunctions() {
             }
         }
 
-        this.input = this.input.toString();
-        console.log('done');
+        username = username.toString();
+
         let waitMessage = await message.channel.send("Contacting Brawlhalla API...");
-        const brawlDB = require('./Commands/API/Brawlhalla.js');
-
-        await brawlDB.callData(this.input, async (trace) => {
-            console.log("async working");
-            if (!trace) {
-                message.channel.send("Something went wrong :sob: ")
-            }
-
-            brawlDB.findRankedData(this.input, xtrace => {
-                console.log(xtrace);
 
 
-                let legendStats = [];
-                for (let i = 0; i < trace.legends.length; i++) {
-                    let legend = trace.legends;
-                    let legendName = Func.titleCase(legend[i]['legend_name_key']);
-                    legendStats[i] = [legend[i]['level'], legendName, legend[i]['games'],
-                        legend[i]['wins'], legend[i]['kos'], legend[i]['falls'], legend[i]['suicides']]
 
-                    //level, name, games, wins, KOs, falls, suicides
-                }
+        let data = await brawlDB.callData(username);
+        let legendStats = await brawlDB.getLegendData(data);
+        let clanData = await brawlDB.parseGuildInfo(data);
+        let player = await brawlDB.parsePlayerInfo(data);
+        let games = await brawlDB.parseRankedInfo(data);
 
-                legendStats = legendStats.sort(function (a, b) {
-                    return b[0] - a[0]
-                });
+        console.log(legendStats);
+        let clanName = "";
+        try {
+            clanName = (clanData['clan_name'])
+        } catch (err) {
+            clanName = "No Clan"
+        }
 
-                console.log(legendStats);
-                try {
-                    this.clanName = (trace.clan.clan_name)
-                } catch (err) {
-                    this.clanName = "ClanNotFound"
-                }
-                let embed = new Discord.RichEmbed();
-                if (this.clanName !== "ClanNotFound") {
-                    embed.setTitle(`${trace.name} of ${this.clanName}\n`)
-                } else {
-                    embed.setTitle(`${trace.name}`)
-                }
-                embed.setColor(message.member.colorRole.color)
-                    .setThumbnail("http://beta.brawlhalla.com/static/i/bhfb1200.png")
-                    .addField(`Level:`, trace.level, true)
-                    .addField(`Rank:`, xtrace.tier, true)
-                    .addField(`Current ELO:`, xtrace.rating, true)
-                    .addField(`Peak ELO:`, xtrace.peak_rating, true)
-                    .addField(`Games Played:`, trace.games, true)
-                    .addField(`Games Won:`, trace.wins, true);
-                console.log("set fields");
-                if (legendStats.length < 12) {
-                    this.loopSize = legendStats.length;
-                } else {
-                    this.loopSize = 12;
-                }
-                for (let x = 0; x < this.loopSize; x++) {
-                    embed.addField(legendStats[x][1],
-                        `Level: ${legendStats[x][0]}\n` +
-                        `Games Played: ${legendStats[x][2]}\n` +
-                        `Games Won: ${legendStats[x][3]}\n` +
-                        `% Win Rate: ${(legendStats[x][3] / legendStats[x][2] * 100).toFixed(2)}\n` +
-                        `KOs: ${legendStats[x][4]}\n` +
-                        `Falls: ${legendStats[x][5]}\n`, true);
-                }
+        let embed = new Discord.RichEmbed();
 
-                waitMessage.delete();
-                message.channel.send(embed);
-            })
-        });
+        if (clanName === "ClanNotFound") {
+            embed.setTitle(`${player.name} of ${clanName}\n`)
+        } else {
+            embed.setTitle(`${player.name}`)
+        }
+
+        embed.setColor(message.member.colorRole.color)
+            .setThumbnail("http://beta.brawlhalla.com/static/i/bhfb1200.png")
+            .addField(`Level:`, games.level, true)
+            .addField(`Rank:`, games.tier, true)
+            .addField(`Current ELO:`, games.rating, true)
+            .addField(`Peak ELO:`, games.peak_rating, true)
+            .addField(`Games Played:`, games.games, true)
+            .addField(`Games Won:`, games.wins, true);
+
+
+        if (legendStats.length < 12) {
+            this.loopSize = legendStats.length;
+        } else {
+            this.loopSize = 12;
+        }
+        for (let x = 0; x < this.loopSize; x++) {
+            embed.addField(legendStats[x][1],
+                `Level: ${legendStats[x][0]}\n` +
+                `Games Played: ${legendStats[x][2]}\n` +
+                `Games Won: ${legendStats[x][3]}\n` +
+                `% Win Rate: ${(legendStats[x][3] / legendStats[x][2] * 100).toFixed(2)}\n`, true
+            );
+        }
+
+        waitMessage.delete();
+        message.channel.send(embed);
 
     };
+
     this.setSteam = (message, leftover_args) => {
         if (!leftover_args) {
             return message.channel.send("No SteamID was provided.");
@@ -540,9 +529,11 @@ function UserFunctions() {
         }
 
     };
+
     this.setsteam = (message, leftover_args) => {
         this.setSteam(message, leftover_args);
     };
+
     this.clearSteam = (message, leftover_args) => {
         if (leftover_args) {
             message.channel.send(`Ignoring ${leftover_args}, .clearSteam only clears the caller's steamID and doesn't take arguments.`)
@@ -577,6 +568,7 @@ function UserFunctions() {
         }
         message.channel.send(finalMessage)
     };
+
     this.nick = (message, leftover_args) => {
 		if (message.author.id !== bot.owner) {
 			return message.channel.send('Only <@$(bot.owner)> has permission to use this command');
@@ -587,6 +579,7 @@ function UserFunctions() {
 			console.log(error);
 		})
     };
+
     this.eval = (message, leftover_args) => {
         return; //too easy to break atm
         if (!message.author.id === bot.owner) {
