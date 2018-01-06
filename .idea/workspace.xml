@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/bot.js" line="98" />
+    <bookmark url="file://$PROJECT_DIR$/bot.js" line="103" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="03e4b6a4-1876-4ccb-9805-227d81e72e7b" name="Default" comment="catching certain errors">
@@ -26,21 +26,31 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="bot.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="bot.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/bot.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-7624">
-              <caret line="61" column="41" lean-forward="true" selection-start-line="61" selection-start-column="41" selection-end-line="61" selection-end-column="41" />
+            <state relative-caret-position="-3565">
+              <caret line="299" column="24" lean-forward="false" selection-start-line="299" selection-start-column="24" selection-end-line="299" selection-end-column="24" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="package.json" pinned="false" current-in-tab="true">
+      <file leaf-file-name="index.d.ts" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/node_modules/discord.js/typings/index.d.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="440">
+              <caret line="1461" column="16" lean-forward="true" selection-start-line="1461" selection-start-column="16" selection-end-line="1461" selection-end-column="16" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="package.json" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/package.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="322">
-              <caret line="14" column="28" lean-forward="true" selection-start-line="14" selection-start-column="28" selection-end-line="14" selection-end-column="28" />
+            <state relative-caret-position="276">
+              <caret line="12" column="18" lean-forward="false" selection-start-line="12" selection-start-column="18" selection-end-line="12" selection-end-column="18" />
               <folding />
             </state>
           </provider>
@@ -59,8 +69,8 @@
       <file leaf-file-name="Brawlhalla.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Commands/API/Brawlhalla.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1511">
-              <caret line="40" column="49" lean-forward="false" selection-start-line="40" selection-start-column="49" selection-end-line="40" selection-end-column="49" />
+            <state relative-caret-position="46">
+              <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -79,11 +89,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>INSERT INTO</find>
-      <find>mysql</find>
-      <find>mySql</find>
-      <find>query</find>
-      <find>setColor</find>
       <find>help</find>
       <find>unhandled</find>
       <find>TOKEN</find>
@@ -109,6 +114,11 @@
       <find>welcome</find>
       <find>api_key</find>
       <find>this.input</find>
+      <find>request</find>
+      <find>.help</find>
+      <find>.bitcoin</find>
+      <find>table</find>
+      <find>.ping</find>
     </findStrings>
     <replaceStrings>
       <replace>send</replace>
@@ -151,8 +161,8 @@
         <option value="$PROJECT_DIR$/Commands/API/Twitter.js" />
         <option value="$PROJECT_DIR$/config0.json" />
         <option value="$PROJECT_DIR$/Commands/API/Brawlhalla.js" />
-        <option value="$PROJECT_DIR$/bot.js" />
         <option value="$PROJECT_DIR$/package.json" />
+        <option value="$PROJECT_DIR$/bot.js" />
       </list>
     </option>
   </component>
@@ -201,6 +211,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -219,24 +230,18 @@
               <item name="Commands" type="462c0819:PsiDirectoryNode" />
               <item name="API" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="Discord.js" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Discord.js" type="462c0819:PsiDirectoryNode" />
-              <item name="DiscordGameTracker" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
       </pane>
       <pane id="Scope" />
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path" value="D:/Program Files/nodejs/node" />
-    <property name="settings.editor.selected.configurable" value="Settings.JavaScript" />
+    <property name="settings.editor.selected.configurable" value="settings.nodejs" />
     <property name="javascript.nodejs.core.library.configured.version" value="7.10.0" />
     <property name="JavaScriptWeakerCompletionTypeGuess" value="true" />
     <property name="HbShouldOpenHtmlAsHb" value="" />
@@ -310,7 +315,8 @@
       <workItem from="1512192590420" duration="9466000" />
       <workItem from="1513645328765" duration="10165000" />
       <workItem from="1514033169243" duration="40000" />
-      <workItem from="1514174653122" duration="8749000" />
+      <workItem from="1514174653122" duration="10253000" />
+      <workItem from="1515235527120" duration="5645000" />
     </task>
     <task id="LOCAL-00001" summary=".brawlhalla adjusting for accounts with &lt; 20 chars playing">
       <created>1509104442026</created>
@@ -337,29 +343,29 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="296605000" />
+    <option name="totallyTimeSpent" value="303754000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13539445" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="TypeScript" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13487881" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32979852" sideWeight="0.50208336" order="1" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3944563" sideWeight="0.49791667" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.32934782" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="npm" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3944563" sideWeight="0.49791667" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32928178" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.49784482" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.49784482" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32979852" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="TypeScript" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32979852" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -389,27 +395,10 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Commands/API/Brawlhalla.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1615">
-          <caret line="95" column="47" lean-forward="false" selection-start-line="95" selection-start-column="47" selection-end-line="95" selection-end-column="47" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Commands/API/Twitter.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="12" column="3" lean-forward="false" selection-start-line="12" selection-start-column="3" selection-end-line="12" selection-end-column="3" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/DiscordGameTracker/debug.log">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="85">
           <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="116" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -436,7 +425,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="276">
           <caret line="12" column="3" lean-forward="true" selection-start-line="12" selection-start-column="3" selection-end-line="12" selection-end-column="3" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -637,7 +625,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="276">
           <caret line="12" column="3" lean-forward="false" selection-start-line="12" selection-start-column="3" selection-end-line="12" selection-end-column="3" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -656,14 +643,21 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Commands/API/Brawlhalla.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1511">
-          <caret line="40" column="49" lean-forward="false" selection-start-line="40" selection-start-column="49" selection-end-line="40" selection-end-column="49" />
+        <state relative-caret-position="46">
+          <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/axios/index.d.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -676,18 +670,26 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/bot.js">
+    <entry file="file://$PROJECT_DIR$/package.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-7624">
-          <caret line="61" column="41" lean-forward="true" selection-start-line="61" selection-start-column="41" selection-end-line="61" selection-end-column="41" />
+        <state relative-caret-position="276">
+          <caret line="12" column="18" lean-forward="false" selection-start-line="12" selection-start-column="18" selection-end-line="12" selection-end-column="18" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/package.json">
+    <entry file="file://$PROJECT_DIR$/node_modules/discord.js/typings/index.d.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="322">
-          <caret line="14" column="28" lean-forward="true" selection-start-line="14" selection-start-column="28" selection-end-line="14" selection-end-column="28" />
+        <state relative-caret-position="440">
+          <caret line="1461" column="16" lean-forward="true" selection-start-line="1461" selection-start-column="16" selection-end-line="1461" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bot.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3565">
+          <caret line="299" column="24" lean-forward="false" selection-start-line="299" selection-start-column="24" selection-end-line="299" selection-end-column="24" />
           <folding />
         </state>
       </provider>

@@ -11,6 +11,7 @@
   "dependencies": {
     "async": "^2.5.0",
     "axios": "^0.17.1",
+    "columnify": "^1.5.4",
     "csgo": "^1.5.7",
     "discord.js": "^11.2.1",
     "mysql": "^2.15.0",
@@ -18,6 +19,6 @@
     "promise-mysql": "^3.1.1",
     "request": "^2.83.0",
     "steam": "^1.4.0",
-    "steam-user": "^3.23.2",
+    "steam-user": "^3.23.2"
   }
 }

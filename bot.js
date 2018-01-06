@@ -3,6 +3,11 @@ const config = require("./config0.json");
 const mysql = require('promise-mysql');
 const request = require('request');
 const brawlDB = require('./Commands/API/Brawlhalla.js');
+const axios = require('axios');
+
+
+//const columnify = require('colu');
+
 
 
 let bot = new Discord.Client();
@@ -268,13 +273,52 @@ bot.on("message", async (message) => {
 
 });
 
+
+
+
+
+
+
+let descriptions = {
+    ping: "Sends ping information.",
+    userinfo: "Sends information about the user's account.",
+    test: "Debug command.",
+    csgo: "Currently not working.",
+    uptime: "Amount of time the bot has been running for.",
+    brawlhalla: "Sends detailed information about player's Brawlhalla account.",
+    setSteam: "Saves user's steamID, allowing @mention to replace the steam ID.",
+    clearSteam: "Clears the steamID associated with the caller's account",
+    help: "This command!",
+    nick: "Changes bot's username (owner only).",
+    bitcoin: "Sends current bitcoin price",
+    eval: "Evaluates expression."
+};
+
 function UserFunctions() {
     this.ping = async (message) => {
-		 let embed = new Discord.RichEmbed();
-            
+        let color;
+        if (bot.ping > 300){
+            color = "RED";
+        }
+        else if (bot.ping > 200){
+            color = "DARK ORANGE"
+        }
+        else if (bot.ping > 100){
+            color = "ORANGE";
+        }
+        else if (bot.ping > 50){
+            color = "GREEN";
+        }
+        let member = message.member;
+        let embed = new Discord.RichEmbed()
+            .setAuthor(member.displayName, member.user.displayAvatarURL)
+            .setTimestamp()
+            .setColor(color)
+            .setTitle(`${bot.ping} ms.`);
         message.channel.send(embed);
     };
     this.userinfo = async (message, leftover_args) => {
+        this.description = "Sends information about the user's account";
         if (leftover_args) {
             // very shitty way to do this
             let mentionedUser = message.mentions.users.first();
@@ -344,10 +388,12 @@ function UserFunctions() {
     };
 
     this.test = async (message) => {
+        this.description = "Debug command";
         message.channel.send("working");
     };
 
     this.csgo = async(message, leftover_args) => {
+        this.description = "Currently not working";
         await message.channel.send("This command is disabled because steam is a piece of shit that doesn't have " +
             "a public csgo API.").delete(10 * 1000);
         /*
@@ -359,6 +405,7 @@ function UserFunctions() {
     };
 
     this.uptime = async (message) => {
+        this.description = "Amount of time the bot has been running for.";
         let uptime;
         uptime = (bot.uptime / 1000.0).toFixed(2);
         this.uptimeMessage = uptime + " seconds.";
@@ -376,7 +423,7 @@ function UserFunctions() {
     };
 
     this.brawlhalla = async (message, leftover_args) => {
-
+        this.description = "Sends detailed information about player's Brawlhalla account.";
         let username = leftover_args || null;
         if (!username) {
             let response = await message.channel.send(`Usage:\n${config.prefix}brawlhalla [STEAM64] or [@user]`
@@ -396,7 +443,6 @@ function UserFunctions() {
                         conn.end();
                         return result;
                     }).then((row) => {
-                        console.log("row length " + row.length);
                         if (row.length === 0) {
                             throw new CustomUserError(`${userMentionedName} does not have their steamID saved on discord.` +
                                 `\nUse ${config.prefix}setSteam [steamID] to save your steamID.`, message);
@@ -430,7 +476,7 @@ function UserFunctions() {
         let clanData = await brawlDB.parseGuildInfo(data);
         let player = await brawlDB.parsePlayerInfo(data);
         let games = await brawlDB.parseRankedInfo(data);
-
+        console.log(player);
         console.log(legendStats);
         let clanName = "";
         try {
@@ -441,7 +487,8 @@ function UserFunctions() {
 
         let embed = new Discord.RichEmbed();
 
-        if (clanName === "ClanNotFound") {
+        // don't bug out if clan isn't found
+        if (clanName !== "No Clan") {
             embed.setTitle(`${player.name} of ${clanName}\n`)
         } else {
             embed.setTitle(`${player.name}`)
@@ -477,6 +524,7 @@ function UserFunctions() {
     };
 
     this.setSteam = (message, leftover_args) => {
+        this.description = "Saves user's steamID, allowing @mention to replace the steam ID";
         if (!leftover_args) {
             return message.channel.send("No SteamID was provided.");
         }
@@ -530,11 +578,8 @@ function UserFunctions() {
 
     };
 
-    this.setsteam = (message, leftover_args) => {
-        this.setSteam(message, leftover_args);
-    };
-
     this.clearSteam = (message, leftover_args) => {
+        this.description = "Clears the steamID associated with the caller's account";
         if (leftover_args) {
             message.channel.send(`Ignoring ${leftover_args}, .clearSteam only clears the caller's steamID and doesn't take arguments.`)
         }
@@ -559,19 +604,20 @@ function UserFunctions() {
         message.channel.send("SteamID cleared! :ok_hand:");
         
     };
-    this.help = async (message) => {
-        let commandArray = Object.getOwnPropertyNames(this);
+    this.help = function(message){
         let finalMessage;
-        for (let i in commandArray) {
-            let stringed = i.toString();
-            finalMessage += `${i.toString()}: ${this.stringed.__doc__}`
+        finalMessage += '\`\`\`\n';
+        for (let i in descriptions) {
+            finalMessage += `${i}: ${descriptions[i]}\n`;
         }
+        finalMessage += "\`\`\`";
         message.channel.send(finalMessage)
     };
 
     this.nick = (message, leftover_args) => {
+        this.description = "Changes bot's username (owner only).";
 		if (message.author.id !== bot.owner) {
-			return message.channel.send('Only <@$(bot.owner)> has permission to use this command');
+			return message.channel.send(`Only <@${bot.owner}> has permission to use this command`);
 		}
          bot.user.setUsername(leftover_args).then(user => {
 			message.channel.send(`Changed my name to ${user.username}`)
@@ -581,6 +627,7 @@ function UserFunctions() {
     };
 
     this.eval = (message, leftover_args) => {
+        this.description = "Evaluates expression";
         return; //too easy to break atm
         if (!message.author.id === bot.owner) {
             return message.channel.send(`You do not have permission to use the eval function`)
@@ -604,17 +651,13 @@ function UserFunctions() {
         });
 
     };
-	this.bitcoin = (message) => {
-		request("https://api.coindesk.com/v1/bpi/currentprice.json", function(error, response, body) {
-		    if (error)
-                console.log('Error: ', error);
-            if (response.statusCode !== 200) {
-                return message.channel.send(`There was a problem contacting Bitcoin Price Index.\nCode: 
-                ${response.statusCode}: ${response.statusMessage}`)
-            }
+	this.bitcoin = async(message) => {
+	    this.description = "Sends current bitcoin price";
+		await axios.get("https://api.coindesk.com/v1/bpi/currentprice.json").then(function(res) {
+		    console.log(res.data);
 
             let embed = new Discord.RichEmbed();
-            let parsed = JSON.parse(body);
+            let parsed = res.data;
 
             let time =  parsed["time"]["updated"];
             let price = parsed["bpi"]["USD"]['rate'];
