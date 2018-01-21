@@ -1,12 +1,13 @@
-const Discord = require("discord.js");
 const config = require("./config0.json");
-const mysql = require('promise-mysql');
-const request = require('request');
+const osu = require('./Commands/API/Osu');
 const brawlDB = require('./Commands/API/Brawlhalla.js');
+
+
+
+const Discord = require("discord.js");
+const mysql = require('promise-mysql');
 const axios = require('axios');
-
-
-//const columnify = require('colu');
+const request = require('request');
 
 
 
@@ -256,8 +257,8 @@ bot.on("message", async (message) => {
 
     let commandCalled = Func.findFunction(message);
     let paramsCalled = Func.findCommandParams(message);
-    console.log("\ncommand called: " +commandCalled);
-    console.log("\nparams called: " + paramsCalled + "\n");
+    //console.log("\ncommand called: " +commandCalled);
+    //console.log("\nparams called: " + paramsCalled + "\n");
 
     let userFunc = new UserFunctions();
 
@@ -291,7 +292,8 @@ let descriptions = {
     help: "This command!",
     nick: "Changes bot's username (owner only).",
     bitcoin: "Sends current bitcoin price",
-    eval: "Evaluates expression."
+    eval: "Evaluates expression.",
+    osu: "Gets osu player information"
 };
 
 function UserFunctions() {
@@ -605,12 +607,16 @@ function UserFunctions() {
         
     };
     this.help = function(message){
-        let finalMessage;
-        finalMessage += '\`\`\`\n';
+        let finalMessage = '\`\`\`apache\n';
+        finalMessage += `Prefix: .\n\n`;
         for (let i in descriptions) {
-            finalMessage += `${i}: ${descriptions[i]}\n`;
+            if (descriptions.hasOwnProperty(i)){
+                console.log(`${i}: ${descriptions[i]}\n`);
+                finalMessage += `${i}: ${descriptions[i]}\n`;
+            }
         }
         finalMessage += "\`\`\`";
+
         message.channel.send(finalMessage)
     };
 
@@ -670,6 +676,24 @@ function UserFunctions() {
 
 
         });
-	}
+	};
+	this.osu = (message, leftover_args) => {
+        osu.getPlayerData(leftover_args).then(function(response){
+            let embed = new Discord.RichEmbed();
+            embed.setColor(message.member.colorRole.color)
+                .setThumbnail('https://s.ppy.sh/images/head-logo.png')
+                .addField('Username', response.username, true)
+                .addField('Level', response.level, true)
+                .addField('Accuracy', response.accuracy, true)
+                .addField('Games Played', response.playcount, true)
+                .addField('Country', response.country, true)
+                .addField('Country Rank', response.pp_country_rank, true)
+                .addField('Global Rank', response.pp_rank, true)
+                .addField('SS Count', response.count_rank_ss, true)
+                .addField('S Count', response.count_rank_s, true)
+                .addField('A Count', response.count_rank_a, true);
+            message.channel.send(embed);
+        });
+    }
 
 }
