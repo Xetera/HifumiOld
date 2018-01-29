@@ -14,3 +14,11 @@ exports.getPlayerData = function(name){
             });
     });
 };
+
+exports.getRecentGames = function (name){
+    return new Promise(function(resolve, reject){
+        api.getRecent(name).then(function(response){
+            console.log(response);
+        });
+    });
+};

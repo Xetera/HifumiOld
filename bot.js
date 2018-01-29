@@ -1,13 +1,21 @@
 const config = require("./config0.json");
 const osu = require('./Commands/API/Osu');
 const brawlDB = require('./Commands/API/Brawlhalla.js');
-
+const util = require('./Commands/Utils/Util');
 
 
 const Discord = require("discord.js");
 const mysql = require('promise-mysql');
 const axios = require('axios');
 const request = require('request');
+const dbg = require('debug');
+
+
+let debug = {};
+debug.silly = dbg("Bot:Silly");
+debug.info = dbg("Bot:Info");
+debug.warning = dbg('Bot:Warning');
+debug.error = dbg("Bot:Error");
 
 
 
@@ -82,6 +90,7 @@ class Func {
     static findUser(userID) {
         return bot.users.get('id', userID).name;
     }
+
     static checkCommands(commandName){
         return mySql.Connect().then((conn) => {
             let query =`SELECT commandOwner FROM commands WHERE commandName='${commandName}'`;
@@ -117,8 +126,8 @@ class Func {
                 return message.channel.send('Looks like you entered a command for <@313426583215931395>.' +
                                             ' I don\'t really understand Python.');
             } else {
-                return message.channel.send('Hmmm.. you entered a valid command but I still called Func.commandLoop' +
-                                            ', something is wrong.')
+                return message.channel.send('Hmmm.. you entered a valid command but I couldn\'t recognize it in' +
+                                            ' my own commands list.')
             } // can't be === node because it wouldn't enter this loop but but check anyway
         });
 
@@ -126,8 +135,8 @@ class Func {
     static searchCommand(leftover) {
 
     }
-
 }
+
 class mySql {
     static Connect() {
         return mysql.createConnection({
@@ -204,12 +213,13 @@ bot.on("guildMemberRemove", async(member) => {
 });
 
 bot.on("channelCreate", (channel) => {
+    let logChannel;
     try {
-    let guildName = channel.guild;
-    let logChannel = guildName.channels.find('name', 'logs');
-    if (!logChannel) {
-        return console.log("A new channel was created but 'logs' channel doesn't exist for me to log it.")
-    }
+        let guildName = channel.guild;
+        logChannel = guildName.channels.find('name', 'logs');
+        if (!logChannel) {
+            return console.log("A new channel was created but 'logs' channel doesn't exist for me to log it.")
+        }
     } catch (err) {
         console.log(err);
     }
@@ -293,7 +303,8 @@ let descriptions = {
     nick: "Changes bot's username (owner only).",
     bitcoin: "Sends current bitcoin price",
     eval: "Evaluates expression.",
-    osu: "Gets osu player information"
+    osu: "Gets osu player information",
+    osuRecent: "Gets information about recent osu games"
 };
 
 function UserFunctions() {
@@ -471,8 +482,6 @@ function UserFunctions() {
 
         let waitMessage = await message.channel.send("Contacting Brawlhalla API...");
 
-
-
         let data = await brawlDB.callData(username);
         let legendStats = await brawlDB.getLegendData(data);
         let clanData = await brawlDB.parseGuildInfo(data);
@@ -608,10 +617,9 @@ function UserFunctions() {
     };
     this.help = function(message){
         let finalMessage = '\`\`\`apache\n';
-        finalMessage += `Prefix: .\n\n`;
+        finalMessage += `Prefix: ${config.prefix}\n\n`;
         for (let i in descriptions) {
             if (descriptions.hasOwnProperty(i)){
-                console.log(`${i}: ${descriptions[i]}\n`);
                 finalMessage += `${i}: ${descriptions[i]}\n`;
             }
         }
@@ -694,6 +702,28 @@ function UserFunctions() {
                 .addField('A Count', response.count_rank_a, true);
             message.channel.send(embed);
         });
-    }
+    };
+    this.osuRecent = async(message, leftover_args) => {
+	    osu.getRecentGames(leftover_args);
+    };
+    this.nuke = (message) => {
+        message.channel.fetchMessages().then(function(messages){
+            let verbs = ['Annihilated', 'Destroyed', 'Rekt', 'Obliterated', 'Eradicated', 'Ravaged', 'Mutilated','Nuked'];
+            let toDelete = [];
 
+            messages.forEach(function(msg){
+                if (msg.content.startsWith('.')){
+                    toDelete.push(msg);
+                }
+                else if (msg.content.startsWith('!')){
+                    toDelete.push(msg);
+                }
+				else if (msg.author.bot)
+					toDelete.push(msg);
+            });
+            message.channel.bulkDelete(toDelete);
+            let confirmationMessage = message.channel.send(`${util.randChoice(verbs)} ${toDelete.length} bot related ${util.pluralize("message", toDelete.length)}`);
+            confirmationMessage.delete(7 * 1000);
+        });
+    }
 }
