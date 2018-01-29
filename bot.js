@@ -1,7 +1,7 @@
 const config = require("./config0.json");
 const osu = require('./Commands/API/Osu');
 const brawlDB = require('./Commands/API/Brawlhalla.js');
-const util = require('./Commands/Utils/Util');
+const util = require('./Util');
 
 
 const Discord = require("discord.js");
@@ -127,7 +127,9 @@ class Func {
                                             ' I don\'t really understand Python.');
             } else {
                 return message.channel.send('Hmmm.. you entered a valid command but I couldn\'t recognize it in' +
-                                            ' my own commands list.')
+                                            ' my own commands list.').then(msg => {
+                                                msg.delete(10* 1000);
+                })
             } // can't be === node because it wouldn't enter this loop but but check anyway
         });
 
@@ -300,8 +302,9 @@ let descriptions = {
     nick: "Changes bot's username (owner only).",
     bitcoin: "Sends current bitcoin price",
     eval: "Evaluates expression.",
-    osu: "Gets osu player information",
-    osuRecent: "Gets information about recent osu games"
+    osu: "Gets osu player information.",
+    osuRecent: "Gets information about recent osu games.",
+    nuke: "Removes past 50 messages to and from bots."
 };
 
 function UserFunctions() {
