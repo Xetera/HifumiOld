@@ -31,8 +31,8 @@
           <file leaf-file-name="bot.js" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/bot.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="322">
-                  <caret line="224" column="5" lean-forward="true" selection-start-line="224" selection-start-column="5" selection-end-line="224" selection-end-column="5" />
+                <state relative-caret-position="623">
+                  <caret line="268" column="41" lean-forward="false" selection-start-line="268" selection-start-column="41" selection-end-line="268" selection-end-column="41" />
                   <folding />
                 </state>
               </provider>
@@ -137,7 +137,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>TOKEN</find>
       <find>credential</find>
       <find>.delete</find>
       <find>process</find>
@@ -167,6 +166,7 @@
       <find>.ping</find>
       <find>params</find>
       <find>send(</find>
+      <find>test</find>
     </findStrings>
     <replaceStrings>
       <replace>send</replace>
@@ -370,7 +370,7 @@
       <workItem from="1515235527120" duration="6255000" />
       <workItem from="1516526229047" duration="1736000" />
       <workItem from="1516527979721" duration="7528000" />
-      <workItem from="1517217077026" duration="1433000" />
+      <workItem from="1517217077026" duration="1868000" />
     </task>
     <task id="LOCAL-00001" summary=".brawlhalla adjusting for accounts with &lt; 20 chars playing">
       <created>1509104442026</created>
@@ -397,7 +397,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="315061000" />
+    <option name="totallyTimeSpent" value="315496000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -722,8 +722,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/bot.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="322">
-          <caret line="224" column="5" lean-forward="true" selection-start-line="224" selection-start-column="5" selection-end-line="224" selection-end-column="5" />
+        <state relative-caret-position="623">
+          <caret line="268" column="41" lean-forward="false" selection-start-line="268" selection-start-column="41" selection-end-line="268" selection-end-column="41" />
           <folding />
         </state>
       </provider>

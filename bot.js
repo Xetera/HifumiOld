@@ -267,14 +267,11 @@ bot.on("message", async (message) => {
 
     let commandCalled = Func.findFunction(message);
     let paramsCalled = Func.findCommandParams(message);
-    //console.log("\ncommand called: " +commandCalled);
-    //console.log("\nparams called: " + paramsCalled + "\n");
 
     let userFunc = new UserFunctions();
 
     //if the called command is a propety name of userFunctions aka function is defined
-    console.log(Object.getOwnPropertyNames(userFunc));
-    console.log(Object.getPrototypeOf(userFunc));
+
     if (Object.getOwnPropertyNames(userFunc).includes(commandCalled.toLowerCase())){
         userFunc[commandCalled](message, paramsCalled);
     } else {
@@ -402,7 +399,10 @@ function UserFunctions() {
 
     this.test = async (message) => {
         this.description = "Debug command";
-        message.channel.send("working");
+        message.channel.send("working")
+            .then(msg=>{
+                msg.delete(2 * 1000);
+            })
     };
 
     this.csgo = async(message, leftover_args) => {
@@ -722,8 +722,10 @@ function UserFunctions() {
 					toDelete.push(msg);
             });
             message.channel.bulkDelete(toDelete);
-            let confirmationMessage = message.channel.send(`${util.randChoice(verbs)} ${toDelete.length} bot related ${util.pluralize("message", toDelete.length)}`);
-            confirmationMessage.delete(7 * 1000);
+            message.channel.send(`${util.randChoice(verbs)} ${toDelete.length} bot related ${util.pluralize("message", toDelete.length)}`)
+                .then(msg => {
+                    msg.delete(7 * 1000);
+                });
         });
     }
 }
