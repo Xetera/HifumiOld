@@ -277,6 +277,12 @@
             <path>
               <item name="Discord.js" type="b2602c69:ProjectViewProjectNode" />
               <item name="Discord.js" type="462c0819:PsiDirectoryNode" />
+              <item name="Commands" type="462c0819:PsiDirectoryNode" />
+              <item name="API" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Discord.js" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Discord.js" type="462c0819:PsiDirectoryNode" />
               <item name="Voice" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
@@ -372,7 +378,7 @@
       <workItem from="1516527979721" duration="7528000" />
       <workItem from="1517217077026" duration="2634000" />
       <workItem from="1517283063789" duration="11148000" />
-      <workItem from="1517295267646" duration="16364000" />
+      <workItem from="1517295267646" duration="16526000" />
     </task>
     <task id="LOCAL-00001" summary=".brawlhalla adjusting for accounts with &lt; 20 chars playing">
       <created>1509104442026</created>
@@ -399,13 +405,12 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="343774000" />
+    <option name="totallyTimeSpent" value="343936000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13593256" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13593256" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32979852" sideWeight="0.50208336" order="1" side_tool="true" content_ui="tabs" />
