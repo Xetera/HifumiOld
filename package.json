@@ -10,13 +10,19 @@
   "author": "Xetera",
   "license": "ISC",
   "dependencies": {
+    "alexa-sdk": "^1.0.25",
+    "alexa-voice-service": "0.0.9",
     "axios": "^0.17.1",
+    "cleverbot-node": "^0.3.11",
     "debug": "^3.1.0",
     "discord.js": "^11.2.1",
+    "ffmpeg-binaries": "^3.2.2-3",
     "mysql-promise": "^4.1.0",
+    "node-opus": "^0.2.7",
     "nodemon": "^1.14.11",
     "nodesu": "^0.6.3",
     "promise-mysql": "^3.1.1",
-    "request": "^2.83.0"
+    "request": "^2.83.0",
+    "ytdl-core": "^0.19.0"
   }
 }

@@ -2,7 +2,10 @@ const config = require("./config0.json");
 const osu = require('./Commands/API/Osu');
 const brawlDB = require('./Commands/API/Brawlhalla.js');
 const util = require('./Util');
-
+const Enum = require('./Commands/Utils/Enumerations');
+const Voice = require('./Voice/Base');
+const messageUtils = require('./Commands/Messages');
+const Youtube = require('./Commands/API/Youtube');
 
 const Discord = require("discord.js");
 const mysql = require('promise-mysql');
@@ -21,7 +24,7 @@ debug.error = dbg("Bot:Error");
 
 let bot = new Discord.Client();
 bot.login(config.TOKEN);
-bot.owner = 140862798832861184;  //Gives specific permissions to me
+bot.owner = "140862798832861184";  //Gives specific permissions to me
 
 class CustomUserError extends Error {
     constructor(msg, messageObject) {
@@ -259,6 +262,10 @@ bot.on("channelDelete", (channel) => {
 });
 
 bot.on("message", async (message) => {
+    if (message.author.bot) {
+        return false;
+    }
+    messageUtils.middleWare(message, bot);
     let validCommand = await Func.returnNullIf(message);
     //just returning empty value won't actually break out of this func
     if (!validCommand){
@@ -310,16 +317,16 @@ let descriptions = {
 function UserFunctions() {
     this.ping = async (message) => {
         let color;
-        if (bot.ping > 300){
+        if (bot.ping > 300) {
             color = "RED";
         }
-        else if (bot.ping > 200){
+        else if (bot.ping > 200) {
             color = "DARK ORANGE"
         }
-        else if (bot.ping > 100){
+        else if (bot.ping > 100) {
             color = "ORANGE";
         }
-        else if (bot.ping > 50){
+        else if (bot.ping > 50) {
             color = "GREEN";
         }
         let member = message.member;
@@ -403,12 +410,12 @@ function UserFunctions() {
     this.test = async (message) => {
         this.description = "Debug command";
         message.channel.send("working")
-            .then(msg=>{
+            .then(msg => {
                 msg.delete(2 * 1000);
             })
     };
 
-    this.csgo = async(message, leftover_args) => {
+    this.csgo = async (message, leftover_args) => {
         this.description = "Currently not working";
         await message.channel.send("This command is disabled because steam is a piece of shit that doesn't have " +
             "a public csgo API.").delete(10 * 1000);
@@ -612,17 +619,17 @@ function UserFunctions() {
             connection.commit();
             connection.end();
             return message.channel.send("There was an error clearing your SteamID, check console for details.");
-            
+
         });
-        
+
         message.channel.send("SteamID cleared! :ok_hand:");
-        
+
     };
-    this.help = function(message){
+    this.help = function (message) {
         let finalMessage = '\`\`\`apache\n';
         finalMessage += `Prefix: ${config.prefix}\n\n`;
         for (let i in descriptions) {
-            if (descriptions.hasOwnProperty(i)){
+            if (descriptions.hasOwnProperty(i)) {
                 finalMessage += `${i}: ${descriptions[i]}\n`;
             }
         }
@@ -633,14 +640,14 @@ function UserFunctions() {
 
     this.nick = (message, leftover_args) => {
         this.description = "Changes bot's username (owner only).";
-		if (message.author.id !== bot.owner) {
-			return message.channel.send(`Only <@${bot.owner}> has permission to use this command`);
-		}
-         bot.user.setUsername(leftover_args).then(user => {
-			message.channel.send(`Changed my name to ${user.username}`)
-		}).catch(error => {
-			console.log(error);
-		})
+        if (message.author.id !== bot.owner) {
+            return message.channel.send(`Only <@${bot.owner}> has permission to use this command`);
+        }
+        bot.user.setUsername(leftover_args).then(user => {
+            message.channel.send(`Changed my name to ${user.username}`)
+        }).catch(error => {
+            console.log(error);
+        })
     };
 
     this.eval = (message, leftover_args) => {
@@ -668,28 +675,28 @@ function UserFunctions() {
         });
 
     };
-	this.bitcoin = async(message) => {
-	    this.description = "Sends current bitcoin price";
-		await axios.get("https://api.coindesk.com/v1/bpi/currentprice.json").then(function(res) {
-		    console.log(res.data);
+    this.bitcoin = async (message) => {
+        this.description = "Sends current bitcoin price";
+        await axios.get("https://api.coindesk.com/v1/bpi/currentprice.json").then(function (res) {
+            console.log(res.data);
 
             let embed = new Discord.RichEmbed();
             let parsed = res.data;
 
-            let time =  parsed["time"]["updated"];
+            let time = parsed["time"]["updated"];
             let price = parsed["bpi"]["USD"]['rate'];
 
             embed.setAuthor("Bitcoin Price", "https://bitcoin.org/img/icons/opengraph.png")
                 .setTitle(":dollar: " + price.toString());
-                //.setTimestamp(time.toISOString());
+            //.setTimestamp(time.toISOString());
 
             message.channel.send(embed);
 
 
         });
-	};
-	this.osu = (message, leftover_args) => {
-        osu.getPlayerData(leftover_args).then(function(response){
+    };
+    this.osu = (message, leftover_args) => {
+        osu.getPlayerData(leftover_args).then(function (response) {
             let embed = new Discord.RichEmbed();
             embed.setColor(message.member.colorRole.color)
                 .setThumbnail('https://s.ppy.sh/images/head-logo.png')
@@ -706,23 +713,23 @@ function UserFunctions() {
             message.channel.send(embed);
         });
     };
-    this.osuRecent = async(message, leftover_args) => {
-	    osu.getRecentGames(leftover_args);
+    this.osuRecent = async (message, leftover_args) => {
+        osu.getRecentGames(leftover_args);
     };
     this.nuke = (message) => {
-        message.channel.fetchMessages().then(function(messages){
-            let verbs = ['Annihilated', 'Destroyed', 'Rekt', 'Obliterated', 'Eradicated', 'Ravaged', 'Mutilated','Nuked'];
+        message.channel.fetchMessages().then(function (messages) {
+            let verbs = ['Annihilated', 'Destroyed', 'Rekt', 'Obliterated', 'Eradicated', 'Ravaged', 'Mutilated', 'Nuked'];
             let toDelete = [];
 
-            messages.forEach(function(msg){
-                if (msg.content.startsWith('.')){
+            messages.forEach(function (msg) {
+                if (msg.content.startsWith('.')) {
                     toDelete.push(msg);
                 }
-                else if (msg.content.startsWith('!')){
+                else if (msg.content.startsWith('!')) {
                     toDelete.push(msg);
                 }
-				else if (msg.author.bot)
-					toDelete.push(msg);
+                else if (msg.author.bot)
+                    toDelete.push(msg);
             });
             message.channel.bulkDelete(toDelete);
             message.channel.send(`${util.randChoice(verbs)} ${toDelete.length} bot related ${util.pluralize("message", toDelete.length)}`)
@@ -730,5 +737,61 @@ function UserFunctions() {
                     msg.delete(7 * 1000);
                 });
         });
+    };
+    this.join = message => {
+        Voice.joinChannel(message);
+    };
+
+    this.play = (message, leftover_args) => {
+        if (!message.guild.voiceConnection) Voice.joinChannel(message);
+        const dispatcher = message.guild.voiceConnection.playStream(
+            Youtube.getYoutubeVideo(leftover_args),{volume:0.01}
+            );
+
+    };
+
+    this.volume = message => {
+
+    };
+
+    this.pause = message => {
+        Voice.pause(message.guild.voiceConnection);
+    };
+
+    this.resume = message => {
+        Voice.resume(message.guild.voiceConnection);
+    };
+
+    this.disconnect = message => {
+        let selfID = bot.user.id;
+        let voiceChannel = message.guild.channels.some(channel =>   {
+            if (channel.type === 'voice'){
+                channel.members.some(member => {
+                    if (member.user.id === selfID){
+                        member.voiceChannel.leave();
+                    }
+
+                });
+            }
+            //console.log(voiceChannel);
+        });
+
+        /*
+        for (let channel of message.guild.channels){
+            console.log(channel.values());
+            if (channel.type === 'voice'){
+                console.log(channel);
+                for (let user in channel.users) {
+                    console.log(channel.users[user]);
+                    if (channel.users[user].id === selfID){
+                        channel.connection.disconnect();
+
+                    }
+                }
+            }
+        }
+        */
     }
+
 }
+//Alexa.handler();
