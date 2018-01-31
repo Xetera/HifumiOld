@@ -755,6 +755,7 @@ function UserFunctions() {
     };
 
     this.disconnect = message => {
+        Voice.disconnect(message);
         let selfID = bot.user.id;
         let voiceChannel = message.guild.channels.some(channel =>   {
             if (channel.type === 'voice'){
@@ -762,7 +763,6 @@ function UserFunctions() {
                     if (member.user.id === selfID){
                         member.voiceChannel.leave();
                     }
-
                 });
             }
             //console.log(voiceChannel);

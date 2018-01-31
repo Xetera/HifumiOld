@@ -54,6 +54,10 @@ const resume = function(message){
     connection.dispatcher.resume();
 };
 
+const disconnect = function(message){
+
+};
+
 /**
  *
  * @param {Discord.Message} message
@@ -72,5 +76,6 @@ module.exports = {
     joinChannel: joinChannel,
     changeVolume: changeVolume,
     pause: pause,
-    resume: resume
+    resume: resume,
+    disconnect: disconnect
 };

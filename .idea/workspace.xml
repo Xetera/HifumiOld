@@ -28,11 +28,11 @@
     <splitter split-orientation="horizontal" split-proportion="0.46768293">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="bot.js" pinned="false" current-in-tab="true">
+          <file leaf-file-name="bot.js" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/bot.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="13003">
-                  <caret line="738" column="0" lean-forward="false" selection-start-line="738" selection-start-column="0" selection-end-line="738" selection-end-column="0" />
+                <state relative-caret-position="317">
+                  <caret line="757" column="34" lean-forward="false" selection-start-line="757" selection-start-column="34" selection-end-line="757" selection-end-column="34" />
                   <folding />
                 </state>
               </provider>
@@ -58,11 +58,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="Base.js" pinned="false" current-in-tab="false">
+          <file leaf-file-name="Base.js" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/Voice/Base.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-23">
-                  <caret line="9" column="2" lean-forward="false" selection-start-line="9" selection-start-column="2" selection-end-line="9" selection-end-column="2" />
+                <state relative-caret-position="1538">
+                  <caret line="76" column="31" lean-forward="true" selection-start-line="76" selection-start-column="31" selection-end-line="76" selection-end-column="31" />
                   <folding />
                 </state>
               </provider>
@@ -115,7 +115,7 @@
           <file leaf-file-name="Youtube.js" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/Commands/API/Youtube.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="517">
+                <state relative-caret-position="1552">
                   <caret line="85" column="32" lean-forward="true" selection-start-line="85" selection-start-column="32" selection-end-line="85" selection-end-column="32" />
                   <folding />
                 </state>
@@ -219,11 +219,11 @@
         <option value="$PROJECT_DIR$/Voice/Class.js" />
         <option value="$PROJECT_DIR$/Voice/Errors.js" />
         <option value="$PROJECT_DIR$/Debug.js" />
-        <option value="$PROJECT_DIR$/Voice/Base.js" />
         <option value="$PROJECT_DIR$/Commands/Messages.js" />
-        <option value="$PROJECT_DIR$/bot.js" />
         <option value="$PROJECT_DIR$/config0.json" />
         <option value="$PROJECT_DIR$/Commands/API/Youtube.js" />
+        <option value="$PROJECT_DIR$/bot.js" />
+        <option value="$PROJECT_DIR$/Voice/Base.js" />
       </list>
     </option>
   </component>
@@ -389,7 +389,7 @@
       <workItem from="1516527979721" duration="7528000" />
       <workItem from="1517217077026" duration="2634000" />
       <workItem from="1517283063789" duration="11148000" />
-      <workItem from="1517295267646" duration="21913000" />
+      <workItem from="1517295267646" duration="22091000" />
     </task>
     <task id="LOCAL-00001" summary=".brawlhalla adjusting for accounts with &lt; 20 chars playing">
       <created>1509104442026</created>
@@ -416,7 +416,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="349323000" />
+    <option name="totallyTimeSpent" value="349501000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -703,22 +703,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Voice/Base.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-23">
-          <caret line="9" column="2" lean-forward="false" selection-start-line="9" selection-start-column="2" selection-end-line="9" selection-end-column="2" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Debug.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="161">
-          <caret line="7" column="8" lean-forward="false" selection-start-line="7" selection-start-column="8" selection-end-line="7" selection-end-column="8" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Commands/Utils/NukeCommands.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="23">
@@ -759,18 +743,34 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/bot.js">
+    <entry file="file://$PROJECT_DIR$/Commands/API/Youtube.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="13003">
-          <caret line="738" column="0" lean-forward="false" selection-start-line="738" selection-start-column="0" selection-end-line="738" selection-end-column="0" />
+        <state relative-caret-position="1552">
+          <caret line="85" column="32" lean-forward="true" selection-start-line="85" selection-start-column="32" selection-end-line="85" selection-end-column="32" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Commands/API/Youtube.js">
+    <entry file="file://$PROJECT_DIR$/bot.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="517">
-          <caret line="85" column="32" lean-forward="true" selection-start-line="85" selection-start-column="32" selection-end-line="85" selection-end-column="32" />
+        <state relative-caret-position="317">
+          <caret line="757" column="34" lean-forward="false" selection-start-line="757" selection-start-column="34" selection-end-line="757" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Debug.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="161">
+          <caret line="7" column="8" lean-forward="false" selection-start-line="7" selection-start-column="8" selection-end-line="7" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Voice/Base.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1538">
+          <caret line="76" column="31" lean-forward="true" selection-start-line="76" selection-start-column="31" selection-end-line="76" selection-end-column="31" />
           <folding />
         </state>
       </provider>
