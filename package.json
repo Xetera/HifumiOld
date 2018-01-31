@@ -17,6 +17,7 @@
     "debug": "^3.1.0",
     "discord.js": "^11.2.1",
     "ffmpeg-binaries": "^3.2.2-3",
+    "googleapis": "^25.0.0",
     "mysql-promise": "^4.1.0",
     "node-opus": "^0.2.7",
     "nodemon": "^1.14.11",

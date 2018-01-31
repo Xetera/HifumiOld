@@ -21,10 +21,10 @@ Discord.Channel.prototype.sendAndRemove = function(message, timeoutDuration){
  * @param {Discord.Message} message
  * @param {Discord.Client} bot
  */
-exports.middleWare = function(message, bot){
+exports.middleWare = function(message, bot) {
     let alexaRequest = message.content.match(/alexa/i);
 
-    if (message.channel.name === 'chat-with-alexa'){
+    if (message.channel.name === 'chat-with-alexa') {
         if (message.mentions.users.array().length !== 0 && !message.isMentioned(bot.user)) return;
         else if (message.content.startsWith('-')) return;
         console.log("Heard my name");
@@ -34,13 +34,11 @@ exports.middleWare = function(message, bot){
         console.log("Heard my name");
         fireAlexaRequest(message);
     }
-    else if (message.isMentioned(bot.user)){
+    else if (message.isMentioned(bot.user)) {
         console.log("Heard my name");
         fireAlexaRequest(message);
     }
 };
-
-
 
 exports.sendErrorEmber = function(){
 

@@ -1,5 +1,7 @@
 const Discord = require('discord.js');
 const fs = require('fs');
+const errors = require('./Errors');
+const debug = require('../Debug').debug;
 
 exports.generateOutputFile = function(channel, member) {
     // use IDs instead of username cause some people have stupid emojis in their name
@@ -12,7 +14,7 @@ exports.generateOutputFile = function(channel, member) {
  * @param {Discord.Message} message
  */
 const joinChannel = function(message){
-    let voiceChannel = getConnection(message);
+    let voiceChannel = message.member.voiceChannel;
     voiceChannel.join()
         .catch(err => {
             if (err.message === Enum.VOICE_ERROR.PERMISSION_ERROR) {
@@ -45,6 +47,7 @@ const pause = function(message){
 
 const resume = function(message){
     let connection = getConnection(message);
+    if (connection instanceof errors.NotVoiceConnected) return;
     if (connection.speaking){
         return message.channel.send('`Could not resume, already playing music.`')
     }
@@ -56,7 +59,13 @@ const resume = function(message){
  * @param {Discord.Message} message
  */
 const getConnection = function(message){
-    return message.guild.voiceConnection;
+    if(!message.guild.voiceConnection){
+        debug.warning('Tried to execute voice command but voiceConnection was missing.');
+        return errors.NotVoiceConnected;
+    }
+    else{
+        return message.guild.voiceConnection;
+    }
 };
 
 module.exports = {

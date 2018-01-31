@@ -11,14 +11,6 @@ const Discord = require("discord.js");
 const mysql = require('promise-mysql');
 const axios = require('axios');
 const request = require('request');
-const dbg = require('debug');
-
-
-let debug = {};
-debug.silly = dbg("Bot:Silly");
-debug.info = dbg("Bot:Info");
-debug.warning = dbg('Bot:Warning');
-debug.error = dbg("Bot:Error");
 
 
 
@@ -744,9 +736,9 @@ function UserFunctions() {
 
     this.play = (message, leftover_args) => {
         if (!message.guild.voiceConnection) Voice.joinChannel(message);
-        const dispatcher = message.guild.voiceConnection.playStream(
-            Youtube.getYoutubeVideo(leftover_args),{volume:0.01}
-            );
+
+        Youtube.handlePlayRequest(message, leftover_args)
+
 
     };
 
@@ -755,11 +747,11 @@ function UserFunctions() {
     };
 
     this.pause = message => {
-        Voice.pause(message.guild.voiceConnection);
+        Voice.pause(message);
     };
 
     this.resume = message => {
-        Voice.resume(message.guild.voiceConnection);
+        Voice.resume(message);
     };
 
     this.disconnect = message => {
