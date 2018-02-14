@@ -1,6 +1,7 @@
 import * as Discord from 'discord.js'
 import * as Moment from 'moment'
 import {securityLevel, SecurityLevels, getSpamTolerance, getMuteDuration} from "../Settings";
+import {muteUser} from "../Moderation/MuteUser";
 import {debug, log} from "../Logging";
 
 
@@ -39,19 +40,7 @@ export async function checkForSpam(message: Discord.Message){
             log(message.member.guild,
                 `\`\`\`Deleted ${deletedMessagesCount} messages from spammer [${author.username}] in #${message.channel.name}\`\`\``);
 
-            const muted : any = message.guild.roles.find('name', 'muted');
-
-            if (!muted)
-                return debug.warning(`Spammer ${author.username} could not be muted, missing 'muted' role.`);
-
-            const mutedMember = await message.member.addRole(muted);
-
-            log(message.member.guild,
-                `[${mutedMember || author.username}] was muted for ${getMuteDuration() / 1000} seconds for spamming.`);
-
-            setTimeout(function(){ // removing mute
-                message.member.removeRole(muted);
-            }, getMuteDuration());
+            muteUser(message.member, getMuteDuration());
 
         }
     }

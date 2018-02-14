@@ -34,10 +34,7 @@ export function getSpamTolerance() : number{
     }
 }
 
-/**
- *
- * @returns {number} - in milliseconds
- */
+// returns in milliseconds
 export function getMuteDuration() : number {
     switch(securityLevel) {
         case SecurityLevels.Dangerous: {

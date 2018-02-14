@@ -36,10 +36,7 @@ function getSpamTolerance() {
     }
 }
 exports.getSpamTolerance = getSpamTolerance;
-/**
- *
- * @returns {number} - in milliseconds
- */
+// returns in milliseconds
 function getMuteDuration() {
     switch (exports.securityLevel) {
         case SecurityLevels.Dangerous: {

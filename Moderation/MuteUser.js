@@ -35,53 +35,26 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Discord = require("discord.js");
-var Moment = require("moment");
 var Settings_1 = require("../Settings");
-var MuteUser_1 = require("../Moderation/MuteUser");
+var ScheduleUnmute_1 = require("./ScheduleUnmute");
 var Logging_1 = require("../Logging");
-function checkForSpam(message) {
+function muteUser(member, time) {
     return __awaiter(this, void 0, void 0, function () {
-        var channel, author_1, threshold_1, messages, userMessages, tolerance, deletedMessages, deletedMessagesCount;
+        var mutedRole, mutedMember;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    if (!(message.channel instanceof Discord.TextChannel)) return [3 /*break*/, 7];
-                    channel = message.channel;
-                    author_1 = message.author;
-                    threshold_1 = Moment(new Date()).subtract(5, 's').toDate();
-                    return [4 /*yield*/, channel.fetchMessages({ limit: 30 })];
+                    mutedRole = member.guild.roles.find('name', 'muted');
+                    if (!mutedRole)
+                        return [2 /*return*/, Logging_1.debug.warning("Spammer " + (member.nickname || member.user.username) + " could not be muted, missing 'muted' role.")];
+                    return [4 /*yield*/, member.addRole(mutedRole)];
                 case 1:
-                    messages = _a.sent();
-                    userMessages = messages.filter(function (msg) {
-                        return msg.author.id === author_1.id && msg.createdAt > threshold_1;
-                    } // get messages sent within the last 5s
-                    );
-                    tolerance = Settings_1.getSpamTolerance();
-                    if (!(userMessages.array().length > tolerance)) return [3 /*break*/, 7];
-                    deletedMessages = void 0;
-                    deletedMessagesCount = void 0;
-                    if (!(Settings_1.securityLevel === Settings_1.SecurityLevels.Medium)) return [3 /*break*/, 3];
-                    return [4 /*yield*/, message.channel.bulkDelete(userMessages)];
-                case 2:
-                    deletedMessages = _a.sent();
-                    return [3 /*break*/, 6];
-                case 3:
-                    if (!(Settings_1.securityLevel === Settings_1.SecurityLevels.High)) return [3 /*break*/, 5];
-                    return [4 /*yield*/, message.channel.bulkDelete(messages.filter(function (msg) { return msg.id === author_1.id; }))];
-                case 4:
-                    deletedMessages = _a.sent();
-                    return [3 /*break*/, 6];
-                case 5: return [2 /*return*/];
-                case 6:
-                    deletedMessagesCount = deletedMessages.array().length;
-                    Logging_1.debug.info("Deleted " + deletedMessagesCount + " messages from spammer [" + author_1.username + "]");
-                    Logging_1.log(message.member.guild, "```Deleted " + deletedMessagesCount + " messages from spammer [" + author_1.username + "] in #" + message.channel.name + "```");
-                    MuteUser_1.muteUser(message.member, Settings_1.getMuteDuration());
-                    _a.label = 7;
-                case 7: return [2 /*return*/];
+                    mutedMember = _a.sent();
+                    Logging_1.log(member.guild, "[" + (mutedMember.nickname || mutedMember.user.username) + "] was muted for " + Settings_1.getMuteDuration() / 1000 + " seconds for spamming.");
+                    ScheduleUnmute_1.scheduleUnmute(member, time);
+                    return [2 /*return*/];
             }
         });
     });
 }
-exports.checkForSpam = checkForSpam;
+exports.muteUser = muteUser;
