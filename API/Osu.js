@@ -1,5 +1,5 @@
 const Nodesu = require('nodesu');
-const config = require('../../config0');
+const config = require('../config0');
 
 const api = new Nodesu.Client(config.osu.API_KEY);
 

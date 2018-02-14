@@ -38,6 +38,9 @@ exports.middleWare = function(message, bot) {
         console.log("Heard my name");
         fireAlexaRequest(message);
     }
+    if (message.content.match(/((https?):\/\/(www\.)?)?youtu\.?be(\.com)?\/(watch\?v=)?\w{11}/)){
+        //message.channel.send('Detected a youtube link');
+    }
 };
 
 exports.sendErrorEmber = function(){

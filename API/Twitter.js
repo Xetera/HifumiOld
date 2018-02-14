@@ -1,5 +1,5 @@
-const config = require('../../config0.json');
-const twitter = require('Commands/API/Twitter');
+const config = require('../config0.json');
+const twitter = require('API/Twitter');
 
 let client = new twitter({
     consumer_key:config.twitter.api_key,

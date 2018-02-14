@@ -1,5 +1,5 @@
 //"use strict";
-const config = require('../../config0.json');
+const config = require('../config0.json');
 const axios = require('axios');
 
 const baseUserSearchURL = "https://api.brawlhalla.com/search?steamid=";

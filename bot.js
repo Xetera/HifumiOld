@@ -1,11 +1,15 @@
 const config = require("./config0.json");
-const osu = require('./Commands/API/Osu');
-const brawlDB = require('./Commands/API/Brawlhalla.js');
+const osu = require('./API/Osu');
+const brawlDB = require('./API/Brawlhalla.js');
 const util = require('./Util');
 const Enum = require('./Commands/Utils/Enumerations');
 const Voice = require('./Voice/Base');
 const messageUtils = require('./Commands/Messages');
-const Youtube = require('./Commands/API/Youtube');
+const Youtube = require('./API/Youtube');
+const spam = require('./Listeners/spam');
+let Command = {};
+Command['ping'] = require('./Commands/Ping').Ping;
+const changeSecurity = require('./Moderation/changeSecurity');
 
 const Discord = require("discord.js");
 const mysql = require('promise-mysql');
@@ -237,6 +241,7 @@ bot.on("channelCreate", (channel) => {
             logChannel.send(`\`\`\`nginx\n${sendmessage}\n\`\`\``)
         });
 });
+
 bot.on("channelDelete", (channel) => {
     try {
         let guildName = channel.guild;
@@ -250,20 +255,20 @@ bot.on("channelDelete", (channel) => {
             let sendMessage = `${sender} deleted channel '${channel.name}' at ${channel.createdAt}`;
             this.logs.send(`\`\`\`nginx\n${sendMessage}\n\`\`\``)
         });
-
 });
 
 bot.on("message", async (message) => {
     if (message.author.bot) {
         return false;
     }
+    spam.checkForSpam(message);
     messageUtils.middleWare(message, bot);
     let validCommand = await Func.returnNullIf(message);
     //just returning empty value won't actually break out of this func
     if (!validCommand){
         return;
     }
-    let sentChannel = message.channel;
+
     console.log(`${message.author.username}: ${message.content}`);
 
     let commandCalled = Func.findFunction(message);
@@ -275,18 +280,13 @@ bot.on("message", async (message) => {
 
     if (Object.getOwnPropertyNames(userFunc).includes(commandCalled.toLowerCase())){
         userFunc[commandCalled](message, paramsCalled);
-    } else {
+    }
+    else {
         Func.commandLoop(message, commandCalled);
         return console.log(commandCalled + " is not a defined function.\n");
     }
 
 });
-
-
-
-
-
-
 
 let descriptions = {
     ping: "Sends ping information.",
@@ -308,26 +308,7 @@ let descriptions = {
 
 function UserFunctions() {
     this.ping = async (message) => {
-        let color;
-        if (bot.ping > 300) {
-            color = "RED";
-        }
-        else if (bot.ping > 200) {
-            color = "DARK ORANGE"
-        }
-        else if (bot.ping > 100) {
-            color = "ORANGE";
-        }
-        else if (bot.ping > 50) {
-            color = "GREEN";
-        }
-        let member = message.member;
-        let embed = new Discord.RichEmbed()
-            .setAuthor(member.displayName, member.user.displayAvatarURL)
-            .setTimestamp()
-            .setColor(color)
-            .setTitle(`${bot.ping} ms.`);
-        message.channel.send(embed);
+        Command.ping(bot, message);
     };
     this.userinfo = async (message, leftover_args) => {
         this.description = "Sends information about the user's account";
@@ -767,23 +748,12 @@ function UserFunctions() {
             }
             //console.log(voiceChannel);
         });
+    };
+    this.ts = message => {
 
-        /*
-        for (let channel of message.guild.channels){
-            console.log(channel.values());
-            if (channel.type === 'voice'){
-                console.log(channel);
-                for (let user in channel.users) {
-                    console.log(channel.users[user]);
-                    if (channel.users[user].id === selfID){
-                        channel.connection.disconnect();
-
-                    }
-                }
-            }
-        }
-        */
+    };
+    this.security = (message, leftover_args )=> {
+        changeSecurity.changeSecurity(message.channel, leftover_args);
     }
-
 }
 //Alexa.handler();

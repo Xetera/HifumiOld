@@ -1,6 +1,6 @@
 const ytdl = require('ytdl-core');
 const Discord = require('discord.js');
-const config = require('../../config0');
+const config = require('../config0');
 const google = require('googleapis');
 
 // initialize the Youtube API library
@@ -60,7 +60,7 @@ const getYoutubeVideoFromSearch = function(search){
 const handlePlayRequest = function (message, leftover_args) {
     const link = messageIsLink(leftover_args);
     if (link){
-        message.channel.send('Heard a youtube song URL')
+        message.channel.send('Heard a youtube song URL');
         message.guild.voiceConnection.playStream(
             getYoutubeVideoFromURL(leftover_args),{volume:0.01}
         );

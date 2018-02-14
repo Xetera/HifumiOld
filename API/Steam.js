@@ -1,7 +1,7 @@
-let Steam = require("steam"),
+let Steam = require("API/Steam"),
     csgo = require("csgo"),
     bot = new Steam.SteamClient(),
-    config = require('../../config0.json'),
+    config = require('../config0.json'),
     steamUser = new Steam.SteamUser(bot),
     steamGC = new Steam.SteamGameCoordinator(bot, 730),
     CSGO = new csgo.CSGOClient(steamUser, steamGC, false);
