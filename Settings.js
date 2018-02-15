@@ -23,6 +23,10 @@ function setSecurityLevel(level) {
     exports.securityLevel = level;
 }
 exports.setSecurityLevel = setSecurityLevel;
+/**
+ *
+ * @returns {number} - number of messages the bot tolerates before
+ */
 function getSpamTolerance() {
     switch (exports.securityLevel) {
         case SecurityLevels.Dangerous: {
@@ -37,18 +41,39 @@ function getSpamTolerance() {
     }
 }
 exports.getSpamTolerance = getSpamTolerance;
-// returns in milliseconds
-function getMuteDuration() {
+var DurationSettings;
+(function (DurationSettings) {
+    DurationSettings[DurationSettings["GET_SECONDS"] = 0] = "GET_SECONDS";
+})(DurationSettings = exports.DurationSettings || (exports.DurationSettings = {}));
+var DANGEROUS_DURATION = 0;
+var MEDIUM_DURATION = 5;
+var HIGH_DURATION = 5;
+function getMuteDate() {
     switch (exports.securityLevel) {
         case SecurityLevels.Dangerous: {
             return Moment(Date.now()).toDate();
         }
         case SecurityLevels.Medium: {
-            return Moment(Date.now()).add(5, 's').toDate(); // 5 sec
+            var date = Moment(new Date()).add(MEDIUM_DURATION, 's').toDate();
+            return date; // 5 sec
         }
         case SecurityLevels.High: {
-            return Moment(Date.now()).add(5, 's').toDate(); // update later
+            return Moment(new Date()).add(HIGH_DURATION, 's').toDate(); // update later
         }
     }
 }
-exports.getMuteDuration = getMuteDuration;
+exports.getMuteDate = getMuteDate;
+function getMuteTime() {
+    switch (exports.securityLevel) {
+        case SecurityLevels.Dangerous: {
+            return DANGEROUS_DURATION;
+        }
+        case SecurityLevels.Medium: {
+            return MEDIUM_DURATION; // 5 sec
+        }
+        case SecurityLevels.High: {
+            return HIGH_DURATION;
+        }
+    }
+}
+exports.getMuteTime = getMuteTime;
