@@ -6,10 +6,12 @@ const Enum = require('./Commands/Utils/Enumerations');
 const Voice = require('./Voice/Base');
 const messageUtils = require('./Commands/Messages');
 const Youtube = require('./API/Youtube');
-const spam = require('./Listeners/spam');
+const spam = require('./Listeners/SpamListener');
 let Command = {};
 Command['ping'] = require('./Commands/Ping').Ping;
 const changeSecurity = require('./Moderation/changeSecurity');
+
+
 
 const Discord = require("discord.js");
 const mysql = require('promise-mysql');
@@ -19,6 +21,12 @@ const request = require('request');
 
 
 let bot = new Discord.Client();
+
+let _muteQueue = require('./Moderation/MuteQueue').MuteQueue;
+
+
+let muteQueue = new _muteQueue();
+
 bot.login(config.TOKEN);
 bot.owner = "140862798832861184";  //Gives specific permissions to me
 
@@ -261,7 +269,7 @@ bot.on("message", async (message) => {
     if (message.author.bot) {
         return false;
     }
-    spam.checkForSpam(message);
+    spam.checkForSpam(message, muteQueue);
     messageUtils.middleWare(message, bot);
     let validCommand = await Func.returnNullIf(message);
     //just returning empty value won't actually break out of this func
