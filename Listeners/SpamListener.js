@@ -40,7 +40,7 @@ var Moment = require("moment");
 var Settings_1 = require("../Settings");
 var MuteUser_1 = require("../Moderation/MuteUser");
 var Logging_1 = require("../Logging");
-function checkForSpam(message) {
+function checkForSpam(message, queue) {
     return __awaiter(this, void 0, void 0, function () {
         var channel, author_1, threshold_1, messages, userMessages, tolerance, deletedMessages, deletedMessagesCount;
         return __generator(this, function (_a) {
@@ -58,6 +58,9 @@ function checkForSpam(message) {
                     } // get messages sent within the last 5s
                     );
                     tolerance = Settings_1.getSpamTolerance();
+                    // user is already muted
+                    if (!message.member.hasPermission("SEND_MESSAGES"))
+                        return [2 /*return*/];
                     if (!(userMessages.array().length > tolerance)) return [3 /*break*/, 7];
                     deletedMessages = void 0;
                     deletedMessagesCount = void 0;
@@ -76,8 +79,8 @@ function checkForSpam(message) {
                 case 6:
                     deletedMessagesCount = deletedMessages.array().length;
                     Logging_1.debug.info("Deleted " + deletedMessagesCount + " messages from spammer [" + author_1.username + "]");
-                    Logging_1.log(message.member.guild, "```Deleted " + deletedMessagesCount + " messages from spammer [" + author_1.username + "] in #" + message.channel.name + "```");
-                    MuteUser_1.muteUser(message.member, Settings_1.getMuteDuration());
+                    // log(message.member.guild,`Deleted ${deletedMessagesCount} messages from spammer [${author.username}] in #${message.channel.name}`);
+                    MuteUser_1.muteUser(message.member, Settings_1.getMuteDuration(), queue);
                     _a.label = 7;
                 case 7: return [2 /*return*/];
             }

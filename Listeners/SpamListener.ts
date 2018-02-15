@@ -3,9 +3,9 @@ import * as Moment from 'moment'
 import {securityLevel, SecurityLevels, getSpamTolerance, getMuteDuration} from "../Settings";
 import {muteUser} from "../Moderation/MuteUser";
 import {debug, log} from "../Logging";
+import {MuteQueue} from "../Moderation/MuteQueue";
 
-
-export async function checkForSpam(message: Discord.Message){
+export async function checkForSpam(message: Discord.Message, queue : MuteQueue){
     if (message.channel instanceof Discord.TextChannel){
 
         const channel   : Discord.TextChannel = message.channel;
@@ -21,6 +21,8 @@ export async function checkForSpam(message: Discord.Message){
         // variable spam tolerance based on security level
         const tolerance = getSpamTolerance();
 
+        // user is already muted
+        if (!message.member.hasPermission("SEND_MESSAGES")) return;
         // user has sent more than
 
         if (userMessages.array().length > tolerance){
@@ -35,12 +37,12 @@ export async function checkForSpam(message: Discord.Message){
             else {
                 return;
             }
+
             deletedMessagesCount = deletedMessages.array().length;
             debug.info(`Deleted ${deletedMessagesCount} messages from spammer [${author.username}]`);
-            log(message.member.guild,
-                `\`\`\`Deleted ${deletedMessagesCount} messages from spammer [${author.username}] in #${message.channel.name}\`\`\``);
+            // log(message.member.guild,`Deleted ${deletedMessagesCount} messages from spammer [${author.username}] in #${message.channel.name}`);
 
-            muteUser(message.member, getMuteDuration());
+            muteUser(message.member, getMuteDuration(), queue);
 
         }
     }
