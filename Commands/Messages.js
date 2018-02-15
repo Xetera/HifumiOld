@@ -1,7 +1,9 @@
 const Discord = require('discord.js');
 const cleverBot = require('cleverbot-node');
 const config = require('./../config0');
-const Alexa = new cleverBot;
+const debug = require('./../Debug').debug;
+const Alexa = new cleverBot();
+
 Alexa.configure({botapi: config.CleverBotAPI});
 
 /**
@@ -24,22 +26,15 @@ Discord.Channel.prototype.sendAndRemove = function(message, timeoutDuration){
 exports.middleWare = function(message, bot) {
     let alexaRequest = message.content.match(/alexa/i);
 
-    if (message.channel.name === 'chat-with-alexa') {
+    if (message.channel.name === 'chat-with-alexa' || alexaRequest || message.isMentioned(bot.user)) {
+        // don't respond to messages not meant for me
         if (message.mentions.users.array().length !== 0 && !message.isMentioned(bot.user)) return;
         else if (message.content.startsWith('-')) return;
-        console.log("Heard my name");
-        fireAlexaRequest(message, false);
-    }
-    else if (alexaRequest) {
-        console.log("Heard my name");
-        fireAlexaRequest(message);
-    }
-    else if (message.isMentioned(bot.user)) {
-        console.log("Heard my name");
-        fireAlexaRequest(message);
-    }
-    if (message.content.match(/((https?):\/\/(www\.)?)?youtu\.?be(\.com)?\/(watch\?v=)?\w{11}/)){
-        //message.channel.send('Detected a youtube link');
+
+        debug.info(`${message.member.nickname || message.author.username} mentioned me in ${message.channel.name}`);
+
+        if (message.channel.name === 'chat-with-alexa') fireAlexaRequest(message, false);
+        else fireAlexaRequest(message)
     }
 };
 
