@@ -1,3 +1,5 @@
+import * as Moment from 'moment'
+
 export enum SecurityLevels {
     Dangerous,
     Medium,
@@ -35,16 +37,16 @@ export function getSpamTolerance() : number{
 }
 
 // returns in milliseconds
-export function getMuteDuration() : number {
+export function getMuteDuration() : Date {
     switch(securityLevel) {
         case SecurityLevels.Dangerous: {
-            return 0;
+            return Moment(Date.now()).toDate();
         }
         case SecurityLevels.Medium: {
-            return 5000; // 5 sec
+            return Moment(Date.now()).add(5, 's').toDate(); // 5 sec
         }
         case SecurityLevels.High: {
-            return 30000;
+            return Moment(Date.now()).add(5, 's').toDate(); // update later
         }
     }
 }

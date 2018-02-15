@@ -11,10 +11,10 @@ export let debug = {
 export function log(guild: Discord.Guild, message : String) : void {
     const logsChannel : Discord.GuildChannel = guild.channels.find('name', 'logs');
     if (!logsChannel){
-        return debug.info(`Tried to log "${message}" but a logs channel was not found.`);
+        return debug.info(`Tried to log a message in ${guild.name} but a logs channel was not found.`);
     }
    if (logsChannel instanceof Discord.TextChannel){
-        logsChannel.send('\`\`\`' + message + '\`\`\`');
+        logsChannel.send('\`\`\`\n' + message + '\`\`\`');
         return debug.info(`Logged a message in ${guild.name}`);
    }
 }

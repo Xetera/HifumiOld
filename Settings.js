@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var Moment = require("moment");
 var SecurityLevels;
 (function (SecurityLevels) {
     SecurityLevels[SecurityLevels["Dangerous"] = 0] = "Dangerous";
@@ -40,13 +41,13 @@ exports.getSpamTolerance = getSpamTolerance;
 function getMuteDuration() {
     switch (exports.securityLevel) {
         case SecurityLevels.Dangerous: {
-            return 0;
+            return Moment(Date.now()).toDate();
         }
         case SecurityLevels.Medium: {
-            return 5000; // 5 sec
+            return Moment(Date.now()).add(5, 's').toDate(); // 5 sec
         }
         case SecurityLevels.High: {
-            return 30000;
+            return Moment(Date.now()).add(5, 's').toDate(); // update later
         }
     }
 }
