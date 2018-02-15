@@ -1,5 +1,5 @@
 import * as Discord from 'discord.js'
-import {getMuteDuration} from "../Settings";
+import {getMuteDate, getMuteTime} from "../Settings";
 import {scheduleUnmute} from "./ScheduleUnmute";
 import {debug, log} from "../Logging";
 import {DiscordAPIError} from "discord.js";
@@ -19,16 +19,15 @@ export async function muteUser(member : Discord.GuildMember, time : Date, queue 
             return debug.warning(`Could not mute spammer ${memberName}, missing permissions.`)
         }
         else {
-            debug.error(`Unexpected error while unmuting`)
+            debug.error(`Unexpected error while muting user ${memberName}`, err);
         }
     }
-    const unmuteTime : Date = getMuteDuration();
-    let timeDelta : number = unmuteTime.getMilliseconds() - Date.now();;
-
+    const unmuteTime : Date = getMuteDate();
+    let timeDelta : number = unmuteTime.getTime() - Date.now();
 
     log(member.guild,
-        `[${memberName}] was muted for ${timeDelta/1000} seconds for spamming.`);
+        `[${memberName}] was muted for ${getMuteTime()} seconds for spamming.`);
 
-    debug.info(`[${memberName}] in ${member.guild.name} was muted for ${getMuteDuration()}`);
+    debug.warning(`[${memberName}] in ${member.guild.name} was muted for ${getMuteTime()} seconds.`);
     queue.add(member, mutedRole, unmuteTime);
 }

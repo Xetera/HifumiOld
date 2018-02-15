@@ -61,17 +61,14 @@ function muteUser(member, time, queue) {
                         return [2 /*return*/, Logging_1.debug.warning("Could not mute spammer " + memberName + ", missing permissions.")];
                     }
                     else {
-                        Logging_1.debug.error("Unexpected error while unmuting");
+                        Logging_1.debug.error("Unexpected error while muting user " + memberName, err_1);
                     }
                     return [3 /*break*/, 4];
                 case 4:
-                    unmuteTime = Settings_1.getMuteDuration();
-                    if (unmuteTime !== undefined)
-                        timeDelta = unmuteTime.getMilliseconds() - Date.now();
-                    else
-                        return [2 /*return*/]; // undefined therefore security level is low;
-                    Logging_1.log(member.guild, "[" + memberName + "] was muted for " + timeDelta / 1000 + " seconds for spamming.");
-                    Logging_1.debug.info("[" + memberName + "] in " + member.guild.name + " was muted for " + Settings_1.getMuteDuration());
+                    unmuteTime = Settings_1.getMuteDate();
+                    timeDelta = unmuteTime.getTime() - Date.now();
+                    Logging_1.log(member.guild, "[" + memberName + "] was muted for " + Settings_1.getMuteTime() + " seconds for spamming.");
+                    Logging_1.debug.info("[" + memberName + "] in " + member.guild.name + " was muted for " + Settings_1.getMuteTime() + " seconds.");
                     queue.add(member, mutedRole, unmuteTime);
                     return [2 /*return*/];
             }
