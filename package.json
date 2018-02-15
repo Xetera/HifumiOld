@@ -18,6 +18,7 @@
     "debug": "^3.1.0",
     "discord.js": "^11.2.1",
     "ffmpeg-binaries": "^3.2.2-3",
+    "flatfile": "^2.0.0",
     "googleapis": "^25.0.0",
     "moment": "^2.20.1",
     "mysql-promise": "^4.1.0",
