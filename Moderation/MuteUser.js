@@ -36,22 +36,43 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var Settings_1 = require("../Settings");
-var ScheduleUnmute_1 = require("./ScheduleUnmute");
 var Logging_1 = require("../Logging");
-function muteUser(member, time) {
+var discord_js_1 = require("discord.js");
+function muteUser(member, time, queue) {
     return __awaiter(this, void 0, void 0, function () {
-        var mutedRole, mutedMember;
+        var memberName, mutedRole, err_1, unmuteTime, timeDelta;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
+                    memberName = member.nickname || member.user.username;
                     mutedRole = member.guild.roles.find('name', 'muted');
                     if (!mutedRole)
-                        return [2 /*return*/, Logging_1.debug.warning("Spammer " + (member.nickname || member.user.username) + " could not be muted, missing 'muted' role.")];
-                    return [4 /*yield*/, member.addRole(mutedRole)];
+                        return [2 /*return*/, Logging_1.debug.warning("Spammer " + memberName + " could not be muted, missing 'muted' role in server " + member.guild.name + ".")];
+                    _a.label = 1;
                 case 1:
-                    mutedMember = _a.sent();
-                    Logging_1.log(member.guild, "[" + (mutedMember.nickname || mutedMember.user.username) + "] was muted for " + Settings_1.getMuteDuration() / 1000 + " seconds for spamming.");
-                    ScheduleUnmute_1.scheduleUnmute(member, time);
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, member.addRole(mutedRole, "Spamming")];
+                case 2:
+                    _a.sent();
+                    return [3 /*break*/, 4];
+                case 3:
+                    err_1 = _a.sent();
+                    if (err_1 instanceof discord_js_1.DiscordAPIError) {
+                        return [2 /*return*/, Logging_1.debug.warning("Could not mute spammer " + memberName + ", missing permissions.")];
+                    }
+                    else {
+                        Logging_1.debug.error("Unexpected error while unmuting");
+                    }
+                    return [3 /*break*/, 4];
+                case 4:
+                    unmuteTime = Settings_1.getMuteDuration();
+                    if (unmuteTime !== undefined)
+                        timeDelta = unmuteTime.getMilliseconds() - Date.now();
+                    else
+                        return [2 /*return*/]; // undefined therefore security level is low;
+                    Logging_1.log(member.guild, "[" + memberName + "] was muted for " + timeDelta / 1000 + " seconds for spamming.");
+                    Logging_1.debug.info("[" + memberName + "] in " + member.guild.name + " was muted for " + Settings_1.getMuteDuration());
+                    queue.add(member, mutedRole, unmuteTime);
                     return [2 /*return*/];
             }
         });
