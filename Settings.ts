@@ -40,8 +40,10 @@ export function getSpamTolerance() : number {
     }
 }
 
+
+
 const DANGEROUS_DURATION : number = 0;
-const MEDIUM_DURATION    : number = 30;
+const MEDIUM_DURATION    : number = 10;
 const HIGH_DURATION      : number = 20 * 60;
 
 export function getMuteDate() : Date {

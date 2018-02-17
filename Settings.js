@@ -41,13 +41,9 @@ function getSpamTolerance() {
     }
 }
 exports.getSpamTolerance = getSpamTolerance;
-var DurationSettings;
-(function (DurationSettings) {
-    DurationSettings[DurationSettings["GET_SECONDS"] = 0] = "GET_SECONDS";
-})(DurationSettings = exports.DurationSettings || (exports.DurationSettings = {}));
 var DANGEROUS_DURATION = 0;
-var MEDIUM_DURATION = 5;
-var HIGH_DURATION = 5;
+var MEDIUM_DURATION = 10;
+var HIGH_DURATION = 20 * 60;
 function getMuteDate() {
     switch (exports.securityLevel) {
         case SecurityLevels.Dangerous: {
@@ -69,7 +65,7 @@ function getMuteTime() {
             return DANGEROUS_DURATION;
         }
         case SecurityLevels.Medium: {
-            return MEDIUM_DURATION; // 5 sec
+            return MEDIUM_DURATION;
         }
         case SecurityLevels.High: {
             return HIGH_DURATION;
