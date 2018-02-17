@@ -22,12 +22,21 @@ const request = require('request');
 
 let bot = new Discord.Client();
 
+
+
 let _muteQueue = require('./Moderation/MuteQueue').MuteQueue;
+let _messageQueue = require('./Moderation/MessageQueue').MessageQueue;
 
 
+let Alexa = require('./API/Alexa').Alexa;
+
+let alexa = new Alexa(bot);
 let muteQueue = new _muteQueue();
 
+const messageQueue = new _messageQueue(muteQueue);
+
 bot.login(config.TOKEN);
+
 bot.owner = "140862798832861184";  //Gives specific permissions to me
 
 class CustomUserError extends Error {
@@ -179,13 +188,13 @@ class mySql {
 }
 
 
+
 bot.on("ready", async () => {
     console.log(`${bot.user.username} is ready!`);
     let link = await bot.generateInvite();
     console.log(link);
     Func.updateGame();
 });
-
 
 bot.on("guildCreate", async(guild) => {
     console.log(`${bot.user.username} joined ${guild.name}`);
@@ -269,7 +278,8 @@ bot.on("message", async (message) => {
     if (message.author.bot) {
         return false;
     }
-    spam.checkForSpam(message, muteQueue);
+    messageQueue.add(message);
+
     messageUtils.middleWare(message, bot);
     let validCommand = await Func.returnNullIf(message);
     //just returning empty value won't actually break out of this func
@@ -720,7 +730,7 @@ function UserFunctions() {
         });
     };
     this.join = message => {
-        Voice.joinChannel(message);
+        Voice.joinChannel(message, alexa);
     };
 
     this.play = (message, leftover_args) => {
@@ -763,5 +773,9 @@ function UserFunctions() {
     this.security = (message, leftover_args )=> {
         changeSecurity.changeSecurity(message.channel, leftover_args);
     }
+    this.queue = message => {
+        messageQueue.getQueue(message.channel);
+    }
 }
 //Alexa.handler();
+module.exports = bot;

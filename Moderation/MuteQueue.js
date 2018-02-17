@@ -37,13 +37,29 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var Logging_1 = require("../Logging");
 var discord_js_1 = require("discord.js");
+var Settings_1 = require("../Settings");
 var MutedUser = /** @class */ (function () {
     function MutedUser(member, role, unmuteDate) {
+        this.member = member;
         this.name = member.nickname || member.user.username; // this can change but we don't care
         this.muteDate = new Date();
         this.unmuteDate = unmuteDate;
         this.role = role;
+        this.muteUser();
     }
+    MutedUser.prototype.muteUser = function () {
+        try {
+            this.member.addRole(this.role, "Spamming");
+        }
+        catch (err) {
+            if (err instanceof discord_js_1.DiscordAPIError) {
+                Logging_1.debug.warning("Could not mute spammer " + this.name + ", missing permissions.");
+            }
+            else {
+                Logging_1.debug.error("Unexpected error while muting user " + this.name, err);
+            }
+        }
+    };
     return MutedUser;
 }());
 var MuteQueue = /** @class */ (function () {
@@ -57,15 +73,41 @@ var MuteQueue = /** @class */ (function () {
     MuteQueue.prototype.getMutedUserCount = function () {
         return this.queue.length;
     };
+    MuteQueue.prototype.release = function () {
+        var members = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            members[_i] = arguments[_i];
+        }
+        var i = 0;
+        var queueLength = members.length;
+        var _loop_1 = function () {
+            var member = members[i];
+            var index = this_1.queue.findIndex(function (user) { return user.member.id === member.id; });
+            if (index > 0) {
+                var releasedSpammer = this_1.queue.splice(index, 1)[0];
+                member.removeRole(releasedSpammer.role, "The " + releasedSpammer.unmuteSeconds + " timeout duration ran out.");
+            }
+            else {
+                Logging_1.debug.warning("Could not release " + (member.nickname || member.user.username) + ", not found in the muteQueue.");
+            }
+            i++;
+        };
+        var this_1 = this;
+        do {
+            _loop_1();
+        } while (i < queueLength - 1); // length of 1 ===
+    };
     MuteQueue.prototype.scheduleUnmute = function (user) {
         var _this = this;
-        var index = this.queue.findIndex(function (usr) { return usr.member.id === user.id; });
+        var index = this.queue.findIndex(function (usr) {
+            return usr.member.id === user.id;
+        });
         var mutedGuildMember = this.queue[index];
         if (mutedGuildMember === undefined)
             return Logging_1.debug.error('Tried to shift an empty MuteQueue.');
-        var timeDelta = mutedGuildMember.unmuteDate.getTime() - Date.now();
+        var timeDelta = Settings_1.getMuteTime(); // in seconds
         Logging_1.debug.silly(timeDelta + " seconds recorded as timeDelta for " + mutedGuildMember.name);
-        setTimeout(function () {
+        var timeoutId = setTimeout(function () {
             return __awaiter(this, void 0, void 0, function () {
                 var index, error_1;
                 return __generator(this, function (_a) {
@@ -89,15 +131,17 @@ var MuteQueue = /** @class */ (function () {
                                 Logging_1.debug.error("Tried to unmute " + mutedGuildMember.name + " but they were already unmuted.", error_1);
                                 return [2 /*return*/, _this.queue.splice(index, 1)];
                             }
+                            Logging_1.debug.error("Unexpected error while unmuting " + mutedGuildMember.name + ".", error_1);
                             return [3 /*break*/, 4];
                         case 4:
                             _this.queue.splice(index, 1);
-                            Logging_1.debug.info(mutedGuildMember.name + " in " + mutedGuildMember.member.guild.name + " was unmuted after " + timeDelta + " seconds of timeout.");
+                            Logging_1.debug.info(mutedGuildMember.name + " in " + mutedGuildMember.member.guild.name + " was unmuted after " + timeDelta + " seconds.");
                             return [2 /*return*/];
                     }
                 });
             });
-        }, timeDelta);
+        }, timeDelta * 1000);
+        mutedGuildMember.timeout = timeoutId;
     };
     return MuteQueue;
 }());
