@@ -30,7 +30,7 @@ let _messageQueue = require('./Moderation/MessageQueue').MessageQueue;
 
 let Alexa = require('./API/Alexa').Alexa;
 
-let alexa = new Alexa(bot);
+let alexa = new Alexa(config.CleverBotAPI);
 let muteQueue = new _muteQueue();
 
 const messageQueue = new _messageQueue(muteQueue);
@@ -73,7 +73,7 @@ class Func {
         else {
             gameString = "servers"
         }
-        let currentlyPlaying = bot.user.setGame(`on ${bot.guilds.size} ${gameString}`);
+        let currentlyPlaying = bot.user.setActivity(`on ${bot.guilds.size} ${gameString}`);
     }
 
     static findCommandParams(message) {
@@ -192,8 +192,16 @@ class mySql {
 bot.on("ready", async () => {
     console.log(`${bot.user.username} is ready!`);
     let link = await bot.generateInvite();
-    console.log(link);
+    console.log("Invite link: " + link+ '\n');
     Func.updateGame();
+
+    let guilds = bot.guilds.array();
+    let guildMessage = `Guilds: ${guilds.length}\n-----------------------------\n`;
+    for (let guild of guilds){
+        guildMessage += `${guild.name}: ${guild.members.array().length} members\n`;
+    }
+
+    console.log(guildMessage);
 });
 
 bot.on("guildCreate", async(guild) => {
@@ -280,7 +288,8 @@ bot.on("message", async (message) => {
     }
     messageQueue.add(message);
 
-    messageUtils.middleWare(message, bot);
+    alexa.checkMessage(message, bot);
+
     let validCommand = await Func.returnNullIf(message);
     //just returning empty value won't actually break out of this func
     if (!validCommand){
@@ -707,11 +716,14 @@ function UserFunctions() {
     this.osuRecent = async (message, leftover_args) => {
         osu.getRecentGames(leftover_args);
     };
-    this.nuke = (message) => {
+    this.nuke = (message, leftover_args) => {
         message.channel.fetchMessages().then(function (messages) {
+            let nukeAll = false;
+            if (leftover_args.includes('--all')) nukeAll = true;
             let verbs = ['Annihilated', 'Destroyed', 'Rekt', 'Obliterated', 'Eradicated', 'Ravaged', 'Mutilated', 'Nuked'];
             let toDelete = [];
 
+            if (!nukeAll)
             messages.forEach(function (msg) {
                 if (msg.content.startsWith('.')) {
                     toDelete.push(msg);
@@ -722,6 +734,11 @@ function UserFunctions() {
                 else if (msg.author.bot)
                     toDelete.push(msg);
             });
+            else
+                messages.forEach(msg => {
+                    toDelete.push(msg);
+                });
+
             message.channel.bulkDelete(toDelete);
             message.channel.send(`${util.randChoice(verbs)} ${toDelete.length} bot related ${util.pluralize("message", toDelete.length)}`)
                 .then(msg => {
@@ -767,14 +784,61 @@ function UserFunctions() {
             //console.log(voiceChannel);
         });
     };
-    this.ts = message => {
-
-    };
     this.security = (message, leftover_args )=> {
         changeSecurity.changeSecurity(message.channel, leftover_args);
-    }
+    };
     this.queue = message => {
         messageQueue.getQueue(message.channel);
+    };
+    this.random = message => {
+        let emotion;
+        let engagement;
+        let regard;
+        try{
+            emotion = util.randRange(0, 100);
+            engagement = util.randRange(0, 100);
+            regard = util.randRange(0, 100);
+            alexa.setEmotion(emotion);
+            alexa.setEngagement(engagement);
+            alexa.setRegard(regard);
+        }
+        catch (err) {
+            console.log(err);
+            return;
+        }
+
+        message.channel.send(`OK, I've randomized my settings to ${emotion} emotion, ${engagement} engagement and ${regard} regard.`);
+    };
+    this.mood = (message) => {
+        const mood = alexa.getMood();
+        message.channel.send(`I am currently running at:\n${mood.emotion} emotion\n${mood.engagement} engagement\n${mood.regard} regard`)
+    };
+    this.set = (message,leftover_args) => {
+        const possibleRequests = ['emotion', 'engagement', 'regard'];
+        leftover_args = leftover_args.split(' ');
+        if (possibleRequests.includes(leftover_args[0])){
+            const request = leftover_args[0];
+            const value = leftover_args[1];
+            try {
+                if (request === 'emotion'){
+                    alexa.setEmotion(value);
+                }
+                else if (request === 'engagement'){
+                    alexa.setEngagement(value);
+                }
+                else if (request === 'regard'){
+                    alexa.setRegard(value);
+                }
+                else {return}
+            }
+            catch (err) {
+                if (err instanceof RangeError){
+                    return message.channel.send('Value has to be between 0 and 100');
+                }
+            }
+
+            message.channel.send(`I set my ${request} to ${value}`);
+        }
     }
 }
 //Alexa.handler();
