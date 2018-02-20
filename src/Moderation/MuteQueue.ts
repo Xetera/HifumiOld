@@ -1,8 +1,8 @@
 import * as Discord from 'discord.js'
-import {debug} from "../../Logging";
+import {debug} from "../Utility/Logging";
 import {scheduleUnmute} from "./ScheduleUnmute";
 import {DiscordAPIError} from "discord.js";
-import {getMuteTime} from "../../Settings";
+import {getMuteTime} from "../Utility/Settings";
 import Timer = NodeJS.Timer;
 
 class MutedUser  {

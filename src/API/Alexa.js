@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var config = require('./../../config0.json');
 var Discord = require("discord.js");
 var clevertype_1 = require("clevertype");
-var logging_1 = require("../../logging");
+var logging_1 = require("../Utility/Logging");
 var Alexa = /** @class */ (function () {
     function Alexa(apiKey) {
         this.identifier = /alexa/i;

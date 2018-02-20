@@ -1,7 +1,7 @@
 import * as Discord from 'discord.js'
-import {getMuteDate, getMuteTime} from "../../Settings";
+import {getMuteDate, getMuteTime} from "../Utility/Settings";
 import {scheduleUnmute} from "./ScheduleUnmute";
-import {debug, log} from "../../Logging";
+import {debug, log} from "../Utility/Logging";
 import {DiscordAPIError} from "discord.js";
 import {MuteQueue} from "./MuteQueue";
 

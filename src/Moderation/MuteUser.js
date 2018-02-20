@@ -35,8 +35,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Settings_1 = require("../../Settings");
-var Logging_1 = require("../../Logging");
+var Settings_1 = require("../Utility/Settings");
+var Logging_1 = require("../Utility/Logging");
 var discord_js_1 = require("discord.js");
 function muteUser(member, time, queue) {
     return __awaiter(this, void 0, void 0, function () {

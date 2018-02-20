@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var Discord = require("discord.js");
 var moment = require("moment");
-var Settings_1 = require("../../Settings");
-var Logging_1 = require("../../Logging");
+var Settings_1 = require("../Utility/Settings");
+var Logging_1 = require("../Utility/Logging");
 var MessageQueue = /** @class */ (function () {
     function MessageQueue(muteQueue, size) {
         this.muteQueue = muteQueue;

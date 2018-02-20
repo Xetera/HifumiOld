@@ -1,8 +1,8 @@
 import * as Discord from 'discord.js'
 import * as Moment from 'moment'
-import {securityLevel, SecurityLevels, getSpamTolerance, getMuteDate} from "../../Settings";
+import {securityLevel, SecurityLevels, getSpamTolerance, getMuteDate} from "../Utility/Settings";
 import {muteUser} from "../Moderation/MuteUser";
-import {debug, log} from "../../Logging";
+import {debug, log} from "../Utility/Logging";
 import {MuteQueue} from "../Moderation/MuteQueue";
 
 export async function checkForSpam(message: Discord.Message, queue : MuteQueue){

@@ -37,9 +37,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var Discord = require("discord.js");
 var Moment = require("moment");
-var Settings_1 = require("../../Settings");
+var Settings_1 = require("../Utility/Settings");
 var MuteUser_1 = require("../Moderation/MuteUser");
-var Logging_1 = require("../../Logging");
+var Logging_1 = require("../Utility/Logging");
 function checkForSpam(message, queue) {
     return __awaiter(this, void 0, void 0, function () {
         var channel, author_1, threshold_1, messages, userMessages, tolerance, deletedMessages, deletedMessagesCount, muteDuration;

@@ -1,5 +1,5 @@
 import * as Discord from 'discord.js'
-import {debug} from '../../../Logging'
+import {debug} from '../../Utility/Logging'
 
 export function changeName(me : Discord.ClientUser, name : string){
     const oldName = me.username;

@@ -1,5 +1,5 @@
 import * as Discord from 'discord.js'
-import {debug} from '../../../Logging'
+import {debug} from '../../Utility/Logging'
 
 export function changePicture(me : Discord.ClientUser, URL : string){
     return new Promise(function (resolve, reject) {

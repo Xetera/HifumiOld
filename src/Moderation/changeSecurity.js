@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var Settings = require("../../Settings");
+var Settings = require("../Utility/Settings");
 function changeSecurity(channel, args) {
     var chosenLevel;
     if (!args.length) {

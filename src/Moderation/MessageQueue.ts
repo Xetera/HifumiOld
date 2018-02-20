@@ -2,8 +2,8 @@ import * as Discord from "discord.js";
 import * as moment from "moment";
 
 import {MuteQueue} from "./MuteQueue";
-import {getMuteDate, getMuteTime, getSpamTolerance, securityLevel, SecurityLevels} from "../../Settings";
-import {debug} from "../../Logging"
+import {getMuteDate, getMuteTime, getSpamTolerance, securityLevel, SecurityLevels} from "../Utility/Settings";
+import {debug} from "../Utility/Logging"
 
 interface Message extends Discord.Message {
     sent : Date;

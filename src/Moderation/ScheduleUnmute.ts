@@ -1,5 +1,5 @@
 import * as Discord from 'discord.js'
-import {debug}from '../../Logging'
+import {debug}from '../Utility/Logging'
 
 export function scheduleUnmute(member : Discord.GuildMember, time: number){
     const mutedMemberName : string = member.nickname || member.user.username;

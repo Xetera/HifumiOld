@@ -1,5 +1,5 @@
 import * as Discord from 'discord.js'
-import * as Settings from "../../Settings";
+import * as Settings from "../Utility/Settings";
 
 export function changeSecurity(channel : Discord.TextChannel, args : String){
     let chosenLevel : String;

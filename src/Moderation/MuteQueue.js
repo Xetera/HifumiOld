@@ -35,9 +35,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Logging_1 = require("../../Logging");
+var Logging_1 = require("../Utility/Logging");
 var discord_js_1 = require("discord.js");
-var Settings_1 = require("../../Settings");
+var Settings_1 = require("../Utility/Settings");
 var MutedUser = /** @class */ (function () {
     function MutedUser(member, role, unmuteDate, muteQueue) {
         this.member = member;
