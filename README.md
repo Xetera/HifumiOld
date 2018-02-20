@@ -10,6 +10,7 @@ In order of importance per topic
 - [ ] Move hosting to heroku
 - [ ] Implement a SQL based database that works for heroku as well
 - [ ] Guild specific prefix change
+- [ ] Split debugging on a per/module basis
 - [ ] Remaining files converted to typescript
 - [ ] Remind Me module
 - [ ] Add module that lets users give themselves roles
