@@ -37,7 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var Mysql = require("promise-mysql");
 var config = require('../config0.json');
-var Logging_1 = require("../Logging");
+var Logging_1 = require("../Utility/Logging");
 var Database = /** @class */ (function () {
     function Database(credentials) {
         var _this = this;

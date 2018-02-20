@@ -1,7 +1,7 @@
 import * as Mysql from 'promise-mysql'
 import * as fs from 'fs'
 const config = require('../config0.json');
-import {debug} from '../Logging'
+import {debug} from '../Utility/Logging'
 
 interface ICredentials {
     host: string;

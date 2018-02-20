@@ -5,3 +5,4 @@ config0.json
 Commands/google-assistant.json
 gspeechSecret.json
 /node-google-speech-api-master
+refactor.json
