@@ -5,7 +5,7 @@
  * @param {number} range - Max range.
  * @returns {number} - Random choice within range
  */
-export function randRange(min : number =0, range : number) : number{
+export function randRange(min : number = 0, range : number) : number{
     if (!min){
         return Math.floor(Math.random() * range);
     }
