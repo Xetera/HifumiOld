@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var Discord = require("discord.js");
-var Logging_1 = require("../../../Logging");
+var Logging_1 = require("../../Utility/Logging");
 function changeName(me, name) {
     var oldName = me.username;
     return new Promise(function (resolve, reject) {
@@ -19,4 +19,4 @@ function changeName(me, name) {
         }
     });
 }
-exports.changeName = changeName;
+exports.default = changeName;

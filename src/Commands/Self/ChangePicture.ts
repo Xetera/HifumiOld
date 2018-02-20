@@ -1,7 +1,7 @@
 import * as Discord from 'discord.js'
 import {debug} from '../../Utility/Logging'
 
-export function changePicture(me : Discord.ClientUser, URL : string){
+export default function changePicture(me : Discord.ClientUser, URL : string){
     return new Promise(function (resolve, reject) {
         try {
             me.setAvatar(URL).then(response => {
