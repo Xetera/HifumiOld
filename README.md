@@ -1,15 +1,37 @@
-# ThiccBot.js
-Personal Node.js based Discord bot done from scratch.
-Currently Running on 4 servers.
+# Alexa
 
-TODO:
+Moderation based discord bot written in Typescript
 
-- [ ] Close open mysql connections that cause problems when left open
-- [ ] Fix eval 
-- [ ] Refactor commands 
-- [x] Crucial life lesson learned from super cool anime-justice-hacker-senpais incredibly complex token search script
-- [x] Use a database to regularly upload updated commands and compare them with ThiccBot.py's
+# TODO:
+In order of importance per topic
 
-API: 
+## General:
+- [ ] Overhaul bot.js to typescript
+- [ ] Move hosting to heroku
+- [ ] Implement a SQL based database that works for heroku as well
+- [ ] Guild specific prefix change
+- [ ] Remaining files converted to typescript
+- [ ] Remind Me module
+- [ ] Add module that lets users give themselves roles
+
+## Moderation:
+- [x] Muting spamming users
+- [ ] Unmuting users based on security level
+- [ ] Option for mass banning muted users from a short interval
+- [ ] Blacklisted / restricted words
+- [ ] Blacklisted links
+- [ ] Remove invite links
+
+## Music:
+- [x] Play basic songs off youtube
+- [ ] Adjustable volume
+- [ ] Queuing up songs
+
+## API: 
 - [x] Brawlhalla API module finished
-- [ ] Steam Game Tracker module finished
+- [x] Cleverbot module rewritten - [clevertype](https://github.com/ilocereal/Clevertype) 
+- [ ] Get cleverbot to store CS per user
+
+## Way Later:
+- [ ] Intent analysis for communicating with Alexa
+- [ ] Voice support for communicating with alexa 
