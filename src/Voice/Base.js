@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const fs = require('fs');
 const errors = require('./Errors');
-const debug = require('../Debug').debug;
+const debug = require('../../Debug').debug;
 
 generateOutputFile = function(channel, member) {
     // use IDs instead of username cause some people have stupid emojis in their name
