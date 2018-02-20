@@ -1,1 +1,0 @@
-export const youtubeInviteRegex : RegExp = /((https?):\/\/(www\.)?)?youtu\.?be(\.com)?\/(watch\?v=)?\w{11}/;

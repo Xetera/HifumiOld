@@ -1,15 +1,15 @@
 const config = require("./config0.json");
-const osu = require('./API/Osu');
-const brawlDB = require('./API/Brawlhalla.js');
+const osu = require('./src/API/Osu');
+const brawlDB = require('./src/API/Brawlhalla.js');
 const util = require('./Util');
-const Enum = require('./Commands/Utils/Enumerations');
-const Voice = require('./Voice/Base');
-const messageUtils = require('./Commands/Messages');
-const Youtube = require('./API/Youtube');
-const spam = require('./Listeners/SpamListener');
+const Enum = require('./src/Commands/Utils/Enumerations');
+const Voice = require('./src/Voice/Base');
+const messageUtils = require('./src/Commands/Messages');
+const Youtube = require('./src/API/Youtube');
+const spam = require('./src/Listeners/SpamListener');
 let Command = {};
-Command['ping'] = require('./Commands/Ping').Ping;
-const changeSecurity = require('./Moderation/changeSecurity');
+Command['ping'] = require('./src/Commands/Ping').Ping;
+const changeSecurity = require('./src/Moderation/changeSecurity');
 
 
 
@@ -24,11 +24,11 @@ let bot = new Discord.Client();
 
 
 
-let _muteQueue = require('./Moderation/MuteQueue').MuteQueue;
-let _messageQueue = require('./Moderation/MessageQueue').MessageQueue;
+let _muteQueue = require('./src/Moderation/MuteQueue').MuteQueue;
+let _messageQueue = require('./src/Moderation/MessageQueue').MessageQueue;
 
 
-let Alexa = require('./API/Alexa').Alexa;
+let Alexa = require('./src/API/Alexa').Alexa;
 
 let alexa = new Alexa(config.CleverBotAPI);
 let muteQueue = new _muteQueue();
