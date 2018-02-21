@@ -1,1 +1,1 @@
-worker: set DEBUG=Bot:* & node index.js
+worker: DEBUG=Bot:* node index.js
