@@ -3,7 +3,15 @@ import * as moment from "moment";
 
 import {MuteQueue} from "./MuteQueue";
 import {getMuteDate, getMuteTime, getSpamTolerance, securityLevel, SecurityLevels} from "../Utility/Settings";
-import {debug} from "../Utility/Logging"
+import * as dbg from "debug";
+
+
+const debug = {
+    silly   : dbg('Bot:MessageQueue:Silly'),
+    info    : dbg('Bot:MessageQueue:Info'),
+    warning : dbg('Bot:MessageQueue:Warning'),
+    error   : dbg('Bog:MessageQueue:Error')
+};
 
 interface Message extends Discord.Message {
     sent : Date;
@@ -15,9 +23,9 @@ export class MessageQueue {
     muteQueue : MuteQueue;
     constructor(muteQueue : MuteQueue, size ?: number){
         this.muteQueue = muteQueue;
-
         this.queue = new Map<Discord.Guild, Message[]>();
         this.bufferLength = size ? size : 200;
+        debug.info('MessageQueue is ready.');
     }
 
     public add(msg: Message) : void {
