@@ -1,4 +1,3 @@
-const config = require('./../../config0.json');
 import * as Discord from 'discord.js'
 import {Cleverbot, Config, Mood} from 'clevertype'
 import * as dbg from 'debug'
