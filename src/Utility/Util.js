@@ -19,11 +19,6 @@ function randBool() {
     return Math.random() >= 0.5;
 }
 exports.randBool = randBool;
-/**
- * Makes a random selection from an input array
- *
- * @return {*} - random choice from array
- */
 function randChoice(array) {
     return array[Math.floor(Math.random() * array.length)];
 }
@@ -48,20 +43,3 @@ var ETime;
     ETime[ETime["Months"] = 5] = "Months";
     ETime[ETime["Years"] = 6] = "Years";
 })(ETime = exports.ETime || (exports.ETime = {}));
-/*
-export function resolveTime(duration : number) : string {
-
-    let  milliseconds : number = parseInt((duration%1000)/100)
-    const seconds : number = parseInt((duration/1000)%60)
-        , minutes = parseInt((duration/(1000*60))%60)
-        , hours = parseInt((duration/(1000*60*60))%24);
-
-    hours = (hours < 10) ? "0" + hours : hours;
-    minutes = (minutes < 10) ? "0" + minutes : minutes;
-    seconds = (seconds < 10) ? "0" + seconds : seconds;
-
-    return hours + ":" + minutes + ":" + seconds + "." + milliseconds;
-
-
-}
-*/ 

@@ -1,3 +1,6 @@
+import {DiscordAPIError, Message} from "discord.js";
+import {debug} from "../Events/onMessage";
+
 /**
  * Returns a random selection from a range of numbers.
  *
@@ -17,12 +20,8 @@ export function randBool() : boolean{
     return Math.random () >= 0.5;
 }
 
-/**
- * Makes a random selection from an input array
- *
- * @return {*} - random choice from array
- */
-export function randChoice(array : Array<any>) : any {
+
+export function randChoice(array : any[]) : any {
     return array[Math.floor(Math.random() * array.length)];
 }
 
@@ -45,20 +44,4 @@ export enum ETime {
     Months,
     Years
 }
-/*
-export function resolveTime(duration : number) : string {
 
-    let  milliseconds : number = parseInt((duration%1000)/100)
-    const seconds : number = parseInt((duration/1000)%60)
-        , minutes = parseInt((duration/(1000*60))%60)
-        , hours = parseInt((duration/(1000*60*60))%24);
-
-    hours = (hours < 10) ? "0" + hours : hours;
-    minutes = (minutes < 10) ? "0" + minutes : minutes;
-    seconds = (seconds < 10) ? "0" + seconds : seconds;
-
-    return hours + ":" + minutes + ":" + seconds + "." + milliseconds;
-
-
-}
-*/

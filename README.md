@@ -2,6 +2,7 @@
 
 Moderation based discord bot written in Typescript
 
+
 # TODO:
 In order of importance per topic
 
@@ -17,6 +18,7 @@ In order of importance per topic
 
 ## Moderation:
 - [x] Muting spamming users
+- [x] Removing invite links
 - [ ] Unmuting users based on security level
 - [ ] Option for mass banning muted users from a short interval
 - [ ] Blacklisted / restricted words

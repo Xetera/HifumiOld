@@ -3,12 +3,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Discord = require("discord.js");
 var moment = require("moment");
 var Settings_1 = require("../Utility/Settings");
-var Logging_1 = require("../Utility/Logging");
+var dbg = require("debug");
+var debug = {
+    silly: dbg('Bot:MessageQueue:Silly'),
+    info: dbg('Bot:MessageQueue:Info'),
+    warning: dbg('Bot:MessageQueue:Warning'),
+    error: dbg('Bog:MessageQueue:Error')
+};
 var MessageQueue = /** @class */ (function () {
     function MessageQueue(muteQueue, size) {
         this.muteQueue = muteQueue;
         this.queue = new Map();
         this.bufferLength = size ? size : 200;
+        debug.info('MessageQueue is ready.');
     }
     MessageQueue.prototype.add = function (msg) {
         var self = this;
@@ -25,7 +32,7 @@ var MessageQueue = /** @class */ (function () {
             if (value.length > self.bufferLength) {
                 var temp = value.shift();
                 if (temp === undefined)
-                    Logging_1.debug.error("Tried to shift out an empty message from " + key.name + "'s messageQueue" +
+                    debug.error("Tried to shift out an empty message from " + key.name + "'s messageQueue" +
                         "\nMost likely because buffer length is 0 or undefined.");
             }
         });
@@ -52,7 +59,7 @@ var MessageQueue = /** @class */ (function () {
         // breaking down all the unique channels
         // guaranteed that all messages are in the same guild
         if (Settings_1.securityLevel === Settings_1.SecurityLevels.High) {
-            Logging_1.debug.silly('Removing spammer in high security mode');
+            debug.silly('Removing spammer in high security mode');
             var allMessages = this.getAllUserMessages(member);
             if (messages !== undefined) {
             }
@@ -67,16 +74,16 @@ var MessageQueue = /** @class */ (function () {
                 targetChannel.bulkDelete(channelMessages);
                 var guildMessages = this_1.queue.get(guild);
                 if (guildMessages === undefined)
-                    return { value: Logging_1.debug.error("Tried to get " + guild.name + " messages in MessageQueue but key does not exist.") };
+                    return { value: debug.error("Tried to get " + guild.name + " messages in MessageQueue but key does not exist.") };
                 for (var i in messages) {
                     try {
                         guildMessages.splice(guildMessages.findIndex(function (msg) { return msg.id === messages[i].id; }), 1);
                     }
                     catch (error) {
-                        Logging_1.debug.error("Error splicing array for " + guild.name + "'s messages in MessageQueue");
+                        debug.error("Error splicing array for " + guild.name + "'s messages in MessageQueue");
                     }
                 }
-                Logging_1.debug.info("Deleted " + messages.length + " messages from " + memberName + " in " + targetChannel.name);
+                debug.info("Deleted " + messages.length + " messages from " + memberName + " in " + targetChannel.name);
             }
         };
         var this_1 = this;
@@ -92,7 +99,7 @@ var MessageQueue = /** @class */ (function () {
         var tolerance = moment(new Date()).subtract(5, 's').toDate();
         var messages = this.queue.get(guild);
         if (messages === undefined) {
-            Logging_1.debug.error("Tried fetching recent messages in a nonexistent server");
+            debug.error("Tried fetching recent messages in a nonexistent server");
             return;
         }
         return messages.filter(function (message) {
@@ -102,7 +109,7 @@ var MessageQueue = /** @class */ (function () {
     MessageQueue.prototype.getAllUserMessages = function (member) {
         var messages = this.queue.get(member.guild);
         if (messages === undefined)
-            return Logging_1.debug.error("Guild " + member.guild + " has no messages to get");
+            return debug.error("Guild " + member.guild + " has no messages to get");
         return messages.filter(function (message) {
             return message.author.id === member.id;
         });

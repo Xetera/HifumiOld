@@ -1,9 +1,16 @@
 import * as Discord from 'discord.js'
-import {debug} from "../Utility/Logging";
+import * as dbg from "debug";
 import {scheduleUnmute} from "./ScheduleUnmute";
 import {DiscordAPIError} from "discord.js";
 import {getMuteTime} from "../Utility/Settings";
 import Timer = NodeJS.Timer;
+
+const debug = {
+    silly   : dbg('Bot:MuteQueue:Silly'),
+    info    : dbg('Bot:MuteQueue:Info'),
+    warning : dbg('Bot:MuteQueue:Warning'),
+    error   : dbg('Bog:MuteQueue:Error')
+};
 
 class MutedUser  {
     member : Discord.GuildMember;
@@ -53,7 +60,9 @@ export class MuteQueue {
 
     constructor(){
         this.queue = [];
+        debug.info('MuteQueue is ready.');
     }
+
     public add(user : Discord.GuildMember, role : Discord.Role, unmuteDate : Date) : void {
         this.queue.push(new MutedUser(user, role, unmuteDate, this));
         //this.scheduleUnmute(user);

@@ -35,9 +35,15 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Logging_1 = require("../Utility/Logging");
+var dbg = require("debug");
 var discord_js_1 = require("discord.js");
 var Settings_1 = require("../Utility/Settings");
+var debug = {
+    silly: dbg('Bot:MuteQueue:Silly'),
+    info: dbg('Bot:MuteQueue:Info'),
+    warning: dbg('Bot:MuteQueue:Warning'),
+    error: dbg('Bog:MuteQueue:Error')
+};
 var MutedUser = /** @class */ (function () {
     function MutedUser(member, role, unmuteDate, muteQueue) {
         this.member = member;
@@ -50,23 +56,23 @@ var MutedUser = /** @class */ (function () {
     }
     MutedUser.prototype.muteUser = function () {
         if (this.member.hasPermission("ADMINISTRATOR"))
-            return Logging_1.debug.warning("Tried to mute " + this.name + " for " + Settings_1.getMuteTime() + " seconds but they are an administrator.");
+            return debug.warning("Tried to mute " + this.name + " for " + Settings_1.getMuteTime() + " seconds but they are an administrator.");
         try {
             this.member.addRole(this.role, "Spamming");
         }
         catch (err) {
             if (err instanceof discord_js_1.DiscordAPIError) {
-                Logging_1.debug.warning("Could not mute spammer " + this.name + ", missing permissions.");
+                debug.warning("Could not mute spammer " + this.name + ", missing permissions.");
             }
             else {
-                Logging_1.debug.error("Unexpected error while muting user " + this.name, err);
+                debug.error("Unexpected error while muting user " + this.name, err);
             }
         }
         this.muteQueue.scheduleUnmute(this.member);
     };
     MutedUser.prototype.cancelUnmute = function () {
         if (this.timeout === undefined)
-            return Logging_1.debug.error("Could not cancel scheduled unmute for " + this.name + ", user has no scheduled unmute date");
+            return debug.error("Could not cancel scheduled unmute for " + this.name + ", user has no scheduled unmute date");
         clearTimeout(this.timeout);
     };
     return MutedUser;
@@ -74,6 +80,7 @@ var MutedUser = /** @class */ (function () {
 var MuteQueue = /** @class */ (function () {
     function MuteQueue() {
         this.queue = [];
+        debug.info('MuteQueue is ready.');
     }
     MuteQueue.prototype.add = function (user, role, unmuteDate) {
         this.queue.push(new MutedUser(user, role, unmuteDate, this));
@@ -97,7 +104,7 @@ var MuteQueue = /** @class */ (function () {
                 member.removeRole(releasedSpammer.role, "The " + releasedSpammer.unmuteSeconds + " timeout duration ran out.");
             }
             else {
-                Logging_1.debug.warning("Could not release " + (member.nickname || member.user.username) + ", not found in the muteQueue.");
+                debug.warning("Could not release " + (member.nickname || member.user.username) + ", not found in the muteQueue.");
             }
             i++;
         };
@@ -113,9 +120,9 @@ var MuteQueue = /** @class */ (function () {
         });
         var mutedGuildMember = this.queue[index];
         if (mutedGuildMember === undefined)
-            return Logging_1.debug.error('Tried to shift an empty MuteQueue.');
+            return debug.error('Tried to shift an empty MuteQueue.');
         var timeDelta = Settings_1.getMuteTime(); // in seconds
-        Logging_1.debug.silly(timeDelta + " seconds recorded as timeDelta for " + mutedGuildMember.name);
+        debug.silly(timeDelta + " seconds recorded as timeDelta for " + mutedGuildMember.name);
         var timeoutId = setTimeout(function () {
             return __awaiter(this, void 0, void 0, function () {
                 var index, error_1;
@@ -124,7 +131,7 @@ var MuteQueue = /** @class */ (function () {
                         case 0:
                             index = _this.queue.findIndex(function (usr) { return usr.member.id === user.id; });
                             if (!mutedGuildMember.role) {
-                                Logging_1.debug.warning("Could not schedule an unmute for user " + mutedGuildMember.name + ", missing 'muted' role.");
+                                debug.warning("Could not schedule an unmute for user " + mutedGuildMember.name + ", missing 'muted' role.");
                                 return [2 /*return*/, _this.queue.splice(index, 1)];
                             }
                             _a.label = 1;
@@ -137,14 +144,14 @@ var MuteQueue = /** @class */ (function () {
                         case 3:
                             error_1 = _a.sent();
                             if (error_1 instanceof discord_js_1.DiscordAPIError) {
-                                Logging_1.debug.error("Tried to unmute " + mutedGuildMember.name + " but they were already unmuted.", error_1);
+                                debug.error("Tried to unmute " + mutedGuildMember.name + " but they were already unmuted.", error_1);
                                 return [2 /*return*/, _this.queue.splice(index, 1)];
                             }
-                            Logging_1.debug.error("Unexpected error while unmuting " + mutedGuildMember.name + ".", error_1);
+                            debug.error("Unexpected error while unmuting " + mutedGuildMember.name + ".", error_1);
                             return [3 /*break*/, 4];
                         case 4:
                             _this.queue.splice(index, 1);
-                            Logging_1.debug.info(mutedGuildMember.name + " in " + mutedGuildMember.member.guild.name + " was unmuted after " + timeDelta + " seconds.");
+                            debug.info(mutedGuildMember.name + " in " + mutedGuildMember.member.guild.name + " was unmuted after " + timeDelta + " seconds.");
                             return [2 /*return*/];
                     }
                 });

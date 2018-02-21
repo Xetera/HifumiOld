@@ -2,7 +2,7 @@ import * as dbg from 'debug'
 import * as Discord from'discord.js'
 
 export let debug = {
-    silly  : dbg('Bot: Silly'),
+    silly  : dbg('Bot:Silly'),
     info   : dbg("Bot:Info"),
     warning: dbg('Bot:Warning'),
     error  : dbg("Bot:Error")

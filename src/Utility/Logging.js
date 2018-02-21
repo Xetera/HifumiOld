@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var dbg = require("debug");
 var Discord = require("discord.js");
 exports.debug = {
-    silly: dbg('Bot: Silly'),
+    silly: dbg('Bot:Silly'),
     info: dbg("Bot:Info"),
     warning: dbg('Bot:Warning'),
     error: dbg("Bot:Error")

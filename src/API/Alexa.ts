@@ -1,7 +1,14 @@
 const config = require('./../../config0.json');
 import * as Discord from 'discord.js'
 import {Cleverbot, Config, Mood} from 'clevertype'
-import {debug} from '../Utility/Logging'
+import * as dbg from 'debug'
+
+const debug = {
+    silly   : dbg('Bot:Cleverbot:Silly'),
+    info    : dbg('Bot:Cleverbot:Info'),
+    warning : dbg('Bot:Cleverbot:Warning'),
+    error   : dbg('Bog:Cleverbot:Error')
+};
 
 export class Alexa {
     cleverbot : Cleverbot;
@@ -10,6 +17,7 @@ export class Alexa {
 
     constructor(apiKey : string){
         this.cleverbot = new Cleverbot(apiKey);
+        debug.info('Cleverbot module is ready');
     }
 
     private replaceKeyword(phrase : string) : string {
