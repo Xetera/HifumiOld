@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var config = require('./../../config0.json');
 var Discord = require("discord.js");
 var clevertype_1 = require("clevertype");
 var dbg = require("debug");
