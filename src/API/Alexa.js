@@ -3,11 +3,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var config = require('./../../config0.json');
 var Discord = require("discord.js");
 var clevertype_1 = require("clevertype");
-var logging_1 = require("../Utility/Logging");
+var dbg = require("debug");
+var debug = {
+    silly: dbg('Bot:Cleverbot:Silly'),
+    info: dbg('Bot:Cleverbot:Info'),
+    warning: dbg('Bot:Cleverbot:Warning'),
+    error: dbg('Bog:Cleverbot:Error')
+};
 var Alexa = /** @class */ (function () {
     function Alexa(apiKey) {
         this.identifier = /alexa/i;
         this.cleverbot = new clevertype_1.Cleverbot(apiKey);
+        debug.info('Cleverbot module is ready');
     }
     Alexa.prototype.replaceKeyword = function (phrase) {
         return phrase.replace(this.identifier, 'cleverbot');
@@ -30,7 +37,7 @@ var Alexa = /** @class */ (function () {
                     return;
                 else if (message.content.startsWith('-'))
                     return;
-                logging_1.debug.info((message.member.nickname || message.author.username) + " from guild " + message.member.guild + " mentioned me in " + message.channel.name);
+                debug.info((message.member.nickname || message.author.username) + " from guild " + message.member.guild + " mentioned me in " + message.channel.name);
                 message.react('👀');
                 var response = void 0;
                 if (message.channel.name === 'chat-with-alexa')

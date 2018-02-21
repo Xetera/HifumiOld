@@ -1,2 +1,1 @@
-node bot.js
-pause
+set DEBUG=Bot:* & npm start node index.js
