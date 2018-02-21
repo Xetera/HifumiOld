@@ -15,7 +15,7 @@ export default function inviteListener(message : Message){
         if (securityLevel === SecurityLevels.Dangerous) return;
         safeDeleteMessage(message).then(()=> {
             debug.info(`Deleted invite link from ${sender}`);
-            safeMessageUser(message.author, bannedForSpammingInvites(message.guild), `spamming`);
+            //safeMessageUser(message.author, bannedForSpammingInvites(message.guild), `spamming`);
         });
     }
 }
