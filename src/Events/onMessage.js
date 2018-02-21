@@ -25,6 +25,6 @@ function onMessage(msg, alexa, messageQueue, bot) {
     // we will change this later to fetch and cache prefixes on a per-server basic
     if (!msg.content.startsWith('.'))
         return;
-    exports.debug.info("[" + msg.guild.name + "]" + msg.author.username + " wrote: " + msg.content);
+    exports.debug.info("[" + msg.guild.name + "] " + msg.author.username + " wrote: " + msg.content);
 }
 exports.default = onMessage;

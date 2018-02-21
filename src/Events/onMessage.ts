@@ -23,12 +23,9 @@ function middleWare
     message.sent = moment(new Date()).toDate();
 
     // we don't want to look at bot messages at all
-
-    // checking for spam
     messageQueue.add(message);
     alexa.checkMessage(message, bot);
     inviteListener(message);
-
 
 }
 
@@ -36,7 +33,6 @@ export default function onMessage
 (msg: Discord.Message, alexa : Alexa, messageQueue : MessageQueue, bot : Discord.Client){
     if (msg.author.bot) return;
 
-    // checking all regex and other things
     middleWare(msg, alexa, messageQueue, bot);
 
     // we will change this later to fetch and cache prefixes on a per-server basic
