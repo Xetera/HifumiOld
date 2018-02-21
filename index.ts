@@ -1,6 +1,6 @@
 // modules
 import {Alexa} from "./src/API/Alexa";
-
+import "reflect-metadata";
 const config = require('./config0.json');
 const cleverbotAPI = require('./config0.json').CleverBotAPI;
 import {MuteQueue} from './src/Moderation/MuteQueue'

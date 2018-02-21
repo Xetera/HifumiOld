@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 // modules
 var Alexa_1 = require("./src/API/Alexa");
+require("reflect-metadata");
 var config = require('./config0.json');
 var cleverbotAPI = require('./config0.json').CleverBotAPI;
 var MuteQueue_1 = require("./src/Moderation/MuteQueue");

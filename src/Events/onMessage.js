@@ -9,11 +9,7 @@ exports.debug = {
     warning: dbg('Bot:onMessage:Warning'),
     error: dbg('Bot:onMessage:Error')
 };
-function middleWare() {
-}
-function onMessage(msg, alexa, messageQueue, bot) {
-    if (msg.author.bot)
-        return;
+function middleWare(msg, alexa, messageQueue, bot) {
     //casting
     var message = msg;
     message.sent = moment(new Date()).toDate();
@@ -21,6 +17,14 @@ function onMessage(msg, alexa, messageQueue, bot) {
     messageQueue.add(message);
     alexa.checkMessage(message, bot);
     InviteListener_1.default(message);
-    exports.debug.info(message.author.username + " wrote: " + message.content);
+}
+function onMessage(msg, alexa, messageQueue, bot) {
+    if (msg.author.bot)
+        return;
+    middleWare(msg, alexa, messageQueue, bot);
+    // we will change this later to fetch and cache prefixes on a per-server basic
+    if (!msg.content.startsWith('.'))
+        return;
+    exports.debug.info("[" + msg.guild.name + "]" + msg.author.username + " wrote: " + msg.content);
 }
 exports.default = onMessage;
