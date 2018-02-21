@@ -1,13 +1,13 @@
 import * as Discord from'discord.js'
-import * as dbg from 'debug'
+import {debug} from '../Utility/Logging'
 
-const log = dbg('Bot: Ready');
+
 
 export default function onReady(bot : Discord.Client){
 
-    log(`${bot.user.username} is ready!`);
+    debug.info(`${bot.user.username} is fully online.`);
     bot.generateInvite().then(link => {
-        log(`Invite link: ${link}`);
+        debug.info(`Invite link: ${link}`);
 
         let guilds = bot.guilds.array();
         let guildMessage = `Guilds: ${guilds.length}\n-----------------------------\n`;
@@ -15,7 +15,7 @@ export default function onReady(bot : Discord.Client){
             guildMessage += `${guild.name}: ${guild.members.array().length} members\n`;
         }
 
-        log(guildMessage);
+        debug.info(guildMessage);
     });
 
 }
