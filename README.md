@@ -7,8 +7,10 @@ Moderation based discord bot written in Typescript
 In order of importance per topic
 
 ## General:
-- [ ] Overhaul bot.js to typescript
-- [ ] Move hosting to heroku
+- [x] Overhaul bot.js to typescript
+- [x] Move hosting to heroku
+- [ ] Rework the way commands are called
+- [ ] Add exceptions for bot owner and mods for invite and spam
 - [ ] Implement a SQL based database that works for heroku as well
 - [ ] Guild specific prefix change
 - [ ] Split debugging on a per/module basis
