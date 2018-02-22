@@ -4,7 +4,7 @@ var dbg = require("debug");
 var InviteListener_1 = require("../Listeners/InviteListener");
 var moment = require("moment");
 exports.debug = {
-    silly: dbg('Bot:onMessage'),
+    silly: dbg('Bot:onMessage:Silly'),
     info: dbg('Bot:onMessage:Info'),
     warning: dbg('Bot:onMessage:Warning'),
     error: dbg('Bot:onMessage:Error')

@@ -1,7 +1,7 @@
 {
-  "name": "thiccbot.js",
+  "name": "Alexa.js",
   "version": "1.0.0",
-  "description": "thiccbots node.js brother",
+  "description": "Moderation bot for discord.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
