@@ -4,10 +4,10 @@ import {randChoice} from "../Utility/Util";
 import {welcomeMessages} from "../Handlers/Replies";
 
 export const debug = {
-    silly: dbg('Bot:onGuildMemberAdd:Silly'),
-    info: dbg('Bot:onGuildMemberAdd:Info'),
+    silly  : dbg('Bot:onGuildMemberAdd:Silly'),
+    info   : dbg('Bot:onGuildMemberAdd:Info'),
     warning: dbg('Bot:onGuildMemberAdd:Warning'),
-    error: dbg('Bot:onGuildMemberAdd:Error')
+    error  : dbg('Bot:onGuildMemberAdd:Error')
 };
 
 export default function onGuildMemberAdd(member : Discord.GuildMember) : void {
@@ -22,7 +22,7 @@ export default function onGuildMemberAdd(member : Discord.GuildMember) : void {
         `because a welcome channel was missing.`);
     }
 
-    if (welcomeChannel instanceof Discord.TextChannel){
+    else if (welcomeChannel instanceof Discord.TextChannel){
         let welcomeChannelEmbed : Discord.RichEmbed= new Discord.RichEmbed()
             .setAuthor(member.displayName, member.user.displayAvatarURL)
             .setTimestamp()
@@ -41,6 +41,9 @@ export default function onGuildMemberAdd(member : Discord.GuildMember) : void {
             .setTitle(`${identifier} has joined the server!`)
             .setDescription(welcomeMessage);
         defaultChannel.send(defaultChannelEmbed);
+    }
+    else if(!defaultChannel){
+        debug.silly(`Could not get a systemChannel to log a user join in ${member.guild.name}`);
     }
 
 }

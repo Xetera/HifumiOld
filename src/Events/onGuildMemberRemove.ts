@@ -21,7 +21,7 @@ export default function onGuildMemberRemove(member : Discord.GuildMember) : void
             .setAuthor(member.displayName, member.user.displayAvatarURL)
             .setTimestamp()
             .setColor("RED")
-            .setTitle(`${identifier} just left the server.`);
+            .setTitle(`${identifier} left the server.`);
         welcomeChannel.send(embed);
     }
 }
