@@ -1,24 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-<<<<<<< HEAD
-var BOT_TOKEN;
-var CLEVERBOT_TOKEN;
-if (process.env.BOT_TOKEN !== undefined && process.env.CLEVERBOT_TOKEN !== undefined) {
-=======
-var onGuildMemberRemove_1 = require("./src/Events/onGuildMemberRemove");
 var BOT_TOKEN;
 var CLEVERBOT_TOKEN;
 if (process.env.BOT_TOKEN !== undefined && process.env.CLEVERBOT_TOKEN !== undefined) {
     // settings for heroku
->>>>>>> index-refactor
     BOT_TOKEN = process.env.BOT_TOKEN;
     CLEVERBOT_TOKEN = process.env.CLEVERBOT_TOKEN;
 }
 else {
-<<<<<<< HEAD
-=======
     // settings for development
->>>>>>> index-refactor
     BOT_TOKEN = require('./config0.json').TOKEN;
     CLEVERBOT_TOKEN = require('./config0.json').CleverBotAPI;
 }
@@ -32,6 +22,7 @@ var onMessage_1 = require("./src/Events/onMessage");
 // dependencies
 var Discord = require("discord.js");
 var onGuildMemberAdd_1 = require("./src/Events/onGuildMemberAdd");
+var onGuildMemberRemove_1 = require("./src/Events/onGuildMemberRemove");
 // instances
 var bot = new Discord.Client();
 var alexa = new Alexa_1.Alexa(CLEVERBOT_TOKEN);
