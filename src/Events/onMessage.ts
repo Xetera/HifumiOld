@@ -6,7 +6,7 @@ import inviteListener from '../Listeners/InviteListener'
 import * as moment from "moment";
 
 export const debug = {
-    silly: dbg('Bot:onMessage'),
+    silly: dbg('Bot:onMessage:Silly'),
     info: dbg('Bot:onMessage:Info'),
     warning: dbg('Bot:onMessage:Warning'),
     error: dbg('Bot:onMessage:Error')

@@ -1,4 +1,3 @@
-
 declare let process : {
     env: {
         BOT_TOKEN: string,
@@ -10,9 +9,11 @@ let BOT_TOKEN : string;
 let CLEVERBOT_TOKEN : string;
 
 if (process.env.BOT_TOKEN !== undefined && process.env.CLEVERBOT_TOKEN !== undefined){
+    // settings for heroku
     BOT_TOKEN = process.env.BOT_TOKEN;
     CLEVERBOT_TOKEN = process.env.CLEVERBOT_TOKEN;
 } else {
+    // settings for development
     BOT_TOKEN = require('./config0.json').TOKEN;
     CLEVERBOT_TOKEN = require('./config0.json').CleverBotAPI;
 }
@@ -27,6 +28,8 @@ import onReady from './src/Events/onReady'
 import onMessage from './src/Events/onMessage'
 // dependencies
 import * as Discord from 'discord.js'
+import onGuildMemberAdd from "./src/Events/onGuildMemberAdd";
+import onGuildMemberRemove from "./src/Events/onGuildMemberRemove";
 
 
 // instances
@@ -41,6 +44,14 @@ bot.on('ready', function(){
     onReady(bot);
 });
 
-bot.on('message', function(message){
+bot.on('message', function(message : Discord.Message){
     onMessage(message, alexa, messageQueue, bot);
+});
+
+bot.on('guildMemberAdd', function(member : Discord.GuildMember){
+    onGuildMemberAdd(member);
+});
+
+bot.on('guildMemberRemove', function(member : Discord.GuildMember){
+    onGuildMemberRemove(member);
 });

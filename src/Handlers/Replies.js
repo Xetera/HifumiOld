@@ -5,3 +5,8 @@ function bannedForSpammingInvites(guild) {
         ("'" + guild.name + "', advertising isn't allowed, sorry.");
 }
 exports.bannedForSpammingInvites = bannedForSpammingInvites;
+exports.welcomeMessages = [
+    'You must be new around here kid...',
+    "Interesting, I haven't seen you around before.",
+    'A new challenger approaches!'
+];

@@ -5,7 +5,7 @@ var onMessage_1 = require("../Events/onMessage");
 var Settings_1 = require("../Utility/Settings");
 var SafeDeleteMessage_1 = require("../Handlers/SafeDeleteMessage");
 var SafeMessageUser_1 = require("../Handlers/SafeMessageUser");
-var Replies_1 = require("../Moderation/Replies");
+var Replies_1 = require("../Handlers/Replies");
 function inviteListener(message) {
     var sender = message.member.nickname || message.author.username;
     if (message.content.match(Regex_1.discordInviteRegex)) {
