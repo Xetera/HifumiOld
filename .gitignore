@@ -7,3 +7,4 @@ gspeechSecret.json
 /node-google-speech-api-master
 refactor.json
 .idea/workspace.xml
+bot_old.js
