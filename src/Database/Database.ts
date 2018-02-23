@@ -1,5 +1,7 @@
 const config = require('../config0.json');
 import {debug} from '../Utility/Logging'
+import {IMain, IDatabase} from 'pg-promise'
+import * as pg from 'pg-promise'
 
 interface ICredentials {
     host: string;
