@@ -5,7 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node build/index.js",
+    "build": "tsc",
+    "postinstall": "npm run build",
+    "heroku-prebuild" : "echo Heroku is installing dependencies.",
+    "heroku-postbuild": "echo Dependencies build!"
   },
   "author": "Xetera",
   "license": "ISC",
