@@ -11,7 +11,7 @@ interface ICredentials {
 }
 
 export class Database {
-    defaultCredentials : ICredentials = {
+    cn : ICredentials = {
         host: 'localhost',
         user: 'root',
         password: config.database.password,
