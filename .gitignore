@@ -6,5 +6,5 @@ Commands/google-assistant.json
 gspeechSecret.json
 /node-google-speech-api-master
 refactor.json
-.idea/workspace.xml
+/.idea
 bot_old.js
