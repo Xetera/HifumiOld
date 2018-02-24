@@ -32,6 +32,7 @@
     "nodemon": "^1.14.11",
     "nodesu": "^0.6.3",
     "opusscript": "0.0.6",
+    "pg-promise": "^7.5.4",
     "reflect-metadata": "^0.1.12",
     "request": "^2.83.0",
     "typescript": "^2.7.2",

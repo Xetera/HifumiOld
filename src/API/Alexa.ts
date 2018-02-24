@@ -11,7 +11,6 @@ const debug = {
 
 export class Alexa {
     cleverbot : Cleverbot;
-    mood : Config;
     identifier : RegExp = /alexa/i;
 
     constructor(apiKey : string){
