@@ -9,6 +9,7 @@ In order of importance per topic
 ## General:
 - [x] Overhaul bot.js to typescript
 - [x] Move hosting to heroku
+- [x] Removed compiled js files from project
 - [ ] Rework the way commands are called
 - [ ] Add exceptions for bot owner and mods for invite and spam
 - [ ] Implement a SQL based database that works for heroku as well
