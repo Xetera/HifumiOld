@@ -17,6 +17,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/debug": "0.0.30",
+    "@types/node": "^9.4.6",
     "axios": "^0.17.1",
     "bufferutil": "^3.0.3",
     "clevertype": "^1.0.7",
