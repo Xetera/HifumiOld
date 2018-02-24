@@ -7,7 +7,7 @@ import * as pg from 'pg-promise'
 export class Database {
 
 
-    constructor(credentials ?: ICredentials){
+    constructor(){
 
     }
     public connect() {
