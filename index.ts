@@ -1,3 +1,5 @@
+import {Database} from "./src/Database/Database";
+
 declare let process : {
     env: {
         BOT_TOKEN: string,
@@ -20,7 +22,6 @@ if (process.env.BOT_TOKEN !== undefined && process.env.CLEVERBOT_TOKEN !== undef
 
 // modules
 import {Alexa} from "./src/API/Alexa";
-import "reflect-metadata";
 import {MuteQueue} from './src/Moderation/MuteQueue'
 import {MessageQueue} from "./src/Moderation/MessageQueue";
 import {debug} from './src/Utility/Logging'
@@ -30,6 +31,7 @@ import onMessage from './src/Events/onMessage'
 import * as Discord from 'discord.js'
 import onGuildMemberAdd from "./src/Events/onGuildMemberAdd";
 import onGuildMemberRemove from "./src/Events/onGuildMemberRemove";
+import onGuildCreate from "./src/Events/onGuildCreate";
 
 
 // instances
@@ -37,7 +39,7 @@ const bot          : Discord.Client = new Discord.Client();
 const alexa        : Alexa          = new Alexa(CLEVERBOT_TOKEN);
 const muteQueue    : MuteQueue      = new MuteQueue();
 const messageQueue : MessageQueue   = new MessageQueue(muteQueue);
-
+const db           : Database       = new Database();
 bot.login(BOT_TOKEN);
 
 bot.on('ready', function(){
@@ -45,7 +47,7 @@ bot.on('ready', function(){
 });
 
 bot.on('message', function(message : Discord.Message){
-    onMessage(message, alexa, messageQueue, bot);
+    onMessage(message, alexa, messageQueue, bot, db);
 });
 
 bot.on('guildMemberAdd', function(member : Discord.GuildMember){
@@ -54,4 +56,8 @@ bot.on('guildMemberAdd', function(member : Discord.GuildMember){
 
 bot.on('guildMemberRemove', function(member : Discord.GuildMember){
     onGuildMemberRemove(member);
+});
+
+bot.on('guildCreate', function(guild : Discord.Guild){
+    onGuildCreate(guild, db);
 });
