@@ -3,6 +3,7 @@ import getInvite from "../Commands/Self/getInvite";
 import nuke from "../Commands/Utilty/Nuke";
 import {Client, Message} from "discord.js";
 import * as dbg from "debug";
+import {Database} from "../Database/Database";
 
 export const debug = {
     silly  : dbg('Bot:CommandHandler:Silly'),
@@ -13,13 +14,18 @@ export const debug = {
 
 export default function commandHandler(
     messageType : MessageType,
-    command : string,
     message : Message,
-    bot : Client){
+    bot     : Client,
+    database: Database){
+
+    const contentArray : string[] = message.content.split(' ');
+    const command : string = contentArray[0].substring(1);
+    const args : string[] = contentArray.splice(1, contentArray.length);
 
     if (messageType === MessageType.PrivateMessage){
         // not allowing all the same commands from
         debug.info(`[DM]<${message.author.username}>: ${message.content}`);
+
         switch(command.toLowerCase()){
             case "invite":
                 message.channel.send(getInvite(bot));
@@ -28,9 +34,15 @@ export default function commandHandler(
     }
     else {
         debug.info(`[${message.guild.name}]<${message.author.username}>: ${message.content}`);
+
         switch(command.toLowerCase()){
             case "nuke":
                 nuke(message.channel);
+                break;
+            case "setprefix":
+                database.setPrefix(message.guild.id, args[0]).then(res=> {
+                    message.channel.send('Prefix changed to ' + res.prefix);
+                });
                 break;
         }
     }
