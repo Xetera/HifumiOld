@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node build/index.js",
+    "start": "nodemon index.js",
     "postinstall": "tsc",
     "heroku-prebuild": "echo Heroku is installing dependencies.",
     "heroku-postbuild": "echo Dependencies built!"
@@ -15,14 +15,12 @@
   "dependencies": {
     "@types/debug": "0.0.30",
     "@types/node": "^9.4.6",
-    "axios": "^0.17.1",
     "bufferutil": "^3.0.3",
     "clevertype": "^1.0.7",
     "debug": "^3.1.0",
     "discord.js": "^11.2.1",
-    "erlpack": "^0.1.2",
+    "erlpack": "github:discordapp/erlpack",
     "ffmpeg-binaries": "^3.2.2-3",
-    "fluent-ffmpeg": "^2.1.2",
     "googleapis": "^26.0.1",
     "moment": "^2.20.1",
     "node-opus": "^0.2.7",
@@ -30,7 +28,6 @@
     "nodesu": "^0.6.3",
     "opusscript": "0.0.6",
     "pg-promise": "^7.5.4",
-    "reflect-metadata": "^0.1.12",
     "request": "^2.83.0",
     "typescript": "^2.7.2",
     "ytdl-core": "^0.19.0"
