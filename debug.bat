@@ -1,1 +1,3 @@
-set DEBUG=Bot:* & npm start
+set DEBUG=Bot:*
+set ENV=DEVELOPMENT
+npm start
