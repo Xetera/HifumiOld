@@ -46,6 +46,14 @@ const updateDefaultChannelStatement : PreparedStatement = {
     values: []
 };
 
+const getDefaultChannelStatement : PreparedStatement = {
+    name: 'get-defailt-channel',
+    text:
+        'SELECT default_channel FROM guilds ' +
+        'WHERE id = $1',
+    values:[]
+};
+
 function getStatement(statement : PreparedStatement) : PreparedStatement{
     return JSON.parse(JSON.stringify(statement));
 }
@@ -71,5 +79,11 @@ export function getWhitelistedInvites(guildId : string) : PreparedStatement{
 export function updateDefaultChannel(guildId : string, channelId : string) : PreparedStatement {
     const stmt = getStatement(updateDefaultChannelStatement);
     stmt.values.push(channelId, guildId);
+    return stmt;
+}
+
+export function getDefaultChannel(guildId: string): PreparedStatement {
+    const stmt = getStatement(getDefaultChannelStatement);
+    stmt.values.push(guildId);
     return stmt;
 }
