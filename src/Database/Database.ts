@@ -184,11 +184,14 @@ export class Database {
 
     public updateDefaultChannel(guildId : string, channelId : string) : Promise<string>{
         return this.db.oneOrNone(updateDefaultChannel(guildId, channelId)).then((r: IGuild)=> {
+            this.initializeGuildIfNone(guildId);
+            this.guilds[guildId].defaultChannel = r.default_channel;
             return r.default_channel;
         });
     }
 
     public getDefaultChannel(guildId: string) : string | undefined {
-        return this.guilds[guildId].defaultChannel || undefined;
+        if (this.guilds[guildId] === undefined) return undefined;
+        return this.guilds[guildId].defaultChannel;
     }
 }
