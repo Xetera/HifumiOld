@@ -1,0 +1,6 @@
+{
+  "invite":{
+    "info": "Sends an invite link so you can have me in your server ☺️\nYou need the 'Manage Servers' permission for this.",
+    "example": ".invite"
+  }
+}

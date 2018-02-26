@@ -1,1 +1,3 @@
-set DEBUG=Bot:* & npm start nodemon index.js
+set DEBUG=Bot:*
+set ENV=DEVELOPMENT
+npm start

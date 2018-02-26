@@ -12,3 +12,7 @@ export const APIErrors = {
     "MISSING_PERMISSIONS": "Missing Permissions",
     "CANNOT_MESSAGE_USER": "Cannot Message User"
 };
+
+export const PSQLErrors = {
+    "DATABASE_DOES_NOT_EXIST":"42P01"
+};

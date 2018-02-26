@@ -34,8 +34,10 @@ export class Alexa {
         this.cleverbot.setRegard(mood);
     }
 
-    public checkMessage(message : Discord.Message, bot :Discord.Client) {
+    public checkMessage(message : Discord.Message, bot :Discord.Client) : void {
         let alexaRequest = message.content.match(/alexa/i);
+        if (message.system) return;
+
         if (message.channel instanceof Discord.TextChannel){
             if (message.channel.name === 'chat-with-alexa' || alexaRequest || message.isMentioned(bot.user)) {
                 // don't respond to messages not meant for me
@@ -44,7 +46,6 @@ export class Alexa {
 
                 debug.info(`${message.member.nickname || message.author.username} from guild ${message.member.guild} mentioned me in ${message.channel.name}`);
                 message.react('👀');
-                let response : string;
 
                 if (message.channel.name === 'chat-with-alexa')
                     this.say(message.content, false).then((resp : string) => {

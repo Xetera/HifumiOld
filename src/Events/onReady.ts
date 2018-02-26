@@ -2,8 +2,8 @@ import * as Discord from'discord.js'
 import {debug} from '../Utility/Logging'
 
 
-
-export default function onReady(bot : Discord.Client){
+// returning owner id at the end
+export default function onReady(bot : Discord.Client) : Promise<string> {
 
     debug.info(`${bot.user.username} is fully online.`);
     bot.generateInvite().then(link => {
@@ -12,10 +12,14 @@ export default function onReady(bot : Discord.Client){
         let guilds = bot.guilds.array();
         let guildMessage = `Guilds: ${guilds.length}\n-----------------------------\n`;
         for (let guild of guilds){
-            guildMessage += `${guild.name}: ${guild.members.array().length} members\n`;
+            guildMessage += `[${guild.name}]: ${guild.members.array().length} members\n`;
         }
 
         debug.info(guildMessage);
+    });
+
+    return bot.fetchApplication().then(app => {
+        return app.owner.id;
     });
 
 }

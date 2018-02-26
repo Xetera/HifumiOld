@@ -3,9 +3,6 @@ import {discordInviteRegex} from "./Regex";
 import {debug} from '../Events/onMessage'
 import {securityLevel, SecurityLevels} from "../Utility/Settings";
 import safeDeleteMessage from "../Handlers/SafeDeleteMessage";
-import safeMessageUser from "../Handlers/SafeMessageUser";
-import {bannedForSpammingInvites} from "../Handlers/Replies";
-
 
 export default function inviteListener(message : Message){
     const sender :string = message.member.nickname || message.author.username;
