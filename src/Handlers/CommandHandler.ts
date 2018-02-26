@@ -4,6 +4,9 @@ import nuke from "../Commands/Utilty/Nuke";
 import {Client, Message} from "discord.js";
 import * as dbg from "debug";
 import {Database} from "../Database/Database";
+import setDefaultChannel from "../Commands/Utilty/SetDefaultChannel";
+import {IGuild, isIGuild} from "../Database/TableTypes";
+import setPrefix from "../Commands/Utilty/SetPrefix";
 
 export const debug = {
     silly  : dbg('Bot:CommandHandler:Silly'),
@@ -40,9 +43,10 @@ export default function commandHandler(
                 nuke(message.channel);
                 break;
             case "setprefix":
-                database.setPrefix(message.guild.id, args[0]).then(res=> {
-                    message.channel.send('Prefix changed to ' + res.prefix);
-                });
+                setPrefix(message, args[0], database);
+                break;
+            case "setdefault":
+                setDefaultChannel(message.guild.id, message.channel, database);
                 break;
         }
     }
