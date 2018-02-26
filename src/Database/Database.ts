@@ -101,13 +101,11 @@ export class Database {
         this.db.any(getPrefixes).then(fields => {
             // returning id, prefix
             fields.forEach(async(guild : IGuild) => {
+                this.initializeGuildIfNone(guild.id);
 
                 const whitelistedInvites = await this.db.any(getWhitelistedInvites(guild.id));
                 if (whitelistedInvites.length > 0)
-                    console.log("guild.id");
-
-                this.initializeGuildIfNone(guild.id);
-                this.guilds[guild.id].whitelistedInvites = whitelistedInvites.map(item => item.link);
+                    this.guilds[guild.id].whitelistedInvites = whitelistedInvites.map(item => item.link);
 
                 this.guilds[guild.id].prefix  = guild.prefix;
 
