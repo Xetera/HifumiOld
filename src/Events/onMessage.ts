@@ -51,7 +51,7 @@ export default function onMessage(
         middleWare(message, alexa, messageQueue, bot);
 
     // we will change this later to fetch and cache prefixes on a per-server basic
-    if (!message.content.startsWith('.')/*!database.getPrefix(message.guild.id)*/) return;
+    if (!database.getPrefix(message.guild.id)) return;
     // right now this only supports 1 char length prefix but we can change that later
 
     commandHandler(messageType, message, bot, database);
