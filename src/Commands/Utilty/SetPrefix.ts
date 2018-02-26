@@ -8,6 +8,8 @@ export const debug = {
 };
 
 export default function setPrefix(message: Discord.Message, prefix: string, database: Database){
+    if (prefix === undefined) return message.channel.send('No prefix was entered.');
+
     database.setPrefix(message.guild.id, prefix).then((res:IGuild|Error|-1 )=> {
         if (isIGuild(res))
             message.channel.send('Prefix changed to ' + res.prefix);
