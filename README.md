@@ -10,12 +10,13 @@ In order of importance per topic
 - [x] Overhaul bot.js to typescript
 - [x] Move hosting to heroku
 - [x] Removed compiled js files from project
-- [ ] Rework the way commands are called
+- [x] Rework the way commands are called
+- [ ] Option to set default channels for welcome messages other than 'welcome'
 - [ ] Add exceptions for bot owner and mods for invite and spam
-- [ ] Implement a SQL based database that works for heroku as well
-- [ ] Guild specific prefix change
-- [ ] Split debugging on a per/module basis
-- [ ] Remaining files converted to typescript
+- [x] Implement a SQL based database that works for heroku as well
+- [x] Guild specific prefix change
+- [x] Split debugging on a per/module basis
+- [x] Remaining files converted to typescript
 - [ ] Remind Me module
 - [ ] Add module that lets users give themselves roles
 
