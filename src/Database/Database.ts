@@ -1,4 +1,5 @@
 import {
+    getDefaultChannel,
     getWhitelistedInvites, insertGuild, PreparedStatement, updateDefaultChannel,
     upsertPrefix
 } from "./PreparedStatements";
@@ -21,6 +22,7 @@ interface ICachedGuild {
     prefix: string;
     blacklistedLinks: string[];
     whitelistedInvites: string[];
+    defaultChannel: string;
 }
 
 export interface PostgresDevLoginConfig {
@@ -64,8 +66,8 @@ export class Database {
     };
     config : DatabaseConfig;
 
-    pgp = pgPromise(this.initOptions);
-    db : IDatabase<any>;
+    private pgp = pgPromise(this.initOptions);
+    private db : IDatabase<any>;
     guilds : Record<string, ICachedGuild> = {};
 
 
@@ -78,13 +80,14 @@ export class Database {
         // we're caching the prefixes instead
         this.cacheGuilds();
         debug.info('Database is connected.');
+
     }
 
     private testDB(){
         this.db.any(testQuery).then(q => {
             console.log("TEST QUERY:");
             console.log(q);
-        })
+        });
     }
 
     private initializeGuildIfNone(guildId : string) : boolean{
@@ -98,7 +101,7 @@ export class Database {
     }
 
     private async cacheGuilds() : Promise<void> {
-        this.db.any(getPrefixes).then(fields => {
+        return this.db.any(getPrefixes).then(fields => {
             // returning id, prefix
             fields.forEach(async(guild : IGuild) => {
                 this.initializeGuildIfNone(guild.id);
@@ -106,6 +109,12 @@ export class Database {
                 const whitelistedInvites = await this.db.any(getWhitelistedInvites(guild.id));
                 if (whitelistedInvites.length > 0)
                     this.guilds[guild.id].whitelistedInvites = whitelistedInvites.map(item => item.link);
+
+                //let defaultChannel;
+                this.db.oneOrNone(getDefaultChannel(guild.id)).then(item => {
+                    this.guilds[guild.id].defaultChannel = item.default_channel;
+                });
+
 
                 this.guilds[guild.id].prefix  = guild.prefix;
 
@@ -147,7 +156,7 @@ export class Database {
     }
 
     public getPrefix(guildId : string) {
-        return this.guilds[guildId];
+        return this.guilds[guildId] || ".";
     }
 
     public addGuild(guild : Guild){
@@ -177,5 +186,9 @@ export class Database {
         return this.db.oneOrNone(updateDefaultChannel(guildId, channelId)).then((r: IGuild)=> {
             return r.default_channel;
         });
+    }
+
+    public getDefaultChannel(guildId: string) : string | undefined {
+        return this.guilds[guildId].defaultChannel || undefined;
     }
 }

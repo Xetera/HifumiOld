@@ -1,7 +1,11 @@
-import {GuildMember} from "discord.js";
+import {Channel, GuildMember, Message, TextChannel} from "discord.js";
 import gb from "../../Misc/Globals";
 
-export default function systemsEval(req : string, member : GuildMember){
+export default function systemsEval(req : string, message : Message){
+    const member  : GuildMember= message.member;
+    const channel : Channel = message.channel;
     if (member.id !== gb.ownerID) return;
-    return eval(req);
+    if (channel instanceof TextChannel){
+        channel.send(eval(req));
+    }
 }

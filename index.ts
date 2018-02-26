@@ -32,7 +32,7 @@ const db           : Database       = new Database(DATABASE_URL);
 bot.login(BOT_TOKEN);
 
 bot.on('ready', async function(){
-    gb.ownerID = await onReady(bot);
+    gb.ownerID = await onReady(bot, db);
 });
 
 bot.on('message', function(message : Discord.Message){
@@ -40,7 +40,7 @@ bot.on('message', function(message : Discord.Message){
 });
 
 bot.on('guildMemberAdd', function(member : Discord.GuildMember){
-    onGuildMemberAdd(member);
+    onGuildMemberAdd(member, db);
 });
 
 bot.on('guildMemberRemove', function(member : Discord.GuildMember){
