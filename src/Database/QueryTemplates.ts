@@ -1,9 +1,12 @@
-export const defaultTableTemplates : string[] = [
+import {Query} from "./Database";
+
+export const defaultTableTemplates : Query[] = [
     'CREATE TABLE IF NOT EXISTS guilds(' +
     'id varchar PRIMARY KEY,' +
     'name varchar,' +
     "prefix char DEFAULT '.'," +
-    'allowsinvites boolean DEFAULT FALSE)',
+    'allowsinvites boolean DEFAULT FALSE,' +
+    "default_channel varchar DEFAULT '')",
 
     'CREATE TABLE IF NOT EXISTS users(' +
     'id varchar,' +
@@ -20,4 +23,8 @@ export const defaultTableTemplates : string[] = [
     'link varchar)',
 ];
 
-export const getPrefixes : string = "SELECT id, prefix FROM guilds";
+export const getPrefixes : Query =
+    "SELECT id, prefix FROM guilds";
+
+export const testQuery : Query =
+    'SELECT * from guilds';
