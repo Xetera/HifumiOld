@@ -2,10 +2,10 @@ import * as Discord from "discord.js";
 import * as dbg from "debug";
 
 export const debug = {
-    silly: dbg('Bot:onGuildMemberRemove:Silly'),
-    info: dbg('Bot:onGuildMemberRemove:Info'),
+    silly  : dbg('Bot:onGuildMemberRemove:Silly'),
+    info   : dbg('Bot:onGuildMemberRemove:Info'),
     warning: dbg('Bot:onGuildMemberRemove:Warning'),
-    error: dbg('Bot:onGuildMemberRemove:Error')
+    error  : dbg('Bot:onGuildMemberRemove:Error')
 };
 
 export default function onGuildMemberRemove(member : Discord.GuildMember) : void {
