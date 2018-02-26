@@ -7,6 +7,7 @@ import {Database} from "../Database/Database";
 import setDefaultChannel from "../Commands/Utilty/SetDefaultChannel";
 import {IGuild, isIGuild} from "../Database/TableTypes";
 import setPrefix from "../Commands/Utilty/SetPrefix";
+import systemsEval from "../Commands/Self/Eval";
 
 export const debug = {
     silly  : dbg('Bot:CommandHandler:Silly'),
@@ -47,6 +48,11 @@ export default function commandHandler(
                 break;
             case "setdefault":
                 setDefaultChannel(message.guild.id, message.channel, database);
+                break;
+            case "removedefault":
+                break;
+            case "eval":
+                systemsEval(args.join(' '), message);
                 break;
         }
     }

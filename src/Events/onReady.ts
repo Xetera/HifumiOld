@@ -1,10 +1,10 @@
 import * as Discord from'discord.js'
 import {debug} from '../Utility/Logging'
+import {Database} from "../Database/Database";
 
 
 // returning owner id at the end
-export default function onReady(bot : Discord.Client) : Promise<string> {
-
+export default function onReady(bot : Discord.Client, database : Database) : Promise<string> {
     debug.info(`${bot.user.username} is fully online.`);
     bot.generateInvite().then(link => {
         debug.info(`Invite link: ${link}`);
