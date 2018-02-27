@@ -8,11 +8,14 @@ export const defaultTableTemplates : Query[] = [
     'allowsinvites boolean DEFAULT FALSE,' +
     "default_channel varchar DEFAULT '')",
 
-    'CREATE TABLE IF NOT EXISTS users(' +
-    'id varchar,' +
-    'name varchar,' +
-    'guild_id int,' +
-    'invitestrikes int DEFAULT 0)',
+    `
+    CREATE TABLE IF NOT EXISTS users(
+    id varchar,
+    name varchar,
+    guild_id varchar,
+    invite_strikes int DEFAULT 0,
+    ignoring boolean DEFAULT FALSE)
+    `,
 
     'CREATE TABLE IF NOT EXISTS blacklisted_links(' +
     'guild_id varchar,' +

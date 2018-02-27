@@ -10,7 +10,7 @@ export interface IUser {
     id: string;
     name:string;
     guild_id: string;
-    invitestrikes: number;
+    invite_strikes: number;
 }
 
 export interface IBlacklistedLinks {
