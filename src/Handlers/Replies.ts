@@ -7,5 +7,6 @@ export function bannedForSpammingInvites(guild : Guild) : string {
 export const welcomeMessages = [
     'You must be new around here kid...',
     "Interesting, I haven't seen you around before.",
-    'A new challenger approaches!'
+    'A new challenger approaches!',
+    "What do you think you're some sort of a tough guy huh?"
 ];
