@@ -1,5 +1,4 @@
 import * as Discord from 'discord.js'
-import {formatTime} from "../../Utility/Util";
 import * as moment from "moment";
 import gb from "../../Misc/Globals";
 import {Environments} from "../../Events/systemStartup";
