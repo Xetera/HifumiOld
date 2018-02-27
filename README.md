@@ -7,17 +7,28 @@ Currently hosted on [heroku](https://www.heroku.com/)
 <img align="middle;" src="https://cdn.discordapp.com/avatars/372615866652557312/9a96e77dd6bfe50474c39e10e3548af3.png?size=256">
 
 ## Whatcha Got:
+![convo](https://image.flaticon.com/icons/png/128/99/99678.png) 
+
 Alexa responds to everything you say if you say her name.
 - Optional: She responds to every message if you make a channel called 'chat-with-alexa' unless starting your message with a dash
 
-Detecting spammers and automatically muting them for a set amount of time.
+![ban](https://cdn.discordapp.com/emojis/230072259933503488.png?v=1) 
+
+Detecting spammers and automatically muting them for a set amount of time. 
 * This requires a role called 'muted' that has no permissions other than reading chat and history
 * The muted rule must be overriding category permissions
 * The channel permissions must either be synched with the category or have its own mute permission
 
 By default she doesn't allow advertising on your server (discord invite links), you can make exceptions or completely enable it.
 
-Logging join and leave times by default on channel 'logs', additional greeting on a channel of your choice with `.setdefault`
+<img src="https://cdn.discordapp.com/emojis/414332109407387649.png?v=1"></img>
+
+
+Logging join and leave times by default on channel 'logs'
+
+Additional greeting on a channel of your choice
+<br/><br/><br/>
+
 
 ## Currently required permissions:
 * Read Messages - pretty
