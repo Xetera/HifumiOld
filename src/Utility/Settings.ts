@@ -54,8 +54,8 @@ export function getOnBanMessageSnipeCount() : number {
     }
 }
 const DANGEROUS_DURATION : number = 0;
-const MEDIUM_DURATION    : number = 10;
-const HIGH_DURATION      : number = 20 * 60;
+const MEDIUM_DURATION    : number = 5 * 60;
+const HIGH_DURATION      : number = 30 * 60;
 
 export function getMuteDate() : Date {
     switch(securityLevel) {
