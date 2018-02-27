@@ -49,7 +49,8 @@ class MutedUser  {
             }
         }
         debug.info(`${this.name} was muted for ${getMuteTime()}s`);
-        log(this.member.guild, `${this.name} was muted for ${getMuteTime()}s`)
+        // TODO: format s based time into nice intervals
+        log(this.member.guild, `${this.name} was muted for ${getMuteTime()}s for spamming.`)
     }
     public cancelUnmute(){
         if (this.timeout === undefined)
