@@ -8,6 +8,10 @@ import setDefaultChannel from "../Commands/Utilty/SetDefaultChannel";
 import {IGuild, isIGuild} from "../Database/TableTypes";
 import setPrefix from "../Commands/Utilty/SetPrefix";
 import systemsEval from "../Commands/Self/Eval";
+import manualRestockUsers from "../Actions/ManualRestockUsers";
+import getPfp from "../Commands/Users/GetPfp";
+import uptime from "../Commands/Self/Uptime";
+import source from "../Commands/Self/Source";
 
 export const debug = {
     silly  : dbg('Bot:CommandHandler:Silly'),
@@ -53,6 +57,18 @@ export default function commandHandler(
                 break;
             case "eval":
                 systemsEval(args.join(' '), message);
+                break;
+            case "restock":
+                manualRestockUsers(message.guild, database);
+                break;
+            case "pfp":
+                getPfp(message, args);
+                break;
+            case "uptime":
+                uptime(message, bot);
+                break;
+            case "source":
+                source(message);
                 break;
         }
     }

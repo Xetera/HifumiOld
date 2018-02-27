@@ -1,12 +1,12 @@
 import {
-    getDefaultChannel,
-    getWhitelistedInvites, insertGuild, PreparedStatement, updateDefaultChannel,
-    upsertPrefix
+    getDefaultChannel, getMemberInviteStrikes,
+    getWhitelistedInvites, incrementMemberInviteStrikes, insertGuild, PreparedStatement, updateDefaultChannel,
+    upsertPrefix, insertMember
 } from "./PreparedStatements";
 import {IDatabase, IMain, IOptions, ITask} from 'pg-promise'
 import {defaultTableTemplates, getPrefixes, testQuery} from "./QueryTemplates";
-import {Collection, Guild} from "discord.js";
-import {IGuild} from "./TableTypes";
+import {Collection, Guild, GuildMember} from "discord.js";
+import {IGuild, IUser} from "./TableTypes";
 
 import * as pgPromise from 'pg-promise'
 import * as dbg from "debug";
@@ -132,20 +132,26 @@ export class Database {
     private checkTables() : Promise<any> {
         return this.db.task(t => {
             let queries : string[] = [];
-            defaultTableTemplates.forEach(query => {
+            defaultTableTemplates.forEach((query : Query)=> {
                 queries.push(t.none(query));
             });
             return t.batch(queries);
         });
     }
 
-    public setPrefix(guild_id : string, prefix : string) : Promise<IGuild|Error|-1> {
+    private addGuild(guild : Guild){
+        this.db.one(insertGuild(guild)).then((guild : IGuild)=> {
+            this.cacheNewGuild(guild);
+        });
+    }
+
+    public setPrefix(guild : Guild, prefix : string) : Promise<IGuild|Error|-1> {
         if (prefix.length > 1) // this could change later on where we support up to 3 but na
             // have to Promise.reject outside the promise chain
             return Promise.reject(-1);
 
-        const prepStatement : PreparedStatement = upsertPrefix(guild_id, prefix);
-        return this.db.one(prepStatement).then((res: IGuild)=> {
+        const query : string = upsertPrefix(guild, prefix);
+        return this.db.one(query).then((res: IGuild)=> {
             // changing our cached value as well
             this.guilds[res.id].prefix = res.prefix;
             return res;
@@ -159,10 +165,10 @@ export class Database {
         return this.guilds[guildId] || ".";
     }
 
-    public addGuild(guild : Guild){
-        this.db.one(insertGuild(guild.id, guild.name)).then((guild : IGuild)=> {
-            this.cacheNewGuild(guild);
-        });
+    public insertMember(member : GuildMember) {
+        return this.db.one(insertMember(member)).then((res : IUser)=> {
+            return; // nothing for now
+        })
     }
 
     public addBlacklistedLink(link : string){
@@ -194,4 +200,25 @@ export class Database {
         if (this.guilds[guildId] === undefined) return undefined;
         return this.guilds[guildId].defaultChannel;
     }
+
+    public insertNewGuild(guild : Guild){
+        this.initializeGuildIfNone(guild.id);
+        this.addGuild(guild);
+        guild.members.forEach((member: GuildMember )=> {
+            this.insertMember(member);
+        });
+    }
+
+    public getMemberInviteStrikes(member : GuildMember){
+        return this.db.oneOrNone(getMemberInviteStrikes(member)).then((res : IUser)=> {
+            return res.invite_strikes;
+        })
+    }
+
+    public incrementMemberInviteStrikes(member : GuildMember){
+        return this.db.one(incrementMemberInviteStrikes(member)).then((res:IUser )=> {
+            return res.invite_strikes;
+        });
+    }
+
 }
