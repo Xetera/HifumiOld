@@ -1,8 +1,11 @@
-# Alexa
+# Alexa 
 
 Moderation based discord bot written in Typescript - inspired by [hotbot](https://github.com/AberrantFox/hotbot)
 
 Currently hosted on [heroku](https://www.heroku.com/)
+
+<img align="middle;" src="https://cdn.discordapp.com/avatars/372615866652557312/9a96e77dd6bfe50474c39e10e3548af3.png?size=256">
+
 ## Whatcha Got:
 Alexa responds to everything you say if you say her name.
 - Optional: She responds to every message if you make a channel called 'chat-with-alexa' unless starting your message with a dash
