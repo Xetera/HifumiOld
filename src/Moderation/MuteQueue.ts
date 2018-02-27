@@ -4,6 +4,7 @@ import {scheduleUnmute} from "./ScheduleUnmute";
 import {DiscordAPIError} from "discord.js";
 import {getMuteTime} from "../Utility/Settings";
 import Timer = NodeJS.Timer;
+import {log} from "../Utility/Logging";
 
 const debug = {
     silly   : dbg('Bot:MuteQueue:Silly'),
@@ -38,15 +39,17 @@ class MutedUser  {
 
         try {
             this.member.addRole(this.role, `Spamming`);
+
         } catch (err) {
             if (err instanceof DiscordAPIError){
-                debug.warning(`Could not mute spammer ${this.name}, missing permissions.`);
+                return debug.warning(`Could not mute spammer ${this.name}, missing permissions.`);
             }
             else {
-                debug.error(`Unexpected error while muting user ${this.name}`, err);
+                return debug.error(`Unexpected error while muting user ${this.name}`, err);
             }
         }
-        this.muteQueue.scheduleUnmute(this.member);
+        debug.info(`${this.name} was muted for ${getMuteTime()}s`);
+        log(this.member.guild, `${this.name} was muted for ${getMuteTime()}s`)
     }
     public cancelUnmute(){
         if (this.timeout === undefined)
@@ -63,9 +66,10 @@ export class MuteQueue {
         debug.info('MuteQueue is ready.');
     }
 
-    public add(user : Discord.GuildMember, role : Discord.Role, unmuteDate : Date) : void {
-        this.queue.push(new MutedUser(user, role, unmuteDate, this));
-        //this.scheduleUnmute(user);
+    public add(member : Discord.GuildMember, role : Discord.Role, unmuteDate : Date) : void {
+        this.queue.push(new MutedUser(member, role, unmuteDate, this));
+        if (this.queue.findIndex(mute => mute.member === member) !== -1)
+            this.scheduleUnmute(member);
     }
 
     public getMutedUserCount() : number {
@@ -94,9 +98,9 @@ export class MuteQueue {
 
     public scheduleUnmute(user : Discord.GuildMember){
         let _this = this;
-        let index : number = this.queue.findIndex((usr: MutedUser) => {
-            return usr.member.id === user.id
-        });
+        let index : number = this.queue.findIndex((usr: MutedUser) =>
+            usr.member.id === user.id
+        );
         let mutedGuildMember : MutedUser = this.queue[index];
         if (mutedGuildMember === undefined) return debug.error('Tried to shift an empty MuteQueue.');
 
