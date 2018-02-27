@@ -48,7 +48,14 @@ export default function onGuildMemberAdd(member : Discord.GuildMember, instance:
         defaultChannel.send(defaultChannelEmbed).then(welcomeMessage => {
             if (welcomeMessage instanceof Discord.Message){
                 // is not an array of messages
-                welcomeMessage.react('👋');
+                const kanna_wave =
+                    member.client.emojis.find('id', '418084038692306965')
+                ||  member.client.emojis.find('id', '418085348258611215');
+
+                if (kanna_wave !== undefined)
+                    welcomeMessage.react(kanna_wave);
+                else
+                    debug.error('Could not react to new user joining with kanna_wave');
             }
         });
     }
