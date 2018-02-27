@@ -1,9 +1,11 @@
-import {Environments, getDatabaseConnection, getEnvironmentSettings, getTokens} from "./src/Events/systemStartup";
+import {getDatabaseConnection, getEnvironmentSettings, getTokens} from "./src/Events/systemStartup";
+import gb, {Instance} from './src/Misc/Globals';
 
-const ENV : Environments = getEnvironmentSettings();
-const [BOT_TOKEN, CLEVERBOT_TOKEN] : string[] = getTokens(ENV);
+gb.ENV  = getEnvironmentSettings();
+// lol @ me passing in "global" variables
+const [BOT_TOKEN, CLEVERBOT_TOKEN] : string[] = getTokens(gb.ENV);
 
-const DATABASE_URL : DatabaseConfig = getDatabaseConnection(ENV);
+const DATABASE_URL : DatabaseConfig = getDatabaseConnection(gb.ENV);
 
 
 // modules
@@ -18,35 +20,47 @@ import onGuildMemberRemove from "./src/Events/onGuildMemberRemove";
 import onGuildCreate from "./src/Events/onGuildCreate";
 
 import * as Discord from 'discord.js'
-import gb from './src/Misc/Globals';
+import onChannelCreate from "./src/Events/onChannelCreate";
 
 // instances
-const bot          : Discord.Client = new Discord.Client();
-const alexa        : Alexa          = new Alexa(CLEVERBOT_TOKEN);
+
 const muteQueue    : MuteQueue      = new MuteQueue();
-const messageQueue : MessageQueue   = new MessageQueue(muteQueue);
-const db           : Database       = new Database(DATABASE_URL);
+
+const instance : Instance = {
+    bot         : new Discord.Client(),
+    alexa       : new Alexa(CLEVERBOT_TOKEN),
+    // otherwise throws no-implicit-any exception
+    muteQueue   : muteQueue,
+    messageQueue: new MessageQueue(muteQueue),
+    database    : new Database(DATABASE_URL)
+};
 
 
 
-bot.login(BOT_TOKEN);
 
-bot.on('ready', async function(){
-    gb.ownerID = await onReady(bot, db);
+
+instance.bot.login(BOT_TOKEN);
+
+instance.bot.on('ready', async function(){
+    gb.ownerID = await onReady(instance);
 });
 
-bot.on('message', function(message : Discord.Message){
-    onMessage(message, alexa, messageQueue, bot, db);
+instance.bot.on('message', function(message : Discord.Message){
+    onMessage(message, instance);
 });
 
-bot.on('guildMemberAdd', function(member : Discord.GuildMember){
-    onGuildMemberAdd(member, db);
+instance.bot.on('guildMemberAdd', function(member : Discord.GuildMember){
+    onGuildMemberAdd(member, instance);
 });
 
-bot.on('guildMemberRemove', function(member : Discord.GuildMember){
+instance.bot.on('guildMemberRemove', function(member : Discord.GuildMember){
     onGuildMemberRemove(member);
 });
 
-bot.on('guildCreate', function(guild : Discord.Guild){
-    onGuildCreate(guild, db);
+instance.bot.on('guildCreate', function(guild : Discord.Guild){
+    onGuildCreate(guild, instance);
+});
+
+instance.bot.on('channelCreate', function(channel :Discord.Channel){
+    onChannelCreate(channel);
 });
