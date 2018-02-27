@@ -59,7 +59,7 @@ export default function commandHandler(
                 systemsEval(args.join(' '), message);
                 break;
             case "restock":
-                manualRestockUsers(message.guild, database);
+                manualRestockUsers(message, database);
                 break;
             case "pfp":
                 getPfp(message, args);

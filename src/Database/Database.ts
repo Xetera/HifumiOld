@@ -1,7 +1,7 @@
 import {
     getDefaultChannel, getMemberInviteStrikes,
     getWhitelistedInvites, incrementMemberInviteStrikes, insertGuild, PreparedStatement, updateDefaultChannel,
-    upsertPrefix, insertMember
+    upsertPrefix, insertMember, cleanAllGuildMembers
 } from "./PreparedStatements";
 import {IDatabase, IMain, IOptions, ITask} from 'pg-promise'
 import {defaultTableTemplates, getPrefixes, testQuery} from "./QueryTemplates";
@@ -140,7 +140,7 @@ export class Database {
     }
 
     private addGuild(guild : Guild){
-        this.db.one(insertGuild(guild)).then((guild : IGuild)=> {
+        return this.db.oneOrNone(insertGuild(guild)).then((guild : IGuild)=> {
             this.cacheNewGuild(guild);
         });
     }
@@ -199,6 +199,18 @@ export class Database {
     public getDefaultChannel(guildId: string) : string | undefined {
         if (this.guilds[guildId] === undefined) return undefined;
         return this.guilds[guildId].defaultChannel;
+    }
+
+    public restockGuildMembers(guild :Guild){
+        this.initializeGuildIfNone(guild.id);
+
+        return this.addGuild(guild).then( ()=> {
+            return this.db.none(cleanAllGuildMembers(guild))
+        }).then(() => {
+            guild.members.forEach((member: GuildMember) => {
+                this.insertMember(member);
+            });
+        });
     }
 
     public insertNewGuild(guild : Guild){

@@ -44,9 +44,6 @@ const insertUserStatement : PreparedStatement = {
     text:
         'INSERT INTO users (id, name, guild_id) ' +
         'VALUES ($1, $2, $3) ' +
-        'WHERE NOT EXISTS (' +
-        'SELECT * FROM users WHERE (id = $1) AND (guild_id = $2)' +
-        ')' +
         'RETURNING *',
     values: []
 };
@@ -85,12 +82,21 @@ export function upsertPrefix(guild  : Guild, prefix : string) : string {
         RETURNING *
         `
 }
+
 export function insertGuild(guild : Guild){
     return `
         INSERT INTO guilds (id, name)
         VALUES ('${guild.id}', '${guild.name}')
+        ON CONFLICT (id) DO UPDATE
+        SET name = '${guild.name}'
         RETURNING *
         `
+}
+
+export function cleanAllGuildMembers(guild : Guild){
+    return `
+        DELETE FROM users 
+        WHERE guild_id = '${guild.id}'`;
 }
 
 export function getWhiltelistedInvites(guild : Guild) : string{
