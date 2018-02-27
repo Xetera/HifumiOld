@@ -40,6 +40,19 @@ export function getSpamTolerance() : number {
     }
 }
 
+export function getOnBanMessageSnipeCount() : number {
+    switch(securityLevel) {
+        case SecurityLevels.Dangerous: {
+            return 0;
+        }
+        case SecurityLevels.Medium: {
+            return 1;
+        }
+        case SecurityLevels.High: {
+            return 4;
+        }
+    }
+}
 const DANGEROUS_DURATION : number = 0;
 const MEDIUM_DURATION    : number = 10;
 const HIGH_DURATION      : number = 20 * 60;
