@@ -35,6 +35,26 @@ export function pluralize(word : string, number: number) : string | -1 {
     return -1;
 }
 
+export function formatTime(seconds : number) : string {
+    let moduloSeconds : number = Math.floor(seconds % 60);
+    let minutes : number = Math.floor(seconds/60);
+    let moduloMinutes : number = Math.floor(minutes % 60);
+    let hours : number = Math.floor(minutes/60);
+    let moduloHours : number = Math.floor(hours % 24);
+    let days : number = Math.floor(hours/24);
+
+    if (seconds < 60)
+        return `${Math.floor(seconds)}s`;
+    else if (minutes < 60) {
+        return `${minutes}m:${moduloSeconds}s`
+    }
+    else if (hours < 24){
+        return `${hours}h:${moduloMinutes}m:${moduloSeconds}`;
+    }
+    else {
+        return `${days}d:${moduloHours}h:${moduloMinutes}m:${moduloSeconds}`;
+    }
+}
 export enum ETime {
     Seconds,
     Minutes,
