@@ -3,6 +3,7 @@ import * as dbg from "debug";
 import {randChoice} from "../Utility/Util";
 import {welcomeMessages} from "../Handlers/Replies";
 import {Database} from "../Database/Database";
+import {Instance} from "../Misc/Globals";
 
 export const debug = {
     silly  : dbg('Bot:onGuildMemberAdd:Silly'),
@@ -11,7 +12,9 @@ export const debug = {
     error  : dbg('Bot:onGuildMemberAdd:Error')
 };
 
-export default function onGuildMemberAdd(member : Discord.GuildMember, database: Database) : void {
+export default function onGuildMemberAdd(member : Discord.GuildMember, instance: Instance) : void {
+    const database = instance.database;
+    database.insertMember(member);
     // we will change this later to fetch from a database instead of using a preset name
     const welcomeChannel : Discord.Channel | undefined = member.guild.channels.find('name', 'welcome');
     const defaultChannelId : string | undefined = database.getDefaultChannel(member.guild.id);
