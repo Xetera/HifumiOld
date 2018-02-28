@@ -13,6 +13,7 @@ import getPfp from "../Commands/Users/GetPfp";
 import uptime from "../Commands/Self/Uptime";
 import source from "../Commands/Self/Source";
 import ch from "../Commands/Fun/CyanideAndHappiness";
+import {getHelp} from "../Commands/Utilty/Help";
 
 export const debug = {
     silly  : dbg('Bot:CommandHandler:Silly'),
@@ -45,6 +46,9 @@ export default function commandHandler(
         debug.info(`[${message.guild.name}]<${message.author.username}>: ${message.content}`);
 
         switch(command.toLowerCase()){
+            case "help":
+                getHelp(message, args, database);
+                break;
             case "nuke":
                 nuke(message.channel);
                 break;

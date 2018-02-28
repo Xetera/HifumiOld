@@ -10,6 +10,7 @@ import {MessageType} from "../Interfaces/Enum";
 import getInvite from "../Commands/Self/getInvite";
 import commandHandler from "../Handlers/CommandHandler";
 import {Instance} from "../Misc/Globals";
+import {getHelp} from "../Commands/Utilty/Help";
 
 export const debug = {
     silly: dbg('Bot:onMessage:Silly'),
@@ -53,8 +54,12 @@ export default function onMessage(
     if (messageType === MessageType.GuildMessage)
         middleWare(message, alexa, messageQueue, bot, database);
 
-    // we will change this later to fetch and cache prefixes on a per-server basic
-    if (!database.getPrefix(message.guild.id)) return;
+    // we want to serve the help page to the user even if they have the wrong
+    // prefix in case they don't know what the prefix is
+    if (message.content === '.help') return getHelp(message, [], database);
+
+    if (!message.content.startsWith(database.getPrefix(message.guild.id))) return;
+
     // right now this only supports 1 char length prefix but we can change that later
 
     commandHandler(messageType, message, bot, database);
