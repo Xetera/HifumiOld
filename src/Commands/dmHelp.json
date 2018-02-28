@@ -1,6 +1,7 @@
 {
   "invite":{
-    "info": "Sends an invite link so you can have me in your server ☺️\nYou need the 'Manage Servers' permission for this.",
-    "example": ".invite"
+    "name": "invite",
+    "info": "Sends an invite link so you can have me in your server =)️\n[Discord requires 'Manage Server' permissions to add bots]",
+    "example": "invite"
   }
 }
