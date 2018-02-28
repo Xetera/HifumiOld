@@ -12,6 +12,7 @@ import manualRestockUsers from "../Actions/ManualRestockUsers";
 import getPfp from "../Commands/Users/GetPfp";
 import uptime from "../Commands/Self/Uptime";
 import source from "../Commands/Self/Source";
+import ch from "../Commands/Fun/CyanideAndHappiness";
 
 export const debug = {
     silly  : dbg('Bot:CommandHandler:Silly'),
@@ -69,6 +70,9 @@ export default function commandHandler(
                 break;
             case "source":
                 source(message);
+                break;
+            case "ch":
+                ch(message);
                 break;
         }
     }
