@@ -1,17 +1,37 @@
 {
   "help": {
-    "info": "sends you, well... this message.",
-    "usage": ".help",
+    "name": "help",
+    "type": "Utility",
+    "info": "Sends you, well... this message.",
+    "usage": "help",
     "example": "😠 I'm not showing you this!"
   },
   "nuke": {
+    "name": "nuke",
+    "type": "Moderation",
     "info":"Deletes a certain number of past messages.",
-    "usage": ".nuke <# of msgs to delete>(default 50)",
-    "example": ".nuke 100"
+    "usage": "nuke <# of msgs to delete> (default 50)",
+    "example": "nuke 100"
   },
   "setprefix": {
-    "info": "Changes the prefix I listen to for this server, requires ADMINISTRATOR permissions from the sender.",
-    "usage":".setprefix {new prefix}",
-    "example": ".setprefix $"
+    "name": "setprefix",
+    "type": "Self",
+    "info": "Changes the prefix I listen to for this server.\n[requires ADMINISTRATOR permissions]",
+    "usage":"setprefix {new prefix}",
+    "example": "setprefix $"
+  },
+  "pfp": {
+    "name": "pfp",
+    "type": "Utility",
+    "info": "Fetches the profile picture of the user.",
+    "usage": "pfp {pinged user or userId}",
+    "example": "pfp @Member | pfp 4563862635863"
+  },
+  "ch": {
+    "name": "ch",
+    "type": "Fun",
+    "info": "Sends a random Cyanide and Happiness comic.",
+    "usage": "ch",
+    "example": "ch"
   }
 }
