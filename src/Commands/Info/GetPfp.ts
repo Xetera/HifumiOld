@@ -1,6 +1,6 @@
 import * as Discord from 'discord.js'
 import * as dbg from "debug";
-import {getHelp} from "../Utilty/Help";
+import {getHelp} from "./Help";
 
 export const debug = {
     silly  : dbg('Bot:PFP:Silly'),

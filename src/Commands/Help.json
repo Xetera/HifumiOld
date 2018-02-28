@@ -16,7 +16,7 @@
   "setprefix": {
     "name": "setprefix",
     "type": "Self",
-    "info": "Changes the prefix I listen to for this server.\n[requires ADMINISTRATOR permissions]",
+    "info": "Changes the prefix I listen to for this server. [only ADMINISTRATOR]",
     "usage":"setprefix {new prefix}",
     "example": "setprefix $"
   },
