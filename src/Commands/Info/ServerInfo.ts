@@ -4,7 +4,6 @@ import {Presence, RichEmbed} from "discord.js";
 export default function serverInfo(message : Discord.Message) : void {
     if (!message.guild.available) return;
     const guild = message.guild;
-    console.log(guild.channels);
     const voiceChannelCount = guild.channels.filter(channel =>
         channel.type === 'voice'
     ).array().length;

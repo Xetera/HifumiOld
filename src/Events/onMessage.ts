@@ -9,6 +9,7 @@ import {MessageType} from "../Interfaces/Enum";
 import commandHandler from "../Handlers/CommandHandler";
 import {Instance} from "../Misc/Globals";
 import {getHelp} from "../Commands/Info/Help";
+import DMCommandHandler from "../Handlers/DMCommandHandler";
 
 export const debug = {
     silly: dbg('Bot:onMessage:Silly'),
@@ -52,11 +53,13 @@ export default function onMessage(message: Discord.Message, instance: Instance){
 
     // we want to serve the help page to the user even if they have the wrong
     // prefix in case they don't know what the prefix is
+    else if (messageType === MessageType.PrivateMessage)
+        return DMCommandHandler(message, instance);
+
     if (message.content === '.help') return getHelp(message, [], database);
 
     if (!message.content.startsWith(database.getPrefix(message.guild.id))) return;
 
     // right now this only supports 1 char length prefix but we can change that later
-
-    commandHandler(messageType, message, bot, database);
+    commandHandler(message, instance);
 }
