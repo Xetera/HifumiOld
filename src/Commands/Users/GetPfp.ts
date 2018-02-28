@@ -9,7 +9,6 @@ export const debug = {
     error  : dbg('Bot:PFP:Error')
 };
 export default function pfp(message: Discord.Message, args : string[]){
-    getHelp();
     let url : string;
     const mentionedMembers = message.mentions.members;
     if (mentionedMembers.array().length > 0){

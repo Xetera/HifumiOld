@@ -162,7 +162,7 @@ export class Database {
     }
 
     public getPrefix(guildId : string) {
-        return this.guilds[guildId] || ".";
+        return this.guilds[guildId].prefix || ".";
     }
 
     public insertMember(member : GuildMember) {
