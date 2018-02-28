@@ -21,6 +21,7 @@ import onGuildCreate from "./src/Events/onGuildCreate";
 
 import * as Discord from 'discord.js'
 import onChannelCreate from "./src/Events/onChannelCreate";
+import updatePresence from "./src/Actions/UpdatePresence";
 
 // instances
 
@@ -40,6 +41,10 @@ const instance : Instance = {
 
 
 instance.bot.login(BOT_TOKEN);
+
+setInterval(function(){
+    updatePresence(instance.bot);
+}, 1000 * 60 * 10);
 
 instance.bot.on('ready', async function(){
     gb.ownerID = await onReady(instance);

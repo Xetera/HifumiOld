@@ -8,6 +8,7 @@ import {Environments} from "../Events/systemStartup";
 interface Globals {
     ownerID: string;
     ENV: Environments;
+    allMembers:number;
 }
 
 export interface Instance {

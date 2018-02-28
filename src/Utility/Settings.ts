@@ -53,6 +53,7 @@ export function getOnBanMessageSnipeCount() : number {
         }
     }
 }
+
 const DANGEROUS_DURATION : number = 0;
 const MEDIUM_DURATION    : number = 5 * 60;
 const HIGH_DURATION      : number = 30 * 60;
