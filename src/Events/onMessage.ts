@@ -4,13 +4,11 @@ import {Alexa} from '../API/Alexa'
 import {MessageQueue} from "../Moderation/MessageQueue";
 import inviteListener from '../Listeners/InviteListener'
 import * as moment from "moment";
-import nuke from "../Commands/Utilty/Nuke";
 import {Database} from "../Database/Database";
 import {MessageType} from "../Interfaces/Enum";
-import getInvite from "../Commands/Self/getInvite";
 import commandHandler from "../Handlers/CommandHandler";
 import {Instance} from "../Misc/Globals";
-import {getHelp} from "../Commands/Utilty/Help";
+import {getHelp} from "../Commands/Info/Help";
 
 export const debug = {
     silly: dbg('Bot:onMessage:Silly'),
@@ -39,9 +37,7 @@ function middleWare(
     inviteListener(message, database);
 }
 
-export default function onMessage(
-    message: Discord.Message,
-    instance: Instance){
+export default function onMessage(message: Discord.Message, instance: Instance){
     const alexa = instance.alexa;
     const bot = instance.bot;
     const database = instance.database;

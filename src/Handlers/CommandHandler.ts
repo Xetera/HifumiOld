@@ -9,11 +9,13 @@ import {IGuild, isIGuild} from "../Database/TableTypes";
 import setPrefix from "../Commands/Utilty/SetPrefix";
 import systemsEval from "../Commands/Self/Eval";
 import manualRestockUsers from "../Actions/ManualRestockUsers";
-import getPfp from "../Commands/Users/GetPfp";
-import uptime from "../Commands/Self/Uptime";
-import source from "../Commands/Self/Source";
+import getPfp from "../Commands/Info/GetPfp";
+import uptime from "../Commands/Info/Uptime";
+import source from "../Commands/Info/Source";
 import ch from "../Commands/Fun/CyanideAndHappiness";
-import {getHelp} from "../Commands/Utilty/Help";
+import {getHelp} from "../Commands/Info/Help";
+import serverInfo from "../Commands/Info/ServerInfo";
+import echo from "../Commands/Utilty/Echo";
 
 export const debug = {
     silly  : dbg('Bot:CommandHandler:Silly'),
@@ -77,6 +79,12 @@ export default function commandHandler(
                 break;
             case "ch":
                 ch(message);
+                break;
+            case "echo":
+                echo(message, args);
+                break;
+            case "serverinfo":
+                serverInfo(message);
                 break;
         }
     }
