@@ -1,5 +1,4 @@
 import * as Discord from 'discord.js'
-import './../help.json'
 import {Database} from "../../Database/Database";
 const help = require('./../Help.json');
 
