@@ -33,5 +33,19 @@
     "info": "Sends a random Cyanide and Happiness comic.",
     "usage": "ch",
     "example": "ch"
+  },
+  "echo": {
+    "name": "echo",
+    "type": "Utility",
+    "info": "Sends a custom message to a channel.",
+    "usage": "echo {channel ID} {message}",
+    "example": "echo 3803832131 Hello World!"
+  },
+  "serverinfo": {
+    "name": "serverinfo",
+    "type": "Info",
+    "info": "Lists information about the current server.",
+    "usage": "serverinfo",
+    "example":"serverinfo"
   }
 }
