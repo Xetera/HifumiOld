@@ -57,7 +57,7 @@ In order of importance per topic
 - [ ] Allow users to disable the cleverbot feature of alexa
 
 ## Database:
-- [x] Implement a SQL based database that works for heroku as well -> Postgres
+- [x] Implement a relational database that works for heroku as well -> Postgres
 - [x] Guild specific prefix change
 - [x] Save the amount of invites a user has sent invites 
 - [x] Option to set default channels for welcome messages other than 'welcome'
@@ -70,11 +70,11 @@ In order of importance per topic
 - [x] Remove invite links
 - [x] Unmuting users based on security level
 - [ ] Option for mass banning muted users from a short interval
-- [ ] Blacklisted / restricted words
-- [ ] Blacklisted links
-- [ ] Save autobanned users (not manually) users to a global watchlist
+- [ ] Save autobanned (not manually) users to a global watchlist
 - [ ] Option to set default moderator warnings channel
 - [ ] Alert mods when users on a watchlist from another server joins
+- [ ] Blacklisted / restricted words
+- [ ] Blacklisted links
 
 ## Music: **-Low priority**
 - [x] Play basic songs off youtube
