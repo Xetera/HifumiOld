@@ -1,7 +1,8 @@
 import * as Discord from'discord.js'
-import {debug} from '../utility/Logging'
+import {debug, startupTable} from '../utility/Logging'
 import {default as gb, Instance} from "../misc/Globals";
 import {Environments} from "./systemStartup";
+const cli = require('heroku-cli-util');
 
 
 
@@ -12,28 +13,33 @@ export default function onReady( instance : Instance) : Promise<string> {
     const bot = instance.bot;
     const database = instance.database;
     gb.allMembers = 0;
-    debug.info(`${bot.user.username} is fully online.`);
+    debug.info(`${bot.user.username} is fully online.`, "Ready");
 
     return bot.generateInvite().then(link => {
         debug.info(`Invite link: ${link}`);
 
         let guilds = bot.guilds.array();
-        let guildMessage = `Guilds: ${guilds.length}\n-----------------------------\n`;
+        let startupGuild = [];
+
         for (let guild of guilds) {
             gb.allMembers += guild.members.array().length;
-            guildMessage += `[${guild.name}]: ${guild.members.array().length} members\n`;
+            startupGuild.push({
+                name: guild.name,
+                members: guild.members.array().length,
+                channels: guild.channels.array().length
+            });
         }
 
-        debug.info(guildMessage);
+        startupTable(startupGuild);
         return bot;
 
-        }).then((bot) => {
+        }).then((bot : Discord.Client) => {
             setGlobals(bot);
             return bot.user.setActivity(`out for ${gb.allMembers} users`, {
             type: 'WATCHING'
         }).then(() => {
             return bot.fetchApplication();
-        }).then(app => {
+        }).then((app : Discord.OAuth2Application)=> {
             return app.owner.id;
         });
     });

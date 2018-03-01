@@ -23,6 +23,7 @@
     "discord.js": "^11.2.1",
     "ffmpeg-binaries": "^3.2.2-3",
     "googleapis": "^26.0.1",
+    "heroku-cli-util": "^8.0.0",
     "moment": "^2.20.1",
     "node-opus": "^0.2.7",
     "nodemon": "^1.14.11",

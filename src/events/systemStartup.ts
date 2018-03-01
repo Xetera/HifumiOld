@@ -1,19 +1,14 @@
-import * as dbg from "debug";
 import {PostgresLiveLoginConfig, PostgresDevLoginConfig} from "../database/Database";
 import gb from "../misc/Globals";
 import {Client, Guild} from "discord.js";
-
-export const debug = {
-    silly  : dbg('Bot:SystemStartup:Silly'),
-    info   : dbg('Bot:SystemStartup:Info'),
-    warning: dbg('Bot:SystemStartup:Warning'),
-    error  : dbg('Bot:SystemStartup:Error')
-};
+import {debug} from '../utility/Logging'
 
 export enum Environments {
     Development,
     Live
 }
+
+
 
 declare let process : {
     env: {

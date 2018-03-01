@@ -1,4 +1,5 @@
 import {Guild} from "discord.js";
+import {randChoice, randRange} from "../utility/Util";
 
 export const adminOnlyCommand : string = 'This command is only available to admins.';
 
@@ -21,6 +22,10 @@ export const welcomeMessages = [
 
 export const lackingOwnerPermissions =
     '_Laughing hysterically_ oh god, I can\'t believe you thought I\'d let you do that. :LUL:';
+
+export function randomRuntimeError() : string {
+    return randChoice(runtimeErrorResponses);
+}
 
 export const runtimeErrorResponses : string[] = [
     "Holy... I almost crashed while trying to do that, there was an error somewhere.",
