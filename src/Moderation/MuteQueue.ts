@@ -2,9 +2,9 @@ import * as Discord from 'discord.js'
 import * as dbg from "debug";
 import {scheduleUnmute} from "./ScheduleUnmute";
 import {DiscordAPIError} from "discord.js";
-import {getMuteTime} from "../Utility/Settings";
+import {getMuteTime} from "../utility/Settings";
 import Timer = NodeJS.Timer;
-import {log} from "../Utility/Logging";
+import {log} from "../utility/Logging";
 
 const debug = {
     silly   : dbg('Bot:MuteQueue:Silly'),

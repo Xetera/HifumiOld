@@ -49,6 +49,7 @@ function getDatabaseType(url : DatabaseConfig){
     return isDeployementLogin(url) ? 'heroku' : 'localhost';
 }
 
+
 export class Database {
     // variable login based on environment
     readonly initOptions = {
@@ -162,7 +163,11 @@ export class Database {
     }
 
     public getPrefix(guildId : string) {
-        return this.guilds[guildId].prefix || ".";
+        if (this.guilds[guildId] === undefined ) {
+            this.initializeGuildIfNone(guildId);
+            return '.';
+        }
+        return this.guilds[guildId].prefix;
     }
 
     public insertMember(member : GuildMember) {

@@ -1,10 +1,10 @@
 import axios, {AxiosRequestConfig, AxiosPromise} from 'axios'
 import * as Discord from 'discord.js'
 import * as cheerio from 'cheerio'
-import {CHBaseEndpoint, CHBaseEndpointMaxValue} from "../Endpoints/CyanideAndHappinessEndpoints";
-import {randRange} from "../../Utility/Util";
+import {CHBaseEndpoint, CHBaseEndpointMaxValue} from "../endpoints/CyanideAndHappinessEndpoints";
+import {randRange} from "../../utility/Util";
 import * as dbg from 'debug'
-import gb from "../../Misc/Globals";
+import gb from "../../misc/Globals";
 
 const debug = {
     error: dbg('Bot:CH:Error')

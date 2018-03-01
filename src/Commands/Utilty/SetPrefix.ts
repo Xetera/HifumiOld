@@ -1,12 +1,14 @@
 import * as Discord from 'discord.js'
-import {IGuild, isIGuild} from "../../Database/TableTypes";
-import {Database} from "../../Database/Database";
+import {IGuild, isIGuild} from "../../database/TableTypes";
+import {Database} from "../../database/Database";
 import * as dbg from "debug";
-import {adminOnlyCommand} from "../../Handlers/Replies";
+import {adminOnlyCommand} from "../../handlers/Replies";
+import onlyOwner from "../../handlers/permissions/decorators/onlyAdmin";
 
 export const debug = {
     error  : dbg('Bot:setPrefix:Error')
 };
+
 
 export default function setPrefix(message: Discord.Message, prefix: string, database: Database){
     if (prefix === undefined) return message.channel.send('No prefix was entered.');

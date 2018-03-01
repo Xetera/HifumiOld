@@ -1,9 +1,9 @@
 import {DiscordAPIError, Guild, GuildMember, Permissions} from "discord.js";
-import {getOnBanMessageSnipeCount} from "../Utility/Settings";
+import {getOnBanMessageSnipeCount} from "../utility/Settings";
 import {debug} from './Actions'
-import {APIErrors} from "../Interfaces/Errors";
-import {log} from "../Utility/Logging";
-import safeMessageUser from "../Handlers/SafeMessageUser";
+import {APIErrors} from "../interfaces/Errors";
+import {log} from "../utility/Logging";
+import safeMessageUser from "../handlers/SafeMessageUser";
 
 
 export default function banForInviteSpam(member : GuildMember){

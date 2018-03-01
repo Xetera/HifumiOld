@@ -1,6 +1,6 @@
 import * as Discord from 'discord.js'
 import * as dbg from "debug";
-import {log} from "../Utility/Logging";
+import {log} from "../utility/Logging";
 
 export const debug = {
     silly  : dbg('Bot:onChannelCreate:Silly'),

@@ -1,5 +1,7 @@
 import * as dbg from "debug";
-import {PostgresLiveLoginConfig, PostgresDevLoginConfig} from "../Database/Database";
+import {PostgresLiveLoginConfig, PostgresDevLoginConfig} from "../database/Database";
+import gb from "../misc/Globals";
+import {Client, Guild} from "discord.js";
 
 export const debug = {
     silly  : dbg('Bot:SystemStartup:Silly'),
@@ -37,6 +39,7 @@ export function getEnvironmentSettings() : Environments{
         debug.error(`Unexpected environment: ${process.env.ENV}, setting environment to DEVELOPMENT.`);
         env = Environments.Development;
     }
+
     return env;
 }
 
@@ -77,4 +80,10 @@ export function getDatabaseConnection(env: Environments) : PostgresDevLoginConfi
         credentials.database = 'discord';
         return credentials;
     }
+}
+
+export function setGlobals(bot : Client){
+    console.log(bot.guilds);
+    const emojiServer : Guild = bot.guilds.find('id', '418699380833648642');
+    gb.emojis = emojiServer.emojis;
 }

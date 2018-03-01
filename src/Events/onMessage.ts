@@ -1,15 +1,15 @@
 import * as Discord from'discord.js'
 import * as dbg from 'debug'
 import {Alexa} from '../API/Alexa'
-import {MessageQueue} from "../Moderation/MessageQueue";
-import inviteListener from '../Listeners/InviteListener'
+import {MessageQueue} from "../moderation/MessageQueue";
+import inviteListener from '../listeners/InviteListener'
 import * as moment from "moment";
-import {Database} from "../Database/Database";
-import {MessageType} from "../Interfaces/Enum";
-import commandHandler from "../Handlers/CommandHandler";
-import {Instance} from "../Misc/Globals";
-import {getHelp} from "../Commands/Info/Help";
-import DMCommandHandler from "../Handlers/DMCommandHandler";
+import {Database} from "../database/Database";
+import {MessageType} from "../interfaces/identifiers";
+import commandHandler from "../handlers/CommandHandler";
+import {Instance} from "../misc/Globals";
+import {getHelp} from "../commands/info/Help";
+import DMCommandHandler from "../handlers/DMCommandHandler";
 
 export const debug = {
     silly: dbg('Bot:onMessage:Silly'),
@@ -61,5 +61,6 @@ export default function onMessage(message: Discord.Message, instance: Instance){
     if (!message.content.startsWith(database.getPrefix(message.guild.id))) return;
 
     // right now this only supports 1 char length prefix but we can change that later
-    commandHandler(message, instance);
+    if (instance.commandHandler !== undefined)
+        instance.commandHandler.handler(message, instance);
 }

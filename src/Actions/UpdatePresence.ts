@@ -1,5 +1,5 @@
 import * as Discord from 'discord.js'
-import {default as gb} from "../Misc/Globals";
+import {default as gb} from "../misc/Globals";
 
 export default function updatePresence(bot : Discord.Client) : void {
     gb.allMembers = 0;

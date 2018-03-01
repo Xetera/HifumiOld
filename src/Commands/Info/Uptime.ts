@@ -1,8 +1,8 @@
 import * as Discord from 'discord.js'
-import {formatTime} from "../../Utility/Util";
+import {formatTime} from "../../utility/Util";
 import * as moment from "moment";
-import gb from "../../Misc/Globals";
-import {Environments} from "../../Events/systemStartup";
+import gb from "../../misc/Globals";
+import {Environments} from "../../events/systemStartup";
 
 export default function uptime(message: Discord.Message, bot : Discord.Client){
     let env : string = gb.ENV === Environments.Live ? 'cloud': 'localhost';

@@ -1,5 +1,5 @@
 import * as Discord from 'discord.js'
-import {Database} from "../../Database/Database";
+import {Database} from "../../database/Database";
 const help = require('../Help.json');
 
 export function getHelp(message : Discord.Message, args : string[],  database : Database) {

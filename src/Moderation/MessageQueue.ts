@@ -2,7 +2,7 @@ import * as Discord from "discord.js";
 import * as moment from "moment";
 
 import {MuteQueue} from "./MuteQueue";
-import {getMuteDate, getMuteTime, getSpamTolerance, securityLevel, SecurityLevels} from "../Utility/Settings";
+import {getMuteDate, getMuteTime, getSpamTolerance, securityLevel, SecurityLevels} from "../utility/Settings";
 import * as dbg from "debug";
 
 

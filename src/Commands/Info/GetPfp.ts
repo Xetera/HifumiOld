@@ -28,7 +28,7 @@ export default function pfp(message: Discord.Message, args : string[]){
             return message.channel.send(args[0] + ' is not a valid user.');
     }
     else {
-        return message.channel.send(`${message.member} pfp requires either pinged user or user ID`);
+        return message.channel.send(`pfp requires either pinged user or user ID`);
     }
     if (url == null){
         return message.channel.send(`${mentionedMembers.first().displayName} does not have a profile picture.`);

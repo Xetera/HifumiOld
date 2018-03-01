@@ -6,19 +6,33 @@
     "usage": "help",
     "example": "😠 I'm not showing you this!"
   },
-  "nuke": {
-    "name": "nuke",
-    "type": "Moderation",
-    "info":"Deletes a certain number of past messages.",
-    "usage": "nuke <# of msgs to delete> (default 50)",
-    "example": "nuke 100"
-  },
   "setprefix": {
     "name": "setprefix",
     "type": "Self",
-    "info": "Changes the prefix I listen to for this server. [only ADMINISTRATOR]",
+    "info": "Changes the prefix I listen to for this server. [ADMIN]",
     "usage":"setprefix {new prefix}",
     "example": "setprefix $"
+  },
+  "nuke": {
+    "name": "nuke",
+    "type": "Moderation",
+    "info":"Deletes a certain number of past messages. [MOD]",
+    "usage": "nuke <# of msgs to delete> (default 50)",
+    "example": "nuke 100"
+  },
+  "setdefault": {
+    "name":"setdefault",
+    "type": "Utility",
+    "info": "Changes the channel I send welcome messages in. [MOD]",
+    "usage":"setdefault",
+    "example":"setdefault"
+  },
+  "echo": {
+    "name": "echo",
+    "type": "Utility",
+    "info": "Sends a custom message to a channel. [MOD]",
+    "usage": "echo {channel ID} {message}",
+    "example": "echo 3803832131 Hello World!"
   },
   "pfp": {
     "name": "pfp",
@@ -34,18 +48,25 @@
     "usage": "ch",
     "example": "ch"
   },
-  "echo": {
-    "name": "echo",
-    "type": "Utility",
-    "info": "Sends a custom message to a channel.",
-    "usage": "echo {channel ID} {message}",
-    "example": "echo 3803832131 Hello World!"
-  },
   "serverinfo": {
     "name": "serverinfo",
     "type": "Info",
     "info": "Lists information about the current server.",
     "usage": "serverinfo",
     "example":"serverinfo"
+  },
+  "uptime":{
+    "name":"uptime",
+    "type":"Info",
+    "info":"Show the amount I've gone since my last restart.",
+    "usage": "uptime",
+    "example": "uptime"
+  },
+  "source": {
+    "name":"source",
+    "type":"Info",
+    "info":"Sends my source code on github.",
+    "usage":"source",
+    "example":"source"
   }
 }

@@ -1,12 +1,12 @@
 import {Message} from 'discord.js'
 import {discordInviteRegex} from "./Regex";
-import {debug} from '../Events/onMessage'
-import {securityLevel, SecurityLevels} from "../Utility/Settings";
-import safeDeleteMessage from "../Handlers/SafeDeleteMessage";
-import {Database} from "../Database/Database";
-import banForInviteSpam from "../Actions/BanForInviteSpam";
-import safeMessageUser from "../Handlers/SafeMessageUser";
-import gb from "../Misc/Globals";
+import {debug} from '../events/onMessage'
+import {securityLevel, SecurityLevels} from "../utility/Settings";
+import safeDeleteMessage from "../handlers/SafeDeleteMessage";
+import {Database} from "../database/Database";
+import banForInviteSpam from "../actions/BanForInviteSpam";
+import safeMessageUser from "../handlers/SafeMessageUser";
+import gb from "../misc/Globals";
 
 export default function inviteListener(message : Message, database : Database){
     if (message.author.id === gb.ownerID) return; // heh

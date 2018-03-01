@@ -1,5 +1,5 @@
 import {DiscordAPIError, Message} from "discord.js";
-import {debug} from "../Events/onMessage";
+import {debug} from "../events/onMessage";
 
 interface ITime {
     seconds: number;
