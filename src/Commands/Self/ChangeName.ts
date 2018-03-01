@@ -1,19 +1,16 @@
 import * as Discord from 'discord.js'
-import {debug} from '../../Utility/Logging'
+import {debug} from '../../utility/Logging'
 
-export default function changeName(me : Discord.ClientUser, name : string){
+export default function setName(message : Discord.Message, name : string){
+    const me : Discord.ClientUser = message.client.user;
     const oldName = me.username;
-    return new Promise(function (resolve, reject) {
-        try {
-            me.setUsername(name).then(response => {
-                debug.info(`Changed my name from ${oldName} to ${response.username}.`);
-                resolve();
-            });
-        } catch (err) {
-            if (err instanceof Discord.DiscordAPIError){
-                debug.error("API error when trying to change my own username.", err);
-                reject(err);
-            }
+    if (name === '' || name === undefined)
+        return
+    return me.setUsername(name).then(response => {
+        return debug.info(`Changed my name from ${oldName} to ${response.username}.`);
+    }).catch (err => {
+        if (err instanceof Discord.DiscordAPIError) {
+            return debug.error("API error when trying to change my own username.", err);
         }
-    });
+    })
 }
