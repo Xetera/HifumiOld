@@ -72,6 +72,9 @@ In order of importance per topic
 - [ ] Option for mass banning muted users from a short interval
 - [ ] Blacklisted / restricted words
 - [ ] Blacklisted links
+- [ ] Save autobanned users (not manually) users to a global watchlist
+- [ ] Option to set default moderator warnings channel
+- [ ] Alert mods when users on a watchlist from another server joins
 
 ## Music: **-Low priority**
 - [x] Play basic songs off youtube
@@ -79,8 +82,9 @@ In order of importance per topic
 - [ ] Queuing up songs
 
 ## API: 
-- [x] Brawlhalla API module finished
 - [x] Cleverbot module rewritten - [clevertype](https://github.com/ilocereal/Clevertype) 
+- [ ] Brawlhalla API rewritten for typescript
+- [ ] Integrate own battlerite API **-Low priority**
 - [ ] Reintroduce the weather module
 - [ ] Get cleverbot to store CS per user **-Low priority**
 
