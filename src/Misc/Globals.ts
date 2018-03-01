@@ -1,14 +1,18 @@
 import * as Discord from 'discord.js'
 import {Alexa} from "../API/Alexa";
-import {MuteQueue} from "../Moderation/MuteQueue";
-import {MessageQueue} from "../Moderation/MessageQueue";
-import {Database} from "../Database/Database";
-import {Environments} from "../Events/systemStartup";
+import {MuteQueue} from "../moderation/MuteQueue";
+import {MessageQueue} from "../moderation/MessageQueue";
+import {Database} from "../database/Database";
+import {Environments} from "../events/systemStartup";
+import CommandHandler from "../handlers/CommandHandler";
+import {Snowflake} from "discord.js";
 
 interface Globals {
     ownerID: string;
+    emojiGuild: Discord.Guild;
     ENV: Environments;
     allMembers:number;
+    emojis: Discord.Collection<Discord.Snowflake, Discord.Emoji>;
 }
 
 export interface Instance {
@@ -17,6 +21,7 @@ export interface Instance {
     muteQueue: MuteQueue,
     messageQueue: MessageQueue,
     database : Database
+    commandHandler?:CommandHandler
 }
 
 let gb : Globals = <Globals>{};

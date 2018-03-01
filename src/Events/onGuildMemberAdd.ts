@@ -1,9 +1,9 @@
 import * as Discord from "discord.js";
 import * as dbg from "debug";
-import {randChoice} from "../Utility/Util";
-import {welcomeMessages} from "../Handlers/Replies";
-import {Database} from "../Database/Database";
-import {Instance} from "../Misc/Globals";
+import {randChoice} from "../utility/Util";
+import {welcomeMessages} from "../handlers/Replies";
+import {Database} from "../database/Database";
+import {Instance} from "../misc/Globals";
 
 export const debug = {
     silly  : dbg('Bot:onGuildMemberAdd:Silly'),
@@ -48,9 +48,7 @@ export default function onGuildMemberAdd(member : Discord.GuildMember, instance:
         defaultChannel.send(defaultChannelEmbed).then(welcomeMessage => {
             if (welcomeMessage instanceof Discord.Message){
                 // is not an array of messages
-                const kanna_wave =
-                    member.client.emojis.find('id', '418084038692306965')
-                ||  member.client.emojis.find('id', '418085348258611215');
+                const kanna_wave = member.client.emojis.find('name', 'alexa_kanna_wave');
 
                 if (kanna_wave !== undefined)
                     welcomeMessage.react(kanna_wave);
