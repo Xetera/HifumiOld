@@ -1,22 +1,41 @@
-import {MessageType} from "../Interfaces/Enum";
-import getInvite from "../Commands/DM/getInvite";
-import nuke from "../Commands/Utilty/Nuke";
-import {Client, Message} from "discord.js";
+import nuke from "../commands/utilty/Nuke";
+import * as Discord from "discord.js";
 import * as dbg from "debug";
-import {Database} from "../Database/Database";
-import setDefaultChannel from "../Commands/Utilty/SetDefaultChannel";
-import {IGuild, isIGuild} from "../Database/TableTypes";
-import setPrefix from "../Commands/Utilty/SetPrefix";
-import systemsEval from "../Commands/Self/Eval";
-import manualRestockUsers from "../Actions/ManualRestockUsers";
-import getPfp from "../Commands/Info/GetPfp";
-import uptime from "../Commands/Info/Uptime";
-import source from "../Commands/Info/Source";
-import ch from "../Commands/Fun/CyanideAndHappiness";
-import {getHelp} from "../Commands/Info/Help";
-import serverInfo from "../Commands/Info/ServerInfo";
-import echo from "../Commands/Utilty/Echo";
-import {Instance} from "../Misc/Globals";
+import {Database} from "../database/Database";
+import setDefaultChannel from "../commands/utilty/SetDefaultChannel";
+import setPrefix from "../commands/utilty/SetPrefix";
+import systemsEval from "../commands/self/Eval";
+import manualRestockUsers from "../actions/ManualRestockUsers";
+import getPfp, {default as pfp} from "../commands/info/GetPfp";
+import uptime from "../commands/info/Uptime";
+import source from "../commands/info/Source";
+import ch from "../commands/fun/CyanideAndHappiness";
+import {getHelp} from "../commands/info/Help";
+import serverInfo from "../commands/info/ServerInfo";
+import echo from "../commands/utilty/Echo";
+import {Instance} from "../misc/Globals";
+import onlyAdmin from "./permissions/decorators/onlyAdmin";
+import {Alexa} from "../API/Alexa";
+import {MuteQueue} from "../moderation/MuteQueue";
+import {MessageQueue} from "../moderation/MessageQueue";
+import onlyOwner from "./permissions/decorators/onlyOwner";
+import setName from "../commands/self/ChangeName";
+import setAvatar from "../commands/self/ChangePicture";
+import onlyMod from "./permissions/decorators/onlyMod";
+
+interface CommandParameters extends Instance {
+    message: Discord.Message;
+    args: string[];
+    bot: Discord.Client;
+    alexa: Alexa,
+    muteQueue: MuteQueue,
+    messageQueue: MessageQueue,
+    database : Database
+}
+
+interface indexSignature {
+    [method:string]: (CommandParameters);
+}
 
 export const debug = {
     silly  : dbg('Bot:CommandHandler:Silly'),
@@ -25,55 +44,109 @@ export const debug = {
     error  : dbg('Bot:CommandHandler:Error')
 };
 
-export default function commandHandler(message : Message,instance : Instance){
-    const bot = instance.bot;
-    const database = instance.database;
 
-    const contentArray : string[] = message.content.split(' ');
-    const command : string = contentArray[0].substring(1);
-    const args : string[] = contentArray.splice(1, contentArray.length);
+export default class CommandHandler implements indexSignature {
+    [method:string]: any;
+    commands : string[];
 
-    debug.info(`[${message.guild.name}]<${message.author.username}>: ${message.content}`);
-
-    switch(command.toLowerCase()){
-        case "help":
-            getHelp(message, args, database);
-            break;
-        case "nuke":
-            nuke(message.channel);
-            break;
-        case "setprefix":
-            setPrefix(message, args[0], database);
-            break;
-        case "setdefault":
-            setDefaultChannel(message.guild.id, message.channel, database);
-            break;
-        case "removedefault":
-            break;
-        case "eval":
-            systemsEval(args.join(' '), message);
-            break;
-        case "restock":
-            manualRestockUsers(message, database);
-            break;
-        case "pfp":
-            getPfp(message, args);
-            break;
-        case "uptime":
-            uptime(message, bot);
-            break;
-        case "source":
-            source(message);
-            break;
-        case "ch":
-            ch(message);
-            break;
-        case "echo":
-            echo(message, args);
-            break;
-        case "serverinfo":
-            serverInfo(message);
-            break;
+    constructor(){
+        this.commands = (Object.getOwnPropertyNames(Object.getPrototypeOf(this))
+            .filter(method=>{
+            return method !== 'constructor' && method !== 'handler';
+        }));
     }
 
+    public handler(message : Discord.Message,instance : Instance){
+        const contentArray : string[] = message.content.split(' ');
+        const command : string = contentArray[0].substring(1).toLowerCase();
+        const args : string[] = contentArray.splice(1, contentArray.length);
+
+        debug.info(`[${message.guild.name}]<${message.author.username}>: ${message.content}`);
+
+        const params : CommandParameters = {
+            message: message,
+            args: args,
+            bot: instance.bot,
+            alexa: instance.alexa,
+            muteQueue: instance.muteQueue,
+            messageQueue: instance.messageQueue,
+            database : instance.database
+        };
+
+        for (let i in this.commands){
+            const match = this.commands[i].match(new RegExp(command, 'i'));
+            console.log(match);
+            if (match)
+                return this[match[0]](params);
+        }
+
+    }
+    @onlyOwner
+    private setName(params: CommandParameters){
+        const name = params.args.join(' ');
+        setName(params.message, name);
+    }
+    /* Owner Commands */
+    @onlyOwner
+    private setAvatar(params: CommandParameters){
+        setAvatar(params.message, params.args[0]);
+    }
+
+    @onlyOwner
+    private eval(params: CommandParameters){
+        systemsEval(params.message, params.args.join(' '))
+    }
+
+    @onlyOwner
+    private restock(params : CommandParameters){
+        manualRestockUsers(params.message, params.database);
+    }
+
+    /* Admin Commands */
+
+    @onlyAdmin
+    private setPrefix(params: CommandParameters){
+        setPrefix(params.message, params.args[0], params.database);
+    }
+
+    /* Mod Commands */
+    @onlyMod
+    private nuke(params: CommandParameters){
+        nuke(params.message.channel, parseInt(params.args[0]));
+    }
+
+    @onlyMod
+    private setDefault(params : CommandParameters){
+        setDefaultChannel(params.message, params.database);
+    }
+
+    @onlyMod
+    private echo(params : CommandParameters){
+        echo(params.message, params.args)
+    }
+
+    /* Public Commands */
+    private help(params: CommandParameters){
+        getHelp(params.message, params.args, params.database)
+    }
+
+    private pfp(params : CommandParameters){
+        pfp(params.message, params.args);
+    }
+
+    private uptime(params : CommandParameters){
+        uptime(params.message, params.bot);
+    }
+
+    private source(params: CommandParameters){
+        source(params.message);
+    }
+
+    private ch(params: CommandParameters){
+        ch(params.message);
+    }
+
+    private serverInfo(params: CommandParameters){
+        serverInfo(params.message);
+    }
 }
