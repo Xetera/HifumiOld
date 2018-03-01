@@ -2,7 +2,7 @@
 
 Moderation based discord bot written in Typescript - inspired by [hotbot](https://github.com/AberrantFox/hotbot)
 
-Currently hosted on [heroku](https://www.heroku.com/)
+Currently hosted on [heroku](https://www.heroku.com/) and using [Discord.js](https://github.com/discordjs/discord.js)
 
 <img align="middle;" src="https://cdn.discordapp.com/avatars/372615866652557312/9a96e77dd6bfe50474c39e10e3548af3.png?size=256">
 
