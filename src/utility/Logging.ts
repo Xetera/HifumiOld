@@ -5,19 +5,19 @@ const cli = require('heroku-cli-util');
 export let debug = {
     silly  : function(obj : any, identifier:string = ''){
         if (identifier !== '') identifier += ':';
-        dbg(`Bot:${identifier}:Silly`)(cli.color.cyan(obj))
+        console.log(identifier + cli.color.cyan(obj))
     },
     info   : function(obj : any,identifier:string = ''){
         if (identifier !== '') identifier += ':';
-        dbg(`Bot:${identifier}Info`)(cli.color.green(obj))
+        console.log(identifier +cli.color.green(obj))
     },
     warning: function(obj : any,identifier:string = ''){
         if (identifier !== '') identifier += ':';
-        dbg(`Bot:${identifier}Warning`)(cli.color.yellow(obj))
+        console.log(identifier + cli.color.yellow(obj))
     },
     error  : function(obj : any,identifier:string = ''){
         if (identifier !== '') identifier += ':';
-        dbg(`Bot:${identifier}Error`)(cli.color.red(obj))
+        console.log(identifier + cli.color.red(obj))
     }
 };
 
