@@ -10,16 +10,16 @@ export async function muteUser(member : Discord.GuildMember, time : Date, queue 
     const mutedRole : any = member.guild.roles.find('name', 'muted');
 
     if (!mutedRole)
-        return debug.warning(`Spammer ${memberName} could not be muted, missing 'muted' role in server ${member.guild.name}.`);
+        return debug.warning(`Spammer ${memberName} could not be muted, missing 'muted' role in server ${member.guild.name}.`, "MuteUser");
 
     try {
         await member.addRole(mutedRole, `Spamming`);
     } catch (err) {
         if (err instanceof DiscordAPIError){
-            return debug.warning(`Could not mute spammer ${memberName}, missing permissions.`)
+            return debug.warning(`Could not mute spammer ${memberName}, missing permissions.`, "MuteUser")
         }
         else {
-            debug.error(`Unexpected error while muting user ${memberName}`, err);
+            debug.error(`Unexpected error while muting user ${memberName}\n` + err,  "MuteUser");
         }
     }
     const unmuteTime : Date = getMuteDate();
@@ -28,6 +28,6 @@ export async function muteUser(member : Discord.GuildMember, time : Date, queue 
     log(member.guild,
         `[${memberName}] was muted for ${getMuteTime()} seconds for spamming.`);
 
-    debug.warning(`[${memberName}] in ${member.guild.name} was muted for ${getMuteTime()} seconds.`);
+    debug.warning(`[${memberName}] in ${member.guild.name} was muted for ${getMuteTime()} seconds.`, "MuteUser");
     queue.add(member, mutedRole, unmuteTime);
 }

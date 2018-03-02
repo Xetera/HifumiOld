@@ -2,13 +2,7 @@ import * as Discord from 'discord.js'
 import {Collection} from "discord.js";
 import * as dbg from "debug";
 import {randomRuntimeError} from "../../handlers/Replies";
-
-export const debug = {
-    silly  : dbg('Bot:Snipe:Silly'),
-    info   : dbg('Bot:Snipe:Info'),
-    warning: dbg('Bot:Snipe:Warning'),
-    error  : dbg('Bot:Snipe:Error')
-};
+import {debug} from '../../utility/Logging'
 /*
 * Removes a user's past messages in a certain channel
 * */

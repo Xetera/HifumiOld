@@ -4,14 +4,8 @@ import {scheduleUnmute} from "./ScheduleUnmute";
 import {DiscordAPIError} from "discord.js";
 import {getMuteTime} from "../utility/Settings";
 import Timer = NodeJS.Timer;
-import {log} from "../utility/Logging";
+import {log, debug} from "../utility/Logging";
 
-const debug = {
-    silly   : dbg('Bot:MuteQueue:Silly'),
-    info    : dbg('Bot:MuteQueue:Info'),
-    warning : dbg('Bot:MuteQueue:Warning'),
-    error   : dbg('Bog:MuteQueue:Error')
-};
 
 class MutedUser  {
     member : Discord.GuildMember;
@@ -35,17 +29,17 @@ class MutedUser  {
 
     public muteUser(){
         if (this.member.hasPermission("ADMINISTRATOR"))
-            return debug.warning(`Tried to mute ${this.name} for ${getMuteTime()} seconds but they are an administrator.`);
+            return debug.warning(`Tried to mute ${this.name} for ${getMuteTime()} seconds but they are an administrator.`, "MuteQueue");
 
         try {
             this.member.addRole(this.role, `Spamming`);
 
         } catch (err) {
             if (err instanceof DiscordAPIError){
-                return debug.warning(`Could not mute spammer ${this.name}, missing permissions.`);
+                return debug.warning(`Could not mute spammer ${this.name}, missing permissions.`, "MuteQueue");
             }
             else {
-                return debug.error(`Unexpected error while muting user ${this.name}`, err);
+                return debug.error(`Unexpected error while muting user ${this.name}\n` +err, "MuteQueue");
             }
         }
         debug.info(`${this.name} was muted for ${getMuteTime()}s`);
@@ -54,7 +48,7 @@ class MutedUser  {
     }
     public cancelUnmute(){
         if (this.timeout === undefined)
-            return debug.error(`Could not cancel scheduled unmute for ${this.name}, user has no scheduled unmute date`);
+            return debug.error(`Could not cancel scheduled unmute for ${this.name}, user has no scheduled unmute date`, "MuteQueue");
         clearTimeout(this.timeout);
     }
 }
@@ -64,7 +58,7 @@ export class MuteQueue {
 
     constructor(){
         this.queue = [];
-        debug.info('MuteQueue is ready.');
+        debug.info('MuteQueue is ready.', "MuteQueue");
     }
 
     public add(member : Discord.GuildMember, role : Discord.Role, unmuteDate : Date) : void {
@@ -88,7 +82,7 @@ export class MuteQueue {
                 member.removeRole(releasedSpammer.role, `The ${releasedSpammer.unmuteSeconds} timeout duration ran out.`)
             }
             else {
-                debug.warning(`Could not release ${member.nickname||member.user.username}, not found in the muteQueue.`);
+                debug.warning(`Could not release ${member.nickname||member.user.username}, not found in the muteQueue.`, "MuteQueue");
             }
 
             i++;
@@ -103,7 +97,7 @@ export class MuteQueue {
             usr.member.id === user.id
         );
         let mutedGuildMember : MutedUser = this.queue[index];
-        if (mutedGuildMember === undefined) return debug.error('Tried to shift an empty MuteQueue.');
+        if (mutedGuildMember === undefined) return debug.error('Tried to shift an empty MuteQueue.', "MuteQueue");
 
         let timeDelta : number = getMuteTime(); // in seconds
 
@@ -122,14 +116,14 @@ export class MuteQueue {
             }
             catch (error) {
                 if (error instanceof DiscordAPIError){
-                    debug.error(`Tried to unmute ${mutedGuildMember.name} but they were already unmuted.`, error);
+                    debug.error(`Tried to unmute ${mutedGuildMember.name} but they were already unmuted.\n` + error, "MuteQueue");
                     return _this.queue.splice(index, 1);
                 }
                 debug.error(`Unexpected error while unmuting ${mutedGuildMember.name}.`, error);
             }
 
             _this.queue.splice(index, 1);
-            debug.info(`${mutedGuildMember.name} in ${mutedGuildMember.member.guild.name} was unmuted after ${timeDelta} seconds.`);
+            debug.info(`${mutedGuildMember.name} in ${mutedGuildMember.member.guild.name} was unmuted after ${timeDelta} seconds.`, "MuteQueue");
 
         }, timeDelta * 1000);
 

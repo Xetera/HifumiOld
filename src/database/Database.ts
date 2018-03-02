@@ -9,14 +9,7 @@ import {Collection, Guild, GuildMember} from "discord.js";
 import {IGuild, IUser} from "./TableTypes";
 
 import * as pgPromise from 'pg-promise'
-import * as dbg from "debug";
-
-export const debug = {
-    silly  : dbg('Bot:Database:Silly'),
-    info   : dbg('Bot:Database:Info'),
-    warning: dbg('Bot:Database:Warning'),
-    error  : dbg('Bot:Database:Error')
-};
+import {debug} from '../utility/Logging'
 
 interface ICachedGuild {
     prefix: string;
@@ -60,8 +53,8 @@ export class Database {
                 //
                 // Connections are reported back with the password hashed,
                 // for safe errors logging, without exposing passwords.
-                console.log('CN:', e.cn);
-                console.log('EVENT:', error.message || error);
+                debug.error('CN:\n'+ e.cn, "Database");
+                debug.error('EVENT:\n'+ error.message || error, "Database");
             }
         })
     };
@@ -74,21 +67,14 @@ export class Database {
 
     constructor(url : DatabaseConfig){
         this.config = url;
-        debug.info("Logging into Postgres on " + getDatabaseType(url));
+        debug.info("Logging into Postgres on " + getDatabaseType(url), "Database");
         this.db = this.pgp(this.config);
         this.checkTables();
         // we don't want to query the db every message so
         // we're caching the prefixes instead
         this.cacheGuilds();
-        debug.info('Database is connected.');
+        debug.info('Database is connected.', "Database");
 
-    }
-
-    private testDB(){
-        this.db.any(testQuery).then(q => {
-            console.log("TEST QUERY:");
-            console.log(q);
-        });
     }
 
     private initializeGuildIfNone(guildId : string) : boolean{
@@ -157,7 +143,7 @@ export class Database {
             this.guilds[res.id].prefix = res.prefix;
             return res;
         }).catch((err : Error) => {
-            debug.error("Error while updating prefix.", err);
+            debug.error("Error while updating prefix.\n"+ err, "Database");
             return err;
         });
     }

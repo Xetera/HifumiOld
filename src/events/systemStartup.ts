@@ -23,15 +23,15 @@ export function getEnvironmentSettings() : Environments{
     let env;
 
     if (process.env.ENV === "LIVE"){
-        debug.info('Current environment is Live.');
+        debug.info('Current environment is Live.', "Startup");
         env = Environments.Live;
     }
     else if (process.env.ENV === "DEVELOPMENT"){
-        debug.info('Current environment is Development');
+        debug.info('Current environment is Development', "Startup");
         env = Environments.Development;
     }
     else {
-        debug.error(`Unexpected environment: ${process.env.ENV}, setting environment to DEVELOPMENT.`);
+        debug.error(`Unexpected environment: ${process.env.ENV}, setting environment to DEVELOPMENT.`, "Startup");
         env = Environments.Development;
     }
 
@@ -52,7 +52,7 @@ export function getTokens(env: Environments) {
         CLEVERBOT_TOKEN = require('../../config0.json').CleverBotAPI;
     }
     else {
-        debug.error(`Unexpected environment: ${env}, setting token variables assuming deployment.`);
+        debug.error(`Unexpected environment: ${env}, setting token variables assuming deployment.`, "Startup");
         BOT_TOKEN = require('../../config0.json').TOKEN;
         CLEVERBOT_TOKEN = require('../../config0.json').CleverBotAPI;
     }
@@ -78,7 +78,6 @@ export function getDatabaseConnection(env: Environments) : PostgresDevLoginConfi
 }
 
 export function setGlobals(bot : Client){
-    console.log(bot.guilds);
     const emojiServer : Guild = bot.guilds.find('id', '418699380833648642');
     gb.emojis = emojiServer.emojis;
 }

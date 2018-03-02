@@ -3,15 +3,7 @@ import * as moment from "moment";
 
 import {MuteQueue} from "./MuteQueue";
 import {getMuteDate, getMuteTime, getSpamTolerance, securityLevel, SecurityLevels} from "../utility/Settings";
-import * as dbg from "debug";
-
-
-const debug = {
-    silly   : dbg('Bot:MessageQueue:Silly'),
-    info    : dbg('Bot:MessageQueue:Info'),
-    warning : dbg('Bot:MessageQueue:Warning'),
-    error   : dbg('Bog:MessageQueue:Error')
-};
+import {debug} from '../utility/Logging'
 
 interface Message extends Discord.Message {
     sent : Date;
@@ -25,7 +17,7 @@ export class MessageQueue {
         this.muteQueue = muteQueue;
         this.queue = new Map<Discord.Guild, Message[]>();
         this.bufferLength = size ? size : 200;
-        debug.info('MessageQueue is ready.');
+        debug.info('MessageQueue is ready.', "MessageQueue");
     }
 
     public add(msg: Message) : void {
@@ -46,7 +38,7 @@ export class MessageQueue {
                 const temp : Message | undefined = value.shift();
                 if (temp === undefined)
                     debug.error(`Tried to shift out an empty message from ${key.name}'s messageQueue` +
-                        `\nMost likely because buffer length is 0 or undefined.`);
+                        `\nMost likely because buffer length is 0 or undefined.`, "MessageQueue");
             }
         });
         this.checkForSpam(msg.member);
@@ -77,7 +69,7 @@ export class MessageQueue {
 
         // guaranteed that all messages are in the same guild
         if (securityLevel === SecurityLevels.High){
-            debug.silly('Removing spammer in high security mode');
+            debug.silly('Removing spammer in high security mode', "MessageQueue");
             const allMessages : Discord.Message[]  | void = this.getAllUserMessages(member);
             if (messages !== undefined){
                 
@@ -97,17 +89,17 @@ export class MessageQueue {
                 targetChannel.bulkDelete(channelMessages);
 
                 const guildMessages : Message[] | undefined = this.queue.get(guild);
-                if (guildMessages === undefined) return debug.error(`Tried to get ${guild.name} messages in MessageQueue but key does not exist.`);
+                if (guildMessages === undefined) return debug.error(`Tried to get ${guild.name} messages in MessageQueue but key does not exist.`, "MessageQueue");
 
                 for (let i in messages){
                     try{
                         guildMessages.splice(guildMessages.findIndex(msg=> msg.id === messages[i].id), 1);
                     }
                     catch (error) {
-                        debug.error(`Error splicing array for ${guild.name}'s messages in MessageQueue`);
+                        debug.error(`Error splicing array for ${guild.name}'s messages in MessageQueue`, "MessageQueue");
                     }
                 }
-                debug.info(`Deleted ${messages.length} messages from ${memberName} in ${targetChannel.name}`);
+                debug.info(`Deleted ${messages.length} messages from ${memberName} in ${targetChannel.name}`, "MessageQueue");
             }
         }
     }
@@ -119,7 +111,7 @@ export class MessageQueue {
         const messages : Message[] | undefined = this.queue.get(guild);
 
         if (messages === undefined) {
-            debug.error(`Tried fetching recent messages in a nonexistent server`);
+            debug.error(`Tried fetching recent messages in a nonexistent server`, "MessageQueue");
             return;
         }
         return messages.filter(message => {
@@ -130,7 +122,7 @@ export class MessageQueue {
 
     private getAllUserMessages(member : Discord.GuildMember) : Message[] | void {
         const messages : Message[] | undefined = this.queue.get(member.guild);
-        if (messages === undefined) return debug.error(`Guild ${member.guild} has no messages to get`);
+        if (messages === undefined) return debug.error(`Guild ${member.guild} has no messages to get`, "MessageQueue");
         return messages.filter(message => {
             return message.author.id === member.id
         })

@@ -44,6 +44,9 @@ export const debug = {
     error  : dbg('Bot:CommandHandler:Error')
 };
 
+function isMessage(message : any) : message is Discord.Message {
+    return <Discord.Message> message.content !== undefined;
+}
 
 export default class CommandHandler implements indexSignature {
     [method:string]: any;
@@ -52,18 +55,36 @@ export default class CommandHandler implements indexSignature {
     constructor(){
         this.commands = (Object.getOwnPropertyNames(Object.getPrototypeOf(this))
             .filter(method=>{
-            return method !== 'constructor' && method !== 'handler';
+            return method !== 'constructor' && method !== 'handler' && method !== 'parseInput';
         }));
     }
 
+    public static parseInput(message : Discord.Message) : [string, string[]]{
+        let args : string[] = [];
+
+        if (isMessage(message))
+            args = message.content.split(' ');
+        else
+            throw new TypeError(`'${message}' is not a Message object.`);
+
+
+        let command : string | undefined = args.shift();
+        if (command !== undefined) {
+            command = command.substring(1);
+            return [command, args];
+        }
+        else {
+            return ['', ['']]
+        }
+    }
+
     public handler(message : Discord.Message,instance : Instance){
-        const contentArray : string[] = message.content.split(' ');
-        const command : string = contentArray[0].substring(1).toLowerCase();
-        const args : string[] = contentArray.splice(1, contentArray.length);
+        const [command, args] = CommandHandler.parseInput(message);
+        if (command == '') return;
 
         debug.info(`[${message.guild.name}]<${message.author.username}>: ${message.content}`);
 
-        const params : CommandParameters = {
+        const params  : CommandParameters = {
             message: message,
             args: args,
             bot: instance.bot,

@@ -1,13 +1,6 @@
 import * as Discord from 'discord.js'
 import {Cleverbot, Config, Mood} from 'clevertype'
-import * as dbg from 'debug'
-
-const debug = {
-    silly   : dbg('Bot:Cleverbot:Silly'),
-    info    : dbg('Bot:Cleverbot:Info'),
-    warning : dbg('Bot:Cleverbot:Warning'),
-    error   : dbg('Bog:Cleverbot:Error')
-};
+import {debug} from '../utility/Logging'
 
 export class Alexa {
     cleverbot : Cleverbot;
@@ -15,7 +8,7 @@ export class Alexa {
 
     constructor(apiKey : string){
         this.cleverbot = new Cleverbot(apiKey);
-        debug.info('Cleverbot module is ready');
+        debug.info('Cleverbot module is ready', "Alexa");
     }
 
     private replaceKeyword(phrase : string) : string {
@@ -44,7 +37,7 @@ export class Alexa {
                 if (message.mentions.users.array().length !== 0 && !message.isMentioned(bot.user)) return;
                 else if (message.content.startsWith('-')) return;
 
-                debug.info(`${message.member.nickname || message.author.username} from guild ${message.member.guild} mentioned me in ${message.channel.name}`);
+                debug.info(`${message.member.nickname || message.author.username} from guild ${message.member.guild} mentioned me in ${message.channel.name}`, "Alexa");
                 message.react('👀');
 
                 if (message.channel.name === 'chat-with-alexa')
