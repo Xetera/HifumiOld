@@ -7,7 +7,7 @@ export default function systemsEval(message : Message, req : string){
     if (member.id !== gb.ownerID) return;
     if (channel instanceof TextChannel){
         try{
-            channel.send(eval(req));
+            channel.send(eval(req.replace(`'`, `\'`)));
         }
         catch (err) {
             channel.send('\`\`\`\n' + err + '\`\`\`');

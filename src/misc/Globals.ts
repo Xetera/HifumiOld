@@ -6,6 +6,7 @@ import {Database} from "../database/Database";
 import {Environments} from "../events/systemStartup";
 import CommandHandler from "../handlers/CommandHandler";
 import {Snowflake} from "discord.js";
+import Watchlist from "../moderation/Watchlist";
 
 interface Globals {
     ownerID: string;
@@ -21,7 +22,8 @@ export interface Instance {
     muteQueue: MuteQueue,
     messageQueue: MessageQueue,
     database : Database
-    commandHandler?:CommandHandler
+    commandHandler?:CommandHandler,
+    watchlist: Watchlist
 }
 
 let gb : Globals = <Globals>{};
