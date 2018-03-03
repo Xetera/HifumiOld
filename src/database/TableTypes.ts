@@ -1,9 +1,12 @@
+import {SecurityLevels} from "../utility/Settings";
+
 export interface IGuild {
     id: string;
     name: string;
     prefix: string;
-    allowsinvites: boolean;
+    allows_invites: boolean;
     default_channel: string;
+    lockdown: boolean;
 }
 
 export interface IUser {
@@ -13,16 +16,27 @@ export interface IUser {
     invite_strikes: number;
 }
 
-export interface IBlacklistedLinks {
+export interface IBlacklistedLink {
     guild_id: string;
     link: string;
 }
 
-export interface IWhitelistedInvites {
+export interface IWhitelistedInvite {
     guild_id: string;
-    link: string;
+    invite: string;
 }
 
+export interface ITrackedUser {
+    id: string;
+    guild_id: string;
+    join_date: Date;
+    security: SecurityLevels;
+}
+
+
+export function isTrackedUser(object: any) : object is ITrackedUser {
+    return 'join_date' in object;
+}
 
 export function isIGuild(object : any) : object is IGuild {
     return 'id' in object;
@@ -32,10 +46,10 @@ export function isIUser(object : any): object is IUser{
     return 'guild_id' in object;
 }
 
-export function isIBlacklistedLinks(object : any): object is IBlacklistedLinks{
-    return 'guild_id' in object;
+export function isIBlacklistedLinks(object : any): object is IBlacklistedLink{
+    return 'link' in object;
 }
 
-export function isIWhitelistedInvites(object : any): object is IWhitelistedInvites{
-    return 'guild_id' in object;
+export function isIWhitelistedInvites(object : any): object is IWhitelistedInvite{
+    return 'invite' in object;
 }

@@ -105,6 +105,15 @@ export function getWhiltelistedInvites(guild : Guild) : string{
         WHERE guild_id = '${guild.id}'
         `
 }
+
+export function changeLockdownStatus(guild : Guild, status : boolean){
+    return `
+        UPDATE guilds 
+        SET lockdown = ${status}
+        WHERE id = ${guild.id}
+        RETURNING *
+        `
+}
 export function getWhitelistedInvites(guildId : string) : PreparedStatement{
     const statement = getStatement(getWhitelistedInvitesStatement);
     statement.values.push(guildId);

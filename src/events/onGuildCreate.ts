@@ -9,8 +9,8 @@ export const debug = {
     error  : dbg('Bot:onGuildCreate:Error')
 };
 export default function onGuildCreate(guild : Discord.Guild, instance : Instance){
-    const database = instance.database;
+    instance.muteQueue.insertNewGuild(guild);
+    instance.database.insertNewGuild(guild);
 
-    database.insertNewGuild(guild);
     debug.info(`I was added to the server: ${guild.name} with ${guild.memberCount} members.`);
 }

@@ -1,7 +1,7 @@
 import {
     getDefaultChannel, getMemberInviteStrikes,
     getWhitelistedInvites, incrementMemberInviteStrikes, insertGuild, PreparedStatement, updateDefaultChannel,
-    upsertPrefix, insertMember, cleanAllGuildMembers
+    upsertPrefix, insertMember, cleanAllGuildMembers, changeLockdownStatus
 } from "./PreparedStatements";
 import {IDatabase, IMain, IOptions, ITask} from 'pg-promise'
 import {defaultTableTemplates, getPrefixes, testQuery} from "./QueryTemplates";
@@ -16,6 +16,7 @@ interface ICachedGuild {
     blacklistedLinks: string[];
     whitelistedInvites: string[];
     defaultChannel: string;
+    lockdown: boolean;
 }
 
 export interface PostgresDevLoginConfig {
@@ -62,12 +63,13 @@ export class Database {
 
     private pgp = pgPromise(this.initOptions);
     private db : IDatabase<any>;
-    guilds : Record<string, ICachedGuild> = {};
+    guilds : Map<string, ICachedGuild>;
 
 
     constructor(url : DatabaseConfig){
         this.config = url;
         debug.info("Logging into Postgres on " + getDatabaseType(url), "Database");
+        this.guilds = new Map<string, ICachedGuild>();
         this.db = this.pgp(this.config);
         this.checkTables();
         // we don't want to query the db every message so
@@ -78,8 +80,10 @@ export class Database {
     }
 
     private initializeGuildIfNone(guildId : string) : boolean{
-        if (this.guilds[guildId] === undefined){
-            this.guilds[guildId] = <ICachedGuild>{};
+        const guild = this.guilds.get(guildId);
+        if (guild === undefined){
+            this.guilds.set(guildId, <ICachedGuild> {});
+            // kind of pointless but whatever
             return false;
         }
         else {
@@ -91,19 +95,22 @@ export class Database {
         return this.db.any(getPrefixes).then(fields => {
             // returning id, prefix
             fields.forEach(async(guild : IGuild) => {
-                this.initializeGuildIfNone(guild.id);
+                let cachedGuild : ICachedGuild | undefined = this.guilds.get(guild.id);
+                if (cachedGuild === undefined) {
+                    this.guilds.set(guild.id, <ICachedGuild> {});
+                    cachedGuild = this.guilds.get(guild.id);
+                }
 
                 const whitelistedInvites = await this.db.any(getWhitelistedInvites(guild.id));
                 if (whitelistedInvites.length > 0)
-                    this.guilds[guild.id].whitelistedInvites = whitelistedInvites.map(item => item.link);
+                    cachedGuild.whitelistedInvites = whitelistedInvites.map(item => item.link);
 
                 //let defaultChannel;
                 this.db.oneOrNone(getDefaultChannel(guild.id)).then(item => {
-                    this.guilds[guild.id].defaultChannel = item.default_channel;
+                    cachedGuild.defaultChannel = item.default_channel;
                 });
 
-
-                this.guilds[guild.id].prefix  = guild.prefix;
+                cachedGuild.prefix  = guild.prefix;
 
                 //debug.info(this.guilds);
             });
@@ -111,9 +118,13 @@ export class Database {
     }
 
     private async cacheNewGuild(guild : IGuild){
-        this.guilds[guild.id].prefix = guild.prefix;
-        this.guilds[guild.id].whitelistedInvites = [];
-        this.guilds[guild.id].blacklistedLinks = [];
+        const cached = this.guilds.get(guild.id);
+        if (cached !== undefined){
+            this.guilds.set(guild.id, <ICachedGuild> {});
+        cached.prefix = guild.prefix;
+        cached.whitelistedInvites = [];
+        cached.blacklistedLinks = [];
+        }
     }
 
     private checkTables() : Promise<any> {
@@ -140,7 +151,11 @@ export class Database {
         const query : string = upsertPrefix(guild, prefix);
         return this.db.one(query).then((res: IGuild)=> {
             // changing our cached value as well
-            this.guilds[res.id].prefix = res.prefix;
+            const cached = this.guilds.get(guild.id);
+            if (cached === undefined)
+                this.guilds.set(guild.id, <ICachedGuild> {});
+
+            cached.prefix = res.prefix;
             return res;
         }).catch((err : Error) => {
             debug.error("Error while updating prefix.\n"+ err, "Database");
@@ -149,11 +164,11 @@ export class Database {
     }
 
     public getPrefix(guildId : string) {
-        if (this.guilds[guildId] === undefined ) {
+        if (this.guilds.get(guildId) === undefined ) {
             this.initializeGuildIfNone(guildId);
             return '.';
         }
-        return this.guilds[guildId].prefix;
+        return this.guilds.get(guildId).prefix;
     }
 
     public insertMember(member : GuildMember) {
@@ -182,14 +197,15 @@ export class Database {
     public updateDefaultChannel(guildId : string, channelId : string) : Promise<string>{
         return this.db.oneOrNone(updateDefaultChannel(guildId, channelId)).then((r: IGuild)=> {
             this.initializeGuildIfNone(guildId);
-            this.guilds[guildId].defaultChannel = r.default_channel;
+            this.guilds.get(guildId).defaultChannel = r.default_channel;
             return r.default_channel;
         });
     }
 
     public getDefaultChannel(guildId: string) : string | undefined {
-        if (this.guilds[guildId] === undefined) return undefined;
-        return this.guilds[guildId].defaultChannel;
+        const guild = this.guilds.get(guildId);
+        if (guild === undefined) return undefined;
+        return guild.defaultChannel;
     }
 
     public restockGuildMembers(guild :Guild){
@@ -224,4 +240,21 @@ export class Database {
         });
     }
 
+    public getLockdownStatus(guild: Guild) : boolean {
+        this.initializeGuildIfNone(guild.id);
+        return this.guilds.get(guild.id).lockdown;
+    }
+
+    public changeLockdownStatus(guild : Guild, status : boolean){
+        if (this.guilds.get(guild.id).lockdown === status)
+            return debug.warning(`Tried to set lockdown`+
+                ` status of ${guild.name} to ${status} but it is already ${status}`);
+
+        this.guilds.get(guild.id).lockdown = status;
+        this.db.one(changeLockdownStatus(guild, status));
+    }
+
+    public getRaidStatus(guild : Guild)  {
+
+    }
 }

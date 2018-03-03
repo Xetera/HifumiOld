@@ -15,6 +15,7 @@ export const debug = {
 export default function onGuildMemberAdd(member : Discord.GuildMember, instance: Instance) : void {
     const database = instance.database;
     database.insertMember(member);
+
     // we will change this later to fetch from a database instead of using a preset name
     const welcomeChannel : Discord.Channel | undefined = member.guild.channels.find('name', 'welcome');
     const defaultChannelId : string | undefined = database.getDefaultChannel(member.guild.id);
@@ -38,7 +39,7 @@ export default function onGuildMemberAdd(member : Discord.GuildMember, instance:
         welcomeChannel.send(welcomeChannelEmbed);
 
     }
-
+    
     if (defaultChannel && defaultChannel instanceof Discord.TextChannel){
         let defaultChannelEmbed : Discord.RichEmbed= new Discord.RichEmbed()
             .setAuthor(member.displayName, member.user.displayAvatarURL)
