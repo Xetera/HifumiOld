@@ -1,9 +1,9 @@
 import * as Moment from 'moment'
 
 export enum SecurityLevels {
-    Dangerous,
-    Medium,
-    High,
+    Dangerous = "DANGEROUS",
+    Medium = "MEDIUM",
+    High = "HIGH",
 }
 
 export function resolveSecurityLevel(security : SecurityLevels) : string {
@@ -17,6 +17,9 @@ export function resolveSecurityLevel(security : SecurityLevels) : string {
 }
 
 export let securityLevel : SecurityLevels = SecurityLevels.Medium;
+
+export let raidDetectionInterval = 30 * 1000;
+
 
 export function setSecurityLevel(level : SecurityLevels){
     securityLevel = level;
@@ -50,6 +53,20 @@ export function getOnBanMessageSnipeCount() : number {
         }
         case SecurityLevels.High: {
             return 4;
+        }
+    }
+}
+
+export function getBulkDeleteCount() : number {
+    switch(securityLevel) {
+        case SecurityLevels.Dangerous: {
+            return 0;
+        }
+        case SecurityLevels.Medium: {
+            return 100;
+        }
+        case SecurityLevels.High: {
+            return 300;
         }
     }
 }
