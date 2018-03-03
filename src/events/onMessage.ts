@@ -22,20 +22,20 @@ interface Message extends Discord.Message {
     sent : Date;
 }
 
-function middleWare(
-    msg: Discord.Message,
-    alexa : Alexa,
-    messageQueue : MessageQueue,
-    bot : Discord.Client,
-    database : Database){
-
+function middleWare(msg: Discord.Message, instance: Instance){
+    const messageQueue = instance.messageQueue;
+    const alexa = instance.alexa;
+    const watchlist = instance.watchlist;
+    const bot = instance.bot;
+    const database = instance.database;
     //casting
     const message = <Message> msg;
     message.sent = moment(new Date()).toDate();
 
     messageQueue.add(message);
+    watchlist.auditMember(message);
     alexa.checkMessage(message, bot);
-    inviteListener(message, database);
+    inviteListener(message, database, watchlist);
 }
 
 export default function onMessage(message: Discord.Message, instance: Instance){
@@ -47,9 +47,10 @@ export default function onMessage(message: Discord.Message, instance: Instance){
     if (message.author.bot) return;
     const messageType : MessageType = message.guild ? MessageType.GuildMessage : MessageType.PrivateMessage;
 
+
     // no need listening for anything for pms since it can be flooded and it's literally useless
     if (messageType === MessageType.GuildMessage)
-        middleWare(message, alexa, messageQueue, bot, database);
+        middleWare(message,instance);
 
     // we want to serve the help page to the user even if they have the wrong
     // prefix in case they don't know what the prefix is

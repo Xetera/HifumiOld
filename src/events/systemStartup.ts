@@ -8,8 +8,6 @@ export enum Environments {
     Live
 }
 
-
-
 declare let process : {
     env: {
         BOT_TOKEN: string,
