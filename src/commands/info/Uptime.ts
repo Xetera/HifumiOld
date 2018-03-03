@@ -13,12 +13,12 @@ export default function uptime(message: Discord.Message, bot : Discord.Client){
     const days= currentUptime.d;
 
     let out : string;
-    if (seconds < 60)
+    if (!minutes && !hours && !days)
         out = `${Math.floor(seconds)}s`;
-    else if (minutes < 60) {
+    else if (!hours && !days) {
         out = `${minutes}m:${seconds}s`
     }
-    else if (hours < 24) {
+    else if (!days) {
         out = `${hours}h:${minutes}m:${seconds}s`;
     }
     else {
