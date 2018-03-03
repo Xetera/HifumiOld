@@ -39,7 +39,7 @@ export default function onGuildMemberAdd(member : Discord.GuildMember, instance:
         welcomeChannel.send(welcomeChannelEmbed);
 
     }
-    
+
     if (defaultChannel && defaultChannel instanceof Discord.TextChannel){
         let defaultChannelEmbed : Discord.RichEmbed= new Discord.RichEmbed()
             .setAuthor(member.displayName, member.user.displayAvatarURL)

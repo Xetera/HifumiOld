@@ -6,7 +6,7 @@ import setPrefix from "../commands/utility/SetPrefix";
 import ch from "../commands/fun/CyanideAndHappiness";
 import nuke from "../commands/utility/Nuke";
 import getPfp from "../commands/info/GetPfp";
-import systemsEval from "../commands/self/Eval";
+import systemsEval from "../commands/debug/Eval";
 import echo from "../commands/utility/Echo";
 import uptime from "../commands/info/Uptime";
 import source from "../commands/info/Source";
