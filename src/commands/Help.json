@@ -20,6 +20,13 @@
     "usage": "nuke <# of msgs to delete> (default 50)",
     "example": "nuke 100"
   },
+  "cleanse": {
+    "name": "cleanse",
+    "type": "Moderation",
+    "info":"Deletes a certain number of past bot related message. [MOD]",
+    "usage": "cleanse <# of msgs to delete> (default 50)",
+    "example": "cleanse 200"
+  },
   "setdefault": {
     "name":"setdefault",
     "type": "Utility",
