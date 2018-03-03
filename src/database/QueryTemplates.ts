@@ -1,6 +1,10 @@
 import {Query} from "./Database";
 
 export const defaultTableTemplates : Query[] = [
+    `
+    DROP TYPE IF EXISTS security;
+    CREATE TYPE security AS ENUM('DANGEROUS', 'MEDIUM', 'HIGH')
+    `,
 
     `
     CREATE TABLE IF NOT EXISTS guilds(

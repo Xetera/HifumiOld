@@ -99,8 +99,14 @@ export default class CommandHandler implements indexSignature {
 
         for (let i in this.commands){
             const match = this.commands[i].match(new RegExp(command, 'i'));
-            if (match)
-                return this[match[0]](params);
+            if (!match) return;
+            try{
+                this[match[0]](params);
+            }
+            catch (error) {
+                debug.error(`Error while passing down function call\n${error}`, 'CommandHandler')
+            }
+
         }
 
     }
