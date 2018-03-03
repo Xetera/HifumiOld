@@ -22,20 +22,31 @@ import * as Discord from 'discord.js'
 import onChannelCreate from "./src/events/onChannelCreate";
 import updatePresence from "./src/actions/UpdatePresence";
 import CommandHandler from "./src/handlers/CommandHandler";
+import Inspector, {default as Watchlist} from "./src/moderation/Watchlist";
 
 // instances
-const muteQueue    : MuteQueue      = new MuteQueue();
+function createInstance(): Instance {
+    // this is how we avoid scoping problems, a little ugly but
+    // it gets the job done
+    let bot =new Discord.Client();
+    let alexa = new Alexa(CLEVERBOT_TOKEN);
+    let database = new Database(DATABASE_URL);
+    let muteQueue = new MuteQueue(database);
+    let watchlist = new Watchlist();
+    let messageQueue = new MessageQueue(muteQueue, database, watchlist);
+    let commandHandler = new CommandHandler();
+    return {
+        bot: bot,
+        alexa: alexa,
+        muteQueue: muteQueue,
+        database: database,
+        messageQueue: messageQueue,
+        commandHandler:commandHandler,
+        watchlist: watchlist
+    }
+}
 
-const instance : Instance = {
-    bot            : new Discord.Client(),
-    alexa          : new Alexa(CLEVERBOT_TOKEN),
-    // otherwise    throws no-implicit-any exception
-    muteQueue      : muteQueue,
-    messageQueue   : new MessageQueue(muteQueue),
-    database       : new Database(DATABASE_URL),
-    commandHandler : new CommandHandler()
-};
-
+const instance = createInstance();
 
 instance.bot.login(BOT_TOKEN);
 

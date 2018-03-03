@@ -4,7 +4,7 @@ import * as dbg from "debug";
 import {Database} from "../database/Database";
 import setDefaultChannel from "../commands/utility/SetDefaultChannel";
 import setPrefix from "../commands/utility/SetPrefix";
-import systemsEval from "../commands/self/Eval";
+import systemsEval from "../commands/debug/Eval";
 import manualRestockUsers from "../actions/ManualRestockUsers";
 import getPfp, {default as pfp} from "../commands/info/GetPfp";
 import uptime from "../commands/info/Uptime";
@@ -22,6 +22,8 @@ import onlyOwner from "./permissions/decorators/onlyOwner";
 import setName from "../commands/self/ChangeName";
 import setAvatar from "../commands/self/ChangePicture";
 import onlyMod from "./permissions/decorators/onlyMod";
+import getQueue from "../commands/debug/getQueue";
+import cleanse from "../commands/utility/Cleanse";
 
 interface CommandParameters extends Instance {
     message: Discord.Message;
@@ -91,7 +93,8 @@ export default class CommandHandler implements indexSignature {
             alexa: instance.alexa,
             muteQueue: instance.muteQueue,
             messageQueue: instance.messageQueue,
-            database : instance.database
+            database : instance.database,
+            watchlist: instance.watchlist
         };
 
         for (let i in this.commands){
@@ -122,6 +125,11 @@ export default class CommandHandler implements indexSignature {
         manualRestockUsers(params.message, params.database);
     }
 
+    @onlyOwner
+    private queue(params : CommandParameters){
+        getQueue(params.message, params.messageQueue);
+    }
+
     /* Admin Commands */
 
     @onlyAdmin
@@ -133,6 +141,16 @@ export default class CommandHandler implements indexSignature {
     @onlyMod
     private nuke(params: CommandParameters){
         nuke(params.message.channel, parseInt(params.args[0]));
+    }
+
+    @onlyMod
+    private cleanse(params: CommandParameters){
+        const limit : string | undefined = params.args.shift();
+
+        limit
+            ? cleanse(params.message.channel, params.database, parseInt(limit))
+            : cleanse(params.message.channel, params.database);
+
     }
 
     @onlyMod
