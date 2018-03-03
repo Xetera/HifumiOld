@@ -1,2 +1,2 @@
 export const youtubeInviteRegex : RegExp = /((https?):\/\/(www\.)?)?youtu\.?be(\.com)?\/(watch\?v=)?\w{11}/;
-export const discordInviteRegex : RegExp = /discord(?:app\.com|\.gg)[\/invite\/]?(?:(?!.*[Ii10OolL]).[a-zA-Z0-9]{5,6}|[a-zA-Z0-9\-]{2,32})/;
+export const discordInviteRegex : RegExp = /(\n|.)*((discord|discordapp).(gg|me|io|com\/invite)\/)(\n|.)*/;
