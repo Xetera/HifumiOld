@@ -2,20 +2,30 @@ import * as Discord from "discord.js";
 import * as moment from "moment";
 
 import {MuteQueue} from "./MuteQueue";
-import {getMuteDate, getMuteTime, getSpamTolerance, securityLevel, SecurityLevels} from "../utility/Settings";
+import {
+    getBulkDeleteCount, getMuteDate, getMuteTime, getSpamTolerance, securityLevel,
+    SecurityLevels
+} from "../utility/Settings";
 import {debug} from '../utility/Logging'
+import {Database} from "../database/Database";
+import Watchlist from "./Watchlist";
 
 interface Message extends Discord.Message {
     sent : Date;
 }
+type messageCollection = Discord.Collection<Discord.Snowflake, Discord.Message>;
 
 export class MessageQueue {
-    queue : Map<Discord.Guild, Message[]>;
+    queue : Map<string, Message[]>;
+    watchlist: Watchlist;
     bufferLength : number;
     muteQueue : MuteQueue;
-    constructor(muteQueue : MuteQueue, size ?: number){
+    db : Database;
+    constructor(muteQueue : MuteQueue, database: Database,watchlist: Watchlist, size ?: number){
         this.muteQueue = muteQueue;
-        this.queue = new Map<Discord.Guild, Message[]>();
+        this.db = database;
+        this.queue = new Map<string, Message[]>();
+        this.watchlist = watchlist;
         this.bufferLength = size ? size : 200;
         debug.info('MessageQueue is ready.', "MessageQueue");
     }
@@ -24,9 +34,9 @@ export class MessageQueue {
         const self = this;
 
         msg.sent = moment(new Date()).toDate();
-        const guild : Message[] | undefined = this.queue.get(msg.guild);
+        const guild : Message[] | undefined = this.queue.get(msg.guild.id);
         if (guild === undefined){
-            this.queue.set(msg.guild, [msg]);
+            this.queue.set(msg.guild.id, [msg]);
         }
         else {
             guild.push(msg);
@@ -35,9 +45,10 @@ export class MessageQueue {
         this.queue.forEach(function(value, key, map){
             //  value.length => length of messages stored in the message queue
             if (value.length > self.bufferLength){
+                const guildName = msg.guild.name;
                 const temp : Message | undefined = value.shift();
                 if (temp === undefined)
-                    debug.error(`Tried to shift out an empty message from ${key.name}'s messageQueue` +
+                    debug.error(`Tried to shift out an empty message from ${guildName}'s messageQueue` +
                         `\nMost likely because buffer length is 0 or undefined.`, "MessageQueue");
             }
         });
@@ -47,9 +58,10 @@ export class MessageQueue {
     //gets called every messages
     private checkForSpam(member : Discord.GuildMember) : void {
         const spamMessages : Message[] | void = this.getRecentUserMessages(member);
+        if (!spamMessages) return;
 
         if (spamMessages == null) return;
-        const isUserSpamming : boolean = spamMessages.length > getSpamTolerance();
+        const isUserSpamming : boolean = spamMessages.length >= getSpamTolerance();
 
         if (isUserSpamming){
             this.removeUserMessages(spamMessages);
@@ -65,50 +77,28 @@ export class MessageQueue {
         const memberName :string = messages[0].member.nickname || messages[0].author.username;
         const guild : Discord.Guild = messages[0].guild;
         // breaking down all the unique channels
+        const channels : Set<Discord.Channel> = new Set(messages.map(message => message.channel));
 
-
-        // guaranteed that all messages are in the same guild
-        if (securityLevel === SecurityLevels.High){
-            debug.silly('Removing spammer in high security mode', "MessageQueue");
-            const allMessages : Discord.Message[]  | void = this.getAllUserMessages(member);
-            if (messages !== undefined){
-                
+        channels.forEach(function(channel : Discord.Channel){
+            if (channel instanceof Discord.TextChannel){
+                channel.fetchMessages({limit: getBulkDeleteCount()}).then((messages : messageCollection) => {
+                    const userMessages = messages.filter(message => message.author.id === member.id);
+                    channel.bulkDelete(userMessages);
+                });
             }
-        }
-        // in case user is spamming in more than one channel
-        const channelIDs : string[] = Array.from(new Set(messages.map(message => message.channel.id)));
-        for (let channelID of channelIDs){
+        });
+    }
 
-            const targetChannel : Discord.Channel = guild.channels.find('id', channelID);
-
-            if (targetChannel instanceof Discord.TextChannel){
-                const channelMessages : Message[] = messages.filter(
-                    msg=> msg.channel.id === targetChannel.id
-                );
-                // delete everything in channel
-                targetChannel.bulkDelete(channelMessages);
-
-                const guildMessages : Message[] | undefined = this.queue.get(guild);
-                if (guildMessages === undefined) return debug.error(`Tried to get ${guild.name} messages in MessageQueue but key does not exist.`, "MessageQueue");
-
-                for (let i in messages){
-                    try{
-                        guildMessages.splice(guildMessages.findIndex(msg=> msg.id === messages[i].id), 1);
-                    }
-                    catch (error) {
-                        debug.error(`Error splicing array for ${guild.name}'s messages in MessageQueue`, "MessageQueue");
-                    }
-                }
-                debug.info(`Deleted ${messages.length} messages from ${memberName} in ${targetChannel.name}`, "MessageQueue");
-            }
-        }
+    public checkLockdown(guild : Discord.Guild): boolean {
+        //const lockdown : boolean =return true;
+        return true;
     }
 
     private getRecentUserMessages(member : Discord.GuildMember) : Message[] | void {
         const guild : Discord.Guild = member.guild;
         const tolerance : Date = moment(new Date()).subtract(5, 's').toDate();
 
-        const messages : Message[] | undefined = this.queue.get(guild);
+        const messages : Message[] | undefined = this.queue.get(guild.id);
 
         if (messages === undefined) {
             debug.error(`Tried fetching recent messages in a nonexistent server`, "MessageQueue");
@@ -121,7 +111,7 @@ export class MessageQueue {
     }
 
     private getAllUserMessages(member : Discord.GuildMember) : Message[] | void {
-        const messages : Message[] | undefined = this.queue.get(member.guild);
+        const messages : Message[] | undefined = this.queue.get(member.guild.id);
         if (messages === undefined) return debug.error(`Guild ${member.guild} has no messages to get`, "MessageQueue");
         return messages.filter(message => {
             return message.author.id === member.id
@@ -136,7 +126,7 @@ export class MessageQueue {
         let output : string = "";
         if (channel instanceof Discord.TextChannel){
             const guild = channel.guild;
-            const messages : Message[] | undefined = this.queue.get(guild);
+            const messages : Message[] | undefined = this.queue.get(guild.id);
             if (messages === undefined) return;
             let messageCount : number = 0;
             for (let i in messages){

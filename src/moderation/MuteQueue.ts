@@ -1,13 +1,18 @@
 import * as Discord from 'discord.js'
 import * as dbg from "debug";
-import {scheduleUnmute} from "./ScheduleUnmute";
 import {DiscordAPIError} from "discord.js";
-import {getMuteTime} from "../utility/Settings";
+import {getMuteTime, raidDetectionInterval} from "../utility/Settings";
 import Timer = NodeJS.Timer;
 import {log, debug} from "../utility/Logging";
+import {Moment} from "moment";
+import moment = require("moment");
+import {changeLockdownStatus} from "../database/PreparedStatements";
+import raidMode from "../actions/RaidMode";
+import {Database} from "../database/Database";
+import muteUser from "../actions/MuteUser";
 
 
-class MutedUser  {
+class MutedMember  {
     member : Discord.GuildMember;
     muteQueue : MuteQueue;
     name : string;
@@ -16,6 +21,7 @@ class MutedUser  {
     role : Discord.Role;
     unmuteSeconds ?: number;
     timeout ?: Timer;
+    muted : boolean;
 
     constructor(member : Discord.GuildMember, role : Discord.Role, unmuteDate : Date, muteQueue: MuteQueue){
         this.member = member;
@@ -28,23 +34,11 @@ class MutedUser  {
     }
 
     public muteUser(){
-        if (this.member.hasPermission("ADMINISTRATOR"))
-            return debug.warning(`Tried to mute ${this.name} for ${getMuteTime()} seconds but they are an administrator.`, "MuteQueue");
-
-        try {
-            this.member.addRole(this.role, `Spamming`);
-
-        } catch (err) {
-            if (err instanceof DiscordAPIError){
-                return debug.warning(`Could not mute spammer ${this.name}, missing permissions.`, "MuteQueue");
-            }
-            else {
-                return debug.error(`Unexpected error while muting user ${this.name}\n` +err, "MuteQueue");
-            }
-        }
-        debug.info(`${this.name} was muted for ${getMuteTime()}s`);
-        // TODO: format s based time into nice intervals
-        log(this.member.guild, `${this.name} was muted for ${getMuteTime()}s for spamming.`)
+        // TODO: fix this seconds only thing
+        this.muted = muteUser(this.member, this.role,
+            'Spamming',
+            `You were muted in ${this.member.guild.name} for ${getMuteTime()} seconds for spamming.`,
+            `Muted @${this.name} for ${getMuteTime()} seconds for spamming.`)
     }
     public cancelUnmute(){
         if (this.timeout === undefined)
@@ -54,31 +48,52 @@ class MutedUser  {
 }
 
 export class MuteQueue {
-    queue : MutedUser[];
-
-    constructor(){
-        this.queue = [];
+    queue : Map<string, MutedMember[]>;
+    raiders : Map<string, MutedMember[]>;
+    database : Database;
+    constructor(database : Database){
+        this.queue = new Map<string, MutedMember[]>();
+        this.raiders = new Map<string, MutedMember[]>();
+        this.database = database;
         debug.info('MuteQueue is ready.', "MuteQueue");
     }
 
     public add(member : Discord.GuildMember, role : Discord.Role, unmuteDate : Date) : void {
-        this.queue.push(new MutedUser(member, role, unmuteDate, this));
-        if (this.queue.findIndex(mute => mute.member === member) !== -1)
-            this.scheduleUnmute(member);
+        let mutedMember : MutedMember = new MutedMember(member, role, unmuteDate, this);
+        let guild : MutedMember[] | undefined = this.queue.get(member.guild.id);
+        if (!mutedMember.muted) return;
+
+        if (guild !== undefined)
+            guild.push(mutedMember);
+        else
+            this.queue.set(member.guild.id, [mutedMember]);
+
+        this.scheduleUnmute(member);
     }
 
-    public getMutedUserCount() : number {
-        return this.queue.length;
+    public getMutedUserCount(guild : Discord.Guild) : number {
+        const members : MutedMember[] | undefined = this.queue.get(guild.id);
+        if (members !== undefined)
+            return members.length;
+        else
+            return 0;
+
     }
 
+    public insertNewGuild(guild : Discord.Guild){
+        if (this.queue.get(guild.id) === undefined){
+            this.queue.set(guild.id, []);
+        }
+    }
     public release(...members: Discord.GuildMember[]) : void {
+        /*
         let i = 0;
         let queueLength : number = members.length;
         do {
             let member = members[i];
-            const index : number = this.queue.findIndex((user : MutedUser) => user.member.id === member.id);
+            const index : number = this.queue.get.findIndex((user : MutedMember) => user.member.id === member.id);
             if (index > 0){ // user was not found in the muteQueue
-                const releasedSpammer : MutedUser = this.queue.splice(index, 1)[0];
+                const releasedSpammer : MutedMember = this.queue.splice(index, 1)[0];
                 member.removeRole(releasedSpammer.role, `The ${releasedSpammer.unmuteSeconds} timeout duration ran out.`)
             }
             else {
@@ -88,15 +103,31 @@ export class MuteQueue {
             i++;
         }
         while (i < queueLength - 1); // length of 1 ===
-
+        */
     }
 
-    public scheduleUnmute(user : Discord.GuildMember){
-        let _this = this;
-        let index : number = this.queue.findIndex((usr: MutedUser) =>
-            usr.member.id === user.id
+    public detectRaid(member: Discord.GuildMember){
+        const members : MutedMember[] | undefined  =this.queue.get(member.guild.id);
+        if (members === undefined) return;
+
+        //const raidStatus = database.getRaids
+        const muteDates = members.map((user : MutedMember) => user.muteDate);
+        const recentlyMuted : Date[] = muteDates.filter((date : Date)=>
+            date > moment(date).subtract(raidDetectionInterval).toDate()
         );
-        let mutedGuildMember : MutedUser = this.queue[index];
+        if (recentlyMuted.length > 5){
+            //raidMode()
+        }
+    }
+
+    public scheduleUnmute(member : Discord.GuildMember){
+        let _this = this;
+        const members : MutedMember[] | undefined  =this.queue.get(member.guild.id);
+        if (members === undefined) return debug.warning(`Guild for ${member.nickname} was not found`, 'MuteQueue');
+        let index : number = members.findIndex((usr: MutedMember) =>
+            usr.member.id === member.id
+        );
+        let mutedGuildMember : MutedMember = members[index];
         if (mutedGuildMember === undefined) return debug.error('Tried to shift an empty MuteQueue.', "MuteQueue");
 
         let timeDelta : number = getMuteTime(); // in seconds
@@ -105,10 +136,14 @@ export class MuteQueue {
 
         const timeoutId : Timer = setTimeout(async function(){
             // index could have changed by the time this is scheduled to run
-            let index : number = _this.queue.findIndex((usr: MutedUser) => usr.member.id === user.id);
+            const timeoutMembers : MutedMember[] | undefined  = _this.queue.get(member.guild.id);
+            if (timeoutMembers === undefined) return;
+
+            let index : number = timeoutMembers.findIndex((usr: MutedMember) => usr.member.id === member.id);
+
             if (!mutedGuildMember.role) {
-                debug.warning(`Could not schedule an unmute for user ${mutedGuildMember.name}, missing 'muted' role.`);
-                return _this.queue.splice(index, 1);
+                debug.warning(`Tried to unmute ${mutedGuildMember.name} but they were already unmuted.\n`, "MuteQueue");
+                return timeoutMembers.splice(index, 1);
             }
 
             try {
@@ -117,16 +152,21 @@ export class MuteQueue {
             catch (error) {
                 if (error instanceof DiscordAPIError){
                     debug.error(`Tried to unmute ${mutedGuildMember.name} but they were already unmuted.\n` + error, "MuteQueue");
-                    return _this.queue.splice(index, 1);
+                    return timeoutMembers.splice(index, 1);
                 }
                 debug.error(`Unexpected error while unmuting ${mutedGuildMember.name}.`, error);
             }
 
-            _this.queue.splice(index, 1);
+            timeoutMembers.splice(index, 1);
+
             debug.info(`${mutedGuildMember.name} in ${mutedGuildMember.member.guild.name} was unmuted after ${timeDelta} seconds.`, "MuteQueue");
 
         }, timeDelta * 1000);
 
         mutedGuildMember.timeout = timeoutId;
+    }
+
+    public nukeRaiders(guild : Discord.Guild) {
+
     }
 }
