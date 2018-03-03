@@ -7,5 +7,23 @@ import {Environments} from "../../events/systemStartup";
 export default function uptime(message: Discord.Message, bot : Discord.Client){
     let env : string = gb.ENV === Environments.Live ? 'cloud': 'localhost';
     const currentUptime = formatTime(message.client.uptime/1000);
-    message.channel.send(`I've been online on ${env} for: ${currentUptime}`).catch()
+    const seconds = currentUptime.s;
+    const minutes = currentUptime.m;
+    const hours = currentUptime.h;
+    const days= currentUptime.d;
+
+    let out : string;
+    if (seconds < 60)
+        out = `${Math.floor(seconds)}s`;
+    else if (minutes < 60) {
+        out = `${minutes}m:${seconds}s`
+    }
+    else if (hours < 24) {
+        out = `${hours}h:${minutes}m:${seconds}s`;
+    }
+    else {
+        out = `${days}d:${hours}h:${minutes}m:${seconds}s`;
+    }
+
+    message.channel.send(`I've been online on ${env} for: ${out}`).catch()
 }
