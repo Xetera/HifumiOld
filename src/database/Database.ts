@@ -1,9 +1,9 @@
 import {
     getDefaultChannel, getMemberInviteStrikes,
-    getWhitelistedInvites, incrementMemberInviteStrikes, insertGuild, PreparedStatement, updateDefaultChannel,
+    getWhitelistedInvites, incrementMemberInviteStrikes, insertGuild, updateDefaultChannel,
     upsertPrefix, insertMember, cleanAllGuildMembers, changeLockdownStatus, saveMember, getAllUsers
 } from "./PreparedStatements";
-import {IDatabase, IMain, IOptions, ITask} from 'pg-promise'
+import {IDatabase, IMain, IOptions, ITask, TQuery} from 'pg-promise'
 import {defaultTableTemplates, getPrefixes, testQuery} from "./QueryTemplates";
 import {Client, Collection, Guild, GuildMember} from "discord.js";
 import {IGuild, IUser} from "./TableTypes";
@@ -105,11 +105,16 @@ export class Database {
             const queries: Query[] = [];
             for (let guild of guilds) {
                 const members : GuildMember[] = guild.members.array();
-                guild.members.forEach(function (value) {
-                    queries.push(t.none(saveMember(value)));
+                guild.members.forEach(function (member) {
+                    const id = member.id;
+                    const name = member.user.username;
+                    const guild_id = member.guild.id;
+                    queries.push(t.none(saveMember, [id, name, guild_id]));
                 });
-                guilds.forEach(function (value) {
-                    queries.push(t.any(insertGuild(value)));
+                guilds.forEach(function (guild) {
+                    const id = guild.id;
+                    const name = guild.name;
+                    queries.push(t.any(insertGuild, [id, name]));
                 });
             }
             return t.batch(queries);
@@ -126,12 +131,12 @@ export class Database {
                     cachedGuild = this.guilds.get(guild.id);
                 }
 
-                const whitelistedInvites = await this.db.any(getWhitelistedInvites(guild.id));
+                const whitelistedInvites = await this.db.any(getWhitelistedInvites, [guild.id]);
                 if (whitelistedInvites.length > 0)
                     cachedGuild.whitelistedInvites = whitelistedInvites.map(item => item.link);
 
                 //let defaultChannel;
-                this.db.oneOrNone(getDefaultChannel(guild.id)).then(item => {
+                this.db.oneOrNone(getDefaultChannel, [guild.id]).then(item => {
                     cachedGuild.defaultChannel = item.default_channel;
                 });
 
@@ -163,7 +168,9 @@ export class Database {
     }
 
     private addGuild(guild : Guild){
-        return this.db.oneOrNone(insertGuild(guild)).then((guild : IGuild)=> {
+        const id = guild.id;
+        const name = guild.name;
+        return this.db.oneOrNone(insertGuild,[id, name]).then((guild : IGuild)=> {
             this.cacheNewGuild(guild);
         });
     }
@@ -173,8 +180,7 @@ export class Database {
             // have to Promise.reject outside the promise chain
             return Promise.reject(-1);
 
-        const query : string = upsertPrefix(guild, prefix);
-        return this.db.one(query).then((res: IGuild)=> {
+        return this.db.one(upsertPrefix, [guild.id, prefix]).then((res: IGuild)=> {
             // changing our cached value as well
             const cached = this.guilds.get(guild.id);
             if (cached === undefined)
@@ -197,7 +203,10 @@ export class Database {
     }
 
     public insertMember(member : GuildMember) {
-        return this.db.one(insertMember(member)).then((res : IUser)=> {
+        const id = member.user.id;
+        const username = member.user.username;
+        const guild_id = member.guild.id;
+        return this.db.one(insertMember, [id, username, guild_id]).then((res : IUser)=> {
             return; // nothing for now
         })
     }
@@ -220,7 +229,7 @@ export class Database {
     }
 
     public updateDefaultChannel(guildId : string, channelId : string) : Promise<string>{
-        return this.db.oneOrNone(updateDefaultChannel(guildId, channelId)).then((r: IGuild)=> {
+        return this.db.oneOrNone(updateDefaultChannel, [guildId, channelId]).then((r: IGuild)=> {
             this.initializeGuildIfNone(guildId);
             this.guilds.get(guildId).defaultChannel = r.default_channel;
             return r.default_channel;
@@ -237,7 +246,7 @@ export class Database {
         this.initializeGuildIfNone(guild.id);
 
         return this.addGuild(guild).then( ()=> {
-            return this.db.none(cleanAllGuildMembers(guild))
+            return this.db.none(cleanAllGuildMembers, [guild.id])
         }).then(() => {
             guild.members.forEach((member: GuildMember) => {
                 this.insertMember(member);
@@ -254,13 +263,17 @@ export class Database {
     }
 
     public getMemberInviteStrikes(member : GuildMember){
-        return this.db.oneOrNone(getMemberInviteStrikes(member)).then((res : IUser)=> {
+        const id = member.id;
+        const guild_id = member.guild.id;
+        return this.db.oneOrNone(getMemberInviteStrikes, [id, guild_id]).then((res : IUser)=> {
             return res.invite_strikes;
         })
     }
 
     public incrementMemberInviteStrikes(member : GuildMember){
-        return this.db.one(incrementMemberInviteStrikes(member)).then((res:IUser )=> {
+        const id = member.id;
+        const guild_id = member.guild.id;
+        return this.db.one(incrementMemberInviteStrikes, [id, guild_id]).then((res:IUser )=> {
             return res.invite_strikes;
         });
     }
@@ -271,12 +284,14 @@ export class Database {
     }
 
     public changeLockdownStatus(guild : Guild, status : boolean){
+        if (this.guilds.get(guild.id) === undefined)
+            return debug.warning(`Guild ${guild.name} does not exist.`);
         if (this.guilds.get(guild.id).lockdown === status)
             return debug.warning(`Tried to set lockdown`+
                 ` status of ${guild.name} to ${status} but it is already ${status}`);
 
         this.guilds.get(guild.id).lockdown = status;
-        this.db.one(changeLockdownStatus(guild, status));
+        this.db.one(changeLockdownStatus, [guild.id, status]);
     }
 
     public getRaidStatus(guild : Guild)  {
