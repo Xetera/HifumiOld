@@ -1,4 +1,4 @@
-import {getDatabaseConnection, getEnvironmentSettings, getTokens, setGlobals} from "./src/events/systemStartup";
+import {getDatabaseConnection, getEnvironmentSettings, getTokens} from "./src/events/systemStartup";
 import gb, {Instance} from './src/misc/Globals';
 
 gb.ENV  = getEnvironmentSettings();

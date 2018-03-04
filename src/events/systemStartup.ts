@@ -74,8 +74,3 @@ export function getDatabaseConnection(env: Environments) : PostgresDevLoginConfi
         return credentials;
     }
 }
-
-export function setGlobals(bot : Client){
-    const emojiServer : Guild = bot.guilds.find('id', '418699380833648642');
-    gb.emojis = emojiServer.emojis;
-}

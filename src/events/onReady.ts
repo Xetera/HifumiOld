@@ -52,4 +52,5 @@ function setGlobals(bot : Discord.Client){
     else {
         gb.emojiGuild = bot.guilds.find('id', require('../../config0.json').EMOJI_GUILD);
     }
+    gb.emojis = gb.emojiGuild.emojis;
 }
