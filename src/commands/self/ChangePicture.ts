@@ -6,7 +6,7 @@ export default function setAvatar(message: Discord.Message, URL : string){
     const me : Discord.ClientUser = message.client.user;
     const lul = gb.emojis.find('name', 'alexa_lul');
     if (URL === '' || URL === undefined)
-        return message.channel.send(`Change picture to what? ${lul} send me a URL.`);
+        return message.channel.send(`Change avatar to what? ${lul} send me a URL.`);
 
     me.setAvatar(URL).then(response => {
         debug.info(`${response.username} avatar successfully changed!.`);

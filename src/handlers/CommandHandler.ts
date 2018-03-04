@@ -80,40 +80,39 @@ export default class CommandHandler implements indexSignature {
         }
     }
 
-    public handler(message : Discord.Message,instance : Instance){
+    public handler(message : Discord.Message,instance : Instance) {
         const [command, args] = CommandHandler.parseInput(message);
         if (command == '') return;
 
         debug.info(`[${message.guild.name}]<${message.author.username}>: ${message.content}`);
 
-        const params  : CommandParameters = {
+        const params: CommandParameters = {
             message: message,
             args: args,
             bot: instance.bot,
             alexa: instance.alexa,
             muteQueue: instance.muteQueue,
             messageQueue: instance.messageQueue,
-            database : instance.database,
+            database: instance.database,
             watchlist: instance.watchlist
         };
 
-        for (let i in this.commands){
+        for (let i in this.commands) {
             const match = this.commands[i].match(new RegExp(command, 'i'));
             if (!match) continue;
-            try{
+            try {
                 return this[match[0]](params);
             }
             catch (error) {
-                if (error instanceof TypeError){
+                // yeah I know this sucks
+                if (error instanceof TypeError && error.message === 'this[match[0]] is not a function') {
                     debug.silly(`Command ${command} does not exist.`);
-                    return
                 }
                 debug.error(`Unexpected error while parsing ${command}\n` + error)
             }
-
         }
-
     }
+
     @onlyOwner
     private setName(params: CommandParameters){
         const name = params.args.join(' ');
