@@ -23,6 +23,7 @@ import onChannelCreate from "./src/events/onChannelCreate";
 import updatePresence from "./src/actions/UpdatePresence";
 import CommandHandler from "./src/handlers/CommandHandler";
 import Inspector, {default as Watchlist} from "./src/moderation/Watchlist";
+import onMessageUpdate from "./src/events/onMessageUpdate";
 
 // instances
 function createInstance(): Instance {
@@ -63,6 +64,9 @@ instance.bot.on('message', function(message : Discord.Message){
     onMessage(message, instance);
 });
 
+instance.bot.on('messageUpdate', function(oldMessage: Discord.Message, newMessage: Discord.Message){
+    onMessageUpdate(oldMessage, newMessage);
+});
 instance.bot.on('guildMemberAdd', function(member : Discord.GuildMember){
     onGuildMemberAdd(member, instance);
 });

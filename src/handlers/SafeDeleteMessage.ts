@@ -8,26 +8,25 @@ const debug = {
     error: dbg('Bot:DeleteMessage:Error')
 };
 
-export default function safeDeleteMessage(message : Message) : Promise<void>{
-    return new Promise<void>(function (resolve) {
+export default function safeDeleteMessage(message : Message) : Promise<Message>{
 
-        message.delete().then(() => {
-            resolve();
-        }).catch(error => {
-            if (error instanceof DiscordAPIError){
-                if (error.message === APIErrors.MISSING_PERMISSIONS){
-                    debug.error(`Could not delete message from ${message.author.username}`+
-                        ` in ${message.guild.name}, missing permissions.`);
-                }
-                else {
-                    debug.error(error);
-                }
+    return message.delete().then((message : Message) => {
+        return message;
+    }).catch(error => {
+        if (error instanceof DiscordAPIError){
+            if (error.message === APIErrors.MISSING_PERMISSIONS){
+                debug.error(`Could not delete message from ${message.author.username}`+
+                    ` in ${message.guild.name}, missing permissions.`);
             }
             else {
-                debug.error(`Unexpected error while trying to delete message from `+
-                    `${message.author.username} in ${message.guild.name}.`, error);
+                debug.error(error);
             }
-            // we don't want to reject here because we're already handling everything here
-        })
-    });
+        }
+        else {
+            debug.error(`Unexpected error while trying to delete message from `+
+                `${message.author.username} in ${message.guild.name}.`, error);
+        }
+        return error;// we don't want to reject here because we're already handling everything here
+    })
+
 }
