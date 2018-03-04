@@ -1,5 +1,6 @@
 import * as dbg from 'debug'
 import * as Discord from'discord.js'
+import gb from "../misc/Globals";
 const cli = require('heroku-cli-util');
 
 export let debug = {

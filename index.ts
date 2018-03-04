@@ -30,7 +30,7 @@ function createInstance(): Instance {
     // it gets the job done
     let bot =new Discord.Client();
     let alexa = new Alexa(CLEVERBOT_TOKEN);
-    let database = new Database(DATABASE_URL);
+    let database = new Database(DATABASE_URL, bot);
     let muteQueue = new MuteQueue(database);
     let watchlist = new Watchlist();
     let messageQueue = new MessageQueue(muteQueue, database, watchlist);

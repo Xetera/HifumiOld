@@ -12,6 +12,8 @@ describe('Catching invite regex', () => {
     });
     it('Not matching non-invites', () => {
         expect('discord gg dFgGVW').to.not.match(discordInviteRegex);
+        expect('https://images-ext-1.discordapp.net/external/s/' +
+            'https/cdn.discordapp.com/attachments/247/4192/cdk.gif').not.match(discordInviteRegex);
     })
 });
 

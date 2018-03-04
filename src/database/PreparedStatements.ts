@@ -114,6 +114,35 @@ export function changeLockdownStatus(guild : Guild, status : boolean){
         RETURNING *
         `
 }
+
+export function saveMember(member: GuildMember) : string {
+    const id = member.id;
+    const name = member.user.username;
+    const guild_id = member.guild.id;
+    return `
+        INSERT INTO users(id, name, guild_id)
+        SELECT '${id}', '${name}', '${guild_id}'
+        WHERE NOT EXISTS(
+            SELECT * FROM users 
+            WHERE id = '${id}' AND guild_id = '${guild_id}'
+        )`
+}
+
+export function saveGuild(guild: Guild){
+
+}
+export function getLeftMembers(member : GuildMember){
+    const id = member.id;
+    const name = member.user.username;
+    const guild_id = member.guild.id;
+    return `
+        SELECT * from users 
+        WHERE NOT EXISTS `
+}
+
+export function getAllUsers(){
+    return `SELECT id, guild_id FROM users`
+}
 export function getWhitelistedInvites(guildId : string) : PreparedStatement{
     const statement = getStatement(getWhitelistedInvitesStatement);
     statement.values.push(guildId);

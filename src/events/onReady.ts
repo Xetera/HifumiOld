@@ -4,11 +4,7 @@ import {default as gb, Instance} from "../misc/Globals";
 import {Environments} from "./systemStartup";
 const cli = require('heroku-cli-util');
 
-
-
 // returning owner id at the end
-
-
 export default function onReady( instance : Instance) : Promise<string> {
     const bot = instance.bot;
     const database = instance.database;
@@ -32,9 +28,9 @@ export default function onReady( instance : Instance) : Promise<string> {
 
         startupTable(startupGuild);
         return bot;
-
         }).then((bot : Discord.Client) => {
             setGlobals(bot);
+            instance.database.doPrep();
             return bot.user.setActivity(`out for ${gb.allMembers} users`, {
             type: 'WATCHING'
         }).then(() => {

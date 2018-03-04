@@ -20,7 +20,7 @@ function createInstance(): Instance {
     // it gets the job done
     let bot =new Discord.Client();
     let alexa = new Alexa(require('../../config0.json').CleverBotAPI);
-    let database = new Database(credentials);
+    let database = new Database(credentials, bot);
     let muteQueue = new MuteQueue(database);
     let watchlist = new Watchlist();
     let messageQueue = new MessageQueue(muteQueue, database, watchlist);

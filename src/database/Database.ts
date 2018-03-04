@@ -1,11 +1,11 @@
 import {
     getDefaultChannel, getMemberInviteStrikes,
     getWhitelistedInvites, incrementMemberInviteStrikes, insertGuild, PreparedStatement, updateDefaultChannel,
-    upsertPrefix, insertMember, cleanAllGuildMembers, changeLockdownStatus
+    upsertPrefix, insertMember, cleanAllGuildMembers, changeLockdownStatus, saveMember, getAllUsers
 } from "./PreparedStatements";
 import {IDatabase, IMain, IOptions, ITask} from 'pg-promise'
 import {defaultTableTemplates, getPrefixes, testQuery} from "./QueryTemplates";
-import {Collection, Guild, GuildMember} from "discord.js";
+import {Client, Collection, Guild, GuildMember} from "discord.js";
 import {IGuild, IUser} from "./TableTypes";
 
 import * as pgPromise from 'pg-promise'
@@ -64,19 +64,27 @@ export class Database {
     private pgp = pgPromise(this.initOptions);
     private db : IDatabase<any>;
     guilds : Map<string, ICachedGuild>;
+    client : Client;
 
-
-    constructor(url : DatabaseConfig){
+    constructor(url : DatabaseConfig, bot : Client){
+        this.client = bot;
         this.config = url;
         debug.info("Logging into Postgres on " + getDatabaseType(url), "Database");
         this.guilds = new Map<string, ICachedGuild>();
         this.db = this.pgp(this.config);
-        this.checkTables();
         // we don't want to query the db every message so
         // we're caching the prefixes instead
-        this.cacheGuilds();
         debug.info('Database is connected.', "Database");
 
+    }
+
+    public doPrep(){
+        this.checkTables()
+        .then(() => {
+            this.cacheGuilds();
+        }).then(() =>{
+            this.crossCheckDatabase();
+        })
     }
 
     private initializeGuildIfNone(guildId : string) : boolean{
@@ -89,6 +97,23 @@ export class Database {
         else {
             return true;
         }
+    }
+
+    private async crossCheckDatabase(){
+        const guilds : Guild[] = this.client.guilds.array();
+        return this.db.task(t => {
+            const queries: Query[] = [];
+            for (let guild of guilds) {
+                const members : GuildMember[] = guild.members.array();
+                guild.members.forEach(function (value) {
+                    queries.push(t.none(saveMember(value)));
+                });
+                guilds.forEach(function (value) {
+                    queries.push(t.any(insertGuild(value)));
+                });
+            }
+            return t.batch(queries);
+        });
     }
 
     private async cacheGuilds() : Promise<void> {
