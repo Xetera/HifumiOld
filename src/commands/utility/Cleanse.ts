@@ -9,6 +9,7 @@ export default async function cleanse(channel : Channel, database: Database, lim
             return channel.send(`${gb.emojis.find('name', 'alexa_feels_bad_man')} I'm not allowed to delete messages...`);
 
         const prefix = database.getPrefix(channel.guild.id);
+        if (limit === undefined) limit = 50;
         const messages : Collection<Snowflake, Message> = await channel.fetchMessages({limit: limit});
 
         const botMessages = messages.filter(function(message){

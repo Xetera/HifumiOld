@@ -99,12 +99,16 @@ export default class CommandHandler implements indexSignature {
 
         for (let i in this.commands){
             const match = this.commands[i].match(new RegExp(command, 'i'));
-            if (!match) return;
+            if (!match) continue;
             try{
-                this[match[0]](params);
+                return this[match[0]](params);
             }
             catch (error) {
-                debug.error(`Error while passing down function call\n${error}`, 'CommandHandler')
+                if (error instanceof TypeError){
+                    debug.silly(`Command ${command} does not exist.`);
+                    return
+                }
+                debug.error(`Unexpected error while parsing ${command}\n` + error)
             }
 
         }
@@ -152,11 +156,7 @@ export default class CommandHandler implements indexSignature {
     @onlyMod
     private cleanse(params: CommandParameters){
         const limit : string | undefined = params.args.shift();
-
-        limit
-            ? cleanse(params.message.channel, params.database, parseInt(limit))
-            : cleanse(params.message.channel, params.database);
-
+        cleanse(params.message.channel, params.database, parseInt(limit))
     }
 
     @onlyMod
