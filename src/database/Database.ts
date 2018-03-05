@@ -2,7 +2,7 @@ import {
     getWelcomeChannel, getMemberInviteStrikes,
     getWhitelistedInvites, incrementMemberInviteStrikes, saveGuild, updateWelcomeChannel,
     upsertPrefix, insertMember, cleanAllGuildMembers, changeLockdownStatus, saveMember, getAllUsers, updateLogsChannel,
-    getGuild
+    getGuild, getAllMembers, setIgnored
 } from "./PreparedStatements";
 import {IDatabase, IMain, IOptions, ITask, TQuery} from 'pg-promise'
 import {defaultTableTemplates, getPrefixes, testQuery} from "./QueryTemplates";
@@ -14,12 +14,19 @@ import {debug} from '../utility/Logging'
 
 export interface ICachedGuild {
     prefix: string;
+    users: ICachedUser[]
     blacklisted_links: string[];
     whitelisted_invites: string[];
     welcome_channel: string;
     logs_channel : string;
     warnings_channel : string;
     lockdown: boolean;
+}
+
+export interface ICachedUser {
+    id : string;
+    guild_id: string;
+    ignoring: boolean;
 }
 
 export interface PostgresDevLoginConfig {
@@ -133,7 +140,7 @@ export class Database {
                     this.guilds.set(guild.id, <ICachedGuild> {});
                     cachedGuild = this.guilds.get(guild.id);
                 }
-
+                this.cacheUsers(guild.id)
                 // TODO: Theres a lot of repetition in this part, make sure we cut this down
                 // TODO: To a less indented, more efficient version
                 const whitelistedInvites = await this.db.any(getWhitelistedInvites, [guild.id]);
@@ -150,6 +157,20 @@ export class Database {
                 cachedGuild.prefix  = guild.prefix;
             });
         });
+    }
+
+    private cacheUsers(guildId : string){
+        this.initializeGuildIfNone(guildId)
+        const guild = this.guilds.get(guildId);
+        this.db.many(getAllMembers, [guildId]).then((users : IUser[]) => {
+            guild.users =  users.map(user => {
+                return {
+                    id: user.id,
+                    guild_id: user.guild_id,
+                    ignoring: user.ignoring
+                }
+            });
+        })
     }
 
     private async cacheNewGuild(guild : IGuild){
@@ -216,6 +237,12 @@ export class Database {
         const guild_id = member.guild.id;
         return this.db.one(insertMember, [id, username, guild_id]).then((res : IUser)=> {
             return; // nothing for now
+        })
+    }
+
+    public getUsers(guildId : string){
+        return this.db.many(getAllMembers, [guildId]).then((r : IUser[]) => {
+            return r;
         })
     }
 
@@ -316,6 +343,25 @@ export class Database {
         this.db.one(changeLockdownStatus, [guild.id, status]);
     }
 
+    public setIgnored(member : GuildMember, state : boolean){
+        const cachedGuild = this.guilds.get(member.guild.id);
+        if (!cachedGuild){
+            debug.error(`Could not find cached guild ${member.guild.name}.`, 'Database')
+            return Promise.reject(`Could not find cached guild ${member.guild.name}`);
+        }
+        return this.db.one(setIgnored, [state, member.guild.id, member.id]).then((user : IUser) => {
+            debug.info(`Now ignoring user ${member.user.username}.`);
+            cachedGuild.users.find(user => user.id === member.id).ignoring = user.ignoring;
+            return user.ignoring;
+        });
+    }
+
+    public getIgnored(member : GuildMember){
+        const guild = this.guilds.get(member.guild.id);
+        if (!guild) return undefined;
+        const target : ICachedUser = guild.users.find(user => user.id === member.id);
+        return target.ignoring;
+    }
     public getRaidStatus(guild : Guild)  {
 
     }

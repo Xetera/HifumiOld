@@ -127,8 +127,22 @@ export const getLeftMembers : Query =
 export const getAllUsers : Query =
     `SELECT id, guild_id FROM users`;
 
+export const getAllMembers : Query =
+    `
+    SELECT * FROM users
+    WHERE guild_id = $1
+    `;
+
 export const getGuild : Query  =
     `
     SELECT * from guilds
     WHERE id = $1
+    `;
+
+export const setIgnored : Query =
+    `
+    UPDATE users
+    SET ignoring = $1 
+    WHERE guild_id = $2 AND id = $3
+    RETURNING ignoring
     `;

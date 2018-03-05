@@ -67,3 +67,4 @@ export const getPrefixes : Query =
 // language=POSTGRES-PSQL
 export const testQuery : Query =
     'SELECT * from guilds';
+

@@ -16,6 +16,7 @@ export interface IUser {
     name:string;
     guild_id: string;
     invite_strikes: number;
+    ignoring: boolean;
 }
 
 export interface IBlacklistedLink {
