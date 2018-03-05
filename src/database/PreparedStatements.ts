@@ -4,41 +4,41 @@ import {Query} from "./Database";
 
 // guild_id
 export const getWhitelistedInvites : Query =
-        `
-        SELECT link FROM whitelisted_invites 
-        WHERE guild_id = $1
-        `;
+    `
+    SELECT link FROM whitelisted_invites 
+    WHERE guild_id = $1
+    `;
 
 
 // default_channel, guild_id
 export const updateDefaultChannel : Query =
-        `
-        UPDATE guilds
-        SET default_channel = $1
-        WHERE id = $2 
-        RETURNING default_channel
-        `;
+    `
+    UPDATE guilds
+    SET default_channel = $1
+    WHERE id = $2 
+    RETURNING default_channel
+    `;
 
 export const getDefaultChannel : Query =
-        `
-        SELECT default_channel FROM guilds
-        WHERE id = $1
-        `;
+    `
+    SELECT default_channel FROM guilds
+    WHERE id = $1
+    `;
 
 export const insertMember : Query =
-        `
-        INSERT INTO users (id, name, guild_id) 
-        VALUES ($1, $2, $3)
-        RETURNING *
-        `;
+    `
+    INSERT INTO users (id, name, guild_id) 
+    VALUES ($1, $2, $3)
+    RETURNING *
+    `;
 
 
 //id, guild_id
 export const getMemberInviteStrikes : Query =
-        `
-        SELECT invite_strikes FROM guilds
-        WHERE id = $1 AND guild_id = $2
-        `;
+    `
+    SELECT invite_strikes FROM guilds
+    WHERE id = $1 AND guild_id = $2
+    `;
 
 
 export const incrementMemberInviteStrikes : Query =

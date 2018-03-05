@@ -24,6 +24,7 @@ import setAvatar from "../commands/self/ChangePicture";
 import onlyMod from "./permissions/decorators/onlyMod";
 import getQueue from "../commands/debug/getQueue";
 import cleanse from "../commands/utility/Cleanse";
+import bump from "../commands/self/Bump";
 
 interface CommandParameters extends Instance {
     message: Discord.Message;
@@ -191,5 +192,9 @@ export default class CommandHandler implements indexSignature {
 
     private serverInfo(params: CommandParameters){
         serverInfo(params.message);
+    }
+
+    private bump(params : CommandParameters){
+        bump(params.message);
     }
 }
