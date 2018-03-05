@@ -1,6 +1,6 @@
 import {DiscordAPIError, Message} from "discord.js";
 import * as dbg from 'debug'
-import {APIErrors} from "../interfaces/Errors";
+import {APIErrors} from "../../interfaces/Errors";
 
 const debug = {
     info: dbg('Bot:DeleteMessage:Info'),

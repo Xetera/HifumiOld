@@ -1,9 +1,9 @@
 import safeMessageUser from "./SafeMessageUser";
 import {DiscordAPIError, GuildMember} from "discord.js";
-import {debug} from "../actions/Actions";
-import {APIErrors} from "../interfaces/Errors";
-import {log} from "../utility/Logging";
-import {getOnBanMessageSnipeCount} from "../utility/Settings";
+import {debug} from "../../actions/Actions";
+import {APIErrors} from "../../interfaces/Errors";
+import {log} from "../../utility/Logging";
+import {getOnBanMessageSnipeCount} from "../../utility/Settings";
 
 export default function safeBanUser(member : GuildMember, reason : string, banMessage : string, logMessage ?: string){
     const memberName : string = member.nickname||member.user.username;
