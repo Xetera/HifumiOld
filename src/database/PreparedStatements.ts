@@ -1,7 +1,7 @@
 import {Guild, GuildMember} from "discord.js";
 import {Query} from "./Database";
 
-
+//
 // guild_id
 export const getWhitelistedInvites : Query =
     `
@@ -10,19 +10,27 @@ export const getWhitelistedInvites : Query =
     `;
 
 
-// default_channel, guild_id
-export const updateDefaultChannel : Query =
+// welcome_channel, guild_id
+export const updateWelcomeChannel : Query =
     `
     UPDATE guilds
-    SET default_channel = $1
+    SET welcome_channel = $1
     WHERE id = $2 
-    RETURNING default_channel
+    RETURNING welcome_channel
     `;
 
-export const getDefaultChannel : Query =
+export const getWelcomeChannel : Query =
     `
-    SELECT default_channel FROM guilds
+    SELECT welcome_channel FROM guilds
     WHERE id = $1
+    `;
+
+export const updateLogsChannel : Query =
+    `
+    UPDATE guilds
+    SET logs_channel = $1
+    WHERE id = $2
+    RETURNING logs_channel
     `;
 
 export const insertMember : Query =
@@ -61,7 +69,7 @@ export const upsertPrefix: Query =
     `;
 
 
-export const  insertGuild : Query =
+export const  saveGuild : Query =
     `
     INSERT INTO guilds (id, name)
     VALUES ($1, $2)
@@ -107,19 +115,13 @@ export const saveMember : Query =
         WHERE id = $1 AND guild_id = $3
     )`;
 
-export function saveGuild(guild: Guild){
-
-}
-
 export const getLeftMembers : Query =
     `
     SELECT * from users 
     WHERE NOT EXISTS(
         SELECT 1 FROM users
         WHERE  
-    
     `;
 
-export function getAllUsers(){
-    return `SELECT id, guild_id FROM users`
-}
+export const getAllUsers : Query =
+    `SELECT id, guild_id FROM users`;

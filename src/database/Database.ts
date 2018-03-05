@@ -1,7 +1,7 @@
 import {
-    getDefaultChannel, getMemberInviteStrikes,
-    getWhitelistedInvites, incrementMemberInviteStrikes, insertGuild, updateDefaultChannel,
-    upsertPrefix, insertMember, cleanAllGuildMembers, changeLockdownStatus, saveMember, getAllUsers
+    getWelcomeChannel, getMemberInviteStrikes,
+    getWhitelistedInvites, incrementMemberInviteStrikes, saveGuild, updateWelcomeChannel,
+    upsertPrefix, insertMember, cleanAllGuildMembers, changeLockdownStatus, saveMember, getAllUsers, updateLogsChannel
 } from "./PreparedStatements";
 import {IDatabase, IMain, IOptions, ITask, TQuery} from 'pg-promise'
 import {defaultTableTemplates, getPrefixes, testQuery} from "./QueryTemplates";
@@ -11,11 +11,13 @@ import {IGuild, IUser} from "./TableTypes";
 import * as pgPromise from 'pg-promise'
 import {debug} from '../utility/Logging'
 
-interface ICachedGuild {
+export interface ICachedGuild {
     prefix: string;
-    blacklistedLinks: string[];
-    whitelistedInvites: string[];
-    defaultChannel: string;
+    blacklisted_links: string[];
+    whitelisted_invites: string[];
+    welcome_channel: string;
+    logs_channel : string;
+    warnings_channel : string;
     lockdown: boolean;
 }
 
@@ -114,7 +116,7 @@ export class Database {
                 guilds.forEach(function (guild) {
                     const id = guild.id;
                     const name = guild.name;
-                    queries.push(t.any(insertGuild, [id, name]));
+                    queries.push(t.any(saveGuild, [id, name]));
                 });
             }
             return t.batch(queries);
@@ -133,11 +135,11 @@ export class Database {
 
                 const whitelistedInvites = await this.db.any(getWhitelistedInvites, [guild.id]);
                 if (whitelistedInvites.length > 0)
-                    cachedGuild.whitelistedInvites = whitelistedInvites.map(item => item.link);
+                    cachedGuild.whitelisted_invites = whitelistedInvites.map(item => item.link);
 
                 //let defaultChannel;
-                this.db.oneOrNone(getDefaultChannel, [guild.id]).then(item => {
-                    cachedGuild.defaultChannel = item.default_channel;
+                this.db.oneOrNone(getWelcomeChannel, [guild.id]).then(item => {
+                    cachedGuild.welcome_channel = item.welcome_channel;
                 });
 
                 cachedGuild.prefix  = guild.prefix;
@@ -152,8 +154,8 @@ export class Database {
         if (cached !== undefined){
             this.guilds.set(guild.id, <ICachedGuild> {});
         cached.prefix = guild.prefix;
-        cached.whitelistedInvites = [];
-        cached.blacklistedLinks = [];
+        cached.whitelisted_invites = [];
+        cached.blacklisted_links = [];
         }
     }
 
@@ -170,11 +172,14 @@ export class Database {
     private addGuild(guild : Guild){
         const id = guild.id;
         const name = guild.name;
-        return this.db.oneOrNone(insertGuild,[id, name]).then((guild : IGuild)=> {
+        return this.db.oneOrNone(saveGuild,[id, name]).then((guild : IGuild)=> {
             this.cacheNewGuild(guild);
         });
     }
 
+    public getGuild(guild : Guild) : ICachedGuild | undefined {
+        return this.guilds.get(guild.id);
+    }
     public setPrefix(guild : Guild, prefix : string) : Promise<IGuild|Error|-1> {
         if (prefix.length > 1) // this could change later on where we support up to 3 but na
             // have to Promise.reject outside the promise chain
@@ -228,18 +233,26 @@ export class Database {
 
     }
 
-    public updateDefaultChannel(guildId : string, channelId : string) : Promise<string>{
-        return this.db.oneOrNone(updateDefaultChannel, [guildId, channelId]).then((r: IGuild)=> {
+    public updateWelcomeChannel(guildId : string, channelId : string) : Promise<string>{
+        return this.db.oneOrNone(updateWelcomeChannel, [channelId, guildId]).then((r: IGuild)=> {
             this.initializeGuildIfNone(guildId);
-            this.guilds.get(guildId).defaultChannel = r.default_channel;
-            return r.default_channel;
+            this.guilds.get(guildId).welcome_channel = r.welcome_channel;
+            return r.welcome_channel;
         });
     }
 
-    public getDefaultChannel(guildId: string) : string | undefined {
+    public getWelcomeChannel(guildId: string) : string | undefined {
         const guild = this.guilds.get(guildId);
         if (guild === undefined) return undefined;
-        return guild.defaultChannel;
+        return guild.welcome_channel;
+    }
+
+    public updateLogsChannel(guildId : string, channelId : string){
+        return this.db.oneOrNone(updateLogsChannel, [channelId, guildId]).then((r : IGuild) => {
+            this.initializeGuildIfNone(guildId);
+            this.guilds.get(guildId).logs_channel = r.logs_channel;
+            return r.logs_channel;
+        });
     }
 
     public restockGuildMembers(guild :Guild){
