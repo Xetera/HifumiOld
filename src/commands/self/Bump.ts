@@ -12,7 +12,7 @@ export default function bump(message: Discord.Message){
         message.channel.send('dlm!bump');
     }
 
-    if (!('DLM' in bots) && !('ServerHound' in bots)){
+    if (!bots.includes('DLM') && !bots.includes('ServerHound')){
         message.channel.send('No advertising bots were found in the server.');
     }
 
