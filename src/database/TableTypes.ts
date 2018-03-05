@@ -5,7 +5,9 @@ export interface IGuild {
     name: string;
     prefix: string;
     allows_invites: boolean;
-    default_channel: string;
+    welcome_channel: string;
+    warnings_channel: string;
+    logs_channel: string;
     lockdown: boolean;
 }
 
