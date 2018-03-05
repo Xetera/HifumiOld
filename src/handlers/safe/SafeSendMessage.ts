@@ -11,6 +11,9 @@ export default function safeSendMessage(channel : Discord.Channel, message: stri
     else if (typeof message === 'object'){
         out = JSON.stringify(message, null, '\t');
     }
+    else {
+        out = message;
+    }
     if (channel instanceof Discord.TextChannel){
         if (!channel.guild.available) return debug.error(`Guild ${channel.guild.name} is not available.`);
 
@@ -21,14 +24,18 @@ export default function safeSendMessage(channel : Discord.Channel, message: stri
         }).catch(err => {
             if (err instanceof DiscordAPIError){
                 if (err.message === APIErrors.MISSING_PERMISSIONS){
-                    debug.warning(`Could not send message to ${channel.name} in ${channel.guild.name}, missing permissions`);
+                    debug.error(`Could not send message to ${channel.name} in ${channel.guild.name}, missing permissions`
+                    , 'safeSendMessage');
                     // TODO: Mod logging errors
                     return;
                 }
                 else if (err.message ===APIErrors.UNKNOWN_GUILD){
-                    debug.warning(`Unknown guild ${channel.guild.name}.\n`, err.stack)
+                    return debug.error(`Unknown guild ${channel.guild.name}.\n` + err.stack, 'safeSendMessage')
                 }
-                debug.warning(`Unexpected error while sending message to channel ${channel.name}\n`, err.stack);
+                else if (err.message === APIErrors.CANNOT_SEND_EMPTY_MESSAGE){
+                    return debug.error(`Tried to send an empty message to ${channel.name}`, 'safeSendMessage')
+                }
+                debug.error(`Unexpected error while sending message to channel ${channel.name}\n` + err.stack, 'safeSendMessage');
             }
         })
     }

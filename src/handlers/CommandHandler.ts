@@ -2,8 +2,8 @@ import nuke from "../commands/utility/Nuke";
 import * as Discord from "discord.js";
 import * as dbg from "debug";
 import {Database} from "../database/Database";
-import setDefaultChannel from "../commands/utility/SetDefaultChannel";
-import setPrefix from "../commands/utility/SetPrefix";
+import setWelcome from "../commands/config/setWelcomeChannel";
+import setPrefix from "../commands/config/SetPrefix";
 import systemsEval from "../commands/debug/Eval";
 import manualRestockUsers from "../actions/ManualRestockUsers";
 import getPfp, {default as pfp} from "../commands/info/GetPfp";
@@ -25,6 +25,7 @@ import onlyMod from "./permissions/decorators/onlyMod";
 import getQueue from "../commands/debug/getQueue";
 import cleanse from "../commands/utility/Cleanse";
 import bump from "../commands/self/Bump";
+import getConfig from "../commands/config/getConfig";
 
 interface CommandParameters extends Instance {
     message: Discord.Message;
@@ -149,6 +150,11 @@ export default class CommandHandler implements indexSignature {
 
     /* Mod Commands */
     @onlyMod
+    private config(params : CommandParameters){
+        getConfig(params.message, params.database);
+    }
+
+    @onlyMod
     private nuke(params: CommandParameters){
         nuke(params.message.channel, parseInt(params.args[0]));
     }
@@ -160,8 +166,8 @@ export default class CommandHandler implements indexSignature {
     }
 
     @onlyMod
-    private setDefault(params : CommandParameters){
-        setDefaultChannel(params.message, params.database);
+    private setWelcome(params : CommandParameters){
+        setWelcome(params.message, params.database);
     }
 
     @onlyMod
