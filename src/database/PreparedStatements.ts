@@ -25,6 +25,7 @@ export const getWelcomeChannel : Query =
     WHERE id = $1
     `;
 
+
 export const updateLogsChannel : Query =
     `
     UPDATE guilds
@@ -125,3 +126,9 @@ export const getLeftMembers : Query =
 
 export const getAllUsers : Query =
     `SELECT id, guild_id FROM users`;
+
+export const getGuild : Query  =
+    `
+    SELECT * from guilds
+    WHERE id = $1
+    `;

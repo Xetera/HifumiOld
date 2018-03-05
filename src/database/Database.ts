@@ -1,7 +1,8 @@
 import {
     getWelcomeChannel, getMemberInviteStrikes,
     getWhitelistedInvites, incrementMemberInviteStrikes, saveGuild, updateWelcomeChannel,
-    upsertPrefix, insertMember, cleanAllGuildMembers, changeLockdownStatus, saveMember, getAllUsers, updateLogsChannel
+    upsertPrefix, insertMember, cleanAllGuildMembers, changeLockdownStatus, saveMember, getAllUsers, updateLogsChannel,
+    getGuild
 } from "./PreparedStatements";
 import {IDatabase, IMain, IOptions, ITask, TQuery} from 'pg-promise'
 import {defaultTableTemplates, getPrefixes, testQuery} from "./QueryTemplates";
@@ -133,18 +134,20 @@ export class Database {
                     cachedGuild = this.guilds.get(guild.id);
                 }
 
+                // TODO: Theres a lot of repetition in this part, make sure we cut this down
+                // TODO: To a less indented, more efficient version
                 const whitelistedInvites = await this.db.any(getWhitelistedInvites, [guild.id]);
                 if (whitelistedInvites.length > 0)
                     cachedGuild.whitelisted_invites = whitelistedInvites.map(item => item.link);
 
-                //let defaultChannel;
-                this.db.oneOrNone(getWelcomeChannel, [guild.id]).then(item => {
+                // we could really be calling this in the begining instead and not here
+                this.db.oneOrNone(getGuild, [guild.id]).then((item : ICachedGuild)=> {
                     cachedGuild.welcome_channel = item.welcome_channel;
+                    cachedGuild.logs_channel = item.logs_channel;
+                    cachedGuild.warnings_channel = item.warnings_channel
                 });
 
                 cachedGuild.prefix  = guild.prefix;
-
-                //debug.info(this.guilds);
             });
         });
     }
@@ -253,6 +256,12 @@ export class Database {
             this.guilds.get(guildId).logs_channel = r.logs_channel;
             return r.logs_channel;
         });
+    }
+
+    public getLogsChannel(guildId : string){
+        const guild = this.guilds.get(guildId);
+        if (!guild) return undefined;
+        return guild.logs_channel;
     }
 
     public restockGuildMembers(guild :Guild){

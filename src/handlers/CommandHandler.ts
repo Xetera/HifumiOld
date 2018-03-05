@@ -26,6 +26,7 @@ import getQueue from "../commands/debug/getQueue";
 import cleanse from "../commands/utility/Cleanse";
 import bump from "../commands/self/Bump";
 import getConfig from "../commands/config/getConfig";
+import setLogsChannel from "../commands/config/setLogsChannel";
 
 interface CommandParameters extends Instance {
     message: Discord.Message;
@@ -170,6 +171,10 @@ export default class CommandHandler implements indexSignature {
         setWelcome(params.message, params.database);
     }
 
+    @onlyMod
+    private setLogs(params : CommandParameters){
+        setLogsChannel(params.message, params.database);
+    }
     @onlyMod
     private echo(params : CommandParameters){
         echo(params.message, params.args)
