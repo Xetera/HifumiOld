@@ -57,6 +57,9 @@ export default function onMessage(message: Discord.Message, instance: Instance){
     else if (messageType === MessageType.PrivateMessage)
         return DMCommandHandler(message, instance);
 
+    if (database.getIgnored(message.member))
+        return;
+
     if (message.content === '.help') return getHelp(message, [], database);
 
     if (!message.content.startsWith(database.getPrefix(message.guild.id))) return;

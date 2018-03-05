@@ -27,6 +27,8 @@ import cleanse from "../commands/utility/Cleanse";
 import bump from "../commands/self/Bump";
 import getConfig from "../commands/config/getConfig";
 import setLogsChannel from "../commands/config/setLogsChannel";
+import getCache from "../commands/debug/Cache";
+import ignore from "../commands/self/Ignore";
 
 interface CommandParameters extends Instance {
     message: Discord.Message;
@@ -142,6 +144,11 @@ export default class CommandHandler implements indexSignature {
         getQueue(params.message, params.messageQueue);
     }
 
+    @onlyOwner
+    private cache(params: CommandParameters){
+        getCache(params.message, params.database);
+    }
+
     /* Admin Commands */
 
     @onlyAdmin
@@ -153,6 +160,12 @@ export default class CommandHandler implements indexSignature {
     @onlyMod
     private config(params : CommandParameters){
         getConfig(params.message, params.database);
+    }
+
+    @onlyMod
+    private ignore(params : CommandParameters){
+        const user = params.message.mentions.members.first();
+        ignore(params.message, user, params.database);
     }
 
     @onlyMod
