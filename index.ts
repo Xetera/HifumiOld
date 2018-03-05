@@ -48,7 +48,7 @@ function createInstance(): Instance {
 }
 
 const instance = createInstance();
-
+gb.instance = instance;
 instance.bot.login(BOT_TOKEN);
 
 

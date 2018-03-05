@@ -1,6 +1,7 @@
 import * as dbg from 'debug'
 import * as Discord from'discord.js'
 import gb from "../misc/Globals";
+import {Database} from "../database/Database";
 const cli = require('heroku-cli-util');
 
 export let debug = {
@@ -42,7 +43,7 @@ export function startupTable(guilds : GuildStats[]){
 
 
 export function log(guild: Discord.Guild, message : String) : void {
-    const logsChannel : Discord.GuildChannel = guild.channels.find('name', 'logs');
+    const logsChannel = guild.channels.get(gb.instance.database.getLogsChannel(guild.id));
     if (!logsChannel){
         return debug.info(`Tried to log a message in ${guild.name} but a logs channel was not found.`);
     }

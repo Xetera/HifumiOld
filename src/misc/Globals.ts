@@ -14,6 +14,7 @@ interface Globals {
     ENV: Environments;
     allMembers:number;
     emojis: Discord.Collection<Discord.Snowflake, Discord.Emoji>;
+    instance: Instance;
 }
 
 export interface Instance {
