@@ -10,7 +10,8 @@ export const APIErrors = {
     "UNKNOWN_GUILD": "Unknown Guild",
     "UNKNOWN_INTEGRATION": "Unknown Integration",
     "MISSING_PERMISSIONS": "Missing Permissions",
-    "CANNOT_MESSAGE_USER": "Cannot Message User"
+    "CANNOT_MESSAGE_USER": "Cannot Message User",
+    "CANNOT_SEND_EMPTY_MESSAGE": "Cannot send an empty message"
 };
 
 export const PSQLErrors = {

@@ -2,10 +2,10 @@ import {Message} from 'discord.js'
 import {discordInviteRegex} from "./Regex";
 import {debug} from '../events/onMessage'
 import {securityLevel, SecurityLevels} from "../utility/Settings";
-import safeDeleteMessage from "../handlers/SafeDeleteMessage";
+import safeDeleteMessage from "../handlers/safe/SafeDeleteMessage";
 import {Database} from "../database/Database";
 import banForInviteSpam from "../actions/BanForInviteSpam";
-import safeMessageUser from "../handlers/SafeMessageUser";
+import safeMessageUser from "../handlers/safe/SafeMessageUser";
 import gb from "../misc/Globals";
 import Watchlist from "../moderation/Watchlist";
 

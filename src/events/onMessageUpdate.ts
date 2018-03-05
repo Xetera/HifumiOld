@@ -1,6 +1,6 @@
 import * as Discord from 'discord.js'
 import {discordInviteRegex} from "../listeners/Regex";
-import safeDeleteMessage from "../handlers/SafeDeleteMessage";
+import safeDeleteMessage from "../handlers/safe/SafeDeleteMessage";
 import {debug} from '../utility/Logging'
 export default function onMessageUpdate(oldMessage : Discord.Message, newMessage : Discord.Message){
     if (newMessage.content.match(discordInviteRegex)){

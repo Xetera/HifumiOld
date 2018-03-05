@@ -1,4 +1,4 @@
-import safeBanUser from "../handlers/SafeBanUser";
+import safeBanUser from "../handlers/safe/SafeBanUser";
 import {GuildMember} from "discord.js";
 
 export default function banTrackedUserForInvite(member : GuildMember){

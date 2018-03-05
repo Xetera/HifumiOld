@@ -18,7 +18,7 @@ export default function onGuildMemberAdd(member : Discord.GuildMember, instance:
 
     // we will change this later to fetch from a database instead of using a preset name
     const welcomeChannel : Discord.Channel | undefined = member.guild.channels.find('name', 'welcome');
-    const defaultChannelId : string | undefined = database.getDefaultChannel(member.guild.id);
+    const defaultChannelId : string | undefined = database.getWelcomeChannel(member.guild.id);
     const defaultChannel : Discord.Channel | undefined = member.guild.channels.find(
         'id', defaultChannelId
     );
