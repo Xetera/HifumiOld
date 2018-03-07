@@ -1,21 +1,24 @@
 ![alexa](https://cdn.discordapp.com/attachments/418699380833648644/420917081131712512/alexanoinvite.png)
 
+Placeholder invite until a stable version is released
 
-Moderation based discord bot written in Typescript - inspired by [hotbot](https://github.com/AberrantFox/hotbot)
+Moderation based discord bot written in Typescript using [Discord.js](https://github.com/discordjs/discord.js) 
 
-Currently hosted on [heroku](https://www.heroku.com/) and using [Discord.js](https://github.com/discordjs/discord.js)
+Currently hosted on [heroku](https://www.heroku.com/)
 
 ## Whatcha Got:
 
-### Conversations: 🗣️ 
+### Interaction: 🗣️ 
+
+![](https://cdn.discordapp.com/emojis/414332109407387649.png?v=1)
 
 Alexa talks to you when she hears you say her name.
 - Optional: She responds to every message if you make a channel called 'chat-with-alexa' unless starting your message with a dash
 #### Note: This might become very expensive as (if) more people start using Alexa which could eventually make it a donator feature.
 
-### Bans and moderation: 🚫
+She will greet new users in a channel of your choice
 
-![ban](https://cdn.discordapp.com/emojis/230072259933503488.png?v=1) 
+### Bans and moderation: 🚫 
 
 Detecting spammers and automatically muting them for a set amount of time. 
 * This requires a role called 'muted' that has no permissions other than reading chat and history
@@ -28,9 +31,7 @@ Locking down guilds on demand, muting everyone for 10 minutes or longer, allowin
 
 ### Bookkeeping: 📚
 
-![](https://cdn.discordapp.com/emojis/414332109407387649.png?v=1)
 
-* Greeting new users on a channel of your choice
 * Logging join and leave times
 * Logging user mutes and duration
 * Optionally logging deleted and edited messages **PLANNED**
@@ -98,3 +99,5 @@ In order of importance per topic
 ## Way Later: 🧠 **-Very Low priority** cuzitsreallyhard 
 - [ ] Intent analysis for communicating with Alexa
 - [ ] Voice support for communicating with alexa 
+
+#### Inspired by [HotBot](https://github.com/AberrantFox/hotbot) in [The Programmer's Hangout](https://discord.gg/programming) on discord
