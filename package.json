@@ -1,5 +1,5 @@
 {
-  "name": "Alexa.js",
+  "name": "Alexa",
   "version": "1.0.0",
   "description": "Moderation bot for discord.",
   "main": "index.js",
@@ -18,7 +18,7 @@
     "@types/node": "^9.4.6",
     "bufferutil": "^3.0.3",
     "cheerio": "^1.0.0-rc.2",
-    "clevertype": "^1.0.9",
+    "clevertype": "^1.0.10",
     "debug": "^3.1.0",
     "discord.js": "^11.2.1",
     "ffmpeg-binaries": "^3.2.2-3",
