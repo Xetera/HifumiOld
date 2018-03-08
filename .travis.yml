@@ -1,15 +1,15 @@
 language: node_js
+node_js:
+  - 'stable'
+  - '8'
 
 cache:
   directories:
     - node_modules
-    
+
 before_script:
   - npm run setup
   - npm run build
 
 script:
   - npm test
-
-after_script:
-  - npm pack
