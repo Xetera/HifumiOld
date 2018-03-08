@@ -7,7 +7,7 @@ import {Database, PostgresDevLoginConfig} from "../database/Database";
 import {Alexa} from "../API/Alexa";
 import {MuteQueue} from "../moderation/MuteQueue";
 import {Instance} from "../misc/Globals";
-import {default as Watchlist} from "../moderation/Watchlist";
+import Watchlist from "../moderation/Watchlist";
 
 let credentials = <PostgresDevLoginConfig>{};
 credentials.user = 'postgres';
@@ -40,6 +40,8 @@ const instances = createInstance();
 
 describe('Handling commands', () => {
     it('Should be parsing input properly', () => {
+        // we don't want to modify our code to take in a string as well as message so
+        // it's a lot easier to just cast it to a message
         const [command, args] = CommandHandler.parseInput(<Discord.Message> {content: "!command args args args"});
         expect(command).to.equal("command");
         expect(args.join(' ')).to.equal('args args args')
@@ -47,10 +49,17 @@ describe('Handling commands', () => {
 });
 
 describe('Alexa', function() {
-    this.timeout(5000);
+    it('Setting clevertype emotion incorrectly', () => {
+        expect(() => instances.alexa.setEmotion(101)).to.throw(RangeError);
+    });
+    it('Setting clevertype regard incorrectly', () => {
+        expect(() => instances.alexa.setRegard(101)).to.throw(RangeError);
+    });
+    it('Setting clevertype engagement incorrectly', () => {
+        expect(() => instances.alexa.setEngagement(101)).to.throw(RangeError);
+    });
     it('Getting cleverbot response', function(done : MochaDone) {
-        instances.alexa.say('hello').then((reply:string)=> {
-            this.timeout(5000);
+        instances.alexa.say('hello').then((reply: any)=> {
             expect(reply).to.be.a('string');
             done();
         });
@@ -58,7 +67,5 @@ describe('Alexa', function() {
     it('Clevertype correctly recording calls', () => {
         expect(instances.alexa.cleverbot.callAmount).to.equal(1);
     });
-    it('Clevertype setting mood properly', () => {
-        instances.alexa
-    });
+
 });

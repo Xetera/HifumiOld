@@ -4,6 +4,9 @@
   "description": "Moderation bot for discord.",
   "main": "index.js",
   "scripts": {
+    "setup": "npm install",
+    "build": "tsc",
+    "build-watch":"tsc --watch",
     "test": "mocha src/tests/*.js",
     "start": "nodemon index.js",
     "postinstall": "tsc",

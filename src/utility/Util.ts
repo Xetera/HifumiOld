@@ -9,11 +9,16 @@ import {debug} from "../events/onMessage";
  * @param {number} range - Max range.
  * @returns {number} - Random choice within range
  */
-export function randRange(min : number = 0, range : number) : number{
-    if (!min){
-        return Math.floor(Math.random() * range);
+export function random(min : number | any[] = 0, range ?: number) : number | any {
+    if (typeof min === 'number'){
+        if (!min){
+            return Math.floor(Math.random() * range);
+        }
+        return Math.floor(Math.random() * (min - range + 1)) + min
     }
-    return Math.floor(Math.random() * (min - range + 1)) + min
+    else if (min instanceof Array){
+        return min[Math.floor(Math.random() * min.length)];
+    }
 }
 
 
@@ -21,10 +26,6 @@ export function randBool() : boolean{
     return Math.random () >= 0.5;
 }
 
-
-export function randChoice(array : any[]) : any {
-    return array[Math.floor(Math.random() * array.length)];
-}
 
 export function pluralize(word : string, number: number) : string | -1 {
     if (number > 1 || number === 0){
