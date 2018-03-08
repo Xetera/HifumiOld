@@ -112,8 +112,9 @@ export default class CommandHandler implements indexSignature {
                 // yeah I know this sucks
                 if (error instanceof TypeError && error.message === 'this[match[0]] is not a function') {
                     debug.silly(`Command ${command} does not exist.`);
+                    return;
                 }
-                debug.error(`Unexpected error while parsing ${command}\n` + error)
+                debug.error(`Unexpected error while executing ${command}\n` + error)
             }
         }
     }
@@ -207,7 +208,7 @@ export default class CommandHandler implements indexSignature {
     }
 
     private source(params: CommandParameters){
-        source(params.message);
+        source(params.message, params.args);
     }
 
     private ch(params: CommandParameters){

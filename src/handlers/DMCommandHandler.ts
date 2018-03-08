@@ -26,7 +26,7 @@ export default function DMCommandHandler(message : Message, instance : Instance)
     // kind of a bad way to check but there won't be many DM
     // commands anyways so it's ok
     if (message.content.includes('invite')){
-        message.channel.send(getInvite(bot));
+        message.channel.send(getInvite());
     }
     else if (message.content.includes('help')){
         message.channel.send(getDMHelp());

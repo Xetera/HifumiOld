@@ -1,5 +1,7 @@
 import {Guild} from "discord.js";
-import {randChoice, randRange} from "../utility/Util";
+import {random} from "../utility/Util";
+import getInvite from "../commands/DM/getInvite";
+import gb from "../misc/Globals";
 
 export const adminOnlyCommand : string = 'This command is only available to admins.';
 
@@ -24,8 +26,11 @@ export const lackingOwnerPermissions =
     '_Laughing hysterically_ oh god, I can\'t believe you thought I\'d let you do that. :LUL:';
 
 export function randomRuntimeError() : string {
-    return randChoice(runtimeErrorResponses);
+    return random(runtimeErrorResponses);
 }
+
+export const advertiseOnRaidBan : string =
+    `Did you enjoy getting humiliated just then?\nInvite me to your server ${gb.instance ? getInvite() : ''}`;
 
 export const runtimeErrorResponses : string[] = [
     "Holy... I almost crashed while trying to do that, there was an error somewhere.",

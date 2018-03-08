@@ -22,7 +22,7 @@ import * as Discord from 'discord.js'
 import onChannelCreate from "./src/events/onChannelCreate";
 import updatePresence from "./src/actions/UpdatePresence";
 import CommandHandler from "./src/handlers/CommandHandler";
-import Inspector, {default as Watchlist} from "./src/moderation/Watchlist";
+import Watchlist from "./src/moderation/Watchlist";
 import onMessageUpdate from "./src/events/onMessageUpdate";
 
 // instances

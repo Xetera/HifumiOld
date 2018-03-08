@@ -41,6 +41,13 @@
     "usage": "echo {channel ID} {message}",
     "example": "echo 3803832131 Hello World!"
   },
+  "ignore": {
+    "name":"ignore",
+    "type":"Self",
+    "info":"Ignores all conversation and commands from a user. [MOD]",
+    "usage": "ignore {@Mention}",
+    "example":"ignore @Xetera"
+  },
   "pfp": {
     "name": "pfp",
     "type": "Utility",

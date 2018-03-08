@@ -1,0 +1,20 @@
+{
+  "help": "https://github.com/ilocereal/Alexa/blob/master/src/commands/info/Help.ts",
+  "echo": "https://github.com/ilocereal/Alexa/blob/master/src/commands/utility/Echo.ts",
+  "pfp": "https://github.com/ilocereal/Alexa/blob/master/src/commands/info/GetPfp.ts",
+  "serverinfo": "https://github.com/ilocereal/Alexa/blob/master/src/commands/info/ServerInfo.ts",
+  "source": "https://github.com/ilocereal/Alexa/blob/master/src/commands/info/Source.ts",
+  "uptime": "https://github.com/ilocereal/Alexa/blob/master/src/commands/info/Uptime.ts",
+  "setprefix": "https://github.com/ilocereal/Alexa/blob/master/src/commands/config/SetPrefix.ts",
+  "config": "https://github.com/ilocereal/Alexa/blob/master/src/commands/config/getConfig.ts",
+  "setlogs": "https://github.com/ilocereal/Alexa/blob/master/src/commands/config/setLogsChannel.ts",
+  "setwelcome" : "https://github.com/ilocereal/Alexa/blob/master/src/commands/config/setWelcomeChannel.ts",
+  "ch" : "https://github.com/ilocereal/Alexa/blob/master/src/commands/fun/CyanideAndHappiness.ts",
+  "snipe": "https://github.com/ilocereal/Alexa/blob/master/src/commands/moderation/Snipe.ts",
+  "bump": "https://github.com/ilocereal/Alexa/blob/master/src/commands/self/Bump.ts",
+  "setname": "https://github.com/ilocereal/Alexa/blob/master/src/commands/self/ChangeName.ts",
+  "setavatar": "https://github.com/ilocereal/Alexa/blob/master/src/commands/self/ChangePicture.ts",
+  "ignore": "https://github.com/ilocereal/Alexa/blob/master/src/commands/self/Ignore.ts",
+  "cleanse" :" https://github.com/ilocereal/Alexa/blob/master/src/commands/utility/Cleanse.ts",
+  "nuke" : "https://github.com/ilocereal/Alexa/blob/master/src/commands/utility/Nuke.ts"
+}

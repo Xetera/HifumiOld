@@ -10,6 +10,9 @@ import {changeLockdownStatus} from "../database/PreparedStatements";
 import raidMode from "../actions/RaidMode";
 import {Database} from "../database/Database";
 import muteUser from "../actions/MuteUser";
+import safeBanUser from "../handlers/safe/SafeBanUser";
+import gb from "../misc/Globals";
+import {advertiseOnRaidBan} from "../handlers/Replies";
 
 
 class MutedMember  {
@@ -86,24 +89,7 @@ export class MuteQueue {
         }
     }
     public release(...members: Discord.GuildMember[]) : void {
-        /*
-        let i = 0;
-        let queueLength : number = members.length;
-        do {
-            let member = members[i];
-            const index : number = this.queue.get.findIndex((user : MutedMember) => user.member.id === member.id);
-            if (index > 0){ // user was not found in the muteQueue
-                const releasedSpammer : MutedMember = this.queue.splice(index, 1)[0];
-                member.removeRole(releasedSpammer.role, `The ${releasedSpammer.unmuteSeconds} timeout duration ran out.`)
-            }
-            else {
-                debug.warning(`Could not release ${member.nickname||member.user.username}, not found in the muteQueue.`, "MuteQueue");
-            }
 
-            i++;
-        }
-        while (i < queueLength - 1); // length of 1 ===
-        */
     }
 
     public detectRaid(member: Discord.GuildMember){
@@ -156,17 +142,37 @@ export class MuteQueue {
                 }
                 debug.error(`Unexpected error while unmuting ${mutedGuildMember.name}.`, error);
             }
-
             timeoutMembers.splice(index, 1);
-
             debug.info(`${mutedGuildMember.name} in ${mutedGuildMember.member.guild.name} was unmuted after ${timeDelta} seconds.`, "MuteQueue");
-
         }, timeDelta * 1000);
 
         mutedGuildMember.timeout = timeoutId;
     }
 
-    public nukeRaiders(guild : Discord.Guild) {
+    public clearRaiders(message: Discord.Message) {
+        const guild = message.guild;
+        const raidGuild = this.queue.get(guild.id);
+        const youTried = gb.emojis.get('alexa_you_tried');
+        const raiderCount = raidGuild.length;
+
+        if (!raidGuild)
+            return debug.error(`Tried clearing raiders in an non - existent guild ${guild.name}.`);
+
+        for (let i = raidGuild.length; i > 0; --i){
+            const raider = raidGuild[i];
+            if (raider.member.hasPermission('ADMINISTRATOR')){
+                debug.warning(`Tried to autoban an admin for raiding in ${guild.name}`);
+                continue;
+                // TODO: Post a warning in the warning channel for this later
+            }
+            safeBanUser(raider.member,
+                `Mass banned by ${message.author.username}`,
+                `You were mass banned by a mod for raiding ${youTried}\n${advertiseOnRaidBan}`);
+            raidGuild.splice(i, 1);
+
+            // we also need to remove them from the database when we implement that
+        }
+        message.channel.send(`Banned ${raiderCount - raidGuild.length} muted raiders. ${youTried}`)
 
     }
 }
