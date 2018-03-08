@@ -3,11 +3,13 @@ import {expect} from 'chai'
 import * as Discord from "discord.js";
 import CommandHandler from "../handlers/CommandHandler";
 import {MessageQueue} from "../moderation/MessageQueue";
-import {Database, PostgresDevLoginConfig} from "../database/Database";
+import {Database, DatabaseConfig, PostgresDevLoginConfig} from "../database/Database";
 import {Alexa} from "../API/Alexa";
 import {MuteQueue} from "../moderation/MuteQueue";
 import {Instance} from "../misc/Globals";
 import Watchlist from "../moderation/Watchlist";
+import {getDatabaseConnection, getTokens} from "../events/systemStartup";
+import gb from "../misc/Globals";
 
 let credentials = <PostgresDevLoginConfig>{};
 credentials.user = 'postgres';
@@ -15,12 +17,16 @@ credentials.host = 'localhost';
 credentials.port = 5432;
 credentials.database = 'discord';
 
+
+const [BOT_TOKEN, CLEVERBOT_TOKEN] : string[] = getTokens(gb.ENV);
+const DATABASE_URL : DatabaseConfig = getDatabaseConnection(gb.ENV);
+
 function createInstance(): Instance {
     // this is how we avoid scoping problems, a little ugly but
     // it gets the job done
     let bot =new Discord.Client();
-    let alexa = new Alexa(require('../../config0.json').CleverBotAPI);
-    let database = new Database(credentials, bot);
+    let alexa = new Alexa(CLEVERBOT_TOKEN);
+    let database = new Database(DATABASE_URL, bot);
     let muteQueue = new MuteQueue(database);
     let watchlist = new Watchlist();
     let messageQueue = new MessageQueue(muteQueue, database, watchlist);
