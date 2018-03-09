@@ -17,19 +17,21 @@ import onMessage from './src/events/onMessage'
 import onGuildMemberAdd from "./src/events/onGuildMemberAdd";
 import onGuildMemberRemove from "./src/events/onGuildMemberRemove";
 import onGuildCreate from "./src/events/onGuildCreate";
-
 import * as Discord from 'discord.js'
 import onChannelCreate from "./src/events/onChannelCreate";
 import updatePresence from "./src/actions/UpdatePresence";
 import CommandHandler from "./src/handlers/CommandHandler";
 import Watchlist from "./src/moderation/Watchlist";
 import onMessageUpdate from "./src/events/onMessageUpdate";
+import onGuildMemberUpdate from "./src/events/onGuildMemberUpdate";
+import onGuildUpdate from "./src/events/onGuildUpdate";
 
 // instances
 function createInstance(): Instance {
     // this is how we avoid scoping problems, a little ugly but
     // it gets the job done
     let bot =new Discord.Client();
+    bot.login(BOT_TOKEN);
     let alexa = new Alexa(CLEVERBOT_TOKEN);
     let database = new Database(DATABASE_URL, bot);
     let muteQueue = new MuteQueue(database);
@@ -49,7 +51,6 @@ function createInstance(): Instance {
 
 const instance = createInstance();
 gb.instance = instance;
-instance.bot.login(BOT_TOKEN);
 
 
 setInterval(function(){
@@ -60,6 +61,8 @@ instance.bot.on('ready', async function(){
     gb.ownerID = await onReady(instance);
 });
 
+
+// === === === === MESSAGE === === === === === //
 instance.bot.on('message', function(message : Discord.Message){
     onMessage(message, instance);
 });
@@ -67,18 +70,38 @@ instance.bot.on('message', function(message : Discord.Message){
 instance.bot.on('messageUpdate', function(oldMessage: Discord.Message, newMessage: Discord.Message){
     onMessageUpdate(oldMessage, newMessage);
 });
+
+instance.bot.on('messageDelete', function(oldMessage: Discord.Message, newMessage: Discord.Message){
+    onMessageUpdate(oldMessage, newMessage);
+});
+
+
+// === === === === GUILD MEMBER === === === === === //
 instance.bot.on('guildMemberAdd', function(member : Discord.GuildMember){
     onGuildMemberAdd(member, instance);
 });
 
+
 instance.bot.on('guildMemberRemove', function(member : Discord.GuildMember){
     onGuildMemberRemove(member);
+});
+
+instance.bot.on('guildMemberUpdate', function(oldMember: Discord.GuildMember, newMember: Discord.GuildMember){
+    onGuildMemberUpdate(oldMember, newMember);
+});
+
+
+// === === === === GUILD === === === === === //
+instance.bot.on('guildUpdate', function(oldMember: Discord.Guild, newMember: Discord.Guild){
+    onGuildUpdate(oldMember, newMember);
 });
 
 instance.bot.on('guildCreate', function(guild : Discord.Guild){
     onGuildCreate(guild, instance);
 });
 
+
+// === === === === CHANNEL === === === === === //
 instance.bot.on('channelCreate', function(channel :Discord.Channel){
     onChannelCreate(channel);
 });
