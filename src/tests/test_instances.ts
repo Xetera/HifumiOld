@@ -71,6 +71,7 @@ describe('Alexa', function() {
             done();
         });
     });
+    this.timeout(10000);
     it('Clevertype correctly recording calls', () => {
         expect(instances.alexa.cleverbot.callAmount).to.equal(1);
     });
