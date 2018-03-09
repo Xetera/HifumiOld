@@ -17,10 +17,10 @@ credentials.host = 'localhost';
 credentials.port = 5432;
 credentials.database = 'discord';
 
+gb.ENV  = getEnvironmentSettings();
 
 const [BOT_TOKEN, CLEVERBOT_TOKEN] : string[] = getTokens(gb.ENV);
 const DATABASE_URL : DatabaseConfig = getDatabaseConnection(gb.ENV);
-gb.ENV  = getEnvironmentSettings();
 
 function createInstance(): Instance {
     // this is how we avoid scoping problems, a little ugly but
