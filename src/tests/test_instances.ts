@@ -56,13 +56,13 @@ describe('Handling commands', () => {
 });
 
 describe('Alexa', function() {
-    it('Setting clevertype emotion incorrectly', () => {
+    it('Error on setting clevertype emotion incorrectly', () => {
         expect(() => instances.alexa.setEmotion(101)).to.throw(RangeError);
     });
-    it('Setting clevertype regard incorrectly', () => {
+    it('Error on setting clevertype regard incorrectly', () => {
         expect(() => instances.alexa.setRegard(101)).to.throw(RangeError);
     });
-    it('Setting clevertype engagement incorrectly', () => {
+    it('Error on setting clevertype engagement incorrectly', () => {
         expect(() => instances.alexa.setEngagement(101)).to.throw(RangeError);
     });
     it('Getting cleverbot response', function(done : MochaDone) {
@@ -71,9 +71,9 @@ describe('Alexa', function() {
             done();
         });
     });
+    
     this.timeout(10000);
     it('Clevertype correctly recording calls', () => {
         expect(instances.alexa.cleverbot.callAmount).to.equal(1);
     });
-
 });

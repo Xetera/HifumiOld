@@ -23,14 +23,15 @@ export const welcomeMessages = [
 ];
 
 export const lackingOwnerPermissions =
-    '_Laughing hysterically_ oh god, I can\'t believe you thought I\'d let you do that. :LUL:';
+    '_Laughing hysterically_ oh god, I can\'t believe you thought I\'d let you do that.';
 
 export function randomRuntimeError() : string {
     return random(runtimeErrorResponses);
 }
 
-export const advertiseOnRaidBan : string =
-    `Did you enjoy getting humiliated just then?\nInvite me to your server ${gb.instance ? getInvite() : ''}`;
+export function advertiseOnRaidBan() : string {
+    return `Want to protect your own server from people like yourself? Invite me!\n${getInvite()}`;
+}
 
 export const runtimeErrorResponses : string[] = [
     "Holy... I almost crashed while trying to do that, there was an error somewhere.",
