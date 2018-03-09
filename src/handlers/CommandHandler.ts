@@ -103,10 +103,10 @@ export default class CommandHandler implements indexSignature {
         };
 
         for (let i in this.commands) {
-            const match = this.commands[i].match(new RegExp(command, 'i'));
+            const match = this.commands[i].toLowerCase() === command.toLowerCase() ? command : undefined;
             if (!match) continue;
             try {
-                return this[match[0]](params);
+                return this[match](params);
             }
             catch (error) {
                 // yeah I know this sucks
