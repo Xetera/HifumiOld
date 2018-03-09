@@ -8,7 +8,7 @@ import {Alexa} from "../API/Alexa";
 import {MuteQueue} from "../moderation/MuteQueue";
 import {Instance} from "../misc/Globals";
 import Watchlist from "../moderation/Watchlist";
-import {getDatabaseConnection, getTokens} from "../events/systemStartup";
+import {getDatabaseConnection, getEnvironmentSettings, getTokens} from "../events/systemStartup";
 import gb from "../misc/Globals";
 
 let credentials = <PostgresDevLoginConfig>{};
@@ -20,6 +20,7 @@ credentials.database = 'discord';
 
 const [BOT_TOKEN, CLEVERBOT_TOKEN] : string[] = getTokens(gb.ENV);
 const DATABASE_URL : DatabaseConfig = getDatabaseConnection(gb.ENV);
+gb.ENV  = getEnvironmentSettings();
 
 function createInstance(): Instance {
     // this is how we avoid scoping problems, a little ugly but
