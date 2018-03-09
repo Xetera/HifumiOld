@@ -103,17 +103,18 @@ export default class CommandHandler implements indexSignature {
         };
 
         for (let i in this.commands) {
-            const match = this.commands[i].match(new RegExp(command, 'i'));
+            const match = this.commands[i].toLowerCase() === command.toLowerCase() ? command : undefined;
             if (!match) continue;
             try {
-                return this[match[0]](params);
+                return this[match](params);
             }
             catch (error) {
                 // yeah I know this sucks
                 if (error instanceof TypeError && error.message === 'this[match[0]] is not a function') {
                     debug.silly(`Command ${command} does not exist.`);
+                    return;
                 }
-                debug.error(`Unexpected error while parsing ${command}\n` + error)
+                debug.error(`Unexpected error while executing ${command}\n` + error)
             }
         }
     }
@@ -207,7 +208,7 @@ export default class CommandHandler implements indexSignature {
     }
 
     private source(params: CommandParameters){
-        source(params.message);
+        source(params.message, params.args);
     }
 
     private ch(params: CommandParameters){

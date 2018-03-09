@@ -160,7 +160,7 @@ export class Database {
     }
 
     private cacheUsers(guildId : string){
-        this.initializeGuildIfNone(guildId)
+        this.initializeGuildIfNone(guildId);
         const guild = this.guilds.get(guildId);
         this.db.many(getAllMembers, [guildId]).then((users : IUser[]) => {
             guild.users =  users.map(user => {
@@ -204,6 +204,7 @@ export class Database {
     public getGuild(guild : Guild) : ICachedGuild | undefined {
         return this.guilds.get(guild.id);
     }
+
     public setPrefix(guild : Guild, prefix : string) : Promise<IGuild|Error|-1> {
         if (prefix.length > 1) // this could change later on where we support up to 3 but na
             // have to Promise.reject outside the promise chain
@@ -235,9 +236,21 @@ export class Database {
         const id = member.user.id;
         const username = member.user.username;
         const guild_id = member.guild.id;
-        return this.db.one(insertMember, [id, username, guild_id]).then((res : IUser)=> {
-            return; // nothing for now
-        })
+        this.initializeGuildIfNone(member.guild.id);
+
+        // checking if we already cached a user
+        if (!this.guilds.get(member.guild.id).users.find(prop => prop.id === member.id)){
+            this.guilds.get(member.guild.id).users.push({
+                id: id,
+                guild_id: guild_id,
+                ignoring: false
+            });
+
+            return this.db.one(insertMember, [id, username, guild_id]).then((res : IUser)=> {
+                return; // nothing for now
+            });
+        }
+
     }
 
     public getUsers(guildId : string){
@@ -358,8 +371,16 @@ export class Database {
 
     public getIgnored(member : GuildMember){
         const guild = this.guilds.get(member.guild.id);
-        if (!guild) return undefined;
+        if (!guild) {
+            debug.warning(`server: ${member.guild.name} is not cached!`);
+            return undefined;
+        }
         const target : ICachedUser = guild.users.find(user => user.id === member.id);
+        if (!target){
+            debug.warning(`user: ${member.user.username} is not cached!`);
+            return undefined;
+        }
+
         return target.ignoring;
     }
     public getRaidStatus(guild : Guild)  {

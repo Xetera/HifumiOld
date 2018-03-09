@@ -42,13 +42,14 @@ export function startupTable(guilds : GuildStats[]){
 
 
 
-export function log(guild: Discord.Guild, message : String) : void {
+export function log(guild: Discord.Guild, message : string) : void {
+    message.replace('@', '@');
     const logsChannel = guild.channels.get(gb.instance.database.getLogsChannel(guild.id));
     if (!logsChannel){
         return debug.info(`Tried to log a message in ${guild.name} but a logs channel was not found.`);
     }
    if (logsChannel instanceof Discord.TextChannel){
-        logsChannel.send('\`\`\`\n' + message + '\`\`\`');
+        logsChannel.send(message);
         return debug.info(`Logged a message in ${guild.name}`);
    }
 }

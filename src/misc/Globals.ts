@@ -8,12 +8,13 @@ import CommandHandler from "../handlers/CommandHandler";
 import {Snowflake} from "discord.js";
 import Watchlist from "../moderation/Watchlist";
 
+export type emojiName = string;
 interface Globals {
     ownerID: string;
     emojiGuild: Discord.Guild;
     ENV: Environments;
     allMembers:number;
-    emojis: Discord.Collection<Discord.Snowflake, Discord.Emoji>;
+    emojis: Map<emojiName, Discord.Emoji>;
     instance: Instance;
 }
 

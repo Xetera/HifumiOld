@@ -6,7 +6,7 @@ import gb from "../../misc/Globals";
 export default async function cleanse(channel : Channel, database: Database, limit : number = 50) {
     if (channel instanceof TextChannel){
         if (!channel.guild.members.find('id', channel.client.user.id).hasPermission("MANAGE_MESSAGES"))
-            return channel.send(`${gb.emojis.find('name', 'alexa_feels_bad_man')} I'm not allowed to delete messages...`);
+            return channel.send(`${gb.emojis.get('alexa_feels_bad_man')} I'm not allowed to delete messages...`);
 
         const prefix = database.getPrefix(channel.guild.id);
         if (limit === undefined) limit = 50;

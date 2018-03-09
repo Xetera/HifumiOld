@@ -1,6 +1,8 @@
 import * as Discord from 'discord.js'
+import gb from "../../misc/Globals";
 
-export default function getInvite(bot : Discord.Client){
+export default function getInvite(){
+    const bot = gb.instance.bot;
     const selfId = bot.user.id;
     /* currently using custom permissions with
     Read Messages

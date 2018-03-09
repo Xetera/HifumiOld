@@ -1,5 +1,7 @@
 import {Guild} from "discord.js";
-import {randChoice, randRange} from "../utility/Util";
+import {random} from "../utility/Util";
+import getInvite from "../commands/DM/getInvite";
+import gb from "../misc/Globals";
 
 export const adminOnlyCommand : string = 'This command is only available to admins.';
 
@@ -21,10 +23,14 @@ export const welcomeMessages = [
 ];
 
 export const lackingOwnerPermissions =
-    '_Laughing hysterically_ oh god, I can\'t believe you thought I\'d let you do that. :LUL:';
+    '_Laughing hysterically_ oh god, I can\'t believe you thought I\'d let you do that.';
 
 export function randomRuntimeError() : string {
-    return randChoice(runtimeErrorResponses);
+    return random(runtimeErrorResponses);
+}
+
+export function advertiseOnRaidBan() : string {
+    return `Want to protect your own server from people like yourself? Invite me!\n${getInvite()}`;
 }
 
 export const runtimeErrorResponses : string[] = [

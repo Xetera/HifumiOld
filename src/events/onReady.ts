@@ -1,7 +1,8 @@
 import * as Discord from'discord.js'
 import {debug, startupTable} from '../utility/Logging'
-import {default as gb, Instance} from "../misc/Globals";
+import {default as gb, emojiName, Instance} from "../misc/Globals";
 import {Environments} from "./systemStartup";
+import {Emoji} from "discord.js";
 const cli = require('heroku-cli-util');
 
 // returning owner id at the end
@@ -48,5 +49,12 @@ function setGlobals(bot : Discord.Client){
     else {
         gb.emojiGuild = bot.guilds.find('id', require('../../config0.json').EMOJI_GUILD);
     }
-    gb.emojis = gb.emojiGuild.emojis;
+    setEmojis();
+}
+
+function setEmojis(){
+    gb.emojis = new Map<emojiName, Emoji>();
+    gb.emojiGuild.emojis.array().forEach(function (emoji) {
+        gb.emojis.set(emoji.name, emoji);
+    })
 }

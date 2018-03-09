@@ -1,6 +1,6 @@
 import * as Discord from "discord.js";
 import * as dbg from "debug";
-import {randChoice} from "../utility/Util";
+import {random} from "../utility/Util";
 import {welcomeMessages} from "../handlers/Replies";
 import {Database} from "../database/Database";
 import {Instance} from "../misc/Globals";
@@ -23,7 +23,7 @@ export default function onGuildMemberAdd(member : Discord.GuildMember, instance:
         'id', defaultChannelId
     );
     const identifier     : string = member.user.bot ? 'A new bot' : 'A new human';
-    const welcomeMessage : string = randChoice(welcomeMessages);
+    const welcomeMessage : string = random(welcomeMessages);
 
     if (welcomeChannel === undefined) {
         return debug.info(`Could not send a member join message to ${member.guild.name} `+

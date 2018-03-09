@@ -2,7 +2,7 @@ import axios, {AxiosRequestConfig, AxiosPromise} from 'axios'
 import * as Discord from 'discord.js'
 import * as cheerio from 'cheerio'
 import {CHBaseEndpoint, CHBaseEndpointMaxValue} from "../endpoints/CyanideAndHappinessEndpoints";
-import {randRange} from "../../utility/Util";
+import {random} from "../../utility/Util";
 import * as dbg from 'debug'
 import gb from "../../misc/Globals";
 
@@ -13,7 +13,7 @@ const debug = {
 export default function ch(message : Discord.Message) : void {
     const endpoint : string = CHBaseEndpoint;
     const maxValue : number = CHBaseEndpointMaxValue;
-    const comicId  : number = randRange(0, maxValue);
+    const comicId  : number = random(0, maxValue);
     axios.get(endpoint + 'random').then((res) => {
         const $ = cheerio.load(res.data);
         message.channel.send('http:' + $('#main-comic').attr('src'));

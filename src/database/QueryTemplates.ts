@@ -21,7 +21,8 @@ export const defaultTableTemplates : Query[] = [
         name varchar,
         guild_id varchar,
         invite_strikes int DEFAULT 0,
-        ignoring boolean DEFAULT FALSE
+        ignoring boolean DEFAULT FALSE,
+        PRIMARY KEY (id, guild_id)
     )
     `,
     `
@@ -57,6 +58,13 @@ export const defaultTableTemplates : Query[] = [
         id varchar,
         bans int,
         reason varchar
+    )`,
+    `
+    CREATE TABLE IF NOT EXISTS muted_users(
+        start_date Date,
+        end_date Date,
+        id varchar,
+        guild_id varchar
     )`
 ];
 
