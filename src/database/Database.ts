@@ -238,15 +238,19 @@ export class Database {
         const guild_id = member.guild.id;
         this.initializeGuildIfNone(member.guild.id);
 
-        this.guilds.get(member.guild.id).users.push({
-            id: id,
-            guild_id: guild_id,
-            ignoring: false
-        });
+        // checking if we already cached a user
+        if (!this.guilds.get(member.guild.id).users.find(prop => prop.id === member.id)){
+            this.guilds.get(member.guild.id).users.push({
+                id: id,
+                guild_id: guild_id,
+                ignoring: false
+            });
 
-        return this.db.one(insertMember, [id, username, guild_id]).then((res : IUser)=> {
-            return; // nothing for now
-        })
+            return this.db.one(insertMember, [id, username, guild_id]).then((res : IUser)=> {
+                return; // nothing for now
+            });
+        }
+
     }
 
     public getUsers(guildId : string){

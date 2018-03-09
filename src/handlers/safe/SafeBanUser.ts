@@ -13,7 +13,7 @@ export default function safeBanUser(member : GuildMember, reason : string, banMe
             `Could not ban ${memberName} from ` +
             `${member.guild.name} for invite spamming, missing ban permissions.`
         );
-        return Promise.reject(`Missing ban permissions.`);
+        return Promise.reject(`Couldn't ban ${member.user.username} from ${member.guild.name}, missing ban permissions.`);
     }
 
     const banOptions = {
