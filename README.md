@@ -1,3 +1,4 @@
+![travis](https://travis-ci.org/ilocereal/Alexa.svg?branch=master)
 ![alexa](https://cdn.discordapp.com/attachments/418699380833648644/420917081131712512/alexanoinvite.png)
 
 Placeholder invite until a stable version is released
