@@ -72,7 +72,7 @@ instance.bot.on('messageUpdate', function(oldMessage: Discord.Message, newMessag
 });
 
 instance.bot.on('messageDelete', function(oldMessage: Discord.Message, newMessage: Discord.Message){
-    onMessageUpdate(oldMessage, newMessage);
+    // (oldMessage, newMessage);
 });
 
 
