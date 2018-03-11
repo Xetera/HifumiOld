@@ -7,7 +7,7 @@ Moderation based discord bot written in Typescript using [Discord.js](https://gi
 
 Currently hosted on [heroku](https://www.heroku.com/)
 
-## Whatcha Got:
+## Whatcha Got: 
 
 ### Interaction: 🗣️ 
 
