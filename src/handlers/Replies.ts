@@ -2,6 +2,8 @@ import {Guild} from "discord.js";
 import {random} from "../utility/Util";
 import getInvite from "../commands/DM/getInvite";
 import gb from "../misc/Globals";
+import {errors} from "pg-promise";
+import {underline} from "../utility/Markdown";
 
 export const adminOnlyCommand : string = 'This command is only available to admins.';
 
@@ -21,6 +23,10 @@ export const welcomeMessages = [
     'You pressed that join button like a champ.',
     'Why hello, what brings you here, friend?'
 ];
+
+export const onNewGuildJoin =
+    'I\'m here to help with baddies on your server and keep things nice and tidy.\n' +
+    'You can also talk to me when you\'re bored by just calling my name! That\'s how you humans normally do it... right?';
 
 export const lackingOwnerPermissions =
     '_Laughing hysterically_ oh god, I can\'t believe you thought I\'d let you do that.';
