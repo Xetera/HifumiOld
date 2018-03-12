@@ -2,6 +2,7 @@ import * as Discord from 'discord.js'
 import {TextChannel, VoiceChannel} from "discord.js";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import gb from "../../misc/Globals";
+import {APIErrors} from "../../interfaces/Errors";
 export default function echo(message:Discord.Message, args: string[]) : void {
     const mention : any = args[0];
     let channel : Discord.Channel;
@@ -25,10 +26,10 @@ export default function echo(message:Discord.Message, args: string[]) : void {
     const echo = args.splice(1).join(' ');
 
     if (channel instanceof TextChannel){
-        echo.replace('@', '`@`');
+        echo.replace('@', '\`@\`');
         channel.send(echo);
     }
     else if (channel instanceof VoiceChannel){
-        message.channel.send(channel + ' is not a text channel.');
+        safeSendMessage(message.channel, channel + ' is not a text channel.');
     }
 }

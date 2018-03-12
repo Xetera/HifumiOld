@@ -91,30 +91,26 @@ export default class CommandHandler implements indexSignature {
 
         debug.info(`[${message.guild.name}]<${message.author.username}>: ${message.content}`);
 
-        const params: CommandParameters = {
-            message: message,
-            args: args,
-            bot: instance.bot,
-            alexa: instance.alexa,
-            muteQueue: instance.muteQueue,
-            messageQueue: instance.messageQueue,
-            database: instance.database,
-            watchlist: instance.watchlist
-        };
+        const params = <CommandParameters> instance;
+        params.args = args;
+        params.message = message;
 
         for (let i in this.commands) {
             const match = this.commands[i].toLowerCase() === command.toLowerCase() ? command : undefined;
-            if (!match) continue;
+            if (match === undefined)
+                continue;
+
+            const execution = this.commands[i];
             try {
-                return this[match](params);
+                return this[execution](params);
             }
             catch (error) {
                 // yeah I know this sucks
-                if (error instanceof TypeError && error.message === 'this[match[0]] is not a function') {
-                    debug.silly(`Command ${command} does not exist.`);
+                if (error instanceof TypeError && error.message === 'this[match] is not a function') {
+                    debug.silly(`Command ${match} does not exist.`);
                     return;
                 }
-                debug.error(`Unexpected error while executing ${command}\n` + error)
+                debug.error(`Unexpected error while executing ${command}\n` + error.stack)
             }
         }
     }

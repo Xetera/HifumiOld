@@ -94,9 +94,7 @@ export class Database {
             return this.cacheGuilds();
         }).then(() =>{
             return this.crossCheckDatabase();
-        }).then(() => {
-            console.log(JSON.stringify(this.guilds));
-        })
+        });
     }
 
     private initializeGuildIfNone(guildId : string) : boolean{

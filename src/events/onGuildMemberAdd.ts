@@ -31,13 +31,12 @@ export default function onGuildMemberAdd(member : Discord.GuildMember, instance:
     }
 
     else if (welcomeChannel instanceof Discord.TextChannel){
-        let welcomeChannelEmbed : Discord.RichEmbed= new Discord.RichEmbed()
+        let welcomeChannelEmbed : Discord.RichEmbed = new Discord.RichEmbed()
             .setAuthor(member.displayName, member.user.displayAvatarURL)
             .setTimestamp()
             .setColor("GREEN")
             .setTitle(`${identifier} has joined the server!`);
         welcomeChannel.send(welcomeChannelEmbed);
-
     }
 
     if (defaultChannel && defaultChannel instanceof Discord.TextChannel){
