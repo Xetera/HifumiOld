@@ -91,9 +91,11 @@ export class Database {
     public doPrep(){
         this.checkTables()
         .then(() => {
-            this.cacheGuilds();
+            return this.cacheGuilds();
         }).then(() =>{
-            this.crossCheckDatabase();
+            return this.crossCheckDatabase();
+        }).then(() => {
+            console.log(JSON.stringify(this.guilds));
         })
     }
 
@@ -101,6 +103,7 @@ export class Database {
         const guild = this.guilds.get(guildId);
         if (guild === undefined){
             this.guilds.set(guildId, <ICachedGuild> {});
+            this.guilds.get(guildId).users = [];
             // kind of pointless but whatever
             return false;
         }
@@ -237,10 +240,11 @@ export class Database {
         const username = member.user.username;
         const guild_id = member.guild.id;
         this.initializeGuildIfNone(member.guild.id);
+        const guild = this.guilds.get(member.guild.id);
 
         // checking if we already cached a user
-        if (!this.guilds.get(member.guild.id).users.find(prop => prop.id === member.id)){
-            this.guilds.get(member.guild.id).users.push({
+        if (!guild.users.find(prop => prop.id === member.id)){
+            guild.users.push({
                 id: id,
                 guild_id: guild_id,
                 ignoring: false

@@ -1,6 +1,6 @@
 import * as Discord from 'discord.js'
 import {Database} from "../../database/Database";
-const help = require('../Help.json');
+const help = require('../help.json');
 
 export function getHelp(message : Discord.Message, args : string[],  database : Database) {
     const prefixLine : string = `.prefix: ${database.getPrefix(message.guild.id)}\n`;

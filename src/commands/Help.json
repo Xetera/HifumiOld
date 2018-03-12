@@ -27,12 +27,19 @@
     "usage": "cleanse <# of msgs to delete> (default 50)",
     "example": "cleanse 200"
   },
-  "setdefault": {
-    "name":"setdefault",
+  "setwelcome": {
+    "name":"setwelcome",
     "type": "Utility",
     "info": "Changes the channel I send welcome messages in. [MOD]",
-    "usage":"setdefault",
-    "example":"setdefault"
+    "usage":"setwelcome",
+    "example":"setwelcome"
+  },
+  "setlogs": {
+    "name":"setlogs",
+    "type": "Utility",
+    "info": "Changes the channel I log events to. [MOD]",
+    "usage":"setlogs",
+    "example":"setlogs"
   },
   "echo": {
     "name": "echo",
