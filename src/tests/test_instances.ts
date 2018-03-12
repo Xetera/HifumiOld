@@ -65,16 +65,15 @@ describe('Alexa', function() {
     it('Error on setting clevertype engagement incorrectly', () => {
         expect(() => instances.alexa.setEngagement(101)).to.throw(RangeError);
     });
+
     it('Getting cleverbot response', function(done : MochaDone) {
         instances.alexa.say('hello').then((reply: any)=> {
             expect(reply).to.be.a('string');
             done();
-        });
-    });
+        })
+    }).timeout(20000);
     
-    this.timeout(10000);
     it('Clevertype correctly recording calls', () => {
-        this.timeout(10000);
         expect(instances.alexa.cleverbot.callAmount).to.equal(1);
     });
 });
