@@ -20,7 +20,7 @@
     "@types/debug": "0.0.30",
     "@types/node": "^9.4.7",
     "cheerio": "^1.0.0-rc.2",
-    "clevertype": "^1.1.0",
+    "clevertype": "^1.1.1",
     "debug": "^3.1.0",
     "discord.js": "^11.2.1",
     "googleapis": "^26.0.1",
