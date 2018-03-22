@@ -57,7 +57,7 @@ In order of importance per topic
 - [x] Move hosting to heroku
 - [x] Removed compiled js files from project
 - [x] Rework the way commands are called
-- [ ] Add exceptions for bot owner and mods for invite and spam
+- [x] Add exceptions for bot owner and mods for invite and spam
 - [x] Split debugging on a per/module basis
 - [x] Remaining files converted to typescript
 - [ ] Remind Me module
