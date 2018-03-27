@@ -1,6 +1,6 @@
-import safeBanUser from "../handlers/safe/SafeBanUser";
+import safeBanUser from "../../../handlers/safe/SafeBanUser";
 import {GuildMember} from "discord.js";
-import {advertiseOnRaidBan} from "../handlers/Replies";
+import {advertiseOnRaidBan} from "../../../interfaces/Replies";
 
 /**
  * Tracked user is a member that has joined in the past 5 minutes
