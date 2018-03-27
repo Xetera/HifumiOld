@@ -72,7 +72,7 @@ export function getBulkDeleteCount() : number {
 }
 
 const DANGEROUS_DURATION : number = 0;
-const MEDIUM_DURATION    : number = 5 * 60;
+const MEDIUM_DURATION    : number = 1/60 * 60;
 const HIGH_DURATION      : number = 30 * 60;
 
 export function getMuteDate() : Date {
@@ -90,7 +90,7 @@ export function getMuteDate() : Date {
     }
 }
 
-export function getMuteTime() : number {
+export function getMuteTime() : number /* seconds */ {
     switch(securityLevel) {
         case SecurityLevels.Dangerous: {
             return DANGEROUS_DURATION;
@@ -100,6 +100,20 @@ export function getMuteTime() : number {
         }
         case SecurityLevels.High: {
             return HIGH_DURATION;
+        }
+    }
+}
+
+export function getMemberTrackDuration() : Date | undefined {
+    switch(securityLevel) {
+        case SecurityLevels.Dangerous: {
+            return undefined;
+        }
+        case SecurityLevels.Medium: {
+            return Moment(new Date()).add(5, 'm').toDate();
+        }
+        case SecurityLevels.High: {
+            return Moment(new Date()).add(15, 'm').toDate();
         }
     }
 }

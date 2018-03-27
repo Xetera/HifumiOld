@@ -10,7 +10,7 @@ import {debug} from "../events/onMessage";
  * @returns {number} - Random choice within range
  */
 export function random(min : number | any[] = 0, range ?: number) : number | any {
-    if (typeof min === 'number'){
+    if (typeof min === 'number' && range){
         if (!min){
             return Math.floor(Math.random() * range);
         }
@@ -20,6 +20,7 @@ export function random(min : number | any[] = 0, range ?: number) : number | any
         return min[Math.floor(Math.random() * min.length)];
     }
 }
+
 
 
 export function randBool() : boolean{
@@ -88,4 +89,14 @@ export function formatTime(seconds : number) : ITime {
             d: days
         };
     }
+}
+
+export function formattedTimeString(sec: number): string{
+    const currentUptime = formatTime(sec);
+    const seconds = currentUptime.s;
+    const minutes = currentUptime.m;
+    const hours = currentUptime.h;
+    const days= currentUptime.d;
+
+    return `${days ? days + 'd' : ''} ${hours ? hours + 'h' : ''} ${minutes ? minutes + 'm' : ''} ${seconds ? seconds + 's' : ''}`;
 }
