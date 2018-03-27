@@ -1,18 +1,25 @@
-# Alexa 
+![travis](https://travis-ci.org/ilocereal/Alexa.svg?branch=master)
+![alexa](https://cdn.discordapp.com/attachments/418699380833648644/420917081131712512/alexanoinvite.png)
 
-Moderation based discord bot written in Typescript - inspired by [hotbot](https://github.com/AberrantFox/hotbot)
+Placeholder invite until a stable version is released
 
-Currently hosted on [heroku](https://www.heroku.com/) and using [Discord.js](https://github.com/discordjs/discord.js)
+Moderation based discord bot written in Typescript using [Discord.js](https://github.com/discordjs/discord.js) 
 
-<img align="middle;" src="https://cdn.discordapp.com/avatars/372615866652557312/9a96e77dd6bfe50474c39e10e3548af3.png?size=256">
+Currently hosted on [heroku](https://www.heroku.com/)
 
-## Whatcha Got:
-![convo](https://image.flaticon.com/icons/png/128/99/99678.png) 
+## Whatcha Got: 
 
-Alexa responds to everything you say if you say her name.
+### Interaction: 🗣️ 
+
+![](https://cdn.discordapp.com/emojis/414332109407387649.png?v=1)
+
+Alexa talks to you when she hears you say her name.
 - Optional: She responds to every message if you make a channel called 'chat-with-alexa' unless starting your message with a dash
+#### Note: This might become very expensive as (if) more people start using Alexa which could eventually make it a donator feature.
 
-![ban](https://cdn.discordapp.com/emojis/230072259933503488.png?v=1) 
+She will greet new users in a channel of your choice
+
+### Bans and moderation: 🚫 
 
 Detecting spammers and automatically muting them for a set amount of time. 
 * This requires a role called 'muted' that has no permissions other than reading chat and history
@@ -21,29 +28,31 @@ Detecting spammers and automatically muting them for a set amount of time.
 
 By default she doesn't allow advertising on your server (discord invite links), you can make exceptions or completely enable it.
 
-<img src="https://cdn.discordapp.com/emojis/414332109407387649.png?v=1"></img>
+Locking down guilds on demand, muting everyone for 10 minutes or longer, allowing Admins to sanely take care of situations. **PLANNED:** 
+
+### Bookkeeping: 📚
 
 
-Logging join and leave times by default on channel 'logs'
+* Logging join and leave times
+* Logging user mutes and duration
+* Optionally logging deleted and edited messages **PLANNED**
+* Warning mods on detecting potential raids **PLANNED:** 
 
-Additional greeting on a channel of your choice
-<br/><br/><br/>
 
-
-## Currently required permissions:
-* Read Messages - pretty
-* Send Messages - obvious
+## Currently required permissions: ❓
+* Read Messages - I mean,
+* Send Messages - yeah...
 * Manage Messages - deleting spam and invites
 * Manage Roles - for adding the 'muted' role to users
 * Add Reactions - Alexa reacts to messages she hears with 👀 and 👋 when greeting new members
-* Ban Members - Banning users who post over 5 (later variable) invites and potentially people sitting in the mute queue
-* Change Nickname(?) Shouldn't really be required unless I add a command for it later
-* Manage Nicknames(?) Could add an automatic nick changer later for people whos name matches with blacklisted words or something similar
+* Ban Members - Banning users who post over 5 (later variable) invites, spammers and potentially people sitting in the mute queue
+* Change Nickname(?) Could implement a self-name change at some point but I'd ideally like to keep the Alexa theme
+* Manage Nicknames(?) Potential automatic nicknaming of users with offensive names
 
 # TODO:
 In order of importance per topic
 
-## General:
+## General: 📖
 - [x] Overhaul bot.js to typescript
 - [x] Move hosting to heroku
 - [x] Removed compiled js files from project
@@ -56,7 +65,7 @@ In order of importance per topic
 - [x] Safe handling of actions like message deletion and PMing users
 - [ ] Allow users to disable the cleverbot feature of alexa
 
-## Database:
+## Database: 🖥️
 - [x] Implement a relational database that works for heroku as well -> Postgres
 - [x] Guild specific prefix change
 - [x] Save the amount of invites a user has sent invites 
@@ -64,7 +73,7 @@ In order of importance per topic
 - [ ] Add the users' mute duration to postgres along with caching
 - [ ] Save the security level of guilds to postgres
 
-## Moderation:
+## Moderation: 🛠️
 - [x] Muting spamming users
 - [x] Removing invite links
 - [x] Remove invite links
@@ -76,18 +85,20 @@ In order of importance per topic
 - [ ] Blacklisted / restricted words
 - [ ] Blacklisted links
 
-## Music: **-Low priority**
+## Music: 🎼 **-Low priority**
 - [x] Play basic songs off youtube
 - [ ] Adjustable volume
 - [ ] Queuing up songs
 
-## API: 
+## API: 📡
 - [x] Cleverbot module rewritten - [clevertype](https://github.com/ilocereal/Clevertype) 
-- [ ] Brawlhalla API rewritten for typescript
+- [ ] Brawlhalla API rewritten for typescript **-Low priority**
 - [ ] Integrate own battlerite API **-Low priority**
 - [ ] Reintroduce the weather module
 - [ ] Get cleverbot to store CS per user **-Low priority**
 
-## Way Later: **-Very Low priority** cuzitsreallyhard
+## Way Later: 🧠 **-Very Low priority** cuzitsreallyhard 
 - [ ] Intent analysis for communicating with Alexa
 - [ ] Voice support for communicating with alexa 
+
+#### Inspired by [HotBot](https://github.com/AberrantFox/hotbot) in [The Programmer's Hangout](https://discord.gg/programming) on discord
