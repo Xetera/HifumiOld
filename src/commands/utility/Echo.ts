@@ -28,7 +28,7 @@ export default function echo(message:Discord.Message, args: string[]) : void {
             `Nope, if the server doesn't let you write there, I can't write for you either.`);
         return;
     }
-    
+
     const echo = args.join(' ');
 
     if (channel instanceof TextChannel){
