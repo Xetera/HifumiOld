@@ -67,7 +67,7 @@ describe('Alexa', function() {
     it('Error on setting clevertype engagement incorrectly', () => {
         expect(() => instances.alexa.setEngagement(101)).to.throw(RangeError);
     });
-
+    this.timeout(20000);
     it('Getting cleverbot response', function(done : MochaDone) {
         instances.alexa.say('hello').then((reply: any)=> {
             expect(reply).to.be.a('string');
