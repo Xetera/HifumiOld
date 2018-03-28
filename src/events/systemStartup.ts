@@ -1,6 +1,6 @@
 import {PostgresLiveLoginConfig, PostgresDevLoginConfig, Database, DatabaseConfig} from "../database/Database";
 import gb, {Instance} from "../misc/Globals";
-import {Client, Guild} from "discord.js";
+import {Client, Guild, Message} from "discord.js";
 import {debug} from '../utility/Logging'
 import {MessageQueue} from "../moderation/MessageQueue";
 import CommandHandler from "../handlers/commands/CommandHandler";
@@ -102,6 +102,6 @@ export function createInstance(BOT_TOKEN: string, CLEVERBOT_TOKEN: string, DATAB
         commandHandler:commandHandler,
         watchlist: watchlist,
         // this is to be able to eval through the context of all the instances
-        eval: (x : any) => eval(x)
+        eval: (message: Message, x : any) => eval(x)
     }
 }

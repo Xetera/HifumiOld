@@ -1,9 +1,12 @@
 import * as Discord from "discord.js";
 import * as dbg from "debug";
 import {random} from "../utility/Util";
-import {welcomeMessages} from "../handlers/Replies";
+import {welcomeMessages} from "../interfaces/Replies";
 import {Database} from "../database/Database";
-import {Instance} from "../misc/Globals";
+import {default as gb, Instance} from "../misc/Globals";
+import guildMemberAddEmbed from "../embeds/events/onGuildMemberAddEmbed";
+import {Channel, GuildMember, Message, TextChannel} from "discord.js";
+import {LogManager} from "../handlers/logging/logManager";
 
 export const debug = {
     silly  : dbg('Bot:onGuildMemberAdd:Silly'),
@@ -17,11 +20,8 @@ export default function onGuildMemberAdd(member : Discord.GuildMember, instance:
     database.insertMember(member);
 
     // we will change this later to fetch from a database instead of using a preset name
-    const welcomeChannel : Discord.Channel | undefined = member.guild.channels.find('name', 'welcome');
-    const defaultChannelId : string | undefined = database.getWelcomeChannel(member.guild.id);
-    const defaultChannel : Discord.Channel | undefined = member.guild.channels.find(
-        'id', defaultChannelId
-    );
+    const welcomeChannel : Channel | undefined = database.getWelcomeChannel(member.guild.id);
+
     const identifier     : string = member.user.bot ? 'A new bot' : 'A new human';
     const welcomeMessage : string = random(welcomeMessages);
 
@@ -31,35 +31,25 @@ export default function onGuildMemberAdd(member : Discord.GuildMember, instance:
     }
 
     else if (welcomeChannel instanceof Discord.TextChannel){
-        let welcomeChannelEmbed : Discord.RichEmbed= new Discord.RichEmbed()
-            .setAuthor(member.displayName, member.user.displayAvatarURL)
-            .setTimestamp()
-            .setColor("GREEN")
-            .setTitle(`${identifier} has joined the server!`);
-        welcomeChannel.send(welcomeChannelEmbed);
-
+        sendEmbed(welcomeChannel, member, welcomeMessage)
     }
 
-    if (defaultChannel && defaultChannel instanceof Discord.TextChannel){
-        let defaultChannelEmbed : Discord.RichEmbed= new Discord.RichEmbed()
-            .setAuthor(member.displayName, member.user.displayAvatarURL)
-            .setColor("GREEN")
-            .setTitle(`${identifier} has joined the server!`)
-            .setDescription(welcomeMessage);
-        defaultChannel.send(defaultChannelEmbed).then(welcomeMessage => {
-            if (welcomeMessage instanceof Discord.Message){
-                // is not an array of messages
-                const kanna_wave = member.client.emojis.find('name', 'alexa_kanna_wave');
+    LogManager.logMemberJoin(member);
+}
 
-                if (kanna_wave !== undefined)
-                    welcomeMessage.react(kanna_wave);
-                else
-                    debug.error('Could not react to new user joining with kanna_wave');
-            }
-        });
-    }
-    else if(!defaultChannel){
-        debug.silly(`Could not get a systemChannel to log a user join in ${member.guild.name}`);
-    }
+function sendEmbed(channel: TextChannel, member: GuildMember, welcomeMessage: string, ){
+    let defaultChannelEmbed : Discord.RichEmbed = guildMemberAddEmbed(member, welcomeMessage);
+    channel.send(defaultChannelEmbed).then((welcomeMessage: Message | Message[])=> {
+        if (Array.isArray(welcomeMessage)) {
+            return;
+        }
+        // is not an array of messages
+        const kanna_wave = member.client.emojis.find('name', 'alexa_kanna_wave');
 
+        if (kanna_wave !== undefined)
+            welcomeMessage.react(kanna_wave);
+        else
+            debug.error('Could not react to new user joining with kanna_wave');
+        gb.instance.database.cacheWelcomeMessage(member, welcomeMessage);
+    });
 }

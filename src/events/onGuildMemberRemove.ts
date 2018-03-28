@@ -1,5 +1,9 @@
 import * as Discord from "discord.js";
 import * as dbg from "debug";
+import gb from "../misc/Globals";
+import {GuildAuditLogs, Message} from "discord.js";
+import safeDeleteMessage from "../handlers/safe/SafeDeleteMessage";
+import {LogManager} from "../handlers/logging/logManager";
 
 export const debug = {
     silly  : dbg('Bot:onGuildMemberRemove:Silly'),
@@ -8,20 +12,17 @@ export const debug = {
     error  : dbg('Bot:onGuildMemberRemove:Error')
 };
 
-export default function onGuildMemberRemove(member : Discord.GuildMember) : void {
+export default  function onGuildMemberRemove(member : Discord.GuildMember) {
     // we will change this later to fetch from a database instead of using a preset name
-    const welcomeChannel : Discord.Channel | undefined = member.guild.channels.find('name', 'welcome');
-    const identifier     : string = member.user.bot ? 'A bot' : 'A human';
-    if (welcomeChannel === undefined) {
-        return debug.info(`Could not send a member leave message to ${member.guild.name} `+
-            `because a welcome channel was missing.`);
-    }
-    else if (welcomeChannel instanceof Discord.TextChannel){
-        let embed = new Discord.RichEmbed()
-            .setAuthor(member.displayName, member.user.displayAvatarURL)
-            .setTimestamp()
-            .setColor("RED")
-            .setTitle(`${identifier} left the server.`);
-        welcomeChannel.send(embed);
-    }
+    return member.guild.fetchAuditLogs().then((logs: GuildAuditLogs)=> {
+        return logs.entries.first().action === 'MEMBER_BAN_ADD';
+    }).then((isBan: boolean) => {
+        const welcomeMessage: Message | undefined = gb.instance.database.uncacheWelcomeMessage(member);
+        if (!welcomeMessage)
+            return void debug.error(`Could not delete the message for user ${member.user.username}`);
+        safeDeleteMessage(welcomeMessage);
+
+        if (isBan) return;
+        LogManager.logMemberLeave(member);
+    })
 }

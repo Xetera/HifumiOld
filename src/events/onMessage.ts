@@ -6,10 +6,10 @@ import inviteListener from '../listeners/InviteListener'
 import * as moment from "moment";
 import {Database} from "../database/Database";
 import {MessageType} from "../interfaces/identifiers";
-import commandHandler from "../handlers/CommandHandler";
+import commandHandler from "../handlers/commands/CommandHandler";
 import {Instance} from "../misc/Globals";
-import {getHelp} from "../commands/info/Help";
-import DMCommandHandler from "../handlers/DMCommandHandler";
+import {getHelp} from "../commands/info/help/Help";
+import DMCommandHandler from "../handlers/commands/DMCommandHandler";
 
 export const debug = {
     silly: dbg('Bot:onMessage:Silly'),
@@ -57,14 +57,14 @@ export default function onMessage(message: Discord.Message, instance: Instance){
     else if (messageType === MessageType.PrivateMessage)
         return DMCommandHandler(message, instance);
 
-    if (database.getIgnored(message.member))
+    else if (database.getIgnored(message.member))
         return;
 
     if (message.content === '.help') return getHelp(message, [], database);
 
-    if (!message.content.startsWith(database.getPrefix(message.guild.id))) return;
+    else if (!message.content.startsWith(database.getPrefix(message.guild.id))) return;
 
     // right now this only supports 1 char length prefix but we can change that later
-    if (instance.commandHandler !== undefined)
+    else if (instance.commandHandler !== undefined)
         instance.commandHandler.handler(message, instance);
 }

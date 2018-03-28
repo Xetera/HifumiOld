@@ -2,6 +2,7 @@ import * as Discord from 'discord.js'
 import {Database} from "../database/Database";
 import * as dbg from "debug";
 import {Instance} from "../misc/Globals";
+
 export const debug = {
     silly  : dbg('Bot:onGuildCreate:Silly'),
     info   : dbg('Bot:onGuildCreate:Info'),
