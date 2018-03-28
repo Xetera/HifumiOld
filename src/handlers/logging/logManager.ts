@@ -1,8 +1,8 @@
 import {
     Channel, Guild, GuildAuditLogs, GuildAuditLogsEntry, GuildMember, RichEmbed, TextChannel,
-    User
+    User, VoiceChannel
 } from "discord.js";
-import {debug} from "../../utility/Logging";
+import {debug, log} from "../../utility/Logging";
 import muteDMEmbed from "../../embeds/moderation/muteDMEmbed";
 import logMutedEmbed from "../../embeds/logging/logMuteEmbed";
 import gb from "../../misc/Globals";
@@ -10,6 +10,8 @@ import logBanEmbed from "../../embeds/logging/logBanEmbed";
 import logMemberJoinEmbed from "../../embeds/logging/logMemberJoinEmbed";
 import logMemberLeaveEmbed from "../../embeds/logging/logMemberLeaveEmbed";
 import logUnbanEmbed from "../../embeds/logging/logUnbanEmbed";
+import logChannelCreateEmbed from "../../embeds/logging/logChannelCreateEmbed";
+import logChannelDeleteEmbed from "../../embeds/logging/logChannelDeleteEmbed";
 
 export class LogManager {
     public static logWarning(guild: Guild, message: string, extra?: string){
@@ -63,6 +65,40 @@ export class LogManager {
             if (!originalBan)
                 return void debug.error(`Could not find the original ban reason for unbanned member in ${guild.name}`);
             LogManager.logToGuild(guild, logUnbanEmbed(user, staff, originalBan.reason), 'member unban');
+        });
+    }
+
+    public static logChannelCreate(channel: Channel){
+        if (!(channel instanceof TextChannel) && !(channel instanceof VoiceChannel))
+            return;
+
+        const logsChannel : Channel | undefined = gb.instance.database.getLogsChannel(channel.guild.id);
+        if (!(logsChannel instanceof TextChannel))
+            return void debug.error(`Log channel for ${channel.guild.name} was set as a voice channel.`);
+
+        if (!logsChannel)
+            return void debug.info(`A new channel was created in ${channel.guild} but a logs channel was not found.`,
+                    "onChannelCreate");
+        channel.guild.fetchAuditLogs().then(audit => {
+            const creator = audit.entries.first().executor;
+            logsChannel.send(logChannelCreateEmbed(channel, creator, channel.name));
+        });
+    }
+
+    public static logChannelDelete(channel: Channel){
+        if (!(channel instanceof TextChannel) && !(channel instanceof VoiceChannel))
+            return;
+
+        const logsChannel : Channel | undefined = gb.instance.database.getLogsChannel(channel.guild.id);
+        if (!(logsChannel instanceof TextChannel))
+            return void debug.error(`Log channel for ${channel.guild.name} was set as a voice channel.`);
+
+        if (!logsChannel)
+            return void debug.info(`A channel was deleted in ${channel.guild} but a logs channel was not found.`,
+                "onChannelCreate");
+        channel.guild.fetchAuditLogs().then(audit => {
+            const creator = audit.entries.first().executor;
+            logsChannel.send(logChannelDeleteEmbed(channel, creator, channel.name));
         });
     }
     /**

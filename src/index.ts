@@ -16,7 +16,6 @@ import onGuildMemberAdd from "./events/onGuildMemberAdd";
 import onGuildMemberRemove from "./events/onGuildMemberRemove";
 import onGuildCreate from "./events/onGuildCreate";
 import * as Discord from 'discord.js'
-import onChannelCreate from "./events/onChannelCreate";
 import updatePresence from "./actions/UpdatePresence";
 import onMessageUpdate from "./events/onMessageUpdate";
 import onGuildMemberUpdate from "./events/onGuildMemberUpdate";
@@ -85,5 +84,9 @@ instance.bot.on('guildBanRemove', (guild:Discord.Guild, member: Discord.User) =>
 
 // === === === === CHANNEL === === === === === //
 instance.bot.on('channelCreate', function(channel :Discord.Channel){
-    onChannelCreate(channel);
+    LogManager.logChannelCreate(channel);
+});
+
+instance.bot.on('channelDelete', function(channel :Discord.Channel){
+    LogManager.logChannelDelete(channel);
 });
