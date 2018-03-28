@@ -32,7 +32,6 @@ Locking down guilds on demand, muting everyone for 10 minutes or longer, allowin
 
 ### Bookkeeping: 📚
 
-
 * Logging join and leave times
 * Logging user mutes and duration
 * Optionally logging deleted and edited messages **PLANNED**
