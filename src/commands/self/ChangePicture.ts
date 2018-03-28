@@ -3,6 +3,7 @@ import {debug} from '../../utility/Logging'
 import gb from "../../misc/Globals";
 
 export default function setAvatar(message: Discord.Message, URL : string){
+
     const me : Discord.ClientUser = message.client.user;
     const lul = gb.emojis.get('alexa_lul');
     if (URL === '' || URL === undefined)

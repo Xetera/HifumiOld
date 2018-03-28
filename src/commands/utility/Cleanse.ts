@@ -1,5 +1,5 @@
 import {Channel, Collection, DiscordAPIError, Message, Snowflake, TextChannel} from "discord.js";
-import {randomRuntimeError} from "../../handlers/Replies";
+import {randomRuntimeError} from "../../interfaces/Replies";
 import {Database} from "../../database/Database";
 import gb from "../../misc/Globals";
 
