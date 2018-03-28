@@ -6,33 +6,37 @@ import {LogManager} from "../../handlers/logging/logManager";
 import muteDMEmbed from "../../embeds/moderation/muteDMEmbed";
 import {Offense} from "../../moderation/interfaces";
 import safeMessageUser from "../../handlers/safe/SafeMessageUser";
+import {formattedTimeString} from "../../utility/Util";
 
-export default function muteUser(member: GuildMember, role: Role, reason: string, userMessage: string, logMessage?: boolean): boolean {
+export default function muteUser(member: GuildMember, role: Role, reason: string | Offense, logMessage?: boolean): Promise<boolean> {
     if (member.hasPermission("ADMINISTRATOR")) {
         debug.warning(`Tried to mute ${member.displayName} for ${getMuteTime()} seconds but they are an administrator.`, "MuteQueue");
-        return false;
+        return Promise.resolve(false);
     }
 
-    else if(!member.guild.members.find('id', member.client.user.id).hasPermission("MANAGE_ROLES")){
+    else if (!member.guild.members.find('id', member.client.user.id).hasPermission("MANAGE_ROLES")){
         debug.warning(`Could not mute ${member.displayName}, missing manage roles permission.`);
-        LogManager.logWarning(member.guild, `Could not mute ${member} for ${reason}, missing \`Manage Roles\` permission.`);
-        return false;
+        LogManager.logWarning(
+            member.guild,
+            `Could not mute ${member} for ${reason}, missing \`Manage Roles\` permission.`);
+        return Promise.resolve(false);
     }
 
-    member.addRole(role, reason).then(()=> {
-        safeMessageUser(member, muteDMEmbed(member, Offense.Spam))
+    return member.addRole(role, reason).then(()=> {
+        return safeMessageUser(member, muteDMEmbed(member, Offense.Spam))
+    }).then(() => {
+        debug.info(`${member.displayName} was muted for ${formattedTimeString(getMuteTime())}`);
+        if (logMessage)
+            LogManager.logMutedUser(member);
+        return true;
     }).catch(err =>{
         if (err instanceof DiscordAPIError){
-            return debug.warning(`Could not mute spammer ${member.displayName}, missing permissions.`, "MuteQueue");
+            //TODO: add missing permission embed
+            debug.warning(`Could not mute spammer ${member.displayName}, missing permissions.`, "MuteQueue");
         }
         else {
-            return debug.error(`Unexpected error while muting user ${member.displayName}\n` +err, "MuteQueue");
+            debug.error(`Unexpected error while muting user ${member.displayName}\n` +err, "MuteQueue");
         }
+        return false;
     });
-
-    debug.info(`${member.displayName} was muted for ${getMuteTime()}s`);
-    // TODO: format s based time into nice intervals
-    if (logMessage)
-        LogManager.logMutedUser(member);
-    return true;
 }
