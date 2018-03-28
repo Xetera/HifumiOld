@@ -10,6 +10,10 @@ export function codeBlock(message : string, language?:CodeBlockLanguage) : strin
     return header + message.trim() + '\n\`\`\`';
 }
 
+export function highlight(message: string): string {
+    return `\`${message}\``;
+}
+
 export function underline(message : string ) : string {
     return '_' + message + '_';
 }

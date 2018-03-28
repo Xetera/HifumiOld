@@ -21,7 +21,9 @@ export function random(min : number | any[] = 0, range ?: number) : number | any
     }
 }
 
-
+export function capitalize(word: string){
+    return word.replace(/^./, word => word[0].toUpperCase() + word.slice(1));
+}
 
 export function randBool() : boolean{
     return Math.random () >= 0.5;
@@ -99,4 +101,20 @@ export function formattedTimeString(sec: number): string{
     const days= currentUptime.d;
 
     return `${days ? days + 'd' : ''} ${hours ? hours + 'h' : ''} ${minutes ? minutes + 'm' : ''} ${seconds ? seconds + 's' : ''}`;
+}
+
+export function sanitizeUserInput(input: string){
+    return input.replace('@', '\`@\`');
+}
+
+export function subtractArrays(first: any[], second: any[]): any[] | undefined {
+    let differences: any = [];
+    first.forEach((value: any)=> {
+        const target: any[] = second.filter((secondVal: any) => {
+            return secondVal === value;
+        });
+        if (!target.length)
+            differences.concat(value);
+    });
+    return differences;
 }

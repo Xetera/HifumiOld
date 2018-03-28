@@ -71,8 +71,9 @@ export function getBulkDeleteCount() : number {
     }
 }
 
+// in seconds
 const DANGEROUS_DURATION : number = 0;
-const MEDIUM_DURATION    : number = 1/60 * 60;
+const MEDIUM_DURATION    : number = 15 * 60;
 const HIGH_DURATION      : number = 30 * 60;
 
 export function getMuteDate() : Date {
