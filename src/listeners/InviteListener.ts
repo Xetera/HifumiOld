@@ -10,7 +10,7 @@ import gb from "../misc/Globals";
 import Watchlist from "../moderation/Watchlist";
 
 export default function inviteListener(message : Message, database : Database, watchlist : Watchlist){
-    if (message.author.id === gb.ownerID) return; // heh
+    if (message.author.id === gb.ownerID || message.member.hasPermission('ADMINISTRATOR')) return; // heh
 
     const sender :string = message.member.nickname || message.author.username;
     //TODO: Add telegram and whatsapp links in here as optional as well
