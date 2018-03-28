@@ -1,5 +1,5 @@
 import {DiscordAPIError, Message, User} from "discord.js";
-import {Database, ICachedUser} from "../../database/Database";
+import {Database} from "../../database/Database";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {codeBlock} from "../../utility/Markdown";
 import {debug} from "../../utility/Logging";

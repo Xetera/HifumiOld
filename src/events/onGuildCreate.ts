@@ -2,7 +2,7 @@ import * as Discord from 'discord.js'
 import {Database} from "../database/Database";
 import * as dbg from "debug";
 import {Instance} from "../misc/Globals";
-import {RichEmbed} from "discord.js";
+import {RichEmbed, TextChannel} from "discord.js";
 
 export const debug = {
     silly  : dbg('Bot:onGuildCreate:Silly'),
@@ -30,7 +30,7 @@ export default function onGuildCreate(guild : Discord.Guild, instance : Instance
         .setFooter(`Default prefix: .`)
         .setTimestamp();
 
-    if (targetChannel&&targetChannel instanceof TextChannel){
+    if (targetChannel&& targetChannel instanceof TextChannel){
         targetChannel.send(embed);
     }
 
