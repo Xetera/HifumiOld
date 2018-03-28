@@ -1,4 +1,4 @@
-import {Query} from "./Database";
+import {Query} from "../Database";
 
 
 // language=POSTGRES-PSQL
