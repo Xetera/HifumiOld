@@ -2,12 +2,7 @@ import * as Discord from 'discord.js'
 import {TextChannel, VoiceChannel} from "discord.js";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import gb from "../../misc/Globals";
-<<<<<<< HEAD
-import {APIErrors} from "../../interfaces/Errors";
-=======
 import {handleFailedCommand, handleInvalidParameters} from "../../handlers/commands/invalidCommandHandler";
-
->>>>>>> dev
 export default function echo(message:Discord.Message, args: string[]) : void {
     if (!args.length){
         handleInvalidParameters(message.channel, `echo`);
@@ -36,13 +31,6 @@ export default function echo(message:Discord.Message, args: string[]) : void {
     const echo = args.join(' ');
 
     if (channel instanceof TextChannel){
-<<<<<<< HEAD
-        echo.replace('@', '\`@\`');
-        channel.send(echo);
-    }
-    else if (channel instanceof VoiceChannel){
-        safeSendMessage(message.channel, channel + ' is not a text channel.');
-=======
         let out;
         // we still want admins to be able to make announcements with this
         if (!message.member.hasPermission('ADMINISTRATOR')){
@@ -55,6 +43,5 @@ export default function echo(message:Discord.Message, args: string[]) : void {
     }
     else if (channel instanceof VoiceChannel){
         handleFailedCommand(message.channel, channel + ' is not a text channel.');
->>>>>>> dev
     }
 }
