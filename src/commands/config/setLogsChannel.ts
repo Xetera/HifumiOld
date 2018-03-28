@@ -1,6 +1,6 @@
 import {Database} from "../../database/Database";
 import {Channel, Message, TextChannel} from "discord.js";
-import {runtimeErrorResponses} from "../../handlers/Replies";
+import {runtimeErrorResponses} from "../../interfaces/Replies";
 import {random} from "../../utility/Util";
 import {debug} from '../../utility/Logging'
 

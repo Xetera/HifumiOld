@@ -1,7 +1,13 @@
-import {PostgresLiveLoginConfig, PostgresDevLoginConfig} from "../database/Database";
-import gb from "../misc/Globals";
-import {Client, Guild} from "discord.js";
+import {PostgresLiveLoginConfig, PostgresDevLoginConfig, Database, DatabaseConfig} from "../database/Database";
+import gb, {Instance} from "../misc/Globals";
+import {Client, Guild, Message} from "discord.js";
 import {debug} from '../utility/Logging'
+import {MessageQueue} from "../moderation/MessageQueue";
+import CommandHandler from "../handlers/commands/CommandHandler";
+import Watchlist from "../moderation/Watchlist";
+import {Alexa} from "../API/Alexa";
+import {MuteQueue} from "../moderation/MuteQueue";
+import {LogManager} from "../handlers/logging/logManager";
 
 export enum Environments {
     Development,
@@ -72,5 +78,30 @@ export function getDatabaseConnection(env: Environments) : PostgresDevLoginConfi
         credentials.port = 5432;
         credentials.database = 'discord';
         return credentials;
+    }
+}
+
+// instances
+export function createInstance(BOT_TOKEN: string, CLEVERBOT_TOKEN: string, DATABASE_CONFIG: DatabaseConfig): Instance {
+    // this is how we avoid scoping problems, a little ugly but
+    // it gets the job done
+    let bot = new Client();
+    bot.login(BOT_TOKEN);
+    let alexa = new Alexa(CLEVERBOT_TOKEN);
+    let database = new Database(DATABASE_CONFIG, bot);
+    let muteQueue = new MuteQueue();
+    let watchlist = new Watchlist();
+    let messageQueue = new MessageQueue(muteQueue, database, watchlist);
+    let commandHandler = new CommandHandler();
+    return {
+        bot: bot,
+        alexa: alexa,
+        muteQueue: muteQueue,
+        database: database,
+        messageQueue: messageQueue,
+        commandHandler:commandHandler,
+        watchlist: watchlist,
+        // this is to be able to eval through the context of all the instances
+        eval: (message: Message, x : any) => eval(x)
     }
 }

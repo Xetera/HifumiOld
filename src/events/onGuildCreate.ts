@@ -2,9 +2,8 @@ import * as Discord from 'discord.js'
 import {Database} from "../database/Database";
 import * as dbg from "debug";
 import {Instance} from "../misc/Globals";
-import {RichEmbed, TextChannel} from "discord.js";
-import {underline} from "../utility/Markdown";
-import {onNewGuildJoin} from "../handlers/Replies";
+import {RichEmbed} from "discord.js";
+
 export const debug = {
     silly  : dbg('Bot:onGuildCreate:Silly'),
     info   : dbg('Bot:onGuildCreate:Info'),

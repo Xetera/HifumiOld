@@ -1,5 +1,5 @@
 import {Channel, Collection, Message, Snowflake, TextChannel} from "discord.js";
-import {randomRuntimeError} from "../../handlers/Replies";
+import {randomRuntimeError} from "../../interfaces/Replies";
 
 export default async function nuke(channel : Channel, limit : number = 50) {
     if (channel instanceof TextChannel){

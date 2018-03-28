@@ -42,9 +42,11 @@ export function startupTable(guilds : GuildStats[]){
 
 
 
+
+// TODO: remove this and just convert everything that bot sends into embeds
 export function log(guild: Discord.Guild, message : string) : void {
-    message.replace('@', '@');
-    const logsChannel = guild.channels.get(gb.instance.database.getLogsChannel(guild.id));
+    message = message.replace('@', '@');
+    const logsChannel = gb.instance.database.getLogsChannel(guild.id);
     if (!logsChannel){
         return debug.info(`Tried to log a message in ${guild.name} but a logs channel was not found.`);
     }

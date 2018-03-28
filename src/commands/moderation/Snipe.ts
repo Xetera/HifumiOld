@@ -1,7 +1,7 @@
 import * as Discord from 'discord.js'
 import {Collection} from "discord.js";
 import * as dbg from "debug";
-import {randomRuntimeError} from "../../handlers/Replies";
+import {randomRuntimeError} from "../../interfaces/Replies";
 import {debug} from '../../utility/Logging'
 /*
 * Removes a user's past messages in a certain channel

@@ -35,14 +35,13 @@ export function randomRuntimeError() : string {
     return random(runtimeErrorResponses);
 }
 
-export function advertiseOnRaidBan() : string {
-    return `Want to protect your own server from people like yourself? Invite me!\n${getInvite()}`;
+export function advertiseOnRaidBan(): string {
+    return `Want to protect your own server from people like yourself? **Invite me!**\n${getInvite()}`;
 }
 
 export const runtimeErrorResponses : string[] = [
     "Holy... I almost crashed while trying to do that, there was an error somewhere.",
     "I really tried my best to do that but something wen't wrong so I couldn't...",
     "This is a little bit awkward but I basically almost broke trying to do that, something's wrong.",
-    "Uh oh, something wen't wrong and I don't know what.",
-    "So I got an unexpected error trying to do that but on the bright side, I would have crashed if not for this message."
+    "Uh oh, something wen't wrong and I don't know what. Someone will look into this."
 ];

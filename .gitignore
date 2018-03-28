@@ -1,8 +1,7 @@
 config0.json
 /node_modules
-Commands/google-assistant.json
-gspeechSecret.json
-/node-google-speech-api-master
 refactor.json
 /.idea
 *.js
+/dist
+src/commands/Help.json

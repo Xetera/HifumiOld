@@ -36,7 +36,13 @@ export interface ITrackedUser {
     security: SecurityLevels;
 }
 
-
+export interface IStats {
+    guilds: number;
+    users_banned: number,
+    users_muted: number,
+    spam_deleted: number,
+    lockdown: number;
+}
 export function isTrackedUser(object: any) : object is ITrackedUser {
     return 'join_date' in object;
 }

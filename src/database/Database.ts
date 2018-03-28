@@ -1,33 +1,25 @@
 import {
-    getWelcomeChannel, getMemberInviteStrikes,
-    getWhitelistedInvites, incrementMemberInviteStrikes, saveGuild, updateWelcomeChannel,
-    upsertPrefix, insertMember, cleanAllGuildMembers, changeLockdownStatus, saveMember, getAllUsers, updateLogsChannel,
-    getGuild, getAllMembers, setIgnored
-} from "./PreparedStatements";
+    getWhitelistedInvites,
+} from "./queries/PreparedStatements";
 import {IDatabase, IMain, IOptions, ITask, TQuery} from 'pg-promise'
-import {defaultTableTemplates, getPrefixes, testQuery} from "./QueryTemplates";
-import {Client, Collection, Guild, GuildMember} from "discord.js";
+import {defaultTableTemplates, getPrefixes, testQuery} from "./queries/QueryTemplates";
+import {Channel, Client, Collection, Guild, GuildMember, Message, TextChannel} from "discord.js";
 import {IGuild, IUser} from "./TableTypes";
-
 import * as pgPromise from 'pg-promise'
 import {debug} from '../utility/Logging'
+import {ICachedGuild, ICachedUser, userId} from "./interface";
+import {
+    changeInviteSetting, changeLockdownStatus, getGuild, getMemberInviteStrikes, saveGuild, updateLogsChannel,
+    updateWelcomeChannel,
+    upsertPrefix
+} from "./queries/guildQueries";
+import {
+    cleanAllGuildMembers, getAllMembers, incrementMemberInviteStrikes, insertMember,
+    saveMember, setIgnored
+} from "./queries/userQueries";
+import gb from "../misc/Globals";
 
-export interface ICachedGuild {
-    prefix: string;
-    users: ICachedUser[]
-    blacklisted_links: string[];
-    whitelisted_invites: string[];
-    welcome_channel: string;
-    logs_channel : string;
-    warnings_channel : string;
-    lockdown: boolean;
-}
 
-export interface ICachedUser {
-    id : string;
-    guild_id: string;
-    ignoring: boolean;
-}
 
 export interface PostgresDevLoginConfig {
     type: string;
@@ -53,17 +45,12 @@ function getDatabaseType(url : DatabaseConfig){
     return isDeployementLogin(url) ? 'heroku' : 'localhost';
 }
 
-
 export class Database {
     // variable login based on environment
     readonly initOptions = {
         // global event notification;
         error: ((error: any, e :any) => {
             if (e.cn) {
-                // A connection-related error;
-                //
-                // Connections are reported back with the password hashed,
-                // for safe errors logging, without exposing passwords.
                 debug.error('CN:\n'+ e.cn, "Database");
                 debug.error('EVENT:\n'+ error.message || error, "Database");
             }
@@ -71,16 +58,16 @@ export class Database {
     };
     config : DatabaseConfig;
 
-    private pgp = pgPromise(this.initOptions);
+    private readonly pgp = pgPromise(this.initOptions);
     private db : IDatabase<any>;
-    guilds : Map<string, ICachedGuild>;
-    client : Client;
-
+    guilds: Map<string, ICachedGuild>;
+    client: Client;
     constructor(url : DatabaseConfig, bot : Client){
         this.client = bot;
         this.config = url;
         debug.info("Logging into Postgres on " + getDatabaseType(url), "Database");
         this.guilds = new Map<string, ICachedGuild>();
+
         this.db = this.pgp(this.config);
         // we don't want to query the db every message so
         // we're caching the prefixes instead
@@ -97,17 +84,16 @@ export class Database {
         });
     }
 
-    private initializeGuildIfNone(guildId : string) : boolean{
-        const guild = this.guilds.get(guildId);
-        if (guild === undefined){
+    private initializeGuildIfNone(guildId : string) : void {
+        let guild: ICachedGuild = this.guilds.get(guildId)!;
+        if (guild === undefined) {
             this.guilds.set(guildId, <ICachedGuild> {});
-            this.guilds.get(guildId).users = [];
-            // kind of pointless but whatever
-            return false;
+            guild = this.guilds.get(guildId)!;
         }
-        else {
-            return true;
-        }
+        if (!guild.users)
+            guild.users = [];
+        if (!guild.welcomeMessages)
+            guild.welcomeMessages = new Map<userId, Message>();
     }
 
     private async crossCheckDatabase(){
@@ -116,7 +102,7 @@ export class Database {
             const queries: Query[] = [];
             for (let guild of guilds) {
                 const members : GuildMember[] = guild.members.array();
-                guild.members.forEach(function (member) {
+                guild.members.forEach( (member) => {
                     const id = member.id;
                     const name = member.user.username;
                     const guild_id = member.guild.id;
@@ -139,9 +125,9 @@ export class Database {
                 let cachedGuild : ICachedGuild | undefined = this.guilds.get(guild.id);
                 if (cachedGuild === undefined) {
                     this.guilds.set(guild.id, <ICachedGuild> {});
-                    cachedGuild = this.guilds.get(guild.id);
+                    cachedGuild = this.guilds.get(guild.id)!;
                 }
-                this.cacheUsers(guild.id)
+                this.cacheUsers(guild.id);
                 // TODO: Theres a lot of repetition in this part, make sure we cut this down
                 // TODO: To a less indented, more efficient version
                 const whitelistedInvites = await this.db.any(getWhitelistedInvites, [guild.id]);
@@ -150,9 +136,9 @@ export class Database {
 
                 // we could really be calling this in the begining instead and not here
                 this.db.oneOrNone(getGuild, [guild.id]).then((item : ICachedGuild)=> {
-                    cachedGuild.welcome_channel = item.welcome_channel;
-                    cachedGuild.logs_channel = item.logs_channel;
-                    cachedGuild.warnings_channel = item.warnings_channel
+                    cachedGuild!.welcome_channel = item.welcome_channel;
+                    cachedGuild!.logs_channel = item.logs_channel;
+                    cachedGuild!.warnings_channel = item.warnings_channel
                 });
 
                 cachedGuild.prefix  = guild.prefix;
@@ -162,7 +148,7 @@ export class Database {
 
     private cacheUsers(guildId : string){
         this.initializeGuildIfNone(guildId);
-        const guild = this.guilds.get(guildId);
+        const guild = this.guilds.get(guildId)!;
         this.db.many(getAllMembers, [guildId]).then((users : IUser[]) => {
             guild.users =  users.map(user => {
                 return {
@@ -172,16 +158,6 @@ export class Database {
                 }
             });
         })
-    }
-
-    private async cacheNewGuild(guild : IGuild){
-        const cached = this.guilds.get(guild.id);
-        if (cached !== undefined){
-            this.guilds.set(guild.id, <ICachedGuild> {});
-        cached.prefix = guild.prefix;
-        cached.whitelisted_invites = [];
-        cached.blacklisted_links = [];
-        }
     }
 
     private checkTables() : Promise<any> {
@@ -198,7 +174,7 @@ export class Database {
         const id = guild.id;
         const name = guild.name;
         return this.db.oneOrNone(saveGuild,[id, name]).then((guild : IGuild)=> {
-            this.cacheNewGuild(guild);
+            this.initializeGuildIfNone(guild.id);
         });
     }
 
@@ -213,7 +189,7 @@ export class Database {
 
         return this.db.one(upsertPrefix, [guild.id, prefix]).then((res: IGuild)=> {
             // changing our cached value as well
-            const cached = this.guilds.get(guild.id);
+            const cached = this.guilds.get(guild.id)!;
             if (cached === undefined)
                 this.guilds.set(guild.id, <ICachedGuild> {});
 
@@ -230,7 +206,7 @@ export class Database {
             this.initializeGuildIfNone(guildId);
             return '.';
         }
-        return this.guilds.get(guildId).prefix;
+        return this.guilds.get(guildId)!.prefix;
     }
 
     public insertMember(member : GuildMember) {
@@ -238,21 +214,40 @@ export class Database {
         const username = member.user.username;
         const guild_id = member.guild.id;
         this.initializeGuildIfNone(member.guild.id);
-        const guild = this.guilds.get(member.guild.id);
-
+        const guild = this.guilds.get(member.guild.id)!;
         // checking if we already cached a user
-        if (!guild.users.find(prop => prop.id === member.id)){
+        if (!guild.users.find(prop => prop.id === member.id)) {
             guild.users.push({
                 id: id,
                 guild_id: guild_id,
                 ignoring: false
             });
 
-            return this.db.one(insertMember, [id, username, guild_id]).then((res : IUser)=> {
+            return this.db.one(insertMember, [id, username, guild_id]).then((res: IUser) => {
                 return; // nothing for now
             });
         }
+    }
 
+    public cacheWelcomeMessage(member: GuildMember, welcomeMessage: Message){
+        const targetGuild: ICachedGuild| undefined = this.guilds.get(member.guild.id);
+        if(!targetGuild)
+            return debug.error(`Guild ${member.guild.name} was not found in cache`, 'Database');
+
+        targetGuild.welcomeMessages.set(member.id, welcomeMessage);
+    }
+
+    public uncacheWelcomeMessage(member: GuildMember): Message| undefined{
+        const targetGuild: ICachedGuild| undefined = this.guilds.get(member.guild.id);
+        if(!targetGuild){
+            debug.error(`Guild ${member.guild.name} was not found in cache`, 'Database');
+            return;
+        }
+        const message: Message | undefined = targetGuild.welcomeMessages.get(member.id);
+            if (!message)
+                debug.error(`Welcome message for user ${member.user.username} was not found`, 'Database');
+        targetGuild.welcomeMessages.delete(member.id);
+        return message;
     }
 
     public getUsers(guildId : string){
@@ -278,32 +273,36 @@ export class Database {
 
     }
 
+    public allowInvites(guildId: string){
+        return this.db.oneOrNone(changeInviteSetting, [guildId, ])
+    }
+
     public updateWelcomeChannel(guildId : string, channelId : string) : Promise<string>{
         return this.db.oneOrNone(updateWelcomeChannel, [channelId, guildId]).then((r: IGuild)=> {
             this.initializeGuildIfNone(guildId);
-            this.guilds.get(guildId).welcome_channel = r.welcome_channel;
+            this.guilds.get(guildId)!.welcome_channel = r.welcome_channel;
             return r.welcome_channel;
         });
     }
 
-    public getWelcomeChannel(guildId: string) : string | undefined {
+    public getWelcomeChannel(guildId: string) : Channel | undefined {
         const guild = this.guilds.get(guildId);
         if (guild === undefined) return undefined;
-        return guild.welcome_channel;
+        return this.client.channels.get(guild.welcome_channel);
     }
 
     public updateLogsChannel(guildId : string, channelId : string){
         return this.db.oneOrNone(updateLogsChannel, [channelId, guildId]).then((r : IGuild) => {
             this.initializeGuildIfNone(guildId);
-            this.guilds.get(guildId).logs_channel = r.logs_channel;
+            this.guilds.get(guildId)!.logs_channel = r.logs_channel;
             return r.logs_channel;
         });
     }
 
-    public getLogsChannel(guildId : string){
+    public getLogsChannel(guildId : string):Channel|undefined {
         const guild = this.guilds.get(guildId);
         if (!guild) return undefined;
-        return guild.logs_channel;
+        return this.client.channels.get(guild.logs_channel);
     }
 
     public restockGuildMembers(guild :Guild){
@@ -344,17 +343,18 @@ export class Database {
 
     public getLockdownStatus(guild: Guild) : boolean {
         this.initializeGuildIfNone(guild.id);
-        return this.guilds.get(guild.id).lockdown;
+        return this.guilds.get(guild.id)!.lockdown;
     }
 
     public changeLockdownStatus(guild : Guild, status : boolean){
-        if (this.guilds.get(guild.id) === undefined)
+        const target = this.guilds.get(guild.id);
+        if (target === undefined)
             return debug.warning(`Guild ${guild.name} does not exist.`);
-        if (this.guilds.get(guild.id).lockdown === status)
+        if (target!.lockdown === status)
             return debug.warning(`Tried to set lockdown`+
                 ` status of ${guild.name} to ${status} but it is already ${status}`);
 
-        this.guilds.get(guild.id).lockdown = status;
+        target!.lockdown = status;
         this.db.one(changeLockdownStatus, [guild.id, status]);
     }
 
@@ -366,7 +366,7 @@ export class Database {
         }
         return this.db.one(setIgnored, [state, member.guild.id, member.id]).then((user : IUser) => {
             debug.info(`Now ignoring user ${member.user.username}.`);
-            cachedGuild.users.find(user => user.id === member.id).ignoring = user.ignoring;
+            cachedGuild.users.find(user => user.id === member.id)!.ignoring = user.ignoring;
             return user.ignoring;
         });
     }
@@ -377,7 +377,7 @@ export class Database {
             debug.warning(`server: ${member.guild.name} is not cached!`);
             return undefined;
         }
-        const target : ICachedUser = guild.users.find(user => user.id === member.id);
+        const target : ICachedUser | undefined = guild.users.find(user => user.id === member.id);
         if (!target){
             debug.warning(`user: ${member.user.username} is not cached!`);
             return undefined;
@@ -385,6 +385,7 @@ export class Database {
 
         return target.ignoring;
     }
+
     public getRaidStatus(guild : Guild)  {
 
     }

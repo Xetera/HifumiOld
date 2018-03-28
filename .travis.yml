@@ -1,18 +1,20 @@
 language: node_js
 node_js:
 - stable
-deploy:
-  provider: heroku
-  api_key:
-    secure: FigVaofSHJk/j5oRWtbDjP6dpGHLFvWkq3hl959NpB3Ko9A9TB/AJ9MDkOVrgqtXaNOGe6TU+t7pFzlF/dULIjkALjThjSrxkvAqfIARTrdCBiH5RMKZpI7UsVWo2TGRSeNmG10yKQQwzwENOnp7kVGISdsTttP+L3K2jX23NNNgqSuGSjCGRXYOKkzr72a+CAYDV0iyilqzYkPOoAeNEdHuWFsdtT2pmLjFwnzhSu729kBIZOnFmrI4px1Je4XMHJ4TiIRbAJHVhEAAdU0hnNzFuJrdL/E5iQgG/m4kH+Jl+RUaekYnfhW5Ebm5xBy249w4XfYUINzWNtXBMF+IOzk35QfKl2b48nFGBLdlDCrzdHzYFNCwkjIDnSaldFU9zYdL0n3tKkJoKDOtvNIUwX8FwFlH5W054yhQ9VP0btJ69Sfxp/P5sQHAhxtmvNy62SP3zOov+KZTZSAxu1oeYXtms0MULf2YDDfXqnkoLe971eRzQ97Dlb2vER735q3IlGzZpB7iwcubqGVgVvJR1lNSIrlnQuRO/WQNty+0/M78d6sE/lzch7IodfD2juUN3wr7Zs4z8NeLgZZd9UKXuVh5afNlJPwQbrkB1zQMXrew+HSLszpWx1iNpDo7QuI5tnNsO5J4aYbZJzl4TlptQ47iH0JbOhqFMlRDekgwW64=
-  app: Alexa
-  on:
-    repo: ilocereal/Alexa
+
 cache:
   directories:
   - node_modules
+
 before_script:
-- npm run setup
-- npm run build
+  - npm run setup
+  - npm install codecov -g
+  - npm run build
+
 script:
-- npm test
+
+  - npm test
+
+after_success:
+  - codecov
+>>>>>>> dev

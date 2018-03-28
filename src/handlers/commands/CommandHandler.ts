@@ -1,36 +1,37 @@
-import nuke from "../commands/utility/Nuke";
+import nuke from "../../commands/utility/Nuke";
 import * as Discord from "discord.js";
 import * as dbg from "debug";
-import {Database} from "../database/Database";
-import setWelcome from "../commands/config/setWelcomeChannel";
-import setPrefix from "../commands/config/SetPrefix";
-import systemsEval from "../commands/debug/Eval";
-import manualRestockUsers from "../actions/ManualRestockUsers";
-import getPfp, {default as pfp} from "../commands/info/GetPfp";
-import uptime from "../commands/info/Uptime";
-import source from "../commands/info/Source";
-import ch from "../commands/fun/CyanideAndHappiness";
-import {getHelp} from "../commands/info/Help";
-import serverInfo from "../commands/info/ServerInfo";
-import echo from "../commands/utility/Echo";
-import {Instance} from "../misc/Globals";
-import onlyAdmin from "./permissions/decorators/onlyAdmin";
-import {Alexa} from "../API/Alexa";
-import {MuteQueue} from "../moderation/MuteQueue";
-import {MessageQueue} from "../moderation/MessageQueue";
-import onlyOwner from "./permissions/decorators/onlyOwner";
-import setName from "../commands/self/ChangeName";
-import setAvatar from "../commands/self/ChangePicture";
-import onlyMod from "./permissions/decorators/onlyMod";
-import getQueue from "../commands/debug/getQueue";
-import cleanse from "../commands/utility/Cleanse";
-import bump from "../commands/self/Bump";
-import getConfig from "../commands/config/getConfig";
-import setLogsChannel from "../commands/config/setLogsChannel";
-import getCache from "../commands/debug/Cache";
-import ignore from "../commands/self/Ignore";
+import {Database} from "../../database/Database";
+import setWelcome from "../../commands/config/setWelcomeChannel";
+import setPrefix from "../../commands/config/SetPrefix";
+import systemsEval from "../../commands/debug/Eval";
+import manualRestockUsers from "../../actions/ManualRestockUsers";
+import getPfp, {default as pfp} from "../../commands/info/GetPfp";
+import uptime from "../../commands/info/Uptime";
+import source from "../../commands/info/Source";
+import ch from "../../commands/fun/CyanideAndHappiness";
+import {getHelp} from "../../commands/info/help/Help";
+import serverInfo from "../../commands/info/ServerInfo";
+import echo from "../../commands/utility/Echo";
+import {Instance} from "../../misc/Globals";
+import onlyAdmin from "../permissions/decorators/onlyAdmin";
+import {Alexa} from "../../API/Alexa";
+import {MuteQueue} from "../../moderation/MuteQueue";
+import {MessageQueue} from "../../moderation/MessageQueue";
+import onlyOwner from "../permissions/decorators/onlyOwner";
+import setName from "../../commands/self/ChangeName";
+import setAvatar from "../../commands/self/ChangePicture";
+import onlyMod from "../permissions/decorators/onlyMod";
+import getQueue from "../../commands/debug/getQueue";
+import cleanse from "../../commands/utility/Cleanse";
+import bump from "../../commands/self/Bump";
+import getConfig from "../../commands/config/getConfig";
+import setLogsChannel from "../../commands/config/setLogsChannel";
+import getCache from "../../commands/debug/Cache";
+import ignore from "../../commands/self/Ignore";
+import botInfo from "../../commands/info/botInfo";
 
-interface CommandParameters extends Instance {
+export interface CommandParameters extends Instance {
     message: Discord.Message;
     args: string[];
     bot: Discord.Client;
@@ -68,12 +69,14 @@ export default class CommandHandler implements indexSignature {
 
     public static parseInput(message : Discord.Message) : [string, string[]]{
         let args : string[] = [];
-
+        // removing excess whitespace between words that can't be removed with .trim()
+        const messageContent = message.content.replace(/\s+/, ' ');
         if (isMessage(message))
-            args = message.content.split(' ');
+            args = messageContent.split(' ');
         else
             throw new TypeError(`'${message}' is not a Message object.`);
 
+        console.log(args);
 
         let command : string | undefined = args.shift();
         if (command !== undefined) {
@@ -97,9 +100,8 @@ export default class CommandHandler implements indexSignature {
 
         for (let i in this.commands) {
             const match = this.commands[i].toLowerCase() === command.toLowerCase() ? command : undefined;
-            if (match === undefined)
+            if (!match)
                 continue;
-
             const execution = this.commands[i];
             try {
                 return this[execution](params);
@@ -128,7 +130,7 @@ export default class CommandHandler implements indexSignature {
 
     @onlyOwner
     private eval(params: CommandParameters){
-        systemsEval(params.message, params.args.join(' '))
+        systemsEval(params.message, params.args)
     }
 
     @onlyOwner
@@ -172,7 +174,7 @@ export default class CommandHandler implements indexSignature {
 
     @onlyMod
     private cleanse(params: CommandParameters){
-        const limit : string | undefined = params.args.shift();
+        const limit : string | undefined = params.args.shift()!;
         cleanse(params.message.channel, params.database, parseInt(limit))
     }
 
@@ -213,6 +215,10 @@ export default class CommandHandler implements indexSignature {
 
     private serverInfo(params: CommandParameters){
         serverInfo(params.message);
+    }
+
+    private botInfo(params: CommandParameters){
+        botInfo(params.message);
     }
 
     private bump(params : CommandParameters){

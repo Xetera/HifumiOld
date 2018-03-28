@@ -9,6 +9,7 @@ import {
 import {debug} from '../utility/Logging'
 import {Database} from "../database/Database";
 import Watchlist from "./Watchlist";
+import gb from "../misc/Globals";
 
 interface Message extends Discord.Message {
     sent : Date;
@@ -42,7 +43,7 @@ export class MessageQueue {
             guild.push(msg);
         }
 
-        this.queue.forEach(function(value, key, map){
+        this.queue.forEach(function(value){
             //  value.length => length of messages stored in the message queue
             if (value.length > self.bufferLength){
                 const guildName = msg.guild.name;
@@ -55,7 +56,7 @@ export class MessageQueue {
         this.checkForSpam(msg.member);
     }
 
-    //gets called every messages
+    //gets called every message
     private checkForSpam(member : Discord.GuildMember) : void {
         const spamMessages : Message[] | void = this.getRecentUserMessages(member);
         if (!spamMessages) return;
@@ -64,14 +65,18 @@ export class MessageQueue {
         const isUserSpamming : boolean = spamMessages.length >= getSpamTolerance();
 
         if (isUserSpamming){
+            // checking if the user is new before punishing
+            if (gb.instance.watchlist.isNewMember(member)){
+                
+            }
             this.removeUserMessages(spamMessages);
-            const unmuteDate : Date = getMuteDate();
-            const mutedRole : Discord.Role = member.guild.roles.find('name', 'muted');
-            this.muteQueue.add(member, mutedRole, unmuteDate);
+            const unmuteDate: Date = getMuteDate();
+            const mutedRole: Discord.Role = member.guild.roles.find('name', 'muted');
+            const muted: boolean = this.muteQueue.add(member, mutedRole, unmuteDate);
         }
     }
 
-    private removeUserMessages(messages : Message[]) : void {
+    private removeUserMessages(messages: Message[]): void {
         // guaranteed that all messages are by the same author so we can just take the first index
         const member : Discord.GuildMember = messages[0].member;
         const memberName :string = messages[0].member.nickname || messages[0].author.username;
@@ -81,8 +86,12 @@ export class MessageQueue {
 
         channels.forEach(function(channel : Discord.Channel){
             if (channel instanceof Discord.TextChannel){
+                const dateLimit: Date = moment(new Date()).subtract('14', 'd').toDate();
                 channel.fetchMessages({limit: getBulkDeleteCount()}).then((messages : messageCollection) => {
-                    const userMessages = messages.filter(message => message.author.id === member.id);
+                    const userMessages = messages.filter(
+                        // we want to avoid fetching messages that are created over 14 days ago
+                        message => message.author.id === member.id && message.createdAt >  dateLimit
+                    );
                     channel.bulkDelete(userMessages);
                 });
             }
@@ -136,7 +145,5 @@ export class MessageQueue {
             }
             channel.send(output);
         }
-
     }
-
 }
