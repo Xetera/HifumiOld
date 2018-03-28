@@ -1,7 +1,8 @@
 import {Guild, Message} from "discord.js";
-import {Database, ICachedGuild} from "../../database/Database";
+import {Database} from "../../database/Database";
 import {debug} from '../../utility/Logging'
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
+import {ICachedGuild} from "../../database/interface";
 
 export default function getConfig(message : Message, db : Database) : void {
     const guild = message.guild;
