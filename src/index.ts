@@ -80,7 +80,7 @@ instance.bot.on('guildBanAdd', (guild:Discord.Guild, member: Discord.User) => {
 });
 
 instance.bot.on('guildBanRemove', (guild:Discord.Guild, member: Discord.User) => {
-    LogManager.logBan(guild, member);
+    LogManager.logUnban(guild, member);
 });
 
 // === === === === CHANNEL === === === === === //
