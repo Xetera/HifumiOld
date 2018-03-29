@@ -1,14 +1,15 @@
 import * as Discord from 'discord.js'
-import {TextChannel, VoiceChannel} from "discord.js";
+import {Message, TextChannel, VoiceChannel} from "discord.js";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import gb from "../../misc/Globals";
 import {handleFailedCommand, handleInvalidParameters} from "../../handlers/commands/invalidCommandHandler";
-
-export default function echo(message:Discord.Message, args: string[]) : void {
+import hasMessagingPermissions from "../../handlers/permissions/missingPermissionsHandler";
+export default function echo(message:Message, args: string[]) : void {
     if (!args.length){
         handleInvalidParameters(message.channel, `echo`);
         return;
     }
+
     const mention : any = args.shift();
     let channel: Discord.Channel | undefined;
 
@@ -31,7 +32,11 @@ export default function echo(message:Discord.Message, args: string[]) : void {
 
     const echo = args.join(' ');
 
-    if (channel instanceof TextChannel){
+    if (channel instanceof TextChannel && message.channel instanceof TextChannel){
+        if (!hasMessagingPermissions(message.guild.me, channel, message.channel)){
+            return;
+        }
+
         let out;
         // we still want admins to be able to make announcements with this
         if (!message.member.hasPermission('ADMINISTRATOR')){
