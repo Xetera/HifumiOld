@@ -14,7 +14,7 @@ export const debug = {
 export default function onGuildCreate(guild : Discord.Guild, instance : Instance){
     instance.muteQueue.insertNewGuild(guild);
     instance.database.insertNewGuild(guild);
-    instance.watchlist.insertNewGuild(guild);
+    instance.trackList.insertNewGuild(guild);
 
     debug.info(`I was added to the server: ${guild.name} with ${guild.memberCount} members.`);
 

@@ -12,9 +12,9 @@ import logMemberLeaveEmbed from "../../embeds/logging/logMemberLeaveEmbed";
 import logUnbanEmbed from "../../embeds/logging/logUnbanEmbed";
 import logChannelCreateEmbed from "../../embeds/logging/logChannelCreateEmbed";
 import logChannelDeleteEmbed from "../../embeds/logging/logChannelDeleteEmbed";
-import logWatchlistSpamBanEmbed from "../../embeds/logging/watchlist/logWatchlistSpamBanEmbed";
+import logWatchlistSpamBanEmbed from "../../embeds/logging/tracklist/logTracklistSpamBanEmbed";
 import {Offense} from "../../moderation/interfaces";
-import logWatchlistInviteBanEmbed from "../../embeds/logging/watchlist/logWatchlistInviteBanEmbed";
+import logWatchlistInviteBanEmbed from "../../embeds/logging/tracklist/logTracklistInviteBanEmbed";
 
 // static channel
 export class LogManager {

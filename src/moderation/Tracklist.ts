@@ -3,8 +3,8 @@ import {getMemberTrackDate, getMemberTrackDuration, securityLevel, SecurityLevel
 import {default as gb, Instance} from "../misc/Globals";
 import {Guild, GuildMember, Message} from "discord.js";
 import {Offense} from "./interfaces";
-import banTrackedUserForInvite from "../actions/punishments/watchlist/BanTrackedUserForInvite";
-import banTrackedUserForSpam from "../actions/punishments/watchlist/banTrackedUserForSpam";
+import banTrackedUserForInvite from "../actions/punishments/tracklist/BanTrackedUserForInvite";
+import banTrackedUserForSpam from "../actions/punishments/tracklist/banTrackedUserForSpam";
 import {debug} from '../utility/Logging';
 
 type guildId = string;

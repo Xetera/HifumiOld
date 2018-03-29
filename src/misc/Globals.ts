@@ -26,7 +26,7 @@ export interface Instance {
     messageQueue: MessageQueue,
     database : Database
     commandHandler?:CommandHandler,
-    tracklist: Tracklist,
+    trackList: Tracklist,
     eval(message: Message, x : any): any
 }
 
