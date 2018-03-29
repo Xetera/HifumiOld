@@ -32,7 +32,6 @@ Locking down guilds on demand, muting everyone for 10 minutes or longer, allowin
 
 ### Bookkeeping: 📚
 
-
 * Logging join and leave times
 * Logging user mutes and duration
 * Optionally logging deleted and edited messages **PLANNED**
@@ -57,7 +56,7 @@ In order of importance per topic
 - [x] Move hosting to heroku
 - [x] Removed compiled js files from project
 - [x] Rework the way commands are called
-- [ ] Add exceptions for bot owner and mods for invite and spam
+- [x] Add exceptions for bot owner and mods for invite and spam
 - [x] Split debugging on a per/module basis
 - [x] Remaining files converted to typescript
 - [ ] Remind Me module
@@ -79,9 +78,9 @@ In order of importance per topic
 - [x] Remove invite links
 - [x] Unmuting users based on security level
 - [ ] Option for mass banning muted users from a short interval
-- [ ] Save autobanned (not manually) users to a global watchlist
+- [ ] Save autobanned (not manually) users to a global trackList
 - [ ] Option to set default moderator warnings channel
-- [ ] Alert mods when users on a watchlist from another server joins
+- [ ] Alert mods when users on a trackList from another server joins
 - [ ] Blacklisted / restricted words
 - [ ] Blacklisted links
 
