@@ -1,11 +1,12 @@
 ![travis](https://travis-ci.org/ilocereal/Alexa.svg?branch=master)
 ![alexa](https://cdn.discordapp.com/attachments/418699380833648644/420917081131712512/alexanoinvite.png)
 
-Placeholder invite until a stable version is released
-
 Moderation based discord bot written in Typescript using [Discord.js](https://github.com/discordjs/discord.js) 
 
 Currently hosted on [heroku](https://www.heroku.com/)
+
+[Invite](https://discordapp.com/oauth2/authorize?client_id=372615866652557312&permissions=0&scope=bot)
+
 
 ## Whatcha Got: 
 
