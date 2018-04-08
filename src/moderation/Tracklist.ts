@@ -120,8 +120,5 @@ export default class Tracklist {
         }
     }
 
-    public detectPreRaid()  {
-        // when an unusual number of people join, elevate detection
-        // lower spam threshold and compare messages from new users to check for spam
-    }
+    // Placeholder, fixed in earlier merges
 }
