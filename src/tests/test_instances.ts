@@ -1,13 +1,13 @@
 import 'mocha'
 import {expect} from 'chai'
 import * as Discord from "discord.js";
-import CommandHandler from "../handlers/commands/CommandHandler";
+import CommandHandler, {CommandParameters} from "../handlers/commands/CommandHandler";
 import {MessageQueue} from "../moderation/MessageQueue";
 import {Database, DatabaseConfig, PostgresDevLoginConfig} from "../database/Database";
 import {Alexa} from "../API/Alexa";
 import {MuteQueue} from "../moderation/MuteQueue";
 import {Instance} from "../misc/Globals";
-import Watchlist from "../moderation/Watchlist";
+import Tracklist from "../moderation/Tracklist";
 import {getDatabaseConnection, getEnvironmentSettings, getTokens} from "../events/systemStartup";
 import gb from "../misc/Globals";
 import {Message} from "discord.js";
@@ -30,8 +30,8 @@ function createInstance(): Instance {
     let alexa = new Alexa(CLEVERBOT_TOKEN);
     let database = new Database(DATABASE_URL, bot);
     let muteQueue = new MuteQueue();
-    let watchlist = new Watchlist();
-    let messageQueue = new MessageQueue(muteQueue, database, watchlist);
+    let trackList = new Tracklist();
+    let messageQueue = new MessageQueue(muteQueue, database, trackList);
     let commandHandler = new CommandHandler();
     return {
         bot: bot,
@@ -40,8 +40,8 @@ function createInstance(): Instance {
         database: database,
         messageQueue: messageQueue,
         commandHandler:commandHandler,
-        watchlist: watchlist,
-        eval: (message: Message, x : string ) => eval(x)
+        trackList: trackList,
+        eval: (params: CommandParameters, message: Message, x : any) => eval(x)
     }
 }
 
@@ -67,14 +67,14 @@ describe('Alexa', function() {
     it('Error on setting clevertype engagement incorrectly', () => {
         expect(() => instances.alexa.setEngagement(101)).to.throw(RangeError);
     });
+    this.timeout(20000);
     it('Getting cleverbot response', function(done : MochaDone) {
         instances.alexa.say('hello').then((reply: any)=> {
             expect(reply).to.be.a('string');
             done();
-        });
-    });
-    
-    this.timeout(10000);
+        })
+    }).timeout(20000);
+
     it('Clevertype correctly recording calls', () => {
         expect(instances.alexa.cleverbot.callAmount).to.equal(1);
     });
