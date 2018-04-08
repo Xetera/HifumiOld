@@ -5,12 +5,12 @@ import {Offense} from "../../moderation/interfaces";
 
 export default function logMutedEmbed(member: GuildMember, mutedBy: GuildMember, reason: string | Offense, duration: number): RichEmbed {
     return new RichEmbed()
-        .setTitle(`User Muted 🔇`)
         .setThumbnail(member.user.avatarURL)
-        .setDescription(member)
         .setColor('#ffa739')
-        .addField(`Muted By`, mutedBy)
-        .addField(`Reason`, reason, true)
+        .setTitle(`Muted 🔇`)
+        .addField(`User `, member, true)
+        .addField(`Muted By`, mutedBy, true)
         .addField(`Duration`, formattedTimeString(duration ? duration : getMuteTime()), true)
+        .addField(`Reason`, reason, true)
         .setTimestamp();
 }

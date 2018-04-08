@@ -18,7 +18,7 @@ export default function muteDMEmbed(member: GuildMember, reason: string | Offens
         // TODO: add strikes here later
         .setDescription(
             `You were muted in **${member.guild}**, while muted you are forbidden from interacting with users in the guild in any way.`)
-        .addField(`Duration`, formattedTimeString(duration ? duration : getMuteTime()))
+        .addField(`Duration`, formattedTimeString(duration ? duration : getMuteTime()), true)
         .addField(`Reason`, reasonMessage, true)
         // if we don't have a given duration then we know that it's just the default mute action duration
         .setFooter('Alexa')
