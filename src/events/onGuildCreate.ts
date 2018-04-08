@@ -2,7 +2,7 @@ import * as Discord from 'discord.js'
 import {Database} from "../database/Database";
 import * as dbg from "debug";
 import {Instance} from "../misc/Globals";
-import {RichEmbed, TextChannel} from "discord.js";
+import {RichEmbed, TextBasedChannel, TextChannel} from "discord.js";
 import onGuildCreateEmbed from "../embeds/events/onGuildCreateEmbed";
 
 export const debug = {
@@ -21,7 +21,7 @@ export default function onGuildCreate(guild : Discord.Guild, instance : Instance
     const targetChannel = guild.systemChannel;
     let embed = onGuildCreateEmbed();
 
-    if (targetChannel && targetChannel instanceof TextChannel){
+    if (targetChannel && targetChannel instanceof TextBasedChannel(TextChannel)){
         targetChannel.send(embed);
     }
 }
