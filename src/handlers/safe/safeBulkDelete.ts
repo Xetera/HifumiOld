@@ -5,14 +5,13 @@ import {
     GuildMember,
     Message,
     Snowflake,
-    TextBasedChannel,
     TextChannel
 } from "discord.js";
 import moment = require("moment");
 import {debug} from "../../utility/Logging";
 
 export default function safeBulkDelete(channel: Channel, member: GuildMember){
-    if (!(channel instanceof TextBasedChannel(TextChannel))){
+    if (!(channel instanceof TextChannel)){
         return;
     }
     const dateLimit: Date = moment(new Date()).subtract('14', 'd').toDate();

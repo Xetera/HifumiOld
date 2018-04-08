@@ -6,8 +6,7 @@ import {
     GuildMember,
     Message, PermissionOverwrites,
     PermissionResolvable,
-    Permissions, Role,
-    TextBasedChannel, TextChannel
+    Permissions, Role
 } from "discord.js";
 import {debug} from "../events/onMessage";
 

@@ -1,7 +1,7 @@
 import * as Discord from 'discord.js'
 import {getMemberTrackDate, getMemberTrackDuration, securityLevel, SecurityLevels} from "../utility/Settings";
 import {default as gb, Instance} from "../misc/Globals";
-import {Guild, GuildMember, Message} from "discord.js";
+import {Guild, GuildMember, Message, TextBasedChannel} from "discord.js";
 import {Offense} from "./interfaces";
 import banTrackedUserForInvite from "../actions/punishments/tracklist/BanTrackedUserForInvite";
 import banTrackedUserForSpam from "../actions/punishments/tracklist/banTrackedUserForSpam";
@@ -107,7 +107,6 @@ export default class Tracklist {
             return void debug.error(
                 `Tried punishing new member '${member.user.username}' in '${member.guild.name}' but they are not tracked.`
             );
-
         else if (tracked.banned)
             return void debug.silly(`User ${member.user.username} is already banned`);
 
