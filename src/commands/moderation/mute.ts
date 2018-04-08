@@ -31,7 +31,6 @@ export default function muteUser(message: Message, args: string[]) {
     }
     const durationInput = args.shift()!;
     const duration = Number(durationInput);
-    console.log(duration);
     // edge cases
     if (duration == 0 || typeof duration !== 'number' || isNaN(duration)) {
         return void message.channel.send(handleFailedCommand(
@@ -42,6 +41,12 @@ export default function muteUser(message: Message, args: string[]) {
 
     const unmuteDate = moment(new Date()).add(duration, 'm').toDate();
     //const formattedDuration = formattedTimeString(duration * 60);
-    gb.instance.muteQueue.add(member, message.member, unmuteDate, reason, duration)
+    gb.instance.muteQueue.add(
+        member,
+        message.member,
+        unmuteDate,
+        reason,
+        duration * 60 /* duration is in seconds */
+    );
 
 }

@@ -8,34 +8,37 @@ import {
 } from "../utility/Settings";
 import {debug} from '../utility/Logging'
 import {Database} from "../database/Database";
-import Watchlist from "./Watchlist";
+import Tracklist from "./Tracklist";
 import gb from "../misc/Globals";
+import {Offense} from "./interfaces";
+import {Channel, GuildMember, Message} from "discord.js";
+import safeBulkDelete from "../handlers/safe/safeBulkDelete";
 
-interface Message extends Discord.Message {
+interface CachedMessage extends Discord.Message {
     sent : Date;
 }
 type messageCollection = Discord.Collection<Discord.Snowflake, Discord.Message>;
 
 export class MessageQueue {
-    queue : Map<string, Message[]>;
-    watchlist: Watchlist;
+    queue : Map<string, CachedMessage[]>;
+    trackList: Tracklist;
     bufferLength : number;
     muteQueue : MuteQueue;
     db : Database;
-    constructor(muteQueue : MuteQueue, database: Database,watchlist: Watchlist, size ?: number){
+    constructor(muteQueue : MuteQueue, database: Database, watchlist: Tracklist, size ?: number){
         this.muteQueue = muteQueue;
         this.db = database;
-        this.queue = new Map<string, Message[]>();
-        this.watchlist = watchlist;
+        this.queue = new Map<string, CachedMessage[]>();
+        this.trackList = watchlist;
         this.bufferLength = size ? size : 200;
         debug.info('MessageQueue is ready.', "MessageQueue");
     }
 
-    public add(msg: Message) : void {
+    public add(msg: CachedMessage) : void {
         const self = this;
 
         msg.sent = moment(new Date()).toDate();
-        const guild : Message[] | undefined = this.queue.get(msg.guild.id);
+        const guild : CachedMessage[] | undefined = this.queue.get(msg.guild.id);
         if (guild === undefined){
             this.queue.set(msg.guild.id, [msg]);
         }
@@ -47,7 +50,7 @@ export class MessageQueue {
             //  value.length => length of messages stored in the message queue
             if (value.length > self.bufferLength){
                 const guildName = msg.guild.name;
-                const temp : Message | undefined = value.shift();
+                const temp : CachedMessage | undefined = value.shift();
                 if (temp === undefined)
                     debug.error(`Tried to shift out an empty message from ${guildName}'s messageQueue` +
                         `\nMost likely because buffer length is 0 or undefined.`, "MessageQueue");
@@ -57,8 +60,8 @@ export class MessageQueue {
     }
 
     //gets called every message
-    private checkForSpam(member : Discord.GuildMember) : void {
-        const spamMessages : Message[] | void = this.getRecentUserMessages(member);
+    private checkForSpam(member : Discord.GuildMember): void {
+        const spamMessages : CachedMessage[] | void = this.getRecentUserMessages(member);
         if (!spamMessages) return;
 
         if (spamMessages == null) return;
@@ -66,17 +69,18 @@ export class MessageQueue {
 
         if (isUserSpamming){
             // checking if the user is new before punishing
-            if (gb.instance.watchlist.isNewMember(member)){
-                
+            const watchlist = gb.instance.trackList;
+            if (watchlist.isNewMember(member)){
+                return watchlist.punishNewMember(member, Offense.Spam);
             }
+
             this.removeUserMessages(spamMessages);
             const unmuteDate: Date = getMuteDate();
-            const mutedRole: Discord.Role = member.guild.roles.find('name', 'muted');
-            const muted: boolean = this.muteQueue.add(member, mutedRole, unmuteDate);
+            this.muteQueue.add(member, member.guild.me, unmuteDate, Offense.Spam);
         }
     }
 
-    private removeUserMessages(messages: Message[]): void {
+    private removeUserMessages(messages: CachedMessage[]): void {
         // guaranteed that all messages are by the same author so we can just take the first index
         const member : Discord.GuildMember = messages[0].member;
         const memberName :string = messages[0].member.nickname || messages[0].author.username;
@@ -84,18 +88,27 @@ export class MessageQueue {
         // breaking down all the unique channels
         const channels : Set<Discord.Channel> = new Set(messages.map(message => message.channel));
 
-        channels.forEach(function(channel : Discord.Channel){
-            if (channel instanceof Discord.TextChannel){
-                const dateLimit: Date = moment(new Date()).subtract('14', 'd').toDate();
-                channel.fetchMessages({limit: getBulkDeleteCount()}).then((messages : messageCollection) => {
-                    const userMessages = messages.filter(
-                        // we want to avoid fetching messages that are created over 14 days ago
-                        message => message.author.id === member.id && message.createdAt >  dateLimit
-                    );
-                    channel.bulkDelete(userMessages);
-                });
-            }
+        channels.forEach(function(channel : Channel){
+            safeBulkDelete(channel, member);
         });
+    }
+
+    public removeUsersRecentMessages(member: GuildMember){
+        const guild = this.queue.get(member.guild.id);
+        if (!guild){
+            return void debug.error(`Cannot bulk delete messages, no guild associated with ${member} in the queue`, 'MessageQueue');
+        }
+        let message;
+        for (let i=guild.length -1 ; i > 0; i--){
+            if (guild[i].id === member.id){
+                message = guild[i];
+            }
+        }
+        if (!message){
+            return void debug.error(`Could not find a message from the user ${member} in the queue`, 'MessageQueue');
+        }
+
+        safeBulkDelete(message.channel, member);
     }
 
     public checkLockdown(guild : Discord.Guild): boolean {
@@ -103,11 +116,11 @@ export class MessageQueue {
         return true;
     }
 
-    private getRecentUserMessages(member : Discord.GuildMember) : Message[] | void {
+    private getRecentUserMessages(member : Discord.GuildMember) : CachedMessage[] | void {
         const guild : Discord.Guild = member.guild;
         const tolerance : Date = moment(new Date()).subtract(5, 's').toDate();
 
-        const messages : Message[] | undefined = this.queue.get(guild.id);
+        const messages : CachedMessage[] | undefined = this.queue.get(guild.id);
 
         if (messages === undefined) {
             debug.error(`Tried fetching recent messages in a nonexistent server`, "MessageQueue");
@@ -119,8 +132,8 @@ export class MessageQueue {
         );
     }
 
-    private getAllUserMessages(member : Discord.GuildMember) : Message[] | void {
-        const messages : Message[] | undefined = this.queue.get(member.guild.id);
+    private getAllUserMessages(member : Discord.GuildMember) : CachedMessage[] | void {
+        const messages : CachedMessage[] | undefined = this.queue.get(member.guild.id);
         if (messages === undefined) return debug.error(`Guild ${member.guild} has no messages to get`, "MessageQueue");
         return messages.filter(message => {
             return message.author.id === member.id
@@ -135,7 +148,7 @@ export class MessageQueue {
         let output : string = "";
         if (channel instanceof Discord.TextChannel){
             const guild = channel.guild;
-            const messages : Message[] | undefined = this.queue.get(guild.id);
+            const messages : CachedMessage[] | undefined = this.queue.get(guild.id);
             if (messages === undefined) return;
             let messageCount : number = 0;
             for (let i in messages){

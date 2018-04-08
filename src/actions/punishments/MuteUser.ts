@@ -34,9 +34,9 @@ export default function muteUser(member: GuildMember, mutedBy: GuildMember, role
         return Promise.resolve(false);
     }
     return member.addRole(role, reason).then(()=> {
-        debug.info(`${member.displayName} was muted for ${formattedTimeString(getMuteTime())}`);
-        LogManager.logMutedUser(member, mutedBy, reason, duration);
         safeMessageUser(member, muteDMEmbed(member, reason, duration)).catch((err) => Promise.reject(err));
+        LogManager.logMutedUser(member, mutedBy, reason, duration);
+        debug.info(`${member.displayName} was muted for ${formattedTimeString(getMuteTime())}`);
         return true;
     }).catch(err =>{
         if (err instanceof DiscordAPIError){
