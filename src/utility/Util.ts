@@ -1,4 +1,14 @@
-import {DiscordAPIError, Message} from "discord.js";
+import {
+    CategoryChannel,
+    Channel,
+    DiscordAPIError,
+    Guild,
+    GuildMember,
+    Message, PermissionOverwrites,
+    PermissionResolvable,
+    Permissions, Role,
+    TextBasedChannel, TextChannel
+} from "discord.js";
 import {debug} from "../events/onMessage";
 
 
@@ -29,7 +39,27 @@ export function randBool() : boolean{
     return Math.random () >= 0.5;
 }
 
+export function isMissingMessagingPermissions(member: GuildMember, channel: Channel): undefined | PermissionResolvable[] {
+    const userPermissions: Permissions = member.permissionsIn(channel);
+    const requirements: PermissionResolvable[] = ['SEND_MESSAGES', 'EMBED_LINKS'];
+    if (userPermissions.has(requirements)){
+        return;
+    }
+    else {
+        return userPermissions.missing(requirements)
+    }
+}
 
+export function channelOverrideDeniesRolePermission(channel: Channel, role: Role, permission: PermissionResolvable): boolean {
+    const resolvedPerm = Permissions.resolve(permission);
+    if (!(channel instanceof CategoryChannel)){
+        throw new Error(`${channel} is not a text channel`);
+    }
+    return Boolean(channel.permissionOverwrites.find(
+        (permission: PermissionOverwrites) => permission.id === role.id && ((permission.deny & resolvedPerm) === resolvedPerm)
+        )
+    );
+}
 export function pluralize(word : string, number: number) : string | -1 {
     if (number > 1 || number === 0){
         return word + 's';
@@ -100,7 +130,11 @@ export function formattedTimeString(sec: number): string{
     const hours = currentUptime.h;
     const days= currentUptime.d;
 
-    return `${days ? days + 'd' : ''} ${hours ? hours + 'h' : ''} ${minutes ? minutes + 'm' : ''} ${seconds ? seconds + 's' : ''}`;
+    return `${days 
+        ? days.toFixed(0) + 'd' : ''} ${hours 
+        ? hours.toFixed(0) + 'h' : ''} ${minutes 
+        ? minutes.toFixed(0) + 'm' : ''} ${seconds 
+        ? seconds.toFixed(0) + 's' : ''}`.trim();
 }
 
 export function sanitizeUserInput(input: string){
