@@ -5,7 +5,7 @@ import * as dbg from "debug";
 import {adminOnlyCommand} from "../../interfaces/Replies";
 import onlyOwner from "../../handlers/permissions/decorators/onlyAdmin";
 import missingAdminEmbed from "../../embeds/permissions/missingAdminEmbed";
-import {handleFailedCommand} from "../../handlers/commands/invalidCommandHandler";
+import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 
 export const debug = {
     error  : dbg('Bot:setPrefix:Error')

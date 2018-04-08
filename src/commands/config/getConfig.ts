@@ -17,9 +17,10 @@ export default function getConfig(message : Message, db : Database) : void {
     const warnings_channel = cache.warnings_channel ? `<#${cache.warnings_channel}>` : `Not set`;
 
     let out : string = "";
-    out += `\`Welcome channel\`: ${welcome_channel}\n`;
-    out += `\`Logs channel\`: ${logs_channel}\n`;
-    out += `\`Warnings channel\`: ${warnings_channel}`;
-
+    out += `**Welcome channel**: ${welcome_channel}\n`;
+    out += `**Logs channel**: ${logs_channel}\n`;
+    out += `**Warnings channel**: ${warnings_channel}\n`;
+    out += `**Command Hints**: ${cache.command_hints ? 'on' : 'off'}\n`;
+    out += `**Invite Protection** ${cache.allows_invites ? 'off' : 'on'}`;
     safeSendMessage(message.channel, out);
 }
