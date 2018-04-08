@@ -3,140 +3,163 @@
     "Logging",
     "Info",
     "Self",
-    "Utility"
+    "Utility",
+    "Moderation"
   ],
-
-  "commands": [{
-    "name": "help",
-    "type": "Info",
-    "info": "Sends you, well... this message.",
-    "usage": "help",
-    "arguments": "0",
-    "example": "help"
-  },
-  {
-    "name": "setprefix",
-    "type": "Self",
-    "info": "Changes my prefix settings.",
-    "usage": "setprefix {prefix}",
-    "example": "setprefix >",
-    "arguments": "1",
-    "permissions": "ADMIN"
-  },
-  {
-    "name": "nuke",
-    "type": "Moderation",
-    "info":"Deletes a certain number of past messages",
-    "usage": "nuke {# of messages to delete} (default 50)",
-    "arguments": "0-1",
-    "example": "nuke 100",
-    "permissions": "MOD"
-  },
-  {
-    "name": "cleanse",
-    "type": "Moderation",
-    "info":"Deletes a certain number of past bot related message.",
-    "usage": "cleanse <# of msgs to delete> (default 50)",
-    "arguments": "0-1",
-    "example": "cleanse 200",
-    "permissions": "MOD"
-  },
-  {
-    "name":"setwelcome",
-    "type": "Logging",
-    "info": "Changes the channel I send welcome messages to.",
-    "usage": "channel welcome",
-    "example": "channel welcome",
-    "permissions": "MOD"
-  },
-  {
-    "name": "setlogs",
-    "type": "Logging",
-    "info": "Changes the channel I keep logs in.",
-    "usage": "channel logs",
-    "example": "`channel logs`",
-    "permissions": "MOD"
-  },
-  {
-    "name":"setwarnings",
-    "type": "Logging",
-    "info": "Changes the channel I send mod warnings to, log channel by default.",
-    "usage": "setwarnings",
-    "arguments": "0",
-    "permissions": "MOD"
-  },
-  {
-    "name": "echo",
-    "type": "Utility",
-    "info": "Sends a custom message to a channel.",
-    "usage": "echo {#mention OR channel ID} {message}",
-    "example": "`echo #lobby Hello World!`",
-    "arguments": "2",
-    "permissions": "MOD"
-  },
-  {
-    "name":"ignore",
-    "type":"Self",
-    "info":"Ignores or unignores all conversation and commands from a user.",
-    "usage": "ignore {@Mention}",
-    "example":"`ignore @Xetera`",
-    "arguments": "1",
-    "permissions": "MOD"
-  },
-  {
-    "name": "pfp",
-    "type": "Utility",
-    "info": "Fetches the profile picture of the user.",
-    "usage": "pfp {@Member OR userId}",
-    "example": "`pfp @Xetera` OR `pfp 4563862635863`",
-    "arguments": "1"
-  },
-  {
-    "name": "ch",
-    "type": "Fun",
-    "info": "Sends a random Cyanide and Happiness comic.",
-    "usage": "ch",
-    "example": "`ch`",
-    "arguments": "0"
-  },
-  {
-    "name": "serverinfo",
-    "type": "Info",
-    "info": "Lists information about the current server.",
-    "usage": "serverinfo",
-    "example":"serverinfo",
-    "arguments": "0"
-  },
-  {
-    "name": "botinfo",
-    "type": "Info",
-    "info": "Shows some information about me.",
-    "usage": "botinfo",
-    "example":"botinfo",
-    "arguments": "0"
-  },
-  {
-    "name":"uptime",
-    "type":"Info",
-    "info":"Show the amount I've gone since my last restart.",
-    "usage": "uptime",
-    "example": "uptime",
-    "arguments": "0"
-  },
-  {
-    "name":"source",
-    "type":"Info",
-    "info":"Sends my source code on github.",
-    "usage":"source {command name}",
-    "example":"source setprefix",
-    "arguments": "0-1"
-  },
-  {
-    "name":"setmood",
-    "type":"Self",
-    "info":"Change my chat settings. **currently WIP**",
-    "usage": "setmood {number or 'random'}",
-    "example": "setmood random",
-    "permissions": "MOD"
-  }]
+  "commands": [
+    {
+      "name": "help",
+      "type": "Info",
+      "info": "Sends you, well... this message.",
+      "usage": "help",
+      "example": "help",
+      "arguments": "0"
+    },
+    {
+      "name": "setprefix",
+      "type": "Self",
+      "info": "Changes my prefix settings.",
+      "usage": "setprefix {prefix}",
+      "example": "setprefix >",
+      "arguments": "1",
+      "permissions": "ADMIN"
+    },
+    {
+      "name": "nuke",
+      "type": "Moderation",
+      "info": "Deletes a certain number of past messages",
+      "usage": "nuke {# of messages to delete} (default 50)",
+      "example": "nuke 100",
+      "arguments": "0-1",
+      "permissions": "MOD"
+    },
+    {
+      "name": "cleanse",
+      "type": "Moderation",
+      "info": "Deletes a certain number of past bot related message.",
+      "usage": "cleanse <# of msgs to delete> (default 50)",
+      "arguments": "0-1",
+      "example": "cleanse 200",
+      "permissions": "MOD"
+    },
+    {
+      "name": "setwelcome",
+      "type": "Logging",
+      "info": "Changes the channel I send welcome messages to.",
+      "usage": "channel welcome",
+      "example": "channel welcome",
+      "arguments": "0",
+      "permissions": "MOD"
+    },
+    {
+      "name": "setlogs",
+      "type": "Logging",
+      "info": "Changes the channel I keep logs in.",
+      "usage": "channel logs",
+      "example": "channel logs",
+      "arguments": "0",
+      "permissions": "MOD"
+    },
+    {
+      "name": "setwarnings",
+      "type": "Logging",
+      "info": "Changes the channel I send mod warnings to, log channel by default.",
+      "usage": "setwarnings",
+      "arguments": "0",
+      "permissions": "MOD"
+    },
+    {
+      "name": "echo",
+      "type": "Utility",
+      "info": "Sends a custom message to a channel.",
+      "usage": "echo {#mention OR channel ID} {message}",
+      "example": "echo #lobby Hello World!",
+      "arguments": "2",
+      "permissions": "MOD"
+    },
+    {
+      "name": "ignore",
+      "type": "Self",
+      "info": "Ignores or unignores all conversation and commands from a user.",
+      "usage": "ignore {@Mention}",
+      "example": "ignore @Xetera",
+      "arguments": "1",
+      "permissions": "MOD"
+    },
+    {
+      "name": "pfp",
+      "type": "Utility",
+      "info": "Fetches the profile picture of the user.",
+      "usage": "pfp {@Member OR userId}",
+      "example": "pfp @Xetera` OR `pfp 4563862635863",
+      "arguments": "1"
+    },
+    {
+      "name": "ch",
+      "type": "Fun",
+      "info": "Sends a random Cyanide and Happiness comic.",
+      "usage": "ch",
+      "example": "ch",
+      "arguments": "0"
+    },
+    {
+      "name": "serverinfo",
+      "type": "Info",
+      "info": "Lists information about the current server.",
+      "usage": "serverinfo",
+      "example": "serverinfo",
+      "arguments": "0"
+    },
+    {
+      "name": "botinfo",
+      "type": "Info",
+      "info": "Shows some information about me.",
+      "usage": "botinfo",
+      "example": "botinfo",
+      "arguments": "0"
+    },
+    {
+      "name": "uptime",
+      "type": "Info",
+      "info": "Show the amount I've gone since my last restart.",
+      "usage": "uptime",
+      "example": "uptime",
+      "arguments": "0"
+    },
+    {
+      "name": "source",
+      "type": "Info",
+      "info": "Sends my source code on github.",
+      "usage": "source {command name}",
+      "example": "source setprefix",
+      "arguments": "0-1"
+    },
+    {
+      "name": "setmood",
+      "type": "Self",
+      "info": "Change my chat settings. **currently WIP**",
+      "usage": "setmood {number or 'random'}",
+      "example": "setmood random",
+      "arguments": "1",
+      "permissions": "MOD"
+    },
+    {
+      "name": "mute",
+      "type": "Moderation",
+      "info": "Mutes a user for a set amount of time. Muted users cannot react to or send messages.",
+      "usage": "mute {@Member or userID} {duration (minutes)} {reason}",
+      "example": "mute @Xetera 60 stop being rude to people",
+      "arguments": "3",
+      "permissions": "MOD"
+    },
+    {
+      "name": "hints",
+      "type": "Self",
+      "info": "Changes my response for when users enter an invalid command.",
+      "usage": "hints {on or off}",
+      "example": "hints off",
+      "arguments": "1",
+      "permissions": "MOD"
+    }
+  ]
 }
