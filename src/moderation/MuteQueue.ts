@@ -11,38 +11,42 @@ import {Database} from "../database/Database";
 import muteUser from "../actions/punishments/MuteUser";
 import safeBanUser from "../handlers/safe/SafeBanUser";
 import gb from "../misc/Globals";
-import {advertiseOnRaidBan} from "../interfaces/Replies";
+import {advertiseOnBan} from "../interfaces/Replies";
 import {formattedTimeString} from "../utility/Util";
 import {Offense} from "./interfaces";
+import unmuteDMEmbed from "../embeds/moderation/unmuteDMEmbed";
 
 
 class MutedMember  {
-    member : Discord.GuildMember;
-    muteQueue : MuteQueue;
     name : string;
     muteDate : Date;
-    unmuteDate : Date;
-    role : Discord.Role;
-    unmuteSeconds ?: number;
     timeout ?: Timer;
     muted : boolean;
 
-    constructor(member : Discord.GuildMember, role : Discord.Role, unmuteDate : Date, muteQueue: MuteQueue){
-        this.member = member;
+    constructor(public member : Discord.GuildMember,
+                public mutedBy: GuildMember,
+                public role : Discord.Role,
+                public unmuteDate : Date,
+                public reason: string,
+                public duration: number,
+                public muteQueue: MuteQueue){
         this.name = member.nickname || member.user.username; // this can change but we don't care
         this.muteDate = new Date();
-        this.unmuteDate = unmuteDate;
-        this.role = role;
-        this.muteQueue = muteQueue;
-        this.muted = false;
-        this.muteUser();
+
+        // we have to initialize this as true for a few seconds and set
+        // it to false later in case we weren't able to mute them
+        this.muted = true;
     }
 
-    private muteUser(){
+    public muteUser(){
         // TODO: fix this seconds only thing
-        muteUser(this.member, this.role, Offense.Spam,true).then(muted => {
-            this.muted = muted;
-        });
+        return muteUser(this.member, this.mutedBy, this.role, this.reason, this.duration).then((result) => {
+            const user = this.member.guild.members.find(user => user.id === this.member.id);
+            if (user){
+                this.muted = false;
+            }
+            return result;
+        })
     }
     public cancelUnmute(){
         if (this.timeout === undefined)
@@ -83,41 +87,51 @@ export class MuteQueue {
      * @param {GuildMember} member
      * @param {Role} role
      * @param {Date} unmuteDate
+     * @param {string | Offense} reason
      * @param {number} duration - in seconds
      */
-    public add(member : GuildMember, role : Role, unmuteDate : Date, duration?: number) : boolean {
+    public add(member : GuildMember, mutedBy: GuildMember, unmuteDate : Date, reason: string | Offense, duration?: number) : Promise<boolean> {
         let guild : MutedMember[] | undefined = this.queue.get(member.guild.id);
 
-        console.log(guild);
-        if (guild !== undefined) {
-            const muted: MutedMember | undefined = guild.find(muted=> muted.member.id === member.id);
-            if (muted) {
-                debug.info(`Tried to mute ${muted.member.user.username} but they were already muted`);
-                return false;
-            }
+        const role: Discord.Role = member.guild.roles.find('name', 'muted');
+        let mutedMember : MutedMember = new MutedMember(
+            member, mutedBy, role, unmuteDate, reason, duration ? duration : getMuteTime(), this
+        );
 
-            let mutedMember : MutedMember = new MutedMember(member, role, unmuteDate, this);
+        if (guild !== undefined) {
+            const existingUser: MutedMember | undefined = guild.find(muted=> muted.member.id === member.id);
+            if (existingUser && existingUser.muted) {
+                debug.info(`Tried to mute ${existingUser.member.user.username} but they were already muted`);
+                return Promise.resolve(false);
+            }
             // is false when we couldn't mute the user
             if (!mutedMember.muted) {
                 debug.warning(`Could not mute user ${member.user.username}`);
-                return false;
+                return Promise.resolve(false);
             }
             guild.push(mutedMember);
         }
         else {
-            let mutedMember : MutedMember = new MutedMember(member, role, unmuteDate, this);
 
             if (!mutedMember.muted){
                 debug.warning(`Could not mute user ${member.user.username}`);
-                return false;
+                return Promise.resolve(false);
             }
+
             this.queue.set(member.guild.id, [mutedMember]);
             guild = this.queue.get(member.guild.id)!;
         }
-        if (guild.length > 1)
-            this.sortGuild(member.guild.id);
-        this.scheduleUnmute(member, duration);
-        return true;
+
+        return mutedMember.muteUser().then(result => {
+            if (guild!.length > 1)
+                this.sortGuild(member.guild.id);
+            if (result){
+                gb.instance.messageQueue.removeUsersRecentMessages(member);
+                this.scheduleUnmute(member, reason, duration);
+                return true;
+            }
+            return false;
+        });
     }
 
     public getMutedUserCount(guild : Discord.Guild) : number {
@@ -169,7 +183,7 @@ export class MuteQueue {
         }
     }
 
-    public scheduleUnmute(member : Discord.GuildMember, duration?: number){
+    public scheduleUnmute(member : Discord.GuildMember, reason: string | Offense, duration?: number){
         const members : MutedMember[] | undefined  =this.queue.get(member.guild.id);
 
         if (members === undefined)
@@ -192,21 +206,24 @@ export class MuteQueue {
 
             if (!timeoutMembers)
                 return;
-            else if (!mutedGuildMember.role) {
+            else if (!mutedGuildMember.role || !mutedGuildMember.member.roles.has(mutedGuildMember.role.id)) {
                 return void debug.warning(`Tried to unmute ${mutedGuildMember.name} but they were already unmuted.\n`, "MuteQueue");
             }
-
-            mutedGuildMember.member.removeRole(mutedGuildMember.role, `End of ${timeFormat} mute.`).catch((error: Error) => {
+            const target = mutedGuildMember.member;
+            target.removeRole(mutedGuildMember.role, `End of ${timeFormat} mute.`)
+                .then(() => {
+                    debug.info(`${mutedGuildMember.name} in ${mutedGuildMember.member.guild.name} was unmuted after ${timeFormat}.`, "MuteQueue");
+                    target.send(unmuteDMEmbed(target, reason, timeFormat));
+                })
+                .catch((error: Error) => {
                 if (error instanceof DiscordAPIError){
                     return void debug.error(`Tried to unmute ${mutedGuildMember.name} but they were already unmuted.\n` + error, "MuteQueue");
                 }
                 return void debug.error(`Unexpected error while unmuting ${mutedGuildMember.name}.` + error, 'MuteQueue');
             });
-            debug.info(`${mutedGuildMember.name} in ${mutedGuildMember.member.guild.name} was unmuted after ${timeFormat}.`, "MuteQueue");
         }, timeDelta * 1000);
 
         mutedGuildMember.timeout = timeoutId;
-
     }
 
     public clearRaiders(message: Discord.Message) {
@@ -229,7 +246,7 @@ export class MuteQueue {
             }
             safeBanUser(raider.member,
                 `Mass banned by ${message.author.username}`,
-                `You were mass banned by a mod for raiding ${youTried}\n${advertiseOnRaidBan}`);
+                `You were mass banned by a mod for raiding ${youTried}\n${advertiseOnBan}`);
             raidGuild.splice(i, 1);
 
             // we also need to remove them from the database when we implement that
