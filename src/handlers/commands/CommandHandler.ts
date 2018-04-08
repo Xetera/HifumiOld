@@ -30,6 +30,14 @@ import setLogsChannel from "../../commands/config/setLogsChannel";
 import getCache from "../../commands/debug/Cache";
 import ignore from "../../commands/self/Ignore";
 import botInfo from "../../commands/info/botInfo";
+import {debug} from "../../utility/Logging";
+import {TextChannel} from "discord.js";
+import identifyMuteRole from "../../commands/config/checkChannelPermissions";
+import createMuteRole from "../../commands/config/createMuteRole";
+import muteUser from "../../commands/moderation/mute";
+import setupMutePermissions from "../../commands/config/setupMutePermissions";
+import commandNotFoundEmbed from "../../embeds/commands/commandNotFoundEmbed";
+import setHints from "../../commands/self/hints";
 
 export interface CommandParameters extends Instance {
     message: Discord.Message;
@@ -45,12 +53,6 @@ interface indexSignature {
     [method:string]: (CommandParameters);
 }
 
-export const debug = {
-    silly  : dbg('Bot:CommandHandler:Silly'),
-    info   : dbg('Bot:CommandHandler:Info'),
-    warning: dbg('Bot:CommandHandler:Warning'),
-    error  : dbg('Bot:CommandHandler:Error')
-};
 
 function isMessage(message : any) : message is Discord.Message {
     return <Discord.Message> message.content !== undefined;
@@ -76,8 +78,6 @@ export default class CommandHandler implements indexSignature {
         else
             throw new TypeError(`'${message}' is not a Message object.`);
 
-        console.log(args);
-
         let command : string | undefined = args.shift();
         if (command !== undefined) {
             command = command.substring(1);
@@ -92,7 +92,10 @@ export default class CommandHandler implements indexSignature {
         const [command, args] = CommandHandler.parseInput(message);
         if (command == '') return;
 
-        debug.info(`[${message.guild.name}]<${message.author.username}>: ${message.content}`);
+        if (message.channel instanceof TextChannel)
+            debug.info(`[${message.guild.name}]::${message.channel.name}::<${message.author.username}>: ${message.content}`, 'CommandHandler');
+        else
+            debug.error(`A non text channel command was forwarded to CommandHandler`, 'CommandHandler');
 
         const params = <CommandParameters> instance;
         params.args = args;
@@ -102,20 +105,23 @@ export default class CommandHandler implements indexSignature {
             const match = this.commands[i].toLowerCase() === command.toLowerCase() ? command : undefined;
             if (!match)
                 continue;
-
             const execution = this.commands[i];
             try {
                 return this[execution](params);
             }
             catch (error) {
-                // yeah I know this sucks
-                if (error instanceof TypeError && error.message === 'this[match] is not a function') {
-                    debug.silly(`Command ${match} does not exist.`);
-                    return;
-                }
                 debug.error(`Unexpected error while executing ${command}\n` + error.stack)
             }
         }
+        if (command === null)
+            return;
+        const hints = instance.database.getCommandHints(message.guild);
+        if (hints){
+            message.channel.send(
+                commandNotFoundEmbed(message.channel, command)
+            );
+        }
+
     }
 
     @onlyOwner
@@ -131,7 +137,7 @@ export default class CommandHandler implements indexSignature {
 
     @onlyOwner
     private eval(params: CommandParameters){
-        systemsEval(params.message, params.args)
+        systemsEval(params)
     }
 
     @onlyOwner
@@ -149,11 +155,20 @@ export default class CommandHandler implements indexSignature {
         getCache(params.message, params.database);
     }
 
+    private test(params: CommandParameters){
+        /*Testing Commands*/
+        setupMutePermissions(params.message);
+    }
     /* Admin Commands */
 
     @onlyAdmin
     private setPrefix(params: CommandParameters){
         setPrefix(params.message, params.args[0], params.database);
+    }
+
+    @onlyAdmin
+    private setup(params: CommandParameters){
+        createMuteRole(params.message);
     }
 
     /* Mod Commands */
@@ -180,6 +195,11 @@ export default class CommandHandler implements indexSignature {
     }
 
     @onlyMod
+    private mute(params: CommandParameters){
+        muteUser(params.message, params.args);
+    }
+
+    @onlyMod
     private setWelcome(params : CommandParameters){
         setWelcome(params.message, params.database);
     }
@@ -193,6 +213,10 @@ export default class CommandHandler implements indexSignature {
         echo(params.message, params.args)
     }
 
+    @onlyMod
+    private hints(params: CommandParameters){
+        setHints(params.message, params.args);
+    }
     /* Public Commands */
     private help(params: CommandParameters){
         getHelp(params.message, params.args, params.database)
