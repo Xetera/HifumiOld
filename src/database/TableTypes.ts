@@ -9,6 +9,7 @@ export interface IGuild {
     warnings_channel: string;
     logs_channel: string;
     lockdown: boolean;
+    command_hints: boolean;
 }
 
 export interface IUser {

@@ -70,11 +70,35 @@ export const upsertPrefix: Query =
     `;
 
 //language=POSTGRES-PSQL
-export const  saveGuild : Query =
+export const saveGuild : Query =
     `
     INSERT INTO guilds (id, name)
     VALUES ($1, $2)
     ON CONFLICT (id) DO UPDATE
     SET name = $2
     RETURNING *
+    `;
+
+
+//language=POSTGRES-PSQL
+export const getCommandHint : Query =
+    `
+    SELECT command_hints FROM guilds
+    WHERE id = $1
+    `;
+
+//language=POSTGRES-PSQL
+export const setCommandHint : Query =
+    `
+    UPDATE guilds SET command_hints = $1
+    WHERE id = $2
+    RETURNING command_hints
+    `;
+
+//language=POSTGRES-PSQL
+export const setInvitesAllowed : Query =
+    `
+    UPDATE guilds SET allows_invites = $1
+    WHERE id = $2
+    RETURNING allows_invites
     `;

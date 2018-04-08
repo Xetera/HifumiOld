@@ -12,6 +12,7 @@ export const defaultTableTemplates : Query[] = [
         logs_channel varchar,
         welcome_channel varchar,
         warnings_channel varchar,
+        command_hints boolean DEFAULT TRUE,
         lockdown boolean DEFAULT false
     )
     `,
@@ -22,6 +23,7 @@ export const defaultTableTemplates : Query[] = [
         guild_id varchar,
         invite_strikes int DEFAULT 0,
         ignoring boolean DEFAULT FALSE,
+        cleverbot_calls int DEFAULT 0,
         PRIMARY KEY (id, guild_id)
     )
     `,
@@ -65,6 +67,12 @@ export const defaultTableTemplates : Query[] = [
         end_date Date,
         id varchar,
         guild_id varchar
+    )`,
+    `
+    CREATE TABLE IF NOT EXISTS cleverbot(
+        guild_id varchar,
+        premium boolean DEFAULT false,
+        calls int DEFAULT 0
     )`
 ];
 
