@@ -160,6 +160,15 @@
       "example": "hints off",
       "arguments": "1",
       "permissions": "MOD"
+    },
+    {
+      "name": "invitefilter",
+      "type": "Self",
+      "info": "Changes my settings for filtering invites, mods can always send invites regardless.",
+      "usage": "invitefilter {on or off}",
+      "example": "invitefilter off",
+      "arguments": "1",
+      "permissions": "ADMIN"
     }
   ]
 }

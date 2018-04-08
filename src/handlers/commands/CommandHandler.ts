@@ -38,6 +38,7 @@ import muteUser from "../../commands/moderation/mute";
 import setupMutePermissions from "../../commands/config/setupMutePermissions";
 import commandNotFoundEmbed from "../../embeds/commands/commandNotFoundEmbed";
 import setHints from "../../commands/self/hints";
+import setInvites from "../../commands/config/setInvites";
 
 export interface CommandParameters extends Instance {
     message: Discord.Message;
@@ -121,7 +122,6 @@ export default class CommandHandler implements indexSignature {
                 commandNotFoundEmbed(message.channel, command)
             );
         }
-
     }
 
     @onlyOwner
@@ -159,8 +159,8 @@ export default class CommandHandler implements indexSignature {
         /*Testing Commands*/
         setupMutePermissions(params.message);
     }
-    /* Admin Commands */
 
+    /* Admin Commands */
     @onlyAdmin
     private setPrefix(params: CommandParameters){
         setPrefix(params.message, params.args[0], params.database);
@@ -169,6 +169,11 @@ export default class CommandHandler implements indexSignature {
     @onlyAdmin
     private setup(params: CommandParameters){
         createMuteRole(params.message);
+    }
+
+    @onlyAdmin
+    private inviteFilter(params: CommandParameters){
+        setInvites(params.message, params.args);
     }
 
     /* Mod Commands */

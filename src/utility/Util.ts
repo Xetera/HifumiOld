@@ -152,3 +152,12 @@ export function subtractArrays(first: any[], second: any[]): any[] | undefined {
     });
     return differences;
 }
+
+export function getOnOff(input: string): boolean | undefined {
+    if (input === 'on')
+        return true;
+    else if (input === 'off')
+        return false;
+    else
+        return undefined;
+}
