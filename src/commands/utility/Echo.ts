@@ -2,8 +2,9 @@ import * as Discord from 'discord.js'
 import {Message, TextChannel, VoiceChannel} from "discord.js";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import gb from "../../misc/Globals";
-import {handleFailedCommand, handleInvalidParameters} from "../../handlers/commands/invalidCommandHandler";
+import {handleInvalidParameters} from "../../handlers/commands/invalidCommandHandler";
 import hasMessagingPermissions from "../../handlers/permissions/missingPermissionsHandler";
+import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 export default function echo(message:Message, args: string[]) : void {
     if (!args.length){
         handleInvalidParameters(message.channel, `echo`);
