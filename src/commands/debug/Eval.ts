@@ -4,10 +4,16 @@ import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {codeBlock} from "../../utility/Markdown";
 import safeMessageUser from "../../handlers/safe/SafeMessageUser";
 import {debug} from "../../utility/Logging";
+import {CommandParameters} from "../../handlers/commands/CommandHandler";
 
-export default function systemsEval(message : Message, req : string[]){
+export default function systemsEval(params: CommandParameters){
+    const message = params.message;
+    const req = params.args;
+    debug.silly(`Owner ${message.author.username} called Eval in ${message.guild.name}`);
+
     if (message.author.id !== gb.ownerID)
         return;
+
     let isCodeBlock: boolean = true;
     let isDMResponse: boolean = false;
     if (req.includes('--debug')){
@@ -27,11 +33,9 @@ export default function systemsEval(message : Message, req : string[]){
         req.splice(index, 1);
     }
 
-
     let response;
-
     try {
-        response = gb.instance.eval(message, req.join(' '));
+        response = gb.instance.eval(params, message, req.join(' '));
     }
     catch (err) {
         response = err.toString();
