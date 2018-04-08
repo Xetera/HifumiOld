@@ -13,14 +13,14 @@ export default function muteDMEmbed(member: GuildMember, reason: string | Offens
     }
     return new RichEmbed()
         .setTitle(`Muted 🔇`)
-        .setThumbnail(member.user.avatarURL)
+        .setThumbnail(member.guild.iconURL)
         .setColor('#ff0000')
         // TODO: add strikes here later
         .setDescription(
-            `You were muted in \`${member.guild}\`, while muted you are forbidden from interacting with users in the guild in any way.`)
+            `You were muted in **${member.guild}**, while muted you are forbidden from interacting with users in the guild in any way.`)
+        .addField(`Duration`, formattedTimeString(duration ? duration : getMuteTime()))
         .addField(`Reason`, reasonMessage, true)
         // if we don't have a given duration then we know that it's just the default mute action duration
-        .addField(`Duration`, duration ? duration : formattedTimeString(getMuteTime()), true)
         .setFooter('Alexa')
         .setTimestamp()
 }
