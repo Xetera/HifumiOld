@@ -10,7 +10,7 @@ const debug = {
 
 export default function safeMessageUser(member: GuildMember, message : string | RichEmbed, reason ?: string, ban?: boolean) : Promise<void> {
     if (ban && !member.guild.me.hasPermission('BAN_MEMBERS')){
-        Promise.reject(`Could not message user about a ban, missing ban permissions`);
+        return Promise.reject(`Could not message user about a ban, missing ban permissions`);
         // do some logging here
     }
 
