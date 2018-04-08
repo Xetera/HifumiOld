@@ -13,6 +13,8 @@ export interface ICachedGuild {
     warnings_channel : string;
     lockdown: boolean;
     welcomeMessages: Map<userId, Message>;
+    command_hints: boolean;
+    allows_invites: boolean;
 }
 
 export function isICachedGuild(guild: any): guild is ICachedGuild {

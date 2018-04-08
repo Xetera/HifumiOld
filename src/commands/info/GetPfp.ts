@@ -1,8 +1,9 @@
 import * as Discord from 'discord.js'
 import * as dbg from "debug";
 import {getHelp} from "./help/Help";
-import {handleFailedCommand, handleInvalidParameters} from "../../handlers/commands/invalidCommandHandler";
+import {handleInvalidParameters} from "../../handlers/commands/invalidCommandHandler";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
+import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 
 export const debug = {
     silly  : dbg('Bot:PFP:Silly'),

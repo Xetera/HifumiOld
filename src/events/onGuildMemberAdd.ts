@@ -18,7 +18,7 @@ export const debug = {
 export default function onGuildMemberAdd(member : Discord.GuildMember, instance: Instance) : void {
     const database = instance.database;
     database.insertMember(member);
-
+    gb.instance.trackList.add(member);
     // we will change this later to fetch from a database instead of using a preset name
     const welcomeChannel : Channel | undefined = database.getWelcomeChannel(member.guild.id);
 

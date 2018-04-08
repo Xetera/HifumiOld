@@ -25,17 +25,15 @@ interface Message extends Discord.Message {
 function middleWare(msg: Discord.Message, instance: Instance){
     const messageQueue = instance.messageQueue;
     const alexa = instance.alexa;
-    const watchlist = instance.watchlist;
+    const watchlist = instance.trackList;
     const bot = instance.bot;
     const database = instance.database;
     //casting
     const message = <Message> msg;
     message.sent = moment(new Date()).toDate();
-
     messageQueue.add(message);
-    watchlist.auditMember(message);
     alexa.checkMessage(message, bot);
-    inviteListener(message, database, watchlist);
+    inviteListener(message, database);
 }
 
 export default function onMessage(message: Discord.Message, instance: Instance){
@@ -60,7 +58,7 @@ export default function onMessage(message: Discord.Message, instance: Instance){
     else if (database.getIgnored(message.member))
         return;
 
-    if (message.content === '.help') return getHelp(message, [], database);
+    if (message.content === '$help') return getHelp(message, [], database);
 
     else if (!message.content.startsWith(database.getPrefix(message.guild.id))) return;
 

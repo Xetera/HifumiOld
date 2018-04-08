@@ -79,9 +79,9 @@ In order of importance per topic
 - [x] Remove invite links
 - [x] Unmuting users based on security level
 - [ ] Option for mass banning muted users from a short interval
-- [ ] Save autobanned (not manually) users to a global watchlist
+- [ ] Save autobanned (not manually) users to a global trackList
 - [ ] Option to set default moderator warnings channel
-- [ ] Alert mods when users on a watchlist from another server joins
+- [ ] Alert mods when users on a trackList from another server joins
 - [ ] Blacklisted / restricted words
 - [ ] Blacklisted links
 

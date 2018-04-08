@@ -28,10 +28,11 @@ export default function onReady( instance : Instance) : Promise<string> {
         }
 
         startupTable(startupGuild);
-        return bot;
+            return bot;
         }).then((bot : Discord.Client) => {
             setGlobals(bot);
             instance.database.doPrep();
+            instance.trackList.initializeGuilds();
             return bot.user.setActivity(`out for ${gb.allMembers} users`, {
             type: 'WATCHING'
         }).then(() => {

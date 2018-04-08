@@ -4,9 +4,9 @@ import {MuteQueue} from "../moderation/MuteQueue";
 import {MessageQueue} from "../moderation/MessageQueue";
 import {Database} from "../database/Database";
 import {Environments} from "../events/systemStartup";
-import CommandHandler from "../handlers/commands/CommandHandler";
+import CommandHandler, {CommandParameters} from "../handlers/commands/CommandHandler";
 import {Message, Snowflake} from "discord.js";
-import Watchlist from "../moderation/Watchlist";
+import Tracklist from "../moderation/Tracklist";
 import {LogManager} from "../handlers/logging/logManager";
 
 export type emojiName = string;
@@ -26,8 +26,8 @@ export interface Instance {
     messageQueue: MessageQueue,
     database : Database
     commandHandler?:CommandHandler,
-    watchlist: Watchlist,
-    eval(message: Message, x : any): any
+    trackList: Tracklist,
+    eval(params: CommandParameters, message: Message, x : any): any
 }
 
 let gb : Globals = <Globals>{};

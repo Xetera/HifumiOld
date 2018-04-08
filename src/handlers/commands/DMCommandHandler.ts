@@ -1,6 +1,6 @@
 import {Instance} from "../../misc/Globals";
 import {Message} from "discord.js";
-import {debug} from "./CommandHandler";
+import {debug} from "../../utility/Logging";
 import getInvite from "../../commands/DM/getInvite";
 import getDMHelp from "../../commands/DM/DMHelp";
 

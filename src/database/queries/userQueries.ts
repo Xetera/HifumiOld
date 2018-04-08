@@ -59,3 +59,18 @@ export const insertMember : Query =
 
 export const getAllUsers : Query =
     `SELECT id, guild_id FROM users`;
+
+//language=POSTGRES-PSQL
+export const getMember : Query =
+    `
+    SELECT * FROM users WHERE guild_id = $1 AND id = $2
+    `;
+
+//language=POSTGRES-PSQL
+export const incrementCleverbotMemberCall: Query =
+    `
+    UPDATE users
+    SET cleverbot_calls = cleverbot_calls + 1 
+    WHERE guild_id = $1 AND id = $2
+    RETURNING cleverbot_calls
+    `;

@@ -3,11 +3,14 @@ import gb, {Instance} from "../misc/Globals";
 import {Client, Guild, Message} from "discord.js";
 import {debug} from '../utility/Logging'
 import {MessageQueue} from "../moderation/MessageQueue";
-import CommandHandler from "../handlers/commands/CommandHandler";
-import Watchlist from "../moderation/Watchlist";
+import CommandHandler, {CommandParameters} from "../handlers/commands/CommandHandler";
+import Tracklist from "../moderation/Tracklist";
 import {Alexa} from "../API/Alexa";
 import {MuteQueue} from "../moderation/MuteQueue";
 import {LogManager} from "../handlers/logging/logManager";
+import {default as catchUncaughtExceptions} from '../handlers/process/uncaughtException'
+import {catchSigterm} from '../handlers/process/sigterm'
+import {default as catchUnhandledRejections} from '../handlers/process/unhandledRejection'
 
 export enum Environments {
     Development,
@@ -90,8 +93,8 @@ export function createInstance(BOT_TOKEN: string, CLEVERBOT_TOKEN: string, DATAB
     let alexa = new Alexa(CLEVERBOT_TOKEN);
     let database = new Database(DATABASE_CONFIG, bot);
     let muteQueue = new MuteQueue();
-    let watchlist = new Watchlist();
-    let messageQueue = new MessageQueue(muteQueue, database, watchlist);
+    let tracklist = new Tracklist();
+    let messageQueue = new MessageQueue(muteQueue, database, tracklist);
     let commandHandler = new CommandHandler();
     return {
         bot: bot,
@@ -100,8 +103,14 @@ export function createInstance(BOT_TOKEN: string, CLEVERBOT_TOKEN: string, DATAB
         database: database,
         messageQueue: messageQueue,
         commandHandler:commandHandler,
-        watchlist: watchlist,
+        trackList: tracklist,
         // this is to be able to eval through the context of all the instances
-        eval: (message: Message, x : any) => eval(x)
+        eval: (params: CommandParameters, message: Message, x : any) => eval(x)
     }
+}
+
+export function setupProcess(){
+    catchUncaughtExceptions();
+    catchUnhandledRejections();
+    catchSigterm();
 }

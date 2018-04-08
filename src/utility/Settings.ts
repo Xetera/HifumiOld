@@ -72,9 +72,9 @@ export function getBulkDeleteCount() : number {
 }
 
 // in seconds
-const DANGEROUS_DURATION : number = 0;
-const MEDIUM_DURATION    : number = 15 * 60;
-const HIGH_DURATION      : number = 30 * 60;
+const MUTE_TIME_DANGEROUS : number = 0;
+const MUTE_TIME_MEDIUM    : number = 15 * 60;
+const MUTE_TIME_HIGH      : number = 30 * 60;
 
 export function getMuteDate() : Date {
     switch(securityLevel) {
@@ -82,30 +82,36 @@ export function getMuteDate() : Date {
             return Moment(Date.now()).toDate();
         }
         case SecurityLevels.Medium: {
-            const date : Date = Moment(new Date()).add(MEDIUM_DURATION, 's').toDate();
+            const date : Date = Moment(new Date()).add(MUTE_TIME_MEDIUM, 's').toDate();
             return date;// 5 sec
         }
         case SecurityLevels.High: {
-            return Moment(new Date()).add(HIGH_DURATION, 's').toDate(); // update later
+            return Moment(new Date()).add(MUTE_TIME_HIGH, 's').toDate(); // update later
         }
     }
 }
 
-export function getMuteTime() : number /* seconds */ {
+/* seconds */
+export function getMuteTime() : number  {
     switch(securityLevel) {
         case SecurityLevels.Dangerous: {
-            return DANGEROUS_DURATION;
+            return MUTE_TIME_DANGEROUS;
         }
         case SecurityLevels.Medium: {
-            return MEDIUM_DURATION;
+            return MUTE_TIME_MEDIUM;
         }
         case SecurityLevels.High: {
-            return HIGH_DURATION;
+            return MUTE_TIME_HIGH;
         }
     }
 }
 
-export function getMemberTrackDuration() : Date | undefined {
+const MEMBER_TRACKING_DANGEROUS  = 0;
+const MEMBER_TRACKING_MEDIUM = 5 * 60;
+const MEMBER_TRACKING_HIGH  = 15 * 60;
+
+// in seconds
+export function getMemberTrackDate() : Date | undefined {
     switch(securityLevel) {
         case SecurityLevels.Dangerous: {
             return undefined;
@@ -115,6 +121,20 @@ export function getMemberTrackDuration() : Date | undefined {
         }
         case SecurityLevels.High: {
             return Moment(new Date()).add(15, 'm').toDate();
+        }
+    }
+}
+export const commandEmbedColor = '#FFE5B4';
+export function getMemberTrackDuration(): number {
+    switch(securityLevel) {
+        case SecurityLevels.Dangerous: {
+            return MEMBER_TRACKING_DANGEROUS;
+        }
+        case SecurityLevels.Medium: {
+            return MEMBER_TRACKING_MEDIUM;
+        }
+        case SecurityLevels.High: {
+            return MEMBER_TRACKING_HIGH
         }
     }
 }

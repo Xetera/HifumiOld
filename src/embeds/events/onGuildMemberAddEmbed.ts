@@ -4,7 +4,6 @@ export default function guildMemberAddEmbed(member: GuildMember, welcomeMessage:
     return new Discord.RichEmbed()
         .setThumbnail(member.user.displayAvatarURL)
         .setColor("GREEN")
-        .setTitle(`${member.user.username} has joined the server!`)
-        .setDescription(welcomeMessage)
+        .addField(`${member.user.username} has joined the server!`, welcomeMessage)
         .setTimestamp()
 }

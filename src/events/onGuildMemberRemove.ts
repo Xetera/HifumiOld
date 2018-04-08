@@ -18,11 +18,15 @@ export default  function onGuildMemberRemove(member : Discord.GuildMember) {
         return logs.entries.first().action === 'MEMBER_BAN_ADD';
     }).then((isBan: boolean) => {
         const welcomeMessage: Message | undefined = gb.instance.database.uncacheWelcomeMessage(member);
-        if (!welcomeMessage)
-            return void debug.error(`Could not delete the message for user ${member.user.username}`);
-        safeDeleteMessage(welcomeMessage);
+        if (!welcomeMessage) {
+            debug.error(`Could not delete the message for user ${member.user.username}`);
+        }
+        else {
+            safeDeleteMessage(welcomeMessage);
+        }
 
-        if (isBan) return;
+        if (isBan)
+            return;
         LogManager.logMemberLeave(member);
     })
 }

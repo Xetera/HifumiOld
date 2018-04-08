@@ -9,15 +9,23 @@ import * as pgPromise from 'pg-promise'
 import {debug} from '../utility/Logging'
 import {ICachedGuild, ICachedUser, userId} from "./interface";
 import {
-    changeInviteSetting, changeLockdownStatus, getGuild, getMemberInviteStrikes, saveGuild, updateLogsChannel,
+    changeInviteSetting,
+    changeLockdownStatus,
+    getCommandHint,
+    getGuild,
+    getMemberInviteStrikes,
+    saveGuild, setCommandHint, setInvitesAllowed,
+    updateLogsChannel,
     updateWelcomeChannel,
     upsertPrefix
 } from "./queries/guildQueries";
 import {
-    cleanAllGuildMembers, getAllMembers, incrementMemberInviteStrikes, insertMember,
+    cleanAllGuildMembers, getAllMembers, getMember, incrementCleverbotMemberCall, incrementMemberInviteStrikes,
+    insertMember,
     saveMember, setIgnored
 } from "./queries/userQueries";
 import gb from "../misc/Globals";
+import {incrementCleverbotGuildCall, inserCleverbotGuild} from "./queries/cleverbotQueries";
 
 
 
@@ -101,7 +109,6 @@ export class Database {
         return this.db.task(t => {
             const queries: Query[] = [];
             for (let guild of guilds) {
-                const members : GuildMember[] = guild.members.array();
                 guild.members.forEach( (member) => {
                     const id = member.id;
                     const name = member.user.username;
@@ -131,6 +138,7 @@ export class Database {
                 // TODO: Theres a lot of repetition in this part, make sure we cut this down
                 // TODO: To a less indented, more efficient version
                 const whitelistedInvites = await this.db.any(getWhitelistedInvites, [guild.id]);
+
                 if (whitelistedInvites.length > 0)
                     cachedGuild.whitelisted_invites = whitelistedInvites.map(item => item.link);
 
@@ -138,7 +146,9 @@ export class Database {
                 this.db.oneOrNone(getGuild, [guild.id]).then((item : ICachedGuild)=> {
                     cachedGuild!.welcome_channel = item.welcome_channel;
                     cachedGuild!.logs_channel = item.logs_channel;
-                    cachedGuild!.warnings_channel = item.warnings_channel
+                    cachedGuild!.warnings_channel = item.warnings_channel;
+                    cachedGuild!.command_hints = item.command_hints;
+                    cachedGuild!.allows_invites = item.allows_invites;
                 });
 
                 cachedGuild.prefix  = guild.prefix;
@@ -215,6 +225,12 @@ export class Database {
         const guild_id = member.guild.id;
         this.initializeGuildIfNone(member.guild.id);
         const guild = this.guilds.get(member.guild.id)!;
+
+        this.db.oneOrNone(getMember, [member.guild.id, member.id]).then((res: IUser | undefined) => {
+            if (!res)
+                return this.db.one(insertMember, [id, username, guild_id]);
+        });
+
         // checking if we already cached a user
         if (!guild.users.find(prop => prop.id === member.id)) {
             guild.users.push({
@@ -223,9 +239,6 @@ export class Database {
                 ignoring: false
             });
 
-            return this.db.one(insertMember, [id, username, guild_id]).then((res: IUser) => {
-                return; // nothing for now
-            });
         }
     }
 
@@ -388,5 +401,53 @@ export class Database {
 
     public getRaidStatus(guild : Guild)  {
 
+    }
+
+    public incrementCleverbotCall(member: GuildMember){
+        const guildId = member.guild.id;
+        this.db.one(incrementCleverbotGuildCall,  [guildId]);
+        this.db.one(incrementCleverbotMemberCall, [guildId, member.id]);
+    }
+
+    public restockCleverbot(){
+        const guilds = gb.instance.bot.guilds.array();
+        for (let i in guilds){
+            this.db.one(inserCleverbotGuild, [guilds[i].id, false, 0])
+        }
+    }
+
+    public getCommandHints(guild: Guild): boolean{
+        const target = this.guilds.get(guild.id);
+        if (target && target.command_hints !== undefined)
+            return target.command_hints;
+        return true;
+    }
+    public setCommandHints(guild: Guild, state: boolean) {
+        const cached = this.guilds.get(guild.id);
+        return this.db.one(setCommandHint, [state, guild.id]).then((res: IGuild)=> {
+            if (cached){
+                cached.command_hints = res.command_hints;
+            }
+            return res.command_hints;
+        })
+    }
+
+    public getInvitesAllowed(guild: Guild): boolean {
+        const target = this.guilds.get(guild.id);
+        if (!target){
+            debug.error(`Could not get allowed_invites for guild ${guild.id}`);
+            return false;
+        }
+        return target.allows_invites;
+    }
+
+    public setInvitesAllowed(guild: Guild, state: boolean) {
+        const cached = this.guilds.get(guild.id);
+        return this.db.one(setInvitesAllowed, [state, guild.id]).then((res: IGuild) => {
+            if (cached){
+                cached.allows_invites = res.allows_invites;
+            }
+            return res.allows_invites;
+        })
     }
 }
