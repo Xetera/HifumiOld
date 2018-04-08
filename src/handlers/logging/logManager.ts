@@ -18,8 +18,13 @@ import logWatchlistInviteBanEmbed from "../../embeds/logging/tracklist/logTrackl
 
 // static channel
 export class LogManager {
-    public static logWarning(guild: Guild, message: string, extra?: string){
-        
+
+
+    private static logWarning(){
+
+    }
+    private static waitForAuditLogs(func: () => any){
+        setTimeout(() => func(), 500);
     }
 
     private static logToGuild(guild: Guild, embed: RichEmbed|string, action?: string){
@@ -34,8 +39,8 @@ export class LogManager {
         return void debug.error(`Log channel for ${guild.name} was not recorded as TextChanel.`, 'LogManager');
     }
 
-    public static logMutedUser(member: GuildMember){
-        LogManager.logToGuild(member.guild, logMutedEmbed(member), 'mute');
+    public static logMutedUser(member: GuildMember, mutedBy: GuildMember, reason: string, duration: number){
+        LogManager.logToGuild(member.guild, logMutedEmbed(member, mutedBy, reason, duration), 'mute');
     }
 
     public static logMemberJoin(member: GuildMember){
@@ -47,12 +52,16 @@ export class LogManager {
     }
 
     public static logBan(guild:Guild, member: User){
-        guild.fetchAuditLogs().then(audit => {
-            const banReason = audit.entries.first().reason;
-            if (banReason.indexOf('<TRACKED>') >= 0)
-                return; // this is a tracked member ban, we don't want to log it normally
-            LogManager.logToGuild(guild, logBanEmbed(member, banReason), 'member ban')
-        });
+        // race condition but audit log should be winning 99% of the time
+        LogManager.waitForAuditLogs(() => {
+            guild.fetchAuditLogs().then(audit => {
+                const entry = audit.entries.first();
+                if (entry.reason && entry.reason.indexOf('<TRACKED>') >= 0)
+                    return; // this is a tracked member ban, we don't want to log it normally
+                LogManager.logToGuild(guild, logBanEmbed(member, entry.reason, entry.executor), 'member ban')
+            });
+        })
+
     }
 
     public static logTrackedBan(guild: Guild, member: User, offense: Offense){
@@ -63,16 +72,18 @@ export class LogManager {
     }
 
     public static logUnban(guild:Guild, user: User){
-        guild.fetchAuditLogs().then(audit => {
-            const auditEntries = audit.entries;
-            const unbanningStaff: User = auditEntries.first().executor;
-            const originalBan: GuildAuditLogsEntry | undefined = auditEntries.array().find(entry =>
-                entry.target === user && entry.action === 'MEMBER_BAN_ADD'
-            );
-            if (!originalBan)
-                return void debug.error(`Could not find the original ban reason for unbanned member in ${guild.name}`);
-            const banningStaff: User = originalBan.executor;
-            LogManager.logToGuild(guild, logUnbanEmbed(user, unbanningStaff, banningStaff, originalBan.reason), 'member unban');
+        LogManager.waitForAuditLogs(() => {
+            guild.fetchAuditLogs().then(audit => {
+                const auditEntries = audit.entries;
+                const unbanningStaff: User = auditEntries.first().executor;
+                const originalBan: GuildAuditLogsEntry | undefined = auditEntries.array().find(entry =>
+                    entry.target === user && entry.action === 'MEMBER_BAN_ADD'
+                );
+                if (!originalBan)
+                    return void debug.error(`Could not find the original ban reason for unbanned member in ${guild.name}`);
+                const banningStaff: User = originalBan.executor;
+                LogManager.logToGuild(guild, logUnbanEmbed(user, unbanningStaff, banningStaff, originalBan.reason), 'member unban');
+            });
         });
     }
 
@@ -80,20 +91,25 @@ export class LogManager {
         if (!(channel instanceof TextChannel) && !(channel instanceof VoiceChannel))
             return void debug.warning(`New channel was created with the type ${channel.type}`);
 
-        channel.guild.fetchAuditLogs().then(audit => {
-            const creator = audit.entries.first().executor;
-            LogManager.logToGuild(channel.guild, logChannelCreateEmbed(channel, creator, channel.name), 'channel create');
-        });
+        LogManager.waitForAuditLogs(() => {
+            channel.guild.fetchAuditLogs().then(audit => {
+                const creator = audit.entries.first().executor;
+                LogManager.logToGuild(channel.guild, logChannelCreateEmbed(channel, creator, channel.name), 'channel create');
+            });
+        })
     }
 
     public static logChannelDelete(channel: Channel){
         if (!(channel instanceof TextChannel) && !(channel instanceof VoiceChannel))
             return;
 
-        channel.guild.fetchAuditLogs().then(audit => {
-            const creator = audit.entries.first().executor;
-            LogManager.logToGuild(channel.guild, logChannelDeleteEmbed(channel, creator, channel.name), 'channel delete');
+        LogManager.waitForAuditLogs(() => {
+            channel.guild.fetchAuditLogs().then(audit => {
+                const creator = audit.entries.first().executor;
+                LogManager.logToGuild(channel.guild, logChannelDeleteEmbed(channel, creator, channel.name), 'channel delete');
+            });
         });
+
     }
     /**
      *
