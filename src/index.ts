@@ -1,6 +1,10 @@
-import {createInstance, getDatabaseConnection, getEnvironmentSettings, getTokens} from "./events/systemStartup";
+import {
+    createInstance, getDatabaseConnection, getEnvironmentSettings, getTokens,
+    setupProcess
+} from "./events/systemStartup";
 import gb from './misc/Globals';
 
+setupProcess();
 gb.ENV  = getEnvironmentSettings();
 
 // lol @ me passing in "global" variables
@@ -16,12 +20,13 @@ import onGuildMemberAdd from "./events/onGuildMemberAdd";
 import onGuildMemberRemove from "./events/onGuildMemberRemove";
 import onGuildCreate from "./events/onGuildCreate";
 import * as Discord from 'discord.js'
-import onChannelCreate from "./events/onChannelCreate";
 import updatePresence from "./actions/UpdatePresence";
 import onMessageUpdate from "./events/onMessageUpdate";
 import onGuildMemberUpdate from "./events/onGuildMemberUpdate";
 import onGuildUpdate from "./events/onGuildUpdate";
 import {LogManager} from "./handlers/logging/logManager";
+import onChannelCreate from "./events/onChannelCreate";
+import onChannelDelete from "./events/onChannelDelete";
 
 
 const instance = createInstance(BOT_TOKEN, CLEVERBOT_TOKEN, DATABASE_CONFIG);
@@ -85,5 +90,9 @@ instance.bot.on('guildBanRemove', (guild:Discord.Guild, member: Discord.User) =>
 
 // === === === === CHANNEL === === === === === //
 instance.bot.on('channelCreate', function(channel :Discord.Channel){
-    onChannelCreate(channel);
+    onChannelCreate(channel)
+});
+
+instance.bot.on('channelDelete', function(channel :Discord.Channel){
+    onChannelDelete(channel);
 });

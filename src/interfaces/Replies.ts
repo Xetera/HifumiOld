@@ -1,16 +1,7 @@
-import {Guild} from "discord.js";
 import {random} from "../utility/Util";
 import getInvite from "../commands/DM/getInvite";
-import gb from "../misc/Globals";
-import {errors} from "pg-promise";
-import {underline} from "../utility/Markdown";
 
 export const adminOnlyCommand : string = 'This command is only available to admins.';
-
-export function bannedForSpammingInvites(guild : Guild) : string {
-    return `I went ahead and banned you for spamming invites in `+
-    `'${guild.name}', advertising isn't allowed, sorry.`;
-}
 
 export const welcomeMessages = [
     'You must be new around here kid...',
@@ -24,18 +15,11 @@ export const welcomeMessages = [
     'Why hello, what brings you here, friend?'
 ];
 
-export const onNewGuildJoin =
-    'I\'m here to help with baddies on your server and keep things nice and tidy.\n' +
-    'You can also talk to me when you\'re bored by just calling my name! That\'s how you humans normally do it... right?';
-
-export const lackingOwnerPermissions =
-    '_Laughing hysterically_ oh god, I can\'t believe you thought I\'d let you do that.';
-
 export function randomRuntimeError() : string {
     return random(runtimeErrorResponses);
 }
 
-export function advertiseOnRaidBan(): string {
+export function advertiseOnBan(): string {
     return `Want to protect your own server from people like yourself? **Invite me!**\n${getInvite()}`;
 }
 
