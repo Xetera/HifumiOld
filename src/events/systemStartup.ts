@@ -112,5 +112,5 @@ export function createInstance(BOT_TOKEN: string, CLEVERBOT_TOKEN: string, DATAB
 export function setupProcess(){
     catchUncaughtExceptions();
     catchUnhandledRejections();
-    catchSigterm();
+    catchSigterm(true);
 }
