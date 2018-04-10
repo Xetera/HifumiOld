@@ -56,12 +56,6 @@ export const defaultTableTemplates : Query[] = [
         lockdowns int
     )`,
     `
-    CREATE TABLE IF NOT EXISTS watch_list(
-        id varchar,
-        bans int,
-        reason varchar
-    )`,
-    `
     CREATE TABLE IF NOT EXISTS muted_users(
         start_date Date,
         end_date Date,
@@ -73,6 +67,26 @@ export const defaultTableTemplates : Query[] = [
         guild_id varchar,
         premium boolean DEFAULT false,
         calls int DEFAULT 0
+    )`,
+    `
+    CREATE TABLE IF NOT EXISTS notes(
+        note_id SERIAL PRIMARY KEY,
+        guild_id varchar,
+        user_id varchar,
+        staff_id varchar,
+        staff_name varchar,
+        note_date date,
+        note_content varchar
+    )`, // staff_name is fallback for when we can't use staff_id to resolve members
+    `
+    CREATE TABLE IF NOT EXISTS watchlist(
+        user_id varchar,
+        guild_id varchar,
+        guild_name varchar,
+        ban_reason varchar,
+        join_date date,
+        ban_date date,
+        PRIMARY KEY (user_id, guild_id)
     )`
 ];
 

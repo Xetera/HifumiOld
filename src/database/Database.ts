@@ -4,7 +4,7 @@ import {
 import {IDatabase, IMain, IOptions, ITask, TQuery} from 'pg-promise'
 import {defaultTableTemplates, getPrefixes, testQuery} from "./queries/QueryTemplates";
 import {Channel, Client, Collection, Guild, GuildMember, Message, TextChannel} from "discord.js";
-import {IGuild, IUser} from "./TableTypes";
+import {IGuild, INote, IUser} from "./TableTypes";
 import * as pgPromise from 'pg-promise'
 import {debug} from '../utility/Logging'
 import {ICachedGuild, ICachedUser, userId} from "./interface";
@@ -26,6 +26,7 @@ import {
 } from "./queries/userQueries";
 import gb from "../misc/Globals";
 import {incrementCleverbotGuildCall, inserCleverbotGuild} from "./queries/cleverbotQueries";
+import {addNote, getNotes, safeDeleteNote} from "./queries/noteQueries";
 
 
 
@@ -448,6 +449,28 @@ export class Database {
                 cached.allows_invites = res.allows_invites;
             }
             return res.allows_invites;
+        })
+    }
+
+    public addNote(guild: Guild, caller: GuildMember, target: GuildMember, note: string){
+        return this.db.oneOrNone(addNote, [guild.id, target.id, caller.id, caller.user.username, new Date(), note]).then(resp => {
+            return resp.note_content;
+        }).catch(error => {
+            return Promise.reject(error);
+        })
+    }
+
+    public getNotes(targetId: string, guildId: string){
+        // we want users to be able to retrieve old message info as well
+        // that's why we're being inconsistent and using string instead of GuildMember
+        return this.db.manyOrNone(getNotes, [guildId, targetId]).then((res: INote[]) => {
+            return res;
+        })
+    }
+
+    public deleteNoteFromGuild(noteId: string, guildId: string){
+        return this.db.oneOrNone(safeDeleteNote, [noteId, guildId]).then(res => {
+            return res;
         })
     }
 }

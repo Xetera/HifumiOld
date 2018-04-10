@@ -39,11 +39,31 @@ export interface ITrackedUser {
 
 export interface IStats {
     guilds: number;
-    users_banned: number,
-    users_muted: number,
-    spam_deleted: number,
+    users_banned: number;
+    users_muted: number;
+    spam_deleted: number;
     lockdown: number;
 }
+
+export interface INote {
+    note_id: number;
+    guild_id: string;
+    user_id: string;
+    staff_id: string;
+    staff_name: string;
+    note_date: Date;
+    note_content: string;
+}
+
+export interface IWatchlist {
+    user_id: string;
+    guild_id: string;
+    guild_name: string;
+    ban_reason: string;
+    join_date: Date;
+    ban_date: Date;
+}
+
 export function isTrackedUser(object: any) : object is ITrackedUser {
     return 'join_date' in object;
 }
