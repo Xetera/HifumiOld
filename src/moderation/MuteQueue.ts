@@ -134,6 +134,21 @@ export class MuteQueue {
         });
     }
 
+    public getMutedUsers(guild: Guild){
+        const targetGuild: MutedMember[] | undefined = this.queue.get(guild.id);
+        if (!targetGuild){
+            return undefined;
+        }
+        let out = '';
+        for (let user in  targetGuild){
+            out += `${targetGuild[user].name}: ${targetGuild[user].muteDate}`;
+        }
+        if (out === ''){
+            out = `No users muted`;
+        }
+        return out;
+    }
+
     public getMutedUserCount(guild : Discord.Guild) : number {
         const members : MutedMember[] | undefined = this.queue.get(guild.id);
         if (members !== undefined)

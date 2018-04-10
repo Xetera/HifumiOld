@@ -21,7 +21,7 @@ export class LogManager {
 
 
     private static logWarning(){
-        
+
     }
     private static waitForAuditLogs(func: () => any){
         setTimeout(() => func(), 500);

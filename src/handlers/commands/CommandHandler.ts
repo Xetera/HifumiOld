@@ -13,7 +13,7 @@ import ch from "../../commands/fun/CyanideAndHappiness";
 import {getHelp} from "../../commands/info/help/Help";
 import serverInfo from "../../commands/info/ServerInfo";
 import echo from "../../commands/utility/Echo";
-import {Instance} from "../../misc/Globals";
+import gb, {Instance} from "../../misc/Globals";
 import onlyAdmin from "../permissions/decorators/onlyAdmin";
 import {Alexa} from "../../API/Alexa";
 import {MuteQueue} from "../../moderation/MuteQueue";
@@ -39,6 +39,10 @@ import setupMutePermissions from "../../commands/config/setupMutePermissions";
 import commandNotFoundEmbed from "../../embeds/commands/commandNotFoundEmbed";
 import setHints from "../../commands/self/hints";
 import setInvites from "../../commands/config/setInvites";
+import getMuted from "../../commands/moderation/getMuted";
+import setNote from "../../commands/moderation/setNote";
+import getHistory from "../../commands/moderation/history";
+import deleteNote from "../../commands/moderation/deleteNote";
 
 export interface CommandParameters extends Instance {
     message: Discord.Message;
@@ -107,6 +111,7 @@ export default class CommandHandler implements indexSignature {
             if (!match)
                 continue;
             const execution = this.commands[i];
+            message.react(gb.emojis.get('alexa_ack')!);
             try {
                 return this[execution](params);
             }
@@ -155,6 +160,7 @@ export default class CommandHandler implements indexSignature {
         getCache(params.message, params.database);
     }
 
+    @onlyOwner
     private test(params: CommandParameters){
         /*Testing Commands*/
         setupMutePermissions(params.message);
@@ -221,6 +227,26 @@ export default class CommandHandler implements indexSignature {
     @onlyMod
     private hints(params: CommandParameters){
         setHints(params.message, params.args);
+    }
+
+    @onlyMod
+    private mutedUsers(params: CommandParameters){
+        getMuted(params.message);
+    }
+
+    @onlyMod
+    private note(params: CommandParameters){
+        setNote(params.message, params.args);
+    }
+
+    @onlyMod
+    private deleteNote(params: CommandParameters){
+        deleteNote(params.message, params.args);
+    }
+
+    @onlyMod
+    public history(params: CommandParameters){
+        getHistory(params.message, params.args);
     }
     /* Public Commands */
     private help(params: CommandParameters){
