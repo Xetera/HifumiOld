@@ -169,6 +169,33 @@
       "example": "invitefilter off",
       "arguments": "1",
       "permissions": "ADMIN"
+    },
+    {
+      "name": "note",
+      "type": "Moderation",
+      "info": "Adds a note to a user. All user information including notes can be looked up by mods.",
+      "usage": "note {@Member or userID} {message}",
+      "example": "note @Xetera keeps sending pepe memes, ban them next time.",
+      "arguments": "2",
+      "permissions": "MOD"
+    },
+    {
+      "name": "deletenote",
+      "type": "Moderation",
+      "info": "Deletes a user note by ID.",
+      "usage": "deletenote {note ID}",
+      "example": "deletenote 420",
+      "arguments": "1",
+      "permissions": "MOD"
+    },
+    {
+      "name": "history",
+      "type": "Moderation",
+      "info": "Fetches the history of a user including things like infractions, notes, join date and watchlist status.",
+      "usage": "history {@Member or userID or username or nickname}",
+      "example": "history Xetera",
+      "arguments": "1",
+      "permissions": "MOD"
     }
   ]
 }
