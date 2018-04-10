@@ -10,7 +10,7 @@ import {handleInvalidParameters} from "../../handlers/commands/invalidCommandHan
  * @param {Message} message
  * @param {string[]} args
  */
-export default function muteUser(message: Message, args: string[]) {
+export default async function muteUser(message: Message, args: string[]) {
     if (args.length <3){
         return void handleInvalidParameters(message.channel, 'mute');
     }
@@ -31,12 +31,19 @@ export default function muteUser(message: Message, args: string[]) {
     }
     const durationInput = args.shift()!;
     const duration = Number(durationInput);
+
     // edge cases
     if (duration == 0 || typeof duration !== 'number' || isNaN(duration)) {
         return void message.channel.send(handleFailedCommand(
             message.channel, `Got ${durationInput} when I was expecting a number in minutes.`
         ))
     }
+    else if(duration > 24 * 60){
+        return void message.channel.send(handleFailedCommand(
+            message.channel, `I currently can't mute people for longer than 1 day.`
+        ));
+    }
+    const placeholder = <Message> await message.channel.send(`Working on it...`);
     const reason = args.join(' ');
 
     const unmuteDate = moment(new Date()).add(duration, 'm').toDate();
@@ -47,6 +54,8 @@ export default function muteUser(message: Message, args: string[]) {
         unmuteDate,
         reason,
         duration * 60 /* duration is in seconds */
-    );
-
+    ).then(res => {
+        console.log(res);
+        return placeholder.edit(`Muted ${member.user.username} for ${formattedTimeString(duration)}`);
+    }).then(x => x.delete(30000));
 }
