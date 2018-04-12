@@ -3,6 +3,7 @@ import {Channel, Message, TextChannel} from "discord.js";
 import {runtimeErrorResponses} from "../../interfaces/Replies";
 import {random} from "../../utility/Util";
 import {debug} from '../../utility/Logging'
+import setConfigChannelEmbed from "../../embeds/commands/configEmbed/setConfigChannelEmbed";
 
 export default function setWelcome(message : Message, db : Database){
     const channel = message.channel;
@@ -12,7 +13,7 @@ export default function setWelcome(message : Message, db : Database){
             const returnedChannel: Channel = channel.guild.channels.find('id', channelId);
 
             if (returnedChannel instanceof TextChannel){
-                channel.send(`Set ${returnedChannel} as default channel.`);
+                channel.send(setConfigChannelEmbed(message.channel, 'welcome'));
             }
         }).catch(err => {
             debug.error(`Error while trying to set welcome channel\n` + err, 'setWelcomeChannel');

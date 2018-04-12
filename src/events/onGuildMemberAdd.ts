@@ -23,7 +23,7 @@ export default function onGuildMemberAdd(member : Discord.GuildMember, instance:
     const welcomeChannel : Channel | undefined = database.getWelcomeChannel(member.guild.id);
 
     const identifier     : string = member.user.bot ? 'A new bot' : 'A new human';
-    const welcomeMessage : string = random(welcomeMessages);
+    const welcomeMessage : string = random(welcomeMessages(member));
 
     if (welcomeChannel === undefined) {
         return debug.info(`Could not send a member join message to ${member.guild.name} `+

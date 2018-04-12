@@ -4,6 +4,7 @@ import {runtimeErrorResponses} from "../../interfaces/Replies";
 import {random} from "../../utility/Util";
 import {debug} from '../../utility/Logging'
 import hasMessagingPermissions from "../../handlers/permissions/missingPermissionsHandler";
+import setConfigChannelEmbed from "../../embeds/commands/configEmbed/setConfigChannelEmbed";
 
 export default function setLogsChannel(message: Message, db: Database){
     const channel = message.channel;
@@ -13,7 +14,7 @@ export default function setLogsChannel(message: Message, db: Database){
 
         db.updateLogsChannel(guildId, channel.id).then((channelId : string) => {
             if (returnedChannel instanceof TextChannel){
-                channel.send(`Set ${returnedChannel} as the default logging channel.`);
+                channel.send(setConfigChannelEmbed(message.channel, 'logs'));
             }
         }).catch(err => {
             debug.error(`Error while trying to set logs channel\n` + err, 'setWelcomeChannel');
