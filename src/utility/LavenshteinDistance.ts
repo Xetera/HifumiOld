@@ -1,6 +1,6 @@
-import {Command} from "../commands/info/help/interface";
+import {Command, Help} from "../commands/info/help/interface";
 
-const help = require('../commands/help.json');
+const help: Help = require('../commands/help.json');
 
 // No idea how this works, copy pasted from somewhere, god bless
 function getEditDistance(a: string, b: string): number
@@ -52,16 +52,15 @@ interface DistanceType {
     distance: number;
 }
 
-export default function lavenshteinDistance(input: string): string {
+export default function lavenshteinDistance(input: string, pool: string[] = help.commands.map(c => c.name)): string {
     if (input.length > 15)
         return 'to spam me like some kind of dummy';
 
-    const commands = help.commands;
-    let editDistances = commands.reduce((obj: DistanceType[], current: Command) => {
-        let commandEditDistance = getEditDistance(input, current.name);
-
+    const commands: string[] = pool;
+    let editDistances = commands.reduce((obj: DistanceType[], name: string) => {
+        let commandEditDistance = getEditDistance(input, name);
         obj.push({
-            name: current.name,
+            name: name,
             distance: commandEditDistance
         });
         return obj;

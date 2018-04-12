@@ -6,9 +6,10 @@ export function handleFailedCommand(channel: Channel, message : string){
 
     let embed = new RichEmbed()
         .setColor('#ff1513')
-        .setTitle(`Something went wrong`)
+        .setTitle(`Something went wrong!`)
         .setDescription(out);
-    if (message !== out){
+    if (out.indexOf('`@`everyone') >= 0){
+        // in case we're
         embed.setFooter(`Nice try btw`)
     }
     if (channel instanceof TextChannel)
