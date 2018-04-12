@@ -5,7 +5,7 @@ import {random} from "../../utility/Util";
 import {debug} from '../../utility/Logging'
 import hasMessagingPermissions from "../../handlers/permissions/missingPermissionsHandler";
 
-export default function setLogsChannel(message : Message, db : Database){
+export default function setLogsChannel(message: Message, db: Database){
     const channel = message.channel;
     const guildId = message.guild.id;
     if (channel instanceof TextChannel){

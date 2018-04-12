@@ -130,10 +130,10 @@ export function formattedTimeString(sec: number): string{
     const days= currentUptime.d;
 
     return `${days 
-        ? days.toFixed(0) + 'd' : ''} ${hours 
-        ? hours.toFixed(0) + 'h' : ''} ${minutes 
+        ?    days.toFixed(0) + 'd' : ''} ${hours 
+        ?   hours.toFixed(0) + 'h' : ''} ${minutes 
         ? minutes.toFixed(0) + 'm' : ''} ${seconds 
-        ? seconds.toFixed(0) + 's' : ''}`.trim();
+        ? seconds.toFixed(0) + 's' : ''}`.replace(/  +/g, ' ');
 }
 
 export function sanitizeUserInput(input: string){
