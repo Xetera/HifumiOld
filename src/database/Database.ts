@@ -2,9 +2,9 @@ import {
     getWhitelistedInvites,
 } from "./queries/PreparedStatements";
 import {IDatabase, IMain, IOptions, ITask, TQuery} from 'pg-promise'
-import {defaultTableTemplates, getPrefixes, testQuery} from "./queries/QueryTemplates";
+import {defaultTableTemplates, getPrefixes, testQuery} from "./queries/tableTemplates";
 import {Channel, Client, Collection, Guild, GuildMember, Message, TextChannel} from "discord.js";
-import {IGuild, INote, IUser} from "./TableTypes";
+import {ICachedMacro, IGuild, IMacro, INote, IUser} from "./TableTypes";
 import * as pgPromise from 'pg-promise'
 import {debug} from '../utility/Logging'
 import {ICachedGuild, ICachedUser, userId} from "./interface";
@@ -15,7 +15,7 @@ import {
     getGuild,
     getMemberInviteStrikes,
     saveGuild, setCommandHint, setInvitesAllowed,
-    updateLogsChannel,
+    updateLogsChannel, updateWarningsChannel,
     updateWelcomeChannel,
     upsertPrefix
 } from "./queries/guildQueries";
@@ -27,6 +27,7 @@ import {
 import gb from "../misc/Globals";
 import {incrementCleverbotGuildCall, inserCleverbotGuild} from "./queries/cleverbotQueries";
 import {addNote, getNotes, safeDeleteNote} from "./queries/noteQueries";
+import {addMacro, deleteMacro, getMacro, getMacroCount, getMacros} from "./queries/macroQueries";
 
 
 
@@ -103,6 +104,8 @@ export class Database {
             guild.users = [];
         if (!guild.welcomeMessages)
             guild.welcomeMessages = new Map<userId, Message>();
+        if (!guild.macros)
+            guild.macros = new Map<string, string>();
     }
 
     private async crossCheckDatabase(){
@@ -139,6 +142,11 @@ export class Database {
                 // TODO: Theres a lot of repetition in this part, make sure we cut this down
                 // TODO: To a less indented, more efficient version
                 const whitelistedInvites = await this.db.any(getWhitelistedInvites, [guild.id]);
+                const macros: IMacro[] = await this.db.manyOrNone(getMacros, [guild.id]);
+
+                for (let i in macros){
+                    cachedGuild.macros.set(macros[i].macro_name, macros[i].macro_content);
+                }
 
                 if (whitelistedInvites.length > 0)
                     cachedGuild.whitelisted_invites = whitelistedInvites.map(item => item.link);
@@ -186,6 +194,10 @@ export class Database {
         const name = guild.name;
         return this.db.oneOrNone(saveGuild,[id, name]).then((guild : IGuild)=> {
             this.initializeGuildIfNone(guild.id);
+            const target = this.guilds.get(guild.id)!;
+            target.allows_invites = guild.allows_invites;
+            target.command_hints = guild.command_hints;
+            target.prefix = guild.prefix;
         });
     }
 
@@ -213,11 +225,12 @@ export class Database {
     }
 
     public getPrefix(guildId : string) {
-        if (this.guilds.get(guildId) === undefined ) {
+        const guild = this.guilds.get(guildId);
+        if (!guild) {
             this.initializeGuildIfNone(guildId);
-            return '.';
+            return '$';
         }
-        return this.guilds.get(guildId)!.prefix;
+        return guild.prefix;
     }
 
     public insertMember(member : GuildMember) {
@@ -313,10 +326,24 @@ export class Database {
         });
     }
 
+    public updateWarningsChannel(guildId: string, channelId: string){
+        return this.db.oneOrNone(updateWarningsChannel, [channelId, guildId]).then((r: IGuild) => {
+            this.initializeGuildIfNone(guildId);
+            this.guilds.get(guildId)!.warnings_channel = r.warnings_channel;
+            return r.warnings_channel;
+        })
+    }
+
     public getLogsChannel(guildId : string):Channel|undefined {
         const guild = this.guilds.get(guildId);
         if (!guild) return undefined;
         return this.client.channels.get(guild.logs_channel);
+    }
+
+    public getWarningsChannel(guildId: string): Channel | undefined {
+        const guild = this.guilds.get(guildId);
+        if (!guild) return;
+        return this.client.channels.get(guild.warnings_channel);
     }
 
     public restockGuildMembers(guild :Guild){
@@ -423,6 +450,7 @@ export class Database {
             return target.command_hints;
         return true;
     }
+
     public setCommandHints(guild: Guild, state: boolean) {
         const cached = this.guilds.get(guild.id);
         return this.db.one(setCommandHint, [state, guild.id]).then((res: IGuild)=> {
@@ -471,6 +499,62 @@ export class Database {
     public deleteNoteFromGuild(noteId: string, guildId: string){
         return this.db.oneOrNone(safeDeleteNote, [noteId, guildId]).then(res => {
             return res;
+        })
+    }
+
+    public addMacro(message: Message, macroName: string, macroContent: string){
+        this.initializeGuildIfNone(message.guild.id);
+        const cached: ICachedGuild = this.guilds.get(message.guild.id)!;
+        return this.db.one(addMacro,
+                [
+                message.author.id,
+                message.guild.id,
+                macroName,
+                macroContent,
+                new Date()
+            ]).then((r: IMacro) => {
+                cached.macros.set(macroName, macroContent);
+                return r;
+        });
+    }
+
+    public getMacroCount(guild: Guild): Promise<number> {
+        return this.db.one(getMacroCount, [guild.id]).then((r: {count: number}) => {
+            debug.silly(`${guild.name} has ${r.count} macros saved.`);
+            return r.count;
+        })
+    }
+
+    public getMacros(guild: Guild): ICachedMacro[] {
+        this.initializeGuildIfNone(guild.id);
+        const cached: ICachedGuild | undefined = this.guilds.get(guild.id)!;
+        const arr: ICachedMacro[] = [];
+        cached.macros.forEach((value, key) => {
+            arr.push({
+                macro_name: key,
+                macro_content: value
+            })
+        });
+        return arr;
+    }
+
+    public getMacro(guild: Guild, macro: string, forceDB: boolean = false): string | Promise<IMacro> | undefined {
+        if (forceDB){
+            return this.db.oneOrNone(getMacro, [guild.id, macro]).then((r: IMacro) => {
+                return r;
+            })
+        }
+        this.initializeGuildIfNone(guild.id);
+        const targetGuild = this.guilds.get(guild.id)!;
+        return targetGuild.macros.get(macro);
+    }
+
+    public deleteMacro(guild: Guild, macro: string): Promise<IMacro> {
+        this.initializeGuildIfNone(guild.id);
+        const targetGuild = this.guilds.get(guild.id)!;
+        return this.db.oneOrNone(deleteMacro, [guild.id, macro]).then((r: IMacro) => {
+            targetGuild.macros.delete(r.macro_name);
+            return r;
         })
     }
 }

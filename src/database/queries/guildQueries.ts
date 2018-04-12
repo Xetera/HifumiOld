@@ -50,6 +50,15 @@ export const updateLogsChannel : Query =
     RETURNING logs_channel
     `;
 
+//language=POSTGRES-PSQL
+export const updateWarningsChannel : Query =
+    `
+    UPDATE guilds
+    SET warnings_channel = $1
+    WHERE id = $2
+    RETURNING warnings_channel
+    `;
+
 
 //language=POSTGRES-PSQL
 export const getMemberInviteStrikes : Query =

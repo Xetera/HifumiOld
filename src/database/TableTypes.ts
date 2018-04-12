@@ -64,6 +64,19 @@ export interface IWatchlist {
     ban_date: Date;
 }
 
+export interface IMacro extends ICachedMacro{
+    creator_id: string;
+    guild_id: string;
+    macro_name: string;
+    macro_content: string;
+    date_created: Date;
+}
+
+export interface ICachedMacro {
+    macro_name: string;
+    macro_content: string;
+}
+
 export function isTrackedUser(object: any) : object is ITrackedUser {
     return 'join_date' in object;
 }

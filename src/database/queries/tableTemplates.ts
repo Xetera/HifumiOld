@@ -7,20 +7,21 @@ export const defaultTableTemplates : Query[] = [
     CREATE TABLE IF NOT EXISTS guilds(
         id varchar PRIMARY KEY,
         name varchar,
-        prefix char DEFAULT '.',
+        prefix char DEFAULT '.' NOT NULL,
         allows_invites boolean DEFAULT FALSE,
         logs_channel varchar,
         welcome_channel varchar,
         warnings_channel varchar,
         command_hints boolean DEFAULT TRUE,
-        lockdown boolean DEFAULT false
+        lockdown boolean DEFAULT false,
+        visible boolean DEFAULT true
     )
     `,
     `
     CREATE TABLE IF NOT EXISTS users(
-        id varchar,
+        id varchar NOT NULL,
         name varchar,
-        guild_id varchar,
+        guild_id varchar NOT NULL,
         invite_strikes int DEFAULT 0,
         ignoring boolean DEFAULT FALSE,
         cleverbot_calls int DEFAULT 0,
@@ -29,8 +30,8 @@ export const defaultTableTemplates : Query[] = [
     `,
     `
     CREATE TABLE IF NOT EXISTS blacklisted_links(
-        guild_id varchar,
-        link varchar
+        guild_id varchar NOT NULL,
+        link varchar NOT NULL
     )
     `,
     `
@@ -41,9 +42,9 @@ export const defaultTableTemplates : Query[] = [
     `,
     `
     CREATE TABLE IF NOT EXISTS tracked_users(
-        id varchar,
-        guild_id varchar,
-        join_date date,
+        id varchar NOT NULL,
+        guild_id varchar NOT NULL,
+        join_date date NOT NULL,
         security security
     )
     `,
@@ -80,14 +81,25 @@ export const defaultTableTemplates : Query[] = [
     )`, // staff_name is fallback for when we can't use staff_id to resolve members
     `
     CREATE TABLE IF NOT EXISTS watchlist(
-        user_id varchar,
+        user_id varchar NOT NULL,
         guild_id varchar,
         guild_name varchar,
-        ban_reason varchar,
+        ban_reason varchar NOT NULL,
+        certainty integer NOT NULL,
         join_date date,
         ban_date date,
         PRIMARY KEY (user_id, guild_id)
-    )`
+    )`,
+    `
+    CREATE TABLE IF NOT EXISTS macros(
+        creator_id varchar NOT NULL,
+        guild_id varchar NOT NULL, 
+        macro_name varchar NOT NULL,
+        macro_content varchar NOT NULL,
+        date_created date NOT NULL,
+        PRIMARY KEY (guild_id, macro_name)
+    )
+    `
 ];
 
 // language=POSTGRES-PSQL

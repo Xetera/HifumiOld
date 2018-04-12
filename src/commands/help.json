@@ -16,6 +16,22 @@
       "arguments": "0"
     },
     {
+      "name": "passives",
+      "type": "Info",
+      "info": "Sends information about what my non-command abilities.",
+      "usage": "passives",
+      "example": "passives",
+      "arguments": "0"
+    },
+    {
+      "name": "bump",
+      "type": "Utility",
+      "info": "Bumps this server if ServerHound or DLM are present",
+      "usage": "bump",
+      "example": "bump",
+      "arguments": "0"
+    },
+    {
       "name": "setprefix",
       "type": "Self",
       "info": "Changes my prefix settings.",
@@ -27,7 +43,7 @@
     {
       "name": "nuke",
       "type": "Moderation",
-      "info": "Deletes a certain number of past messages",
+      "info": "Deletes a certain number of past messages.",
       "usage": "nuke {# of messages to delete} (default 50)",
       "example": "nuke 100",
       "arguments": "0-1",
@@ -196,6 +212,30 @@
       "example": "history Xetera",
       "arguments": "1",
       "permissions": "MOD"
+    },
+    {
+      "name": "addmacro",
+      "type": "Utility",
+      "info": "Adds a new macro. Macros are special commands that you can add to make me respond with a specific message or picture URL.",
+      "usage": "addmacro {macro name} {message}",
+      "example": "addmacro rolepls Be patient, you'll have to be active first to get a role",
+      "arguments": "2",
+      "permissions": "MOD"
+    },
+    {
+      "name": "listmacros",
+      "type": "Utility",
+      "info": "Lists all the macros I have saved on this server.",
+      "usage": "listmacros ",
+      "example": "listmacros",
+      "arguments": "0"
+    },
+    {
+      "name": "deletemacro",
+      "type": "Utility",
+      "info": "Deletes a saved macro from the server.",
+      "usage": "deletemacro {macro name}",
+      "example": "deletemacro "
     }
   ]
 }

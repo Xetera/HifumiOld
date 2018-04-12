@@ -7,6 +7,9 @@ import commandNotFoundEmbed from "../../../embeds/commands/commandNotFoundEmbed"
 import {highlight} from "../../../utility/Markdown";
 import {capitalize} from "../../../utility/Util";
 import {commandEmbedColor} from "../../../utility/Settings";
+import gb from "../../../misc/Globals";
+import {ICachedMacro, IMacro} from "../../../database/TableTypes";
+import helpMacroEmbed from "../../../embeds/commands/helpMacroEmbed";
 const help = require('../../help.json');
 
 export function getHelp(message : Message, args : string[],  database : Database) {
@@ -36,17 +39,21 @@ export function getHelp(message : Message, args : string[],  database : Database
     }
     // searching specific command
     getSpecificHelp(message, args[0], prefix);
-
 }
 
-function getSpecificHelp(message: Message, arg: string, prefix: string){
+async function getSpecificHelp(message: Message, arg: string, prefix: string){
     const command: Command = help.commands.find((command: Command)=> command.name === arg);
-    if (!command)
+    if (!command) {
+        const macro = <IMacro> await gb.instance.database.getMacro(message.guild, arg, true);
+        if (macro){
+            return message.channel.send(helpMacroEmbed(message.guild, macro));
+        }
         return message.channel.send(commandNotFoundEmbed(message.channel, arg));
+    }
     const shortCommand: boolean = command.usage === command.example;
     let embed = new RichEmbed()
         .setTitle('__' + command.name + '__')
-        .setColor('#FFE5B4')
+        .setColor(commandEmbedColor)
         .addField('Info', command.info)
         .addField('Usage', highlight(prefix + command.usage))
         .addField('Example', highlight(prefix + command.example))

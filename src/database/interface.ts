@@ -13,6 +13,7 @@ export interface ICachedGuild {
     warnings_channel : string;
     lockdown: boolean;
     welcomeMessages: Map<userId, Message>;
+    macros: Map<string, string>;
     command_hints: boolean;
     allows_invites: boolean;
 }
