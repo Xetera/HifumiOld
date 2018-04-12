@@ -10,6 +10,7 @@ import commandHandler from "../handlers/commands/CommandHandler";
 import {Instance} from "../misc/Globals";
 import {getHelp} from "../commands/info/help/Help";
 import DMCommandHandler from "../handlers/commands/DMCommandHandler";
+import pingListener from "../listeners/pingListener";
 
 export const debug = {
     silly: dbg('Bot:onMessage:Silly'),
@@ -33,6 +34,7 @@ function middleWare(msg: Discord.Message, instance: Instance){
     message.sent = moment(new Date()).toDate();
     messageQueue.add(message);
     alexa.checkMessage(message, bot);
+    pingListener(message, database);
     inviteListener(message, database);
 }
 
