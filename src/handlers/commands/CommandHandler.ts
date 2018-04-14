@@ -62,6 +62,12 @@ interface indexSignature {
     [method:string]: (CommandParameters);
 }
 
+interface UserInputData {
+    stealth: boolean;
+    command: string;
+    args: string[];
+}
+
 
 function isMessage(message : any) : message is Discord.Message {
     return <Discord.Message> message.content !== undefined;
@@ -82,8 +88,9 @@ export default class CommandHandler implements indexSignature {
         this.restarting = false;
     }
 
-    public static parseInput(message : Discord.Message) : [string, string[]]{
+    public static parseInput(message : Discord.Message): UserInputData | undefined {
         let args : string[] = [];
+        const prefix = gb.instance.database.getPrefix(message.guild.id);
         // removing excess whitespace between words that can't be removed with .trim()
         const messageContent = message.content.replace(/\s+/, ' ');
         if (isMessage(message))
@@ -91,22 +98,39 @@ export default class CommandHandler implements indexSignature {
         else
             throw new TypeError(`'${message}' is not a Message object.`);
 
-        let command : string | undefined = args.shift();
-        // TODO: fix this for stealth commands
-        if (command !== undefined) {
-            command = command.substring(1);
-            return [command, args];
+        let command : string | undefined = args.shift()!;
+
+        // detecting stealth command
+        let out = <UserInputData> {
+            args: args
+        };
+
+        if (command.substring(0, 2) === prefix + prefix){
+            debug.silly(`[${message.guild.name}]<${message.author}> Entered a stealth command`, 'CommandHandler')
+            out.stealth= true;
+            out.command = command.substring(2);
+            return out;
         }
-        else {
-            return ['', ['']]
+        else if (command[0] === prefix){
+            out.stealth = false;
+            out.command=command.substring(1);
+            return out;
         }
+        // not a command
+        return undefined;
     }
+
+
 
     public async handler(message : Discord.Message,instance : Instance) {
         if (this.restarting)
             return;
-        const [command, args] = CommandHandler.parseInput(message);
-        if (command == '') return;
+        const inputData: UserInputData | undefined = CommandHandler.parseInput(message);
+        if (inputData === undefined)
+            return;
+        else if (inputData.stealth){
+            message.delete();
+        }
 
         if (message.channel instanceof TextChannel)
             debug.info(`[${message.guild.name}]::${message.channel.name}::<${message.author.username}>: ${message.content}`, 'CommandHandler');
@@ -114,11 +138,11 @@ export default class CommandHandler implements indexSignature {
             debug.error(`A non text channel command was forwarded to CommandHandler`, 'CommandHandler');
 
         const params = <CommandParameters> instance;
-        params.args = args;
+        params.args = inputData.args;
         params.message = message;
 
         for (let i in this.commands) {
-            const match = this.commands[i].toLowerCase() === command.toLowerCase() ? command : undefined;
+            const match = this.commands[i].toLowerCase() === inputData.command.toLowerCase() ? inputData.command : undefined;
             if (!match)
                 continue;
             const execution = this.commands[i];
@@ -127,25 +151,25 @@ export default class CommandHandler implements indexSignature {
                 return this[execution](params);
             }
             catch (error) {
-                debug.error(`Unexpected error while executing ${command}\n` + error.stack)
+                debug.error(`Unexpected error while executing ${inputData.command}\n` + error.stack)
             }
         }
-        if (command === null){
-            return;
-        }
+
+        // User input is not a command, checking macros
         const macros: ICachedMacro[] = gb.instance.database.getMacros(message.guild);
         let targetMacro: ICachedMacro | undefined;
         if (macros.length){
-            targetMacro = macros.find(macro => macro.macro_name === command);
+            targetMacro = macros.find(macro => macro.macro_name === inputData.command);
             if (targetMacro){
                 return void message.channel.send(targetMacro.macro_content);
             }
         }
 
+        // User input is not a command OR a macro, checking if guild has hints enabled
         const hints = instance.database.getCommandHints(message.guild);
         if (hints){
             message.channel.send(
-                commandNotFoundEmbed(message.channel, command, macros.map(macro => macro.macro_name))
+                commandNotFoundEmbed(message.channel, inputData.command, macros.map(macro => macro.macro_name))
             );
         }
     }
