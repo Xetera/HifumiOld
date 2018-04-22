@@ -35,6 +35,7 @@ export class Database {
 
     public connect(url: string): Promise<Connection> {
         return this.ormConfig(url).then(() => {
+            console.log(url);
             return createConnection({
                 type: 'postgres',
                 url: url,

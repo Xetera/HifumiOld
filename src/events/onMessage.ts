@@ -41,10 +41,6 @@ function middleWare(msg: Discord.Message){
 }
 
 export default async function onMessage(message: Discord.Message){
-    const alexa = gb.instance.alexa;
-    const bot = gb.instance.bot;
-    const database = gb.instance.database;
-    const messageQueue = gb.instance.messageQueue;
     // we don't want to look at bot messages at all
     if (message.author.bot)
         return;
