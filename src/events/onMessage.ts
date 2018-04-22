@@ -50,7 +50,7 @@ export default async function onMessage(message: Discord.Message){
         return;
 
     else if (!gb.instance.database.ready) {
-        message.channel.send(`😰 give me some time to get set up first.`);
+        //message.channel.send(`😰 give me some time to get set up first.`);
         return void debug.info(`Got message from ${message.guild.name} but the DB hasn't finished caching.`);
     }
 
