@@ -41,12 +41,6 @@ export class AlexaToHifumi1524349599152 implements MigrationInterface {
                 type: 'varchar',
                 isNullable: true
         })]);
-        await queryRunner.changeColumn('guilds', 'prefix',
-            new TableColumn({
-                name: 'prefix',
-                type: 'character'
-            })
-        );
         await queryRunner.renameColumn('guilds', 'command_hints', 'hints');
         await queryRunner.changeColumn('guilds', 'lockdown',
             new TableColumn({
