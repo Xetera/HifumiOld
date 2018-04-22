@@ -8,7 +8,7 @@
 		"src/database/models/**/*.ts"
 	],
 	"migrations": [
-		"stc/database/migrations/**/*.ts"
+		"src/database/migrations/**/*.ts"
 	],
 	"subscribers": [
 		"src/database/subscribers/**/*.ts"

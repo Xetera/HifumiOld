@@ -50,7 +50,6 @@ export class Database {
                     type: 'redis',
                     duration: Infinity,
                     options: {
-                        // TODO: Make this dynamic
                         url: this.env === Environments.Development ? 'redis://localhost:6379' : process.env.REDISCLOUD_URL
                     }
                 }
