@@ -6,15 +6,15 @@ import {createWarningEmbed} from "./processWarningEmbed";
 export function catchSigterm(notifyOwner: boolean){
     process.once('SIGTERM', () => {
         debug.warning(`SIGTERM RECEIVED, RESTARTING...`);
-        if (!notifyOwner)
-            return;
-
         const owner : User | undefined = gb.instance.bot.users.get(gb.ownerID);
-        if (!owner)
-            return debug.error('Could not fetch bot owner.');
-        gb.instance.bot.user.setActivity('Restarting...');
-
-        const embed = createWarningEmbed(`SIGTERM`, `Received a sigterm (likely a heroku cycle). Shutting down in 10s`);
-        owner.send(embed);
+        if (!owner || !notifyOwner) {
+            debug.error('Could not fetch bot owner to send sigterm embed.');
+            return process.exit(0);
+        }
+        gb.instance.bot.user.setActivity('Restarting...').then(() => {
+            const embed = createWarningEmbed(`SIGTERM`, `Received a sigterm (likely a heroku cycle). Shutting down now`);
+            owner.send(embed);
+            process.exit(0);
+        })
     });
 }
