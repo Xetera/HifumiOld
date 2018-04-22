@@ -188,7 +188,7 @@ export class MuteQueue {
         const members : MutedMember[] | undefined  =this.queue.get(member.guild.id);
         if (members === undefined) return;
 
-        //const raidStatus = database.getRaids
+        //const raidStatus = Database.getRaids
         const muteDates = members.map((user : MutedMember) => user.muteDate);
         const recentlyMuted : Date[] = muteDates.filter((date : Date)=>
             date > moment(date).subtract(raidDetectionInterval).toDate()
@@ -264,7 +264,7 @@ export class MuteQueue {
                 `You were mass banned by a mod for raiding ${youTried}\n${advertiseOnBan}`);
             raidGuild.splice(i, 1);
 
-            // we also need to remove them from the database when we implement that
+            // we also need to remove them from the Database when we implement that
         }
         message.channel.send(`Banned ${raiderCount - raidGuild.length} muted raiders. ${youTried}`)
     }

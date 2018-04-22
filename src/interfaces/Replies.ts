@@ -31,7 +31,7 @@ export function randomRuntimeError() : string {
 }
 
 export function advertiseOnBan(): string {
-    return `Want to protect your own server from people like yourself? **Invite me!**\n${getInvite()}`;
+    return `Want to protect your own server from people like yourself? [Invite me!](${getInvite()})`;
 }
 
 export const runtimeErrorResponses : string[] = [

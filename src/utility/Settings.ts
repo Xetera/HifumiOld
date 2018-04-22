@@ -125,6 +125,8 @@ export function getMemberTrackDate() : Date | undefined {
     }
 }
 export const commandEmbedColor = '#FFE5B4';
+export const warningEmbedColor = '#ffc42a';
+
 export function getMemberTrackDuration(): number {
     switch(securityLevel) {
         case SecurityLevels.Dangerous: {

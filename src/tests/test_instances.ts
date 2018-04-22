@@ -3,15 +3,15 @@ import {expect} from 'chai'
 import * as Discord from "discord.js";
 import CommandHandler, {CommandParameters} from "../handlers/commands/CommandHandler";
 import {MessageQueue} from "../moderation/MessageQueue";
-import {Database, DatabaseConfig, PostgresDevLoginConfig} from "../database/Database";
-import {Alexa} from "../API/Alexa";
+import {Cleverbot} from "../API/Cleverbot";
 import {MuteQueue} from "../moderation/MuteQueue";
 import {Instance} from "../misc/Globals";
 import Tracklist from "../moderation/Tracklist";
 import {getDatabaseConnection, getEnvironmentSettings, getTokens} from "../events/systemStartup";
 import gb from "../misc/Globals";
 import {Message} from "discord.js";
-
+import {Database} from "../database/Database";
+const Heroku = require('heroku-client');
 let credentials = <PostgresDevLoginConfig>{};
 credentials.user = 'postgres';
 credentials.host = 'localhost';
@@ -21,18 +21,19 @@ credentials.database = 'discord';
 gb.ENV  = getEnvironmentSettings();
 
 const [BOT_TOKEN, CLEVERBOT_TOKEN] : string[] = getTokens(gb.ENV);
-const DATABASE_URL : DatabaseConfig = getDatabaseConnection(gb.ENV);
+const DATABASE_URL : string = getDatabaseConnection(gb.ENV);
 
 function createInstance(): Instance {
     // this is how we avoid scoping problems, a little ugly but
     // it gets the job done
     let bot =new Discord.Client();
-    let alexa = new Alexa(CLEVERBOT_TOKEN);
-    let database = new Database(DATABASE_URL, bot);
+    let alexa = new Cleverbot(CLEVERBOT_TOKEN);
+    let database = new Database(DATABASE_URL);
     let muteQueue = new MuteQueue();
     let trackList = new Tracklist();
     let messageQueue = new MessageQueue(muteQueue, database, trackList);
     let commandHandler = new CommandHandler();
+    let heroku = new Heroku();
     return {
         bot: bot,
         alexa: alexa,
@@ -41,6 +42,7 @@ function createInstance(): Instance {
         messageQueue: messageQueue,
         commandHandler:commandHandler,
         trackList: trackList,
+        heroku:
         eval: (params: CommandParameters, message: Message, x : any) => eval(x)
     }
 }
@@ -57,7 +59,7 @@ describe('Handling commands', () => {
     });
 });
 
-describe('Alexa', function() {
+describe('Cleverbot', function() {
     it('Error on setting clevertype emotion incorrectly', () => {
         expect(() => instances.alexa.setEmotion(101)).to.throw(RangeError);
     });

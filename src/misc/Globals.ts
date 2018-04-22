@@ -1,5 +1,5 @@
 import * as Discord from 'discord.js'
-import {Alexa} from "../API/Alexa";
+import {Cleverbot} from "../API/Cleverbot";
 import {MuteQueue} from "../moderation/MuteQueue";
 import {MessageQueue} from "../moderation/MessageQueue";
 import {Database} from "../database/Database";
@@ -14,19 +14,20 @@ interface Globals {
     ownerID: string;
     emojiGuild: Discord.Guild;
     ENV: Environments;
-    allMembers:number;
+    allMembers: number;
     emojis: Map<emojiName, Discord.Emoji>;
     instance: Instance;
 }
 
 export interface Instance {
     bot: Discord.Client,
-    alexa: Alexa,
+    alexa: Cleverbot,
     muteQueue: MuteQueue,
     messageQueue: MessageQueue,
-    database : Database
+    database : Database,
     commandHandler?:CommandHandler,
     trackList: Tracklist,
+    heroku: any
     eval(params: CommandParameters, message: Message, x : any): any
 }
 
