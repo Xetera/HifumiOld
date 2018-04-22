@@ -113,7 +113,6 @@ export class Database {
 
     public getGuild(guildId: string): Promise<Guild> {
         return this.conn.manager.findOne(Guild, {where: {id: guildId}, cache: true}).then((r: any) => {
-            console.log(r);
             if (!r)
                 return Promise.reject('Guild not found');
             return r;
