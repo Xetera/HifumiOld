@@ -38,7 +38,6 @@ export class Database {
             return createConnection({
                 type: 'postgres',
                 url: url,
-                username: 'postgres',
                 database: 'discord',
                 entities: ['src/database/models/**/*.js'],
                 migrations: ['src/database/migrations/**/*.js'],
