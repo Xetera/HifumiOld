@@ -394,5 +394,11 @@ export class Database {
             return Promise.reject(err);
         })
     }
+
+    public incrementCleverbotCalls(guildId: string){
+        return this.invalidateCache('guilds').then(() => {
+            return this.conn.manager.increment(Guild, {id: guildId}, 'cleverbot_calls', 1);
+        })
+    }
 }
 

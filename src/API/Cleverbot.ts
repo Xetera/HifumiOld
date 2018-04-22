@@ -52,12 +52,8 @@ export class Cleverbot {
                 `[${message.member.guild}]::${message.channel.name}::<${message.author.username}> cleverbot call`, "Cleverbot");
             message.react('👀');
 
-            if (message.channel.name === 'chat-with-hifumi')
-                this.say(message.content, message.member.id, false).then((resp : string) => {
-                message.channel.send(resp)
-            });
-            else
                 this.say(message.content, message.member.id).then((resp : string) => {
+                gb.instance.database.incrementCleverbotCalls(message.guild.id);
                 message.channel.send(resp);
             });
         }
