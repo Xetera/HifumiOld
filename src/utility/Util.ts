@@ -137,7 +137,7 @@ export function formattedTimeString(sec: number): string{
 }
 
 export function sanitizeUserInput(input: string){
-    return input.replace('@', '\`@\`');
+    return input.replace('@', '`@`').trim();
 }
 
 export function subtractArrays(first: any[], second: any[]): any[] | undefined {
@@ -159,4 +159,8 @@ export function getOnOff(input: string): boolean | undefined {
         return false;
     else
         return undefined;
+}
+
+export function arrayFromValues(obj: {[id: string]: any}){
+    return Object.keys(obj).map(k => obj[k]);
 }
