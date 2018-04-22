@@ -2,7 +2,6 @@ import {Message} from "discord.js";
 import {handleInvalidParameters} from "../../handlers/commands/invalidCommandHandler";
 import gb from "../../misc/Globals";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
-import {IMacro} from "../../database/TableTypes";
 import {debug} from "../../utility/Logging";
 import {DeleteResult} from "typeorm";
 

@@ -3,7 +3,6 @@ import {Database} from "../../database/Database";
 
 import {debug} from '../../utility/Logging'
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
-import {ICachedGuild} from "../../database/interface";
 import gb from "../../misc/Globals";
 import {Guild} from "../../database/models/guild";
 

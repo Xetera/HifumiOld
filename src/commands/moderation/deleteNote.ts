@@ -3,7 +3,6 @@ import {handleInvalidParameters} from "../../handlers/commands/invalidCommandHan
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import gb from "../../misc/Globals";
 import {debug} from "../../utility/Logging";
-import {INote} from "../../database/TableTypes";
 import {DeleteResult} from "typeorm";
 
 export default async function deleteNote(message: Message, args: string[]){

@@ -2,7 +2,6 @@ import {Message} from "discord.js";
 import {handleInvalidParameters} from "../../handlers/commands/invalidCommandHandler";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import gb from "../../misc/Globals";
-import {IMacro} from "../../database/TableTypes";
 import {Help} from "../info/help/interface";
 import {debug} from "../../utility/Logging";
 import {Macro} from "../../database/models/macro";
@@ -29,7 +28,7 @@ export default async function addMacro(message: Message, args: string[]) {
     }
 
     // @ts-ignore
-    gb.instance.testDb.getMacroCount(message.guild.id).then(async (count: number) => {
+    gb.instance.database.getMacroCount(message.guild.id).then(async (count: number) => {
         if (count >= 50) {
             return void handleFailedCommand(
                 message.channel, "Whoa, you already have 50 macros saved, you'll have to delete some first "
@@ -46,9 +45,10 @@ export default async function addMacro(message: Message, args: string[]) {
         }
 
         return gb.instance.database.addMacro(message, macroName, macroContent)
-    }).then(async(macro: IMacro) => {
+    }).then(async(macro: Partial<Macro>|undefined) => {
         const prefix = await gb.instance.database.getPrefix(message.guild.id);
-        message.channel.send(`From now on I'll respond to **${prefix}${macro.macro_name}** with:\n${macro.macro_content}`);
+        if (macro)
+            message.channel.send(`From now on I'll respond to **${prefix}${macro.macro_name}** with:\n${macro.macro_content}`);
     }).catch((err: Error) => {
         if (err.message === 'Duplicate macro'){
             return debug.silly(`Duplicate macro ${macroName} entered in ${message.guild.name}`, 'addMacro');

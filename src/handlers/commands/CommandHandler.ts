@@ -43,11 +43,11 @@ import deleteNote from "../../commands/moderation/deleteNote";
 import passives from "../../commands/info/passives";
 import setWarningsChannel from "../../commands/config/setWarningsChannel";
 import addMacro from "../../commands/utility/addMacro";
-import {ICachedMacro, IMacro} from "../../database/TableTypes";
 import listMacros from "../../commands/utility/listMacros";
 import deleteMacro from "../../commands/utility/deleteMacro";
 import randomQuote from "../../commands/fun/randomQuote";
 import setChatChannel from "../../commands/config/setChatChannel";
+import {Macro} from "../../database/models/macro";
 
 export interface CommandParameters extends Instance {
     message: Discord.Message;
@@ -156,8 +156,8 @@ export default class CommandHandler implements indexSignature {
         }
 
         // User input is not a command, checking macros
-        const macros: ICachedMacro[] = await gb.instance.database.getMacros(message.guild.id);
-        let targetMacro: ICachedMacro | undefined;
+        const macros: Macro[] = await gb.instance.database.getMacros(message.guild.id);
+        let targetMacro: Macro | undefined;
         if (macros.length){
             targetMacro = macros.find(macro => macro.macro_name === inputData.command);
             if (targetMacro){

@@ -8,7 +8,6 @@ import {highlight} from "../../../utility/Markdown";
 import {capitalize} from "../../../utility/Util";
 import {commandEmbedColor} from "../../../utility/Settings";
 import gb from "../../../misc/Globals";
-import {ICachedMacro, IMacro} from "../../../database/TableTypes";
 import helpMacroEmbed from "../../../embeds/commands/helpMacroEmbed";
 const help = require('../../help.json');
 

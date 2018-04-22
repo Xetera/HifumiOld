@@ -1,7 +1,6 @@
 import {GuildMember, Message, User} from "discord.js";
 import {handleInvalidParameters} from "../../handlers/commands/invalidCommandHandler";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
-import {INote} from "../../database/TableTypes";
 import gb from "../../misc/Globals";
 import historyEmbed from "../../embeds/commands/historyEmbed";
 import {debug} from "../../utility/Logging";

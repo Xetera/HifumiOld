@@ -1,8 +1,8 @@
-import {ICachedMacro, IMacro} from "../../database/TableTypes";
 import {Guild, RichEmbed} from "discord.js";
 import gb from "../../misc/Globals";
+import {Macro} from "../../database/models/macro";
 
-export default async function listMacrosEmbed(guild: Guild, macros: ICachedMacro[]) {
+export default async function listMacrosEmbed(guild: Guild, macros: Macro[]) {
     return new RichEmbed()
         .setColor(`#a8ff6c`)
         .addField(`Macros for ${guild}`, macros.length

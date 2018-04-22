@@ -1,4 +1,3 @@
-import {IMacro} from "../../database/TableTypes";
 import {Guild, RichEmbed} from "discord.js";
 import {commandEmbedColor} from "../../utility/Settings";
 import moment = require("moment");

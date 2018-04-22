@@ -12,6 +12,7 @@ import gb from "../misc/Globals";
 import {Message} from "discord.js";
 import {Database} from "../database/Database";
 const Heroku = require('heroku-client');
+/*
 let credentials = <PostgresDevLoginConfig>{};
 credentials.user = 'postgres';
 credentials.host = 'localhost';
@@ -80,3 +81,4 @@ describe('Cleverbot', function() {
         expect(instances.alexa.cleverbot.callAmount).to.equal(1);
     });
 });
+*/

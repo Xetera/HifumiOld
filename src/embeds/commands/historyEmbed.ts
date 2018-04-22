@@ -1,5 +1,4 @@
 import {GuildMember, RichEmbed, User} from "discord.js";
-import {INote} from "../../database/TableTypes";
 import moment = require("moment");
 import {Note} from "../../database/models/note";
 
