@@ -2,8 +2,9 @@ import {IMacro} from "../../database/TableTypes";
 import {Guild, RichEmbed} from "discord.js";
 import {commandEmbedColor} from "../../utility/Settings";
 import moment = require("moment");
+import {Macro} from "../../database/models/macro";
 
-export default function helpMacroEmbed(guild: Guild, macro: IMacro) {
+export default function helpMacroEmbed(guild: Guild, macro: Macro) {
     return new RichEmbed()
         .setTitle(`Macro: __**${macro.macro_name}**__`)
         .setColor(commandEmbedColor)

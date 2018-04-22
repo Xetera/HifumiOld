@@ -1,13 +1,14 @@
 import {GuildMember, RichEmbed, User} from "discord.js";
 import {INote} from "../../database/TableTypes";
 import moment = require("moment");
+import {Note} from "../../database/models/note";
 
-export default function historyEmbed(member: GuildMember | User, notes: INote[]){
+export default function historyEmbed(member: GuildMember | User, notes: Note[]){
     const username = member instanceof User ? member.username : member.user.username;
     const discrim = member instanceof User ? member.discriminator : member.user.discriminator;
     const nickname = member instanceof User ? undefined : member.nickname;
     const url = member instanceof User ? member.avatarURL : member.user.avatarURL;
-    // we might want to check the database for a joindate on this for better results
+    // we might want to check the Database for a joindate on this for better results
     const joinDate = member instanceof User ? undefined : member.joinedAt;
     const creationDate = member instanceof User ? member.createdAt : member.user.createdAt;
 

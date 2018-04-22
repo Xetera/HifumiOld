@@ -8,6 +8,6 @@ export default function tracklistSpamBanDMEmbed(guild: Guild): RichEmbed{
         .setDescription(
             `You were banned in \`${guild.name}\` for spamming as a tracked member.`+
             `\n\n${advertiseOnBan()}`)
-        .setImage('https://github.com/ilocereal/Alexa/blob/master/alexanoinvite.png?raw=true')
+        .setImage('https://github.com/ilocereal/Hifumi/blob/master/alexanoinvite.png?raw=true')
         .setTimestamp()
 }

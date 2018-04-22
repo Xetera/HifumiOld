@@ -21,6 +21,6 @@ export default function muteDMEmbed(member: GuildMember, reason: string | Offens
         .addField(`Duration`, formattedTimeString(duration ? duration : getMuteTime()), true)
         .addField(`Reason`, reasonMessage, true)
         // if we don't have a given duration then we know that it's just the default mute action duration
-        .setFooter('Alexa')
+        .setFooter('Hifumi')
         .setTimestamp()
 }
