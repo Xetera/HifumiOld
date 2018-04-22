@@ -5,7 +5,7 @@ Moderation based discord bot written in Typescript using [Discord.js](https://gi
 
 Currently hosted on [heroku](https://www.heroku.com/)
 
-[Invite](https://discordapp.com/oauth2/authorize?client_id=372615866652557312&permissions=0&scope=bot)
+[Invite Me](https://discordapp.com/oauth2/authorize?client_id=372615866652557312&permissions=0&scope=bot) - Prefix: $
 
 
 ## Whatcha Got:
@@ -63,7 +63,7 @@ In order of importance per topic
 - [ ] Remind Me module
 - [ ] Add module that lets users give themselves roles **-Low priority**
 - [x] Safe handling of actions like message deletion and PMing users
-- [ ] Allow users to disable the cleverbot feature of alexa
+- [ ] Allow users to disable the cleverbot feature
 
 ## Database: 🖥️
 - [x] Implement a relational Database that works for heroku as well -> Postgres
@@ -96,6 +96,7 @@ In order of importance per topic
 - [ ] Integrate own battlerite API **-Low priority**
 - [ ] Reintroduce the weather module
 - [ ] Get cleverbot to store CS per user **-Low priority**
+
 
 ## Way Later: 🧠 **-Very Low priority** cuzitsreallyhard
 - [ ] Intent analysis for communicating with Hifumi
