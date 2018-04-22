@@ -5,13 +5,13 @@
 	"logging": true,
 	"dropSchema": true,
 	"entities": [
-		"src/database/models/**/*.ts"
+		"src/database/models/**/*.js"
 	],
 	"migrations": [
-		"src/database/migrations/**/*.ts"
+		"src/database/migrations/**/*.js"
 	],
 	"subscribers": [
-		"src/database/subscribers/**/*.ts"
+		"src/database/subscribers/**/*.js"
 	],
 	"cli": {
 		"entitiesDir": "src/database/models",
