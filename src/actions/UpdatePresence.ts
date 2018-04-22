@@ -8,7 +8,7 @@ export default function updatePresence(bot : Discord.Client) : void {
         gb.allMembers += value.memberCount;
     });
 
-    bot.user.setActivity(`out for ${gb.allMembers} users`, {
+    bot.user.setActivity(`out for ${gb.allMembers} users | $help`, {
         type: 'WATCHING'
     });
 }

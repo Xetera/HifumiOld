@@ -1,560 +1,402 @@
-import {
-    getWhitelistedInvites,
-} from "./queries/PreparedStatements";
-import {IDatabase, IMain, IOptions, ITask, TQuery} from 'pg-promise'
-import {defaultTableTemplates, getPrefixes, testQuery} from "./queries/tableTemplates";
-import {Channel, Client, Collection, Guild, GuildMember, Message, TextChannel} from "discord.js";
-import {ICachedMacro, IGuild, IMacro, INote, IUser} from "./TableTypes";
-import * as pgPromise from 'pg-promise'
-import {debug} from '../utility/Logging'
-import {ICachedGuild, ICachedUser, userId} from "./interface";
-import {
-    changeInviteSetting,
-    changeLockdownStatus,
-    getCommandHint,
-    getGuild,
-    getMemberInviteStrikes,
-    saveGuild, setCommandHint, setInvitesAllowed,
-    updateLogsChannel, updateWarningsChannel,
-    updateWelcomeChannel,
-    upsertPrefix
-} from "./queries/guildQueries";
-import {
-    cleanAllGuildMembers, getAllMembers, getMember, incrementCleverbotMemberCall, incrementMemberInviteStrikes,
-    insertMember,
-    saveMember, setIgnored
-} from "./queries/userQueries";
+import {createConnection, ConnectionOptions, Connection, getConnection, DeleteResult} from 'typeorm'
+import {IORMConfig} from "./ormconfig.interface";
 import gb from "../misc/Globals";
-import {incrementCleverbotGuildCall, inserCleverbotGuild} from "./queries/cleverbotQueries";
-import {addNote, getNotes, safeDeleteNote} from "./queries/noteQueries";
-import {addMacro, deleteMacro, getMacro, getMacroCount, getMacros} from "./queries/macroQueries";
-
-
-
-export interface PostgresDevLoginConfig {
-    type: string;
-    host: string;
-    port: number;
-    database: string;
-    user: string;
-}
-
-export interface PostgresLiveLoginConfig {
-    type: string;
-    connectionString: string;
-    ssl: boolean;
-}
-
-export type DatabaseConfig = PostgresLiveLoginConfig|PostgresDevLoginConfig;
-export type Query = string;
-function isDeployementLogin(object: any) : object is PostgresLiveLoginConfig {
-    return 'ssl' in object;
-}
-
-function getDatabaseType(url : DatabaseConfig){
-    return isDeployementLogin(url) ? 'heroku' : 'localhost';
-}
+import {Environments} from "../events/systemStartup";
+import {debug} from "../utility/Logging";
+import {User} from "./models/user";
+import {Guild} from "./models/guild";
+import {GuildMember, Message, Guild as DiscordGuild, GuildAuditLogsFetchOptions} from "discord.js";
+import {Macro} from "./models/macro";
+import {Note} from "./models/note";
+import {arrayFromValues} from "../utility/Util";
+import 'reflect-metadata';
+import * as fs from 'fs'
+const rootConfig: IORMConfig = require('../../ormconfig.json');
 
 export class Database {
-    // variable login based on environment
-    readonly initOptions = {
-        // global event notification;
-        error: ((error: any, e :any) => {
-            if (e.cn) {
-                debug.error('CN:\n'+ e.cn, "Database");
-                debug.error('EVENT:\n'+ error.message || error, "Database");
-            }
-        })
-    };
-    config : DatabaseConfig;
+    env: Environments;
+    connectionString: string;
+    conn: Connection;
+    ready: boolean = false;
+    welcomeMessages: {[id: string]: Message[]};
+    constructor(url: string) {
+        this.env = gb.ENV;
+        this.connectionString = url;
 
-    private readonly pgp = pgPromise(this.initOptions);
-    private db : IDatabase<any>;
-    guilds: Map<string, ICachedGuild>;
-    client: Client;
-    constructor(url : DatabaseConfig, bot : Client){
-        this.client = bot;
-        this.config = url;
-        debug.info("Logging into Postgres on " + getDatabaseType(url), "Database");
-        this.guilds = new Map<string, ICachedGuild>();
-
-        this.db = this.pgp(this.config);
-        // we don't want to query the db every message so
-        // we're caching the prefixes instead
-        debug.info('Database is connected.', "Database");
-
-    }
-
-    public doPrep(){
-        this.checkTables()
-        .then(() => {
-            return this.cacheGuilds();
-        }).then(() =>{
-            return this.crossCheckDatabase();
-        });
-    }
-
-    private initializeGuildIfNone(guildId : string) : void {
-        let guild: ICachedGuild = this.guilds.get(guildId)!;
-        if (guild === undefined) {
-            this.guilds.set(guildId, <ICachedGuild> {});
-            guild = this.guilds.get(guildId)!;
-        }
-        if (!guild.users)
-            guild.users = [];
-        if (!guild.welcomeMessages)
-            guild.welcomeMessages = new Map<userId, Message>();
-        if (!guild.macros)
-            guild.macros = new Map<string, string>();
-    }
-
-    private async crossCheckDatabase(){
-        const guilds : Guild[] = this.client.guilds.array();
-        return this.db.task(t => {
-            const queries: Query[] = [];
-            for (let guild of guilds) {
-                guild.members.forEach( (member) => {
-                    const id = member.id;
-                    const name = member.user.username;
-                    const guild_id = member.guild.id;
-                    queries.push(t.none(saveMember, [id, name, guild_id]));
-                });
-                guilds.forEach(function (guild) {
-                    const id = guild.id;
-                    const name = guild.name;
-                    queries.push(t.any(saveGuild, [id, name]));
-                });
-            }
-            return t.batch(queries);
-        });
-    }
-
-    private async cacheGuilds() : Promise<void> {
-        return this.db.any(getPrefixes).then(fields => {
-            // returning id, prefix
-            fields.forEach(async(guild : IGuild) => {
-                let cachedGuild : ICachedGuild | undefined = this.guilds.get(guild.id);
-                if (cachedGuild === undefined) {
-                    this.guilds.set(guild.id, <ICachedGuild> {});
-                    cachedGuild = this.guilds.get(guild.id)!;
-                }
-                this.cacheUsers(guild.id);
-                // TODO: Theres a lot of repetition in this part, make sure we cut this down
-                // TODO: To a less indented, more efficient version
-                const whitelistedInvites = await this.db.any(getWhitelistedInvites, [guild.id]);
-                const macros: IMacro[] = await this.db.manyOrNone(getMacros, [guild.id]);
-
-                for (let i in macros){
-                    cachedGuild.macros.set(macros[i].macro_name, macros[i].macro_content);
-                }
-
-                if (whitelistedInvites.length > 0)
-                    cachedGuild.whitelisted_invites = whitelistedInvites.map(item => item.link);
-
-                // we could really be calling this in the begining instead and not here
-                this.db.oneOrNone(getGuild, [guild.id]).then((item : ICachedGuild)=> {
-                    cachedGuild!.welcome_channel = item.welcome_channel;
-                    cachedGuild!.logs_channel = item.logs_channel;
-                    cachedGuild!.warnings_channel = item.warnings_channel;
-                    cachedGuild!.command_hints = item.command_hints;
-                    cachedGuild!.allows_invites = item.allows_invites;
-                });
-
-                cachedGuild.prefix  = guild.prefix;
-            });
-        });
-    }
-
-    private cacheUsers(guildId : string){
-        this.initializeGuildIfNone(guildId);
-        const guild = this.guilds.get(guildId)!;
-        this.db.many(getAllMembers, [guildId]).then((users : IUser[]) => {
-            guild.users =  users.map(user => {
-                return {
-                    id: user.id,
-                    guild_id: user.guild_id,
-                    ignoring: user.ignoring
-                }
-            });
+        debug.info(`Logging into postgres in ${this.env === Environments.Development ? 'dev' : 'live'} mode.`, `Database`);
+        this.connect(url).then(conn => {
+            debug.info(`Logged into postgres`, `Database`);
+            this.conn = conn;
+            return this.crossCheck();
+        }).then(() => {
+            this.ready = true;
         })
     }
 
-    private checkTables() : Promise<any> {
-        return this.db.task(t => {
-            let queries : string[] = [];
-            defaultTableTemplates.forEach((query : Query)=> {
-                queries.push(t.none(query));
-            });
-            return t.batch(queries);
-        });
-    }
-
-    private addGuild(guild : Guild){
-        const id = guild.id;
-        const name = guild.name;
-        return this.db.oneOrNone(saveGuild,[id, name]).then((guild : IGuild)=> {
-            this.initializeGuildIfNone(guild.id);
-            const target = this.guilds.get(guild.id)!;
-            target.allows_invites = guild.allows_invites;
-            target.command_hints = guild.command_hints;
-            target.prefix = guild.prefix;
-        });
-    }
-
-    public getGuild(guild : Guild) : ICachedGuild | undefined {
-        return this.guilds.get(guild.id);
-    }
-
-    public setPrefix(guild : Guild, prefix : string) : Promise<IGuild|Error|-1> {
-        if (prefix.length > 1) // this could change later on where we support up to 3 but na
-            // have to Promise.reject outside the promise chain
-            return Promise.reject(-1);
-
-        return this.db.one(upsertPrefix, [guild.id, prefix]).then((res: IGuild)=> {
-            // changing our cached value as well
-            const cached = this.guilds.get(guild.id)!;
-            if (cached === undefined)
-                this.guilds.set(guild.id, <ICachedGuild> {});
-
-            cached.prefix = res.prefix;
-            return res;
-        }).catch((err : Error) => {
-            debug.error("Error while updating prefix.\n"+ err, "Database");
-            return err;
-        });
-    }
-
-    public getPrefix(guildId : string) {
-        const guild = this.guilds.get(guildId);
-        if (!guild) {
-            this.initializeGuildIfNone(guildId);
-            return '$';
-        }
-        return guild.prefix;
-    }
-
-    public insertMember(member : GuildMember) {
-        const id = member.user.id;
-        const username = member.user.username;
-        const guild_id = member.guild.id;
-        this.initializeGuildIfNone(member.guild.id);
-        const guild = this.guilds.get(member.guild.id)!;
-
-        this.db.oneOrNone(getMember, [member.guild.id, member.id]).then((res: IUser | undefined) => {
-            if (!res)
-                return this.db.one(insertMember, [id, username, guild_id]);
-        });
-
-        // checking if we already cached a user
-        if (!guild.users.find(prop => prop.id === member.id)) {
-            guild.users.push({
-                id: id,
-                guild_id: guild_id,
-                ignoring: false
+    public connect(url: string): Promise<Connection> {
+        return this.ormConfig(url).then(() => {
+            return createConnection({
+                type: 'postgres',
+                url: url,
+                username: 'postgres',
+                database: 'discord',
+                entities: ['src/database/models/**/*.js'],
+                migrations: ['src/database/migrations/**/*.js'],
+                synchronize: /*false, */ this.env === Environments.Development,
+                dropSchema: /*false, */ this.env === Environments.Development,
+                cli: {
+                    migrationsDir: 'migrations'
+                },
+                cache: {
+                    type: 'redis',
+                    duration: Infinity,
+                    options: {
+                        // TODO: Make this dynamic
+                        host: this.env === Environments.Development ? 'localhost' : process.env.REDISCLOUD_URL,
+                        port: 6379
+                    }
+                }
+            }).catch(err => {
+                debug.error(err, `Database`);
+                return Promise.reject(err);
             });
 
+        }).catch(err => {
+            debug.error(err, `Database`);
+            return Promise.reject(err);
+        });
+    }
+
+    private ormConfig(url: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            rootConfig.url = url;
+            fs.writeFile('ormconfig.json', JSON.stringify(rootConfig, null, '\t'), (err) => {
+                if (err)
+                    return reject();
+                return resolve();
+            });
+        });
+    }
+
+    public async crossCheck(): Promise<void> {
+        debug.silly(`Crosschecking database`, `Database`);
+        const guilds = gb.instance.bot.guilds.array();
+        for (let i in guilds) {
+            const guild = guilds[i];
+            await this.addGuild(guild);
+            const users = guild.members.array();
+            for (let i in users) {
+                const user = users[i];
+                await this.addMember(user);
+                console.log(await this.getUser(user.guild.id, user.user.id))
+            }
         }
+        debug.silly(`Crosschecked db`,`Database`);
+        return Promise.resolve();
     }
 
-    public cacheWelcomeMessage(member: GuildMember, welcomeMessage: Message){
-        const targetGuild: ICachedGuild| undefined = this.guilds.get(member.guild.id);
-        if(!targetGuild)
-            return debug.error(`Guild ${member.guild.name} was not found in cache`, 'Database');
-
-        targetGuild.welcomeMessages.set(member.id, welcomeMessage);
+    public invalidateCache(table: string): Promise<void>{
+        // always caching so we're force validating queryResultCache
+        return this.conn.queryResultCache!.remove([table]);
     }
 
-    public uncacheWelcomeMessage(member: GuildMember): Message| undefined{
-        const targetGuild: ICachedGuild| undefined = this.guilds.get(member.guild.id);
-        if(!targetGuild){
-            debug.error(`Guild ${member.guild.name} was not found in cache`, 'Database');
+    public getUsers(guildId: string): Promise<User[]> {
+        return this.conn.manager.find(User, {where: {guild_id: guildId}, cache: true});
+    }
+
+    public getUser(guildId: string, userId: string): Promise<User>  {
+        return this.conn.manager.find(User, {where: {guild_id: guildId, id: userId}, cache: true}).then((r: User[]) => {
+            if (r.length > 1) {
+                debug.error(`Multiple instances of user ${userId} exists in the db.`, `Database`);
+            }
+            return r[0];
+        }).catch((err: Error)=> {
+            return Promise.reject(err);
+        })
+    }
+
+    public getGuild(guildId: string): Promise<Guild> {
+        return this.conn.manager.findOne(Guild, {where: {id: guildId}, cache: true}).then((r: any) => {
+            console.log(r);
+            if (!r)
+                return Promise.reject('Guild not found');
+            return r;
+        }).catch((err: Error)=> {
+            return Promise.reject(err);
+        })
+    }
+
+    public getGuilds(): Promise<Guild[]>{
+        return this.conn.manager.find(Guild, {cache: true});
+    }
+
+    public getMacros(guildId: string): Promise<Macro[]> {
+        return this.conn.manager.find(Macro, {where: {guild_id: guildId}, cache: true}).then((r: Macro[]) => {
+            return r;
+        });
+    }
+
+    public getMacro(guildId: string, name: string): Promise<Macro|undefined> {
+        return this.conn.manager.findOne(Macro, {where: {guild_id: guildId, macro_name: name}, cache: true});
+    }
+
+    public getMacroCount(guildId: string): Promise<number> {
+        return this.getMacros(guildId).then((r: Macro[]) => {
+            return r.length;
+        });
+    }
+
+    public setPrefix(guildId: string, prefix: string) {
+        if (prefix.length > 1) {
+            return Promise.reject(`Prefix for ${guildId} must be a single character`);
+        }
+        return this.invalidateCache('guilds').then(() => {
+            return this.conn.manager.save(Guild, {id: guildId, prefix: prefix});
+        }).catch(err => {
+            debug.error(`Error getting guild`, `Database`);
+            return Promise.reject(err);
+        })
+    }
+
+    public getPrefix(guildId: string): Promise<string> {
+        return this.getGuild(guildId).then((guild: Guild) => {
+            return guild.prefix;
+        }).catch(err => {
+            return Promise.reject(err);
+        });
+    }
+
+    public addMember(target: GuildMember): Promise<Partial<User>> {
+        return this.invalidateCache('users').then(() => {
+            return this.conn.manager.save(User, {id: target.id, guild_id: target.guild.id});
+        }).catch(err => {
+            return Promise.reject(err);
+        });
+    }
+
+    public addGuild(guild: DiscordGuild): Promise<Partial<Guild>>{
+        return this.invalidateCache('guilds').then(() => {
+            return this.conn.manager.save(Guild, {
+                id: guild.id
+            });
+        }).catch(err => {
+            return Promise.reject(err);
+        })
+    }
+
+    public addMacro(message: Message, macroName: string, macroContent: string): Promise<Partial<Macro>> {
+        return this.invalidateCache('macros').then(() => {
+            return this.conn.manager.save(Macro, {
+                creator_id: message.author.id,
+                date_created: new Date(),
+                guild_id: message.guild.id,
+                macro_name: macroName,
+                macro_content: macroContent
+            });
+        }).catch(err => {
+            return Promise.reject(err);
+        });
+    }
+
+    public deleteMacro(guild: DiscordGuild, macroName: string): Promise<DeleteResult>{
+        return this.conn.manager.delete(Macro, {macro_name: macroName, guild_id: guild.id});
+    }
+
+    public addNote(guild: DiscordGuild, caller: GuildMember, target: GuildMember, noteContent: string): Promise<Partial<Note>> {
+        return this.invalidateCache('notes').then(() => {
+            return this.conn.manager.save(Note, {
+                guild_id: guild.id,
+                staff_id: caller.id,
+                target_id: target.id,
+                staff_name: caller.user.username,
+                guild_name: guild.name,
+                note_date: new Date(),
+                note_content: noteContent
+            });
+        })
+    }
+
+    public deleteNote(guild: DiscordGuild, noteId: string): Promise<DeleteResult> {
+        return this.invalidateCache('notes').then(() => {
+            return this.conn.createQueryBuilder()
+                .delete()
+                .from(Note)
+                .where('note_id = :note_id AND guild_id = :guild_id', {note_id: noteId, guild_id: guild.id})
+                .execute();
+        })
+    }
+
+    public getNotes(memberId: string, guildId: string){
+        return this.conn.manager.find(Note, {where: {target_id: memberId, guild_id: guildId}, cache: true});
+    }
+
+    public cacheWelcomeMessage(member: GuildMember, welcomeMessage: Message) {
+        const target = this.welcomeMessages[member.guild.id];
+        if (!target.length){
+            this.welcomeMessages[member.guild.id] = [welcomeMessage];
             return;
         }
-        const message: Message | undefined = targetGuild.welcomeMessages.get(member.id);
-            if (!message)
-                debug.error(`Welcome message for user ${member.user.username} was not found`, 'Database');
-        targetGuild.welcomeMessages.delete(member.id);
-        return message;
+        this.welcomeMessages[member.guild.id].push(welcomeMessage);
     }
 
-    public getUsers(guildId : string){
-        return this.db.many(getAllMembers, [guildId]).then((r : IUser[]) => {
-            return r;
+    public unCacheWelcomeMessage(member: GuildMember): Message|undefined {
+        const target = this.welcomeMessages[member.guild.id];
+        if(!target.length){
+            const err = `A welcome message in ${member.guild.id} could not be removed because the list is empty`
+            debug.error(err, `Database`);
+        }
+        return target.find(t => t.member.id === member.id);
+
+    }
+
+    public setAllowGuildInvites(guildId: string, state: boolean): Promise<Partial<Guild>> {
+        return this.invalidateCache('guilds').then(() => {
+            return this.conn.manager.save(Guild, {id: guildId, allows_invites: state});
+        }).catch(err => {
+            return Promise.reject(err);
         })
     }
 
-    public addBlacklistedLink(link : string){
-
+    public getAllowGuildInvites(guildId: string): Promise<boolean> {
+        return this.getGuild(guildId).then((r: Guild) => {
+            return r.allows_invites;
+        }).catch(err => {
+            return Promise.reject(err);
+        })
     }
 
-    public removeBlacklistedLink(link : string){
-
+    public setWelcomeChannel(guildId: string, channelId: string): Promise<Partial<Guild>> {
+        return this.invalidateCache('guilds').then(() => {
+            return this.conn.manager.save(Guild, {id: guildId, welcome_channel: channelId});
+        }).catch(err => {
+            return Promise.reject(err);
+        })
     }
 
-    public addWhitelistedInvite(invite : string){
-        // we need to make sure we're only matching the
-        // invite part of this and not the whole link itself
+    public setLogsChannel(guildId: string, channelId: string): Promise<Partial<Guild>> {
+        return this.invalidateCache('guilds').then(() => {
+            return this.conn.manager.save(Guild, {id: guildId, logs_channel: channelId});
+        }).catch(err => {
+            return Promise.reject(err);
+        });
     }
 
-    public removeWhitelistedInvite(invite : string){
-
+    public setWarningsChannel(guildId: string, channelId: string): Promise<Partial<Guild>> {
+        return this.invalidateCache('guilds').then(() => {
+            return this.conn.manager.save(Guild, {id: guildId, warnings_channel: channelId});
+        }).catch(err => {
+            return Promise.reject(err);
+        });
     }
 
-    public allowInvites(guildId: string){
-        return this.db.oneOrNone(changeInviteSetting, [guildId, ])
+    public setChatChannel(guildId: string, channelId:string): Promise<Partial<Guild>> {
+        return this.invalidateCache('guildss').then(() => {
+            return this.conn.manager.save(Guild, {id: guildId, chat_channel: channelId});
+        }).catch(err => {
+            return Promise.reject(err);
+        })
     }
 
-    public updateWelcomeChannel(guildId : string, channelId : string) : Promise<string>{
-        return this.db.oneOrNone(updateWelcomeChannel, [channelId, guildId]).then((r: IGuild)=> {
-            this.initializeGuildIfNone(guildId);
-            this.guilds.get(guildId)!.welcome_channel = r.welcome_channel;
+    public getWelcomeChannel(guildId: string): Promise<string> {
+        return this.getGuild(guildId).then((r: Guild) => {
             return r.welcome_channel;
+        }).catch(err => {
+            return Promise.reject(err);
         });
     }
 
-    public getWelcomeChannel(guildId: string) : Channel | undefined {
-        const guild = this.guilds.get(guildId);
-        if (guild === undefined) return undefined;
-        return this.client.channels.get(guild.welcome_channel);
-    }
-
-    public updateLogsChannel(guildId : string, channelId : string){
-        return this.db.oneOrNone(updateLogsChannel, [channelId, guildId]).then((r : IGuild) => {
-            this.initializeGuildIfNone(guildId);
-            this.guilds.get(guildId)!.logs_channel = r.logs_channel;
+    public getLogsChannel(guildId: string): Promise<string> {
+        return this.getGuild(guildId).then((r: Guild) => {
             return r.logs_channel;
+        }).catch(err => {
+            return Promise.reject(err);
         });
     }
 
-    public updateWarningsChannel(guildId: string, channelId: string){
-        return this.db.oneOrNone(updateWarningsChannel, [channelId, guildId]).then((r: IGuild) => {
-            this.initializeGuildIfNone(guildId);
-            this.guilds.get(guildId)!.warnings_channel = r.warnings_channel;
+    public getWarningsChannel(guildId: string): Promise<string> {
+        return this.getGuild(guildId).then((r: Guild) => {
             return r.warnings_channel;
+        }).catch(err => {
+            return Promise.reject(err);
+        });
+    }
+
+    public getChatChannel(guildId: string): Promise<string> {
+        return this.getGuild(guildId).then((r: Guild) => {
+            return r.chat_channel;
+        }).catch(err => {
+            return Promise.reject(err);
         })
     }
 
-    public getLogsChannel(guildId : string):Channel|undefined {
-        const guild = this.guilds.get(guildId);
-        if (!guild) return undefined;
-        return this.client.channels.get(guild.logs_channel);
+    public setUserIgnore(member: GuildMember, state: boolean): Promise<Partial<User>> {
+        return this.invalidateCache('users').then(() => {
+            return this.conn.manager.save(User, {guild_id: member.guild.id, id: member.id, ignoring: state});
+        }).catch(err => {
+            return Promise.reject(err);
+        })
     }
 
-    public getWarningsChannel(guildId: string): Channel | undefined {
-        const guild = this.guilds.get(guildId);
-        if (!guild) return;
-        return this.client.channels.get(guild.warnings_channel);
+    public getUserIgnore(member: GuildMember): Promise<boolean> {
+        return this.getUser(member.guild.id, member.id).then((r: User) => {
+            if (!r)
+                return true;
+            return r.ignoring;
+        }).catch(err => {
+            return Promise.reject(err);
+        });
     }
 
-    public restockGuildMembers(guild :Guild){
-        this.initializeGuildIfNone(guild.id);
+    public setCommandHints(guildId: string, state: boolean): Promise<Partial<Guild>> {
+        return this.invalidateCache('guilds').then(() => {
+            return this.conn.manager.save(Guild, {id: guildId, hints: state});
+        })
 
-        return this.addGuild(guild).then( ()=> {
-            return this.db.none(cleanAllGuildMembers, [guild.id])
-        }).then(() => {
-            guild.members.forEach((member: GuildMember) => {
-                this.insertMember(member);
+    }
+
+    public getCommandHints(guildId: string) {
+        return this.getGuild(guildId).then((r: Guild) => {
+            return r.hints;
+        }).catch(err => {
+            return Promise.reject(err);
+        });
+    }
+
+    public getReactions(guildId: string){
+        return this.getGuild(guildId).then((r: Guild) => {
+            return r.reactions;
+        }).catch(err => {
+            return Promise.reject(err);
+        })
+    }
+
+    public incrementInviteStrike(member: GuildMember){
+        const memberIdentity = {
+            id: member.id,
+            guild_id: member.guild.id
+        };
+
+        return this.conn.manager.increment(User, memberIdentity, 'invite_strikes', 1)
+            .catch(err => Promise.reject(err))
+            .then(() => {
+                return this.conn.manager.findOne(User, memberIdentity)
+            }).then((r: User|undefined) => {
+                if (!r){
+                    return Promise.reject(`Invite strike of user with ID ${member.id} could not be incremented, user not found.`);
+                }
+                return Promise.resolve(r.invite_strikes);
+            }).catch(err =>  Promise.reject(err));
+    }
+
+    public setReactions(guildId: string, state: boolean){
+        return this.invalidateCache('guilds').then(() => {
+            return this.conn.manager.save(Guild, {
+                id: guildId,
+                reactions: state
             });
-        });
-    }
-
-    public insertNewGuild(guild : Guild){
-        this.initializeGuildIfNone(guild.id);
-        this.addGuild(guild);
-        guild.members.forEach((member: GuildMember )=> {
-            this.insertMember(member);
-        });
-    }
-
-    public getMemberInviteStrikes(member : GuildMember){
-        const id = member.id;
-        const guild_id = member.guild.id;
-        return this.db.oneOrNone(getMemberInviteStrikes, [id, guild_id]).then((res : IUser)=> {
-            return res.invite_strikes;
-        })
-    }
-
-    public incrementMemberInviteStrikes(member : GuildMember){
-        const id = member.id;
-        const guild_id = member.guild.id;
-        return this.db.one(incrementMemberInviteStrikes, [id, guild_id]).then((res:IUser )=> {
-            return res.invite_strikes;
-        });
-    }
-
-    public getLockdownStatus(guild: Guild) : boolean {
-        this.initializeGuildIfNone(guild.id);
-        return this.guilds.get(guild.id)!.lockdown;
-    }
-
-    public changeLockdownStatus(guild : Guild, status : boolean){
-        const target = this.guilds.get(guild.id);
-        if (target === undefined)
-            return debug.warning(`Guild ${guild.name} does not exist.`);
-        if (target!.lockdown === status)
-            return debug.warning(`Tried to set lockdown`+
-                ` status of ${guild.name} to ${status} but it is already ${status}`);
-
-        target!.lockdown = status;
-        this.db.one(changeLockdownStatus, [guild.id, status]);
-    }
-
-    public setIgnored(member : GuildMember, state : boolean){
-        const cachedGuild = this.guilds.get(member.guild.id);
-        if (!cachedGuild){
-            debug.error(`Could not find cached guild ${member.guild.name}.`, 'Database')
-            return Promise.reject(`Could not find cached guild ${member.guild.name}`);
-        }
-        return this.db.one(setIgnored, [state, member.guild.id, member.id]).then((user : IUser) => {
-            debug.info(`Now ignoring user ${member.user.username}.`);
-            cachedGuild.users.find(user => user.id === member.id)!.ignoring = user.ignoring;
-            return user.ignoring;
-        });
-    }
-
-    public getIgnored(member : GuildMember){
-        const guild = this.guilds.get(member.guild.id);
-        if (!guild) {
-            debug.warning(`server: ${member.guild.name} is not cached!`);
-            return undefined;
-        }
-        const target : ICachedUser | undefined = guild.users.find(user => user.id === member.id);
-        if (!target){
-            debug.warning(`user: ${member.user.username} is not cached!`);
-            return undefined;
-        }
-
-        return target.ignoring;
-    }
-
-    public getRaidStatus(guild : Guild)  {
-
-    }
-
-    public incrementCleverbotCall(member: GuildMember){
-        const guildId = member.guild.id;
-        this.db.one(incrementCleverbotGuildCall,  [guildId]);
-        this.db.one(incrementCleverbotMemberCall, [guildId, member.id]);
-    }
-
-    public restockCleverbot(){
-        const guilds = gb.instance.bot.guilds.array();
-        for (let i in guilds){
-            this.db.one(inserCleverbotGuild, [guilds[i].id, false, 0])
-        }
-    }
-
-    public getCommandHints(guild: Guild): boolean{
-        const target = this.guilds.get(guild.id);
-        if (target && target.command_hints !== undefined)
-            return target.command_hints;
-        return true;
-    }
-
-    public setCommandHints(guild: Guild, state: boolean) {
-        const cached = this.guilds.get(guild.id);
-        return this.db.one(setCommandHint, [state, guild.id]).then((res: IGuild)=> {
-            if (cached){
-                cached.command_hints = res.command_hints;
-            }
-            return res.command_hints;
-        })
-    }
-
-    public getInvitesAllowed(guild: Guild): boolean {
-        const target = this.guilds.get(guild.id);
-        if (!target){
-            debug.error(`Could not get allowed_invites for guild ${guild.id}`);
-            return false;
-        }
-        return target.allows_invites;
-    }
-
-    public setInvitesAllowed(guild: Guild, state: boolean) {
-        const cached = this.guilds.get(guild.id);
-        return this.db.one(setInvitesAllowed, [state, guild.id]).then((res: IGuild) => {
-            if (cached){
-                cached.allows_invites = res.allows_invites;
-            }
-            return res.allows_invites;
-        })
-    }
-
-    public addNote(guild: Guild, caller: GuildMember, target: GuildMember, note: string){
-        return this.db.oneOrNone(addNote, [guild.id, target.id, caller.id, caller.user.username, new Date(), note]).then(resp => {
-            return resp.note_content;
-        }).catch(error => {
-            return Promise.reject(error);
-        })
-    }
-
-    public getNotes(targetId: string, guildId: string){
-        // we want users to be able to retrieve old message info as well
-        // that's why we're being inconsistent and using string instead of GuildMember
-        return this.db.manyOrNone(getNotes, [guildId, targetId]).then((res: INote[]) => {
-            return res;
-        })
-    }
-
-    public deleteNoteFromGuild(noteId: string, guildId: string){
-        return this.db.oneOrNone(safeDeleteNote, [noteId, guildId]).then(res => {
-            return res;
-        })
-    }
-
-    public addMacro(message: Message, macroName: string, macroContent: string){
-        this.initializeGuildIfNone(message.guild.id);
-        const cached: ICachedGuild = this.guilds.get(message.guild.id)!;
-        return this.db.one(addMacro,
-                [
-                message.author.id,
-                message.guild.id,
-                macroName,
-                macroContent,
-                new Date()
-            ]).then((r: IMacro) => {
-                cached.macros.set(macroName, macroContent);
-                return r;
-        });
-    }
-
-    public getMacroCount(guild: Guild): Promise<number> {
-        return this.db.one(getMacroCount, [guild.id]).then((r: {count: number}) => {
-            debug.silly(`${guild.name} has ${r.count} macros saved.`);
-            return r.count;
-        })
-    }
-
-    public getMacros(guild: Guild): ICachedMacro[] {
-        this.initializeGuildIfNone(guild.id);
-        const cached: ICachedGuild | undefined = this.guilds.get(guild.id)!;
-        const arr: ICachedMacro[] = [];
-        cached.macros.forEach((value, key) => {
-            arr.push({
-                macro_name: key,
-                macro_content: value
-            })
-        });
-        return arr;
-    }
-
-    public getMacro(guild: Guild, macro: string, forceDB: boolean = false): string | Promise<IMacro> | undefined {
-        if (forceDB){
-            return this.db.oneOrNone(getMacro, [guild.id, macro]).then((r: IMacro) => {
-                return r;
-            })
-        }
-        this.initializeGuildIfNone(guild.id);
-        const targetGuild = this.guilds.get(guild.id)!;
-        return targetGuild.macros.get(macro);
-    }
-
-    public deleteMacro(guild: Guild, macro: string): Promise<IMacro> {
-        this.initializeGuildIfNone(guild.id);
-        const targetGuild = this.guilds.get(guild.id)!;
-        return this.db.oneOrNone(deleteMacro, [guild.id, macro]).then((r: IMacro) => {
-            targetGuild.macros.delete(r.macro_name);
-            return r;
+        }).catch(err => {
+            return Promise.reject(err);
         })
     }
 }
+
