@@ -51,8 +51,7 @@ export class Database {
                     duration: Infinity,
                     options: {
                         // TODO: Make this dynamic
-                        url: this.env === Environments.Development ? 'redis://localhost' : process.env.REDISCLOUD_URL,
-                        port: this.env === Environments.Development ? 6379 : 10852
+                        url: this.env === Environments.Development ? 'redis://localhost:6379' : process.env.REDISCLOUD_URL
                     }
                 }
             }).catch(err => {
