@@ -4,6 +4,7 @@ import {random, sanitizeUserInput} from "../../utility/Util";
 import findCommand from "../../commands/info/help/findCommand";
 import gb from "../../misc/Globals";
 import ReactionManager from "../reactions/reactionManager";
+import {highlight} from "../../utility/Markdown";
 
 export async function handleInvalidParameters(channel : Channel, commandName: string){
     const command = findCommand(commandName);
@@ -25,8 +26,8 @@ export async function handleInvalidParameters(channel : Channel, commandName: st
         .setColor('#ffdd51')
         .setTitle(`Yikes, that's not how you do that! ⚠`)
         .setDescription(`${command.name} takes **${command.arguments}** arguments.️`)
-        .addField(`Usage`, command.usage)
-        .addField(`Example`, command.example)
+        .addField(`Usage`, highlight(command.usage!))
+        .addField(`Example`, highlight(command.example!))
         .setFooter(`${await gb.instance.database.getPrefix(channel.guild.id)}${command.name} for more info`);
     if (await gb.instance.database.getReactions(channel.guild.id)){
         embed.setThumbnail(random(ReactionManager.getInstance().sorry));

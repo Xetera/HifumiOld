@@ -11,6 +11,7 @@ import {default as gb, Instance} from "../misc/Globals";
 import {getHelp} from "../commands/info/help/Help";
 import DMCommandHandler from "../handlers/commands/DMCommandHandler";
 import pingListener from "../listeners/pingListener";
+import memeListener from "../listeners/memeListener";
 
 export const debug = {
     silly: dbg('Bot:onMessage:Silly'),
@@ -36,6 +37,7 @@ function middleWare(msg: Discord.Message){
     alexa.checkMessage(message, bot);
     pingListener(message, database);
     inviteListener(message, database);
+    memeListener(message);
 }
 
 export default async function onMessage(message: Discord.Message){
