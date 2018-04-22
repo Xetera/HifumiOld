@@ -15,7 +15,7 @@ import serverInfo from "../../commands/info/ServerInfo";
 import echo from "../../commands/utility/Echo";
 import gb, {Instance} from "../../misc/Globals";
 import admin from "../permissions/decorators/onlyAdmin";
-import {Alexa} from "../../API/Alexa";
+import {Cleverbot} from "../../API/Cleverbot";
 import {MuteQueue} from "../../moderation/MuteQueue";
 import {MessageQueue} from "../../moderation/MessageQueue";
 import botOwner from "../permissions/decorators/onlyOwner";
@@ -27,7 +27,6 @@ import cleanse from "../../commands/utility/Cleanse";
 import bump from "../../commands/self/Bump";
 import getConfig from "../../commands/config/getConfig";
 import setLogsChannel from "../../commands/config/setLogsChannel";
-import getCache from "../../commands/debug/Cache";
 import ignore from "../../commands/self/Ignore";
 import botInfo from "../../commands/info/botInfo";
 import {debug} from "../../utility/Logging";
@@ -47,12 +46,14 @@ import addMacro from "../../commands/utility/addMacro";
 import {ICachedMacro, IMacro} from "../../database/TableTypes";
 import listMacros from "../../commands/utility/listMacros";
 import deleteMacro from "../../commands/utility/deleteMacro";
+import randomQuote from "../../commands/fun/randomQuote";
+import setChatChannel from "../../commands/config/setChatChannel";
 
 export interface CommandParameters extends Instance {
     message: Discord.Message;
     args: string[];
     bot: Discord.Client;
-    alexa: Alexa,
+    alexa: Cleverbot,
     muteQueue: MuteQueue,
     messageQueue: MessageQueue,
     database : Database
@@ -76,21 +77,20 @@ function isMessage(message : any) : message is Discord.Message {
 export default class CommandHandler implements indexSignature {
     [method:string]: any;
     commands : string[];
-    restarting: boolean;
+    restarting: boolean = false;
     constructor(){
-        this.commands = (Object.getOwnPropertyNames(Object.getPrototypeOf(this))
+        this.commands = Object.getOwnPropertyNames(Object.getPrototypeOf(this))
             .filter(method=> {
             return method !== 'constructor'
                 && method !== 'handler'
                 && method !== 'parseInput'
                 && method !== 'restarting';
-        }));
-        this.restarting = false;
+        });
     }
 
-    public static parseInput(message : Discord.Message): UserInputData | undefined {
+    public static async parseInput(message : Discord.Message): Promise<UserInputData | undefined> {
         let args : string[] = [];
-        const prefix = gb.instance.database.getPrefix(message.guild.id);
+        const prefix = await gb.instance.database.getPrefix(message.guild.id);
         // removing excess whitespace between words that can't be removed with .trim()
         const messageContent = message.content.replace(/\s+/, ' ');
         if (isMessage(message))
@@ -101,6 +101,7 @@ export default class CommandHandler implements indexSignature {
         let command : string | undefined = args.shift()!;
 
         // detecting stealth command
+        // setting the rest of the properties later
         let out = <UserInputData> {
             args: args
         };
@@ -120,12 +121,11 @@ export default class CommandHandler implements indexSignature {
         return undefined;
     }
 
-
-
-    public async handler(message : Discord.Message,instance : Instance) {
+    public async handler(message : Discord.Message) {
+        console.log(this.restarting);
         if (this.restarting)
             return;
-        const inputData: UserInputData | undefined = CommandHandler.parseInput(message);
+        const inputData: UserInputData | undefined = await CommandHandler.parseInput(message);
         if (inputData === undefined)
             return;
         else if (inputData.stealth){
@@ -137,7 +137,7 @@ export default class CommandHandler implements indexSignature {
         else
             debug.error(`A non text channel command was forwarded to CommandHandler`, 'CommandHandler');
 
-        const params = <CommandParameters> instance;
+        const params = <CommandParameters> gb.instance;
         params.args = inputData.args;
         params.message = message;
 
@@ -156,7 +156,7 @@ export default class CommandHandler implements indexSignature {
         }
 
         // User input is not a command, checking macros
-        const macros: ICachedMacro[] = gb.instance.database.getMacros(message.guild);
+        const macros: ICachedMacro[] = await gb.instance.database.getMacros(message.guild.id);
         let targetMacro: ICachedMacro | undefined;
         if (macros.length){
             targetMacro = macros.find(macro => macro.macro_name === inputData.command);
@@ -166,7 +166,7 @@ export default class CommandHandler implements indexSignature {
         }
 
         // User input is not a command OR a macro, checking if guild has hints enabled
-        const hints = instance.database.getCommandHints(message.guild);
+        const hints = await gb.instance.database.getCommandHints(message.guild.id);
         if (hints){
             message.channel.send(
                 commandNotFoundEmbed(message.channel, inputData.command, macros.map(macro => macro.macro_name))
@@ -201,17 +201,6 @@ export default class CommandHandler implements indexSignature {
     }
 
     @botOwner
-    private cache(params: CommandParameters){
-        getCache(params.message, params.database);
-    }
-
-    @botOwner
-    private test(params: CommandParameters){
-        /*Testing Commands*/
-        //setupMutePermissions(params.message);
-    }
-
-    @botOwner
     private guilds(params: CommandParameters){
         params.message.channel.send(params.bot.guilds.array().map(g => `${g.name}: ${g.id} Members:${g.memberCount}`).join('\n'));
     }
@@ -221,6 +210,12 @@ export default class CommandHandler implements indexSignature {
     @admin
     private setPrefix(params: CommandParameters){
         setPrefix(params.message, params.args[0], params.database);
+    }
+
+    @admin
+    private reactions(params: CommandParameters){
+
+
     }
 
     @admin
@@ -263,17 +258,22 @@ export default class CommandHandler implements indexSignature {
 
     @mod
     private setWelcome(params : CommandParameters){
-        setWelcome(params.message, params.database);
+        setWelcome(params.message);
     }
 
     @mod
     private setLogs(params : CommandParameters){
-        setLogsChannel(params.message, params.database);
+        setLogsChannel(params.message);
     }
 
     @mod
     private setWarnings(params: CommandParameters){
         setWarningsChannel(params.message);
+    }
+
+    @mod
+    private setChat(params: CommandParameters){
+        setChatChannel(params.message);
     }
 
     @mod
@@ -322,7 +322,7 @@ export default class CommandHandler implements indexSignature {
     }
     /* Public Commands */
     private help(params: CommandParameters){
-        getHelp(params.message, params.args, params.database)
+        getHelp(params.message, params.args)
     }
 
     private passives(params: CommandParameters){
@@ -355,5 +355,9 @@ export default class CommandHandler implements indexSignature {
 
     private bump(params : CommandParameters){
         bump(params.message);
+    }
+
+    private randomQuote(params: CommandParameters){
+        randomQuote(params.message);
     }
 }

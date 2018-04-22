@@ -10,6 +10,7 @@ export default function onlyMod(target : any, key: any , descriptor: any) {
             message.channel.send(missingModEmbed());
             return;
         }
+
         return originalMethod.apply(this, arguments);
     };
 

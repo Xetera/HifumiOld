@@ -7,7 +7,7 @@ export default function safeSendMessage
 (channel : Discord.Channel, message: string | number | object | RichEmbed, deleteAfter?: number): Promise<Message|Message[]> {
     let out : string|RichEmbed;
     if (typeof message === 'number'){
-        out = message.toString();
+        out = message.toString().trim();
     }
     else if (message instanceof RichEmbed){
         out = message;

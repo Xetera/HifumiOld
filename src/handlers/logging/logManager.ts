@@ -1,5 +1,5 @@
 import {
-    Channel, Guild, GuildAuditLogs, GuildAuditLogsEntry, GuildMember, RichEmbed, TextChannel,
+    Channel, Guild, GuildAuditLogs, GuildAuditLogsEntry, GuildMember, Message, RichEmbed, TextChannel,
     User, VoiceChannel
 } from "discord.js";
 import {debug, log} from "../../utility/Logging";
@@ -16,6 +16,7 @@ import logWatchlistSpamBanEmbed from "../../embeds/logging/tracklist/logTracklis
 import {Offense} from "../../moderation/interfaces";
 import logWatchlistInviteBanEmbed from "../../embeds/logging/tracklist/logTracklistInviteBanEmbed";
 import logEveryonePingEmbed from "../../embeds/logging/warnings/logEveryonePingEmbed";
+import logMentionSpamEmbed from "../../embeds/logging/warnings/logMentionSpamEmbed";
 
 // static class
 export class LogManager {
@@ -24,10 +25,15 @@ export class LogManager {
         setTimeout(() => guild.fetchAuditLogs().then((logs: GuildAuditLogs) => func(logs)), 500);
     }
 
-    private static logWarning(guild: Guild, embed: RichEmbed|string, action: string){
-        const warningsChannel : Channel | undefined = gb.instance.database.getWarningsChannel(guild.id);
-        if (!warningsChannel)
-            return void debug.info(`Could not log a ${action ? action + ' action' : 'warning'} in ${guild.name}, missing logs channel`, 'LogManager');
+    private static async logWarning(guild: Guild, embed: RichEmbed|string, action: string){
+        const channelId : string = await gb.instance.database.getWarningsChannel(guild.id);
+        if (!channelId)
+            return void debug.info(`Could not log a ${action ? action + ' action' : 'message'} in ${guild.name}, missing warnings channel`, 'LogManager');
+        const warningsChannel = guild.channels.get(channelId);
+        if (!warningsChannel){
+            // User probably deleted the channel and didn't update their logs setting
+            return void debug.error(`Could not resolve a warnings channel saved in the database`, `LogManager`);
+        }
         if (warningsChannel instanceof TextChannel){
             warningsChannel.send(embed);
             debug.silly(`Logged a ${action ? action + ' action' : 'warning'} in ${guild.name}`, 'LogManager');
@@ -36,10 +42,16 @@ export class LogManager {
         return void debug.error(`Warning channel for ${guild.name} was not recorded as TextChanel.`, 'LogManager');
     }
 
-    private static logMessage(guild: Guild, embed: RichEmbed|string, action: string){
-        const logsChannel : Channel | undefined = gb.instance.database.getLogsChannel(guild.id);
-        if (!logsChannel)
+    private static async logMessage(guild: Guild, embed: RichEmbed|string, action: string){
+        const channelId : string = await gb.instance.database.getLogsChannel(guild.id);
+        if (!channelId)
             return void debug.info(`Could not log a ${action ? action + ' action' : 'message'} in ${guild.name}, missing logs channel`, 'LogManager');
+        const logsChannel = guild.channels.get(channelId);
+        if (!logsChannel){
+            // User probably deleted the channel and didn't update their logs setting
+            debug.error(channelId);
+            return void debug.error(`Could not resolve a logs channel saved in the database`, `Database`);
+        }
         if (logsChannel instanceof TextChannel){
             logsChannel.send(embed);
             debug.silly(`Logged a ${action ? action + ' action' : 'message'} in ${guild.name}`, 'LogManager');
@@ -111,7 +123,16 @@ export class LogManager {
         });
     }
 
-    public static logPingEveryoneAttempt(member: GuildMember, channel: Channel){
-        LogManager.logWarning(member.guild, logEveryonePingEmbed(member, channel), 'everyone ping');
+    public static logPingEveryoneAttempt(member: GuildMember, channel: Channel, content: string){
+        LogManager.logWarning(member.guild, logEveryonePingEmbed(member, channel, content), 'everyone ping');
+    }
+
+    public static logMentionSpam(message: Message){
+        LogManager.logWarning(message.member.guild,  logMentionSpamEmbed(
+            message.member,
+            message.channel,
+            message.content,
+            message.mentions.members.array()
+        ), '')
     }
 }
