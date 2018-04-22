@@ -85,7 +85,6 @@ export class Database {
             for (let i in users) {
                 const user = users[i];
                 await this.addMember(user);
-                console.log(await this.getUser(user.guild.id, user.user.id))
             }
         }
         debug.silly(`Crosschecked db`,`Database`);
