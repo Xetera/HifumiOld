@@ -39,7 +39,6 @@ export class Database {
             return createConnection({
                 type: 'postgres',
                 url: url,
-                database: 'discord',
                 entities: ['src/database/models/**/*.js'],
                 migrations: ['src/database/migrations/**/*.js'],
                 synchronize: /*false, */ this.env === Environments.Development,
