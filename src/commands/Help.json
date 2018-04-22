@@ -10,10 +10,10 @@
     {
       "name": "help",
       "type": "Info",
-      "info": "Sends you, well... this message.",
-      "usage": "help",
-      "example": "help",
-      "arguments": "0"
+      "info": "Sends you, well... this message (/ω＼). Enter a specific command to get more help.",
+      "usage": "help { command }",
+      "example": "help ignore",
+      "arguments": "0-1"
     },
     {
       "name": "passives",
@@ -34,8 +34,8 @@
     {
       "name": "setprefix",
       "type": "Self",
-      "info": "Changes my prefix settings.",
-      "usage": "setprefix {prefix}",
+      "info": "Changes my prefix settings. Currently only supporting single character commands, sorry.",
+      "usage": "setprefix { prefix }",
       "example": "setprefix >",
       "arguments": "1",
       "permissions": "ADMIN"
@@ -44,7 +44,7 @@
       "name": "nuke",
       "type": "Moderation",
       "info": "Deletes a certain number of past messages.",
-      "usage": "nuke {# of messages to delete} (default 50)",
+      "usage": "nuke { # of messages to delete? }",
       "example": "nuke 100",
       "arguments": "0-1",
       "permissions": "MOD"
@@ -53,7 +53,7 @@
       "name": "cleanse",
       "type": "Moderation",
       "info": "Deletes a certain number of past bot related message.",
-      "usage": "cleanse <# of msgs to delete> (default 50)",
+      "usage": "cleanse { # of msgs to delete? }",
       "arguments": "0-1",
       "example": "cleanse 200",
       "permissions": "MOD"
@@ -61,9 +61,9 @@
     {
       "name": "setwelcome",
       "type": "Logging",
-      "info": "Changes the channel I send welcome messages to.",
-      "usage": "channel welcome",
-      "example": "channel welcome",
+      "info": "Changes the channel I send welcome messages to. This is for everyone to see, I log them separately in the logs channel.",
+      "usage": "setwelcome",
+      "example": "setwelcome",
       "arguments": "0",
       "permissions": "MOD"
     },
@@ -71,8 +71,8 @@
       "name": "setlogs",
       "type": "Logging",
       "info": "Changes the channel I keep logs in.",
-      "usage": "channel logs",
-      "example": "channel logs",
+      "usage": "setlogs",
+      "example": "setlogs",
       "arguments": "0",
       "permissions": "MOD"
     },
@@ -81,6 +81,16 @@
       "type": "Logging",
       "info": "Changes the channel I send mod warnings to, log channel by default.",
       "usage": "setwarnings",
+      "example": "setwarnings",
+      "arguments": "0",
+      "permissions": "MOD"
+    },
+    {
+      "name": "setchat",
+      "type": "Self",
+      "info": "Changes my chat channel. I respond to all messages in this channel regardless of hearing my name. I won't reply if you put a **-** in front of your message or mention someone else.",
+      "usage": "setchat",
+      "example": "setchat",
       "arguments": "0",
       "permissions": "MOD"
     },
@@ -88,16 +98,16 @@
       "name": "echo",
       "type": "Utility",
       "info": "Sends a custom message to a channel.",
-      "usage": "echo {#mention OR channel ID} {message}",
+      "usage": "echo { #mention | channel ID } { message }",
       "example": "echo #lobby Hello World!",
       "arguments": "2",
       "permissions": "MOD"
     },
     {
       "name": "ignore",
-      "type": "Self",
-      "info": "Ignores or unignores all conversation and commands from a user.",
-      "usage": "ignore {@Mention}",
+      "type": "Moderation",
+      "info": "Ignores or un-ignores all conversation and commands from a user.",
+      "usage": "ignore { @Mention }",
       "example": "ignore @Xetera",
       "arguments": "1",
       "permissions": "MOD"
@@ -106,7 +116,7 @@
       "name": "pfp",
       "type": "Utility",
       "info": "Fetches the profile picture of the user.",
-      "usage": "pfp {@Member OR userId}",
+      "usage": "pfp { @Member | user ID }",
       "example": "pfp @Xetera` OR `pfp 4563862635863",
       "arguments": "1"
     },
@@ -146,7 +156,7 @@
       "name": "source",
       "type": "Info",
       "info": "Sends my source code on github.",
-      "usage": "source {command name}",
+      "usage": "source { command name? }",
       "example": "source setprefix",
       "arguments": "0-1"
     },
@@ -154,7 +164,7 @@
       "name": "setmood",
       "type": "Self",
       "info": "Change my chat settings. **currently WIP**",
-      "usage": "setmood {number or 'random'}",
+      "usage": "setmood { number | 'random' }",
       "example": "setmood random",
       "arguments": "1",
       "permissions": "MOD"
@@ -163,7 +173,7 @@
       "name": "mute",
       "type": "Moderation",
       "info": "Mutes a user for a set amount of time. Muted users cannot react to or send messages.",
-      "usage": "mute {@Member or userID} {duration (minutes)} {reason}",
+      "usage": "mute { @Member | userID } { duration (minutes) } { reason }",
       "example": "mute @Xetera 60 stop being rude to people",
       "arguments": "3",
       "permissions": "MOD"
@@ -171,17 +181,26 @@
     {
       "name": "hints",
       "type": "Self",
-      "info": "Changes my response for when users enter an invalid command.",
-      "usage": "hints {on or off}",
+      "info": "Determines whether I respond to invalid commands with a hint or not.",
+      "usage": "hints {'on' | 'off'}",
       "example": "hints off",
       "arguments": "1",
       "permissions": "MOD"
     },
     {
-      "name": "invitefilter",
+      "name": "config",
       "type": "Self",
-      "info": "Changes my settings for filtering invites, mods can always send invites regardless.",
-      "usage": "invitefilter {on or off}",
+      "info": "Sends all the settings I remember about this server",
+      "usage": "config",
+      "example": "config",
+      "arguments": "0",
+      "permissions": "MOD"
+    },
+    {
+      "name": "invitefilter",
+      "type": "Moderation",
+      "info": "Changes my settings for deleting invites, mods can always send invites regardless.\n**On** => I DELETE ALL (╬ಠ益ಠ)\n**Off** => Everyone can send invites (/ω＼)",
+      "usage": "invitefilter { 'on' | 'off' }",
       "example": "invitefilter off",
       "arguments": "1",
       "permissions": "ADMIN"
@@ -190,7 +209,7 @@
       "name": "note",
       "type": "Moderation",
       "info": "Adds a note to a user. All user information including notes can be looked up by mods.",
-      "usage": "note {@Member or userID} {message}",
+      "usage": "note { @Member | userID } { message }",
       "example": "note @Xetera keeps sending pepe memes, ban them next time.",
       "arguments": "2",
       "permissions": "MOD"
@@ -199,7 +218,7 @@
       "name": "deletenote",
       "type": "Moderation",
       "info": "Deletes a user note by ID.",
-      "usage": "deletenote {note ID}",
+      "usage": "deletenote { note ID }",
       "example": "deletenote 420",
       "arguments": "1",
       "permissions": "MOD"
@@ -208,7 +227,7 @@
       "name": "history",
       "type": "Moderation",
       "info": "Fetches the history of a user including things like infractions, notes, join date and watchlist status.",
-      "usage": "history {@Member or userID or username or nickname}",
+      "usage": "history { @Member | userID | username | nickname }",
       "example": "history Xetera",
       "arguments": "1",
       "permissions": "MOD"
@@ -217,7 +236,7 @@
       "name": "addmacro",
       "type": "Utility",
       "info": "Adds a new macro. Macros are special commands that you can add to make me respond with a specific message or picture URL.",
-      "usage": "addmacro {macro name} {message}",
+      "usage": "addmacro { macro name } { message }",
       "example": "addmacro rolepls Be patient, you'll have to be active first to get a role",
       "arguments": "2",
       "permissions": "MOD"
@@ -226,7 +245,7 @@
       "name": "listmacros",
       "type": "Utility",
       "info": "Lists all the macros I have saved on this server.",
-      "usage": "listmacros ",
+      "usage": "listmacros",
       "example": "listmacros",
       "arguments": "0"
     },
@@ -234,8 +253,27 @@
       "name": "deletemacro",
       "type": "Utility",
       "info": "Deletes a saved macro from the server.",
-      "usage": "deletemacro {macro name}",
-      "example": "deletemacro "
+      "usage": "deletemacro { macro name }",
+      "example": "deletemacro",
+      "arguments": "1",
+      "permissions": "MOD"
+    },
+    {
+      "name": "randomquote",
+      "type": "Fun",
+      "info": "Sends a random quote by someone.",
+      "usage": "randomquote",
+      "example": "randomquote",
+      "arguments": "0"
+    },
+    {
+      "name": "reactions",
+      "type": "Self",
+      "info": "Toggles the gif/image reactions I add to some of my replies",
+      "usage": "reactions {'on'|'off'}",
+      "example": "reactions off",
+      "arguments": "1",
+      "permissions": "ADMIN"
     }
   ]
 }

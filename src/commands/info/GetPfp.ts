@@ -11,9 +11,9 @@ export const debug = {
     warning: dbg('Bot:PFP:Warning'),
     error  : dbg('Bot:PFP:Error')
 };
-export default function pfp(message: Discord.Message, args : string[]){
+export default async function pfp(message: Discord.Message, args : string[]){
     if (!args.length){
-        return handleInvalidParameters(message.channel, 'pfp');
+        return await handleInvalidParameters(message.channel, 'pfp');
     }
     let url : string;
     let user : Discord.User;

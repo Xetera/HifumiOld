@@ -5,9 +5,9 @@ import gb from "../../misc/Globals";
 import {handleInvalidParameters} from "../../handlers/commands/invalidCommandHandler";
 import hasMessagingPermissions from "../../handlers/permissions/missingPermissionsHandler";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
-export default function echo(message:Message, args: string[]) : void {
+export default async function echo(message:Message, args: string[]) {
     if (!args.length){
-        handleInvalidParameters(message.channel, `echo`);
+        await handleInvalidParameters(message.channel, `echo`);
         return;
     }
 

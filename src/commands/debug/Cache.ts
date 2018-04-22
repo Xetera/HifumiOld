@@ -4,7 +4,7 @@ import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {codeBlock} from "../../utility/Markdown";
 import {debug} from "../../utility/Logging";
 import {APIErrors} from "../../interfaces/Errors";
-
+/*
 export default function getCache(message: Message, database : Database){
     const cache = database.guilds.get(message.guild.id);
 
@@ -17,5 +17,6 @@ export default function getCache(message: Message, database : Database){
         }
     });
     debug.info(out);
-    //safeSendMessage(message.channel, database.guilds);
+    //safeSendMessage(message.channel, Database.guilds);
 }
+*/

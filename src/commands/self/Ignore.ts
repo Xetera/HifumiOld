@@ -3,8 +3,9 @@ import {Database} from "../../database/Database";
 import {GuildMember} from "discord.js";
 import {underline} from "../../utility/Markdown";
 import gb from "../../misc/Globals";
+import {User} from "../../database/models/user";
 
-export default function ignore(message : Discord.Message, member : GuildMember, database : Database) {
+export default async function ignore(message : Discord.Message, member : GuildMember, database : Database) {
     if (member === undefined){
         return message.channel.send(`Couldn't find a mentioned member.`);
     }
@@ -15,9 +16,9 @@ export default function ignore(message : Discord.Message, member : GuildMember, 
         return message.channel.send(`I have a really hard time ignoring admins, sorry.`);
 
 
-    const status = database.getIgnored(member);
-    database.setIgnored(member, !status).then((state: boolean) => {
-        if (state)
+    const status = await gb.instance.database.getUserIgnore(member);
+    await gb.instance.database.setUserIgnore(member, !status).then((state: Partial<User>) => {
+        if (state.ignoring)
             message.channel.send(`Ignoring everything from ${member.user.username}.`);
         else
             message.channel.send(`Unignored ${member.user.username}`);

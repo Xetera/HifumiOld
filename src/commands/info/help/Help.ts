@@ -12,10 +12,10 @@ import {ICachedMacro, IMacro} from "../../../database/TableTypes";
 import helpMacroEmbed from "../../../embeds/commands/helpMacroEmbed";
 const help = require('../../help.json');
 
-export function getHelp(message : Message, args : string[],  database : Database) {
-    const prefix: string = database.getPrefix(message.guild.id);
+export async function getHelp(message : Message, args : string[]) {
+    const prefix: string = await gb.instance.database.getPrefix(message.guild.id);
     if (!args.length){
-        const prefix : string = database.getPrefix(message.guild.id);
+        const prefix : string = await gb.instance.database.getPrefix(message.guild.id);
         let embed = new RichEmbed().addField("Your prefix", prefix, true);
 
         const sortedCommands = help.commands.reduce((obj: {[type:string]: Command[]}, command: Command) => {
@@ -27,7 +27,7 @@ export function getHelp(message : Message, args : string[],  database : Database
         }, {});
         // this may be a little
         for(let key in sortedCommands){
-            const command = sortedCommands[key].map((cmd: Command)=> '\`' + cmd.name + '\`').join(' ');
+            const command = sortedCommands[key].map((cmd: Command)=> '\`' + cmd.name + '\`').join(', ');
             embed.addField(sortedCommands[key][0].type, command);
         }
 
@@ -44,7 +44,7 @@ export function getHelp(message : Message, args : string[],  database : Database
 async function getSpecificHelp(message: Message, arg: string, prefix: string){
     const command: Command = help.commands.find((command: Command)=> command.name === arg);
     if (!command) {
-        const macro = <IMacro> await gb.instance.database.getMacro(message.guild, arg, true);
+        const macro = await gb.instance.database.getMacro(message.guild.id, arg);
         if (macro){
             return message.channel.send(helpMacroEmbed(message.guild, macro));
         }

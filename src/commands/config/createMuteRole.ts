@@ -1,8 +1,5 @@
 import {Message, Permissions, PermissionString, RichEmbed, Role} from "discord.js";
 import missingPermissionsEmbed from "../../embeds/permissions/missingPermissionsEmbed";
-import createMuteRoleEmbed from "../../embeds/commands/configEmbed/createMuteRoleEmbed";
-import {updateWelcomeChannel} from "../../database/queries/guildQueries";
-import {channelOverrideDeniesRolePermission} from "../../utility/Util";
 import {APIErrors} from "../../interfaces/Errors";
 
 export default function createMuteRole(message: Message): Promise<Role> {

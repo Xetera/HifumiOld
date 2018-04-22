@@ -12,7 +12,7 @@ import {handleInvalidParameters} from "../../handlers/commands/invalidCommandHan
  */
 export default async function muteUser(message: Message, args: string[]) {
     if (args.length <3){
-        return void handleInvalidParameters(message.channel, 'mute');
+        return void await handleInvalidParameters(message.channel, 'mute');
     }
     const userInput = args.shift()!;
     const mention = message.mentions.members.first();

@@ -1,4 +1,4 @@
-import {Alexa} from "../../API/Alexa";
+import {Cleverbot} from "../../API/Cleverbot";
 import {Instance} from "../../misc/Globals";
 import onlyMod from "../../handlers/permissions/decorators/onlyMod";
 import {CommandParameters} from "../../handlers/commands/CommandHandler";

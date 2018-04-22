@@ -4,7 +4,7 @@ const sources = require('./Sources.json');
 
 export default function source(message: Message, args : string[]){
     if (!args.length)
-        return message.channel.send('https://github.com/ilocereal/Alexa');
+        return message.channel.send('https://github.com/ilocereal/Hifumi');
     const command = args[0];
     if (!sources[command])
         return safeSendMessage(message.channel, `${command} is not a valid command.`);

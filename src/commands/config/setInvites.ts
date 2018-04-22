@@ -2,30 +2,33 @@ import {Message} from "discord.js";
 import gb from "../../misc/Globals";
 import {handleInvalidParameters} from "../../handlers/commands/invalidCommandHandler";
 import {getOnOff} from "../../utility/Util";
+import {Guild} from "../../database/models/guild";
+import disableInvitesEmbed from "../../embeds/commands/configEmbed/disableInvitesEmbed";
+import enableInvitesEmbed from "../../embeds/commands/configEmbed/enableInvitesEmbed";
+import alreadyDisabledInvitesEmbed from "../../embeds/commands/configEmbed/alreadyDisabledinvitesEmbed";
+import alreadyEnabledInvitesEmbed from "../../embeds/commands/configEmbed/alreadyEnabledInvitesEmbed";
 
-export default function setInvites(message: Message, args: string[]){
+export default async function setInvites(message: Message, args: string[]){
     if (!args.length){
-        return void handleInvalidParameters(message.channel, 'checkinvites');
+        return void await handleInvalidParameters(message.channel, 'invitefilter');
     }
     //invitefilter off -> allows_invites = on;
     const input = args.shift()!;
     const inputAllowed = !getOnOff(input);
     // state -> allow invites = true
     if (inputAllowed === undefined)
-        return void handleInvalidParameters(message.channel, 'checkinvites');
-    const allowed  = gb.instance.database.getInvitesAllowed(message.guild);
+        return void await handleInvalidParameters(message.channel, 'invitefilter');
+    const allowed  = await gb.instance.database.getAllowGuildInvites(message.guild.id);
 
     if (!allowed && !inputAllowed){
-        return void message.channel.send(`I'm already listening for all invites, no need to enable it again ${gb.emojis.get('alexa_all_good')}`)
+        return void message.channel.send(await alreadyDisabledInvitesEmbed(message.guild))
     }
 
     else if (allowed && inputAllowed){
-        return void message.channel.send(`I'm already not looking at invite links, you can send them whenever you like.`)
+        return void message.channel.send(await alreadyEnabledInvitesEmbed(message.guild))
     }
 
-    gb.instance.database.setInvitesAllowed(message.guild, inputAllowed).then(response => {
-        message.channel.send(!response
-            ? `Roger roger, I'll be removing all invites from non-admins now on!`
-            : `Oh... OK, I turned off my invite checks. Everyone will be able to post invites now.`)
+    gb.instance.database.setAllowGuildInvites(message.guild.id, inputAllowed).then(async (response: Partial<Guild>)=> {
+        message.channel.send(!response.allows_invites ? await disableInvitesEmbed(message.guild) : await enableInvitesEmbed(message.guild))
     })
 }
