@@ -13,11 +13,11 @@ export const debug = {
 };
 
 export default  function onGuildMemberRemove(member : Discord.GuildMember) {
-    // we will change this later to fetch from a database instead of using a preset name
+    // we will change this later to fetch from a Database instead of using a preset name
     return member.guild.fetchAuditLogs().then((logs: GuildAuditLogs)=> {
         return logs.entries.first().action === 'MEMBER_BAN_ADD';
     }).then((isBan: boolean) => {
-        const welcomeMessage: Message | undefined = gb.instance.database.uncacheWelcomeMessage(member);
+        const welcomeMessage: Message | undefined = gb.instance.database.unCacheWelcomeMessage(member);
         if (!welcomeMessage) {
             debug.error(`Could not delete the message for user ${member.user.username}`);
         }

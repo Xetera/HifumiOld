@@ -1,17 +1,17 @@
-import {PostgresLiveLoginConfig, PostgresDevLoginConfig, Database, DatabaseConfig} from "../database/Database";
+import {Database} from "../database/Database";
 import gb, {Instance} from "../misc/Globals";
 import {Client, Guild, Message} from "discord.js";
 import {debug} from '../utility/Logging'
 import {MessageQueue} from "../moderation/MessageQueue";
 import CommandHandler, {CommandParameters} from "../handlers/commands/CommandHandler";
 import Tracklist from "../moderation/Tracklist";
-import {Alexa} from "../API/Alexa";
+import {Cleverbot} from "../API/Cleverbot";
 import {MuteQueue} from "../moderation/MuteQueue";
 import {LogManager} from "../handlers/logging/logManager";
 import {default as catchUncaughtExceptions} from '../handlers/process/uncaughtException'
 import {catchSigterm} from '../handlers/process/sigterm'
 import {default as catchUnhandledRejections} from '../handlers/process/unhandledRejection'
-
+const Heroku = require('heroku-client');
 export enum Environments {
     Development,
     Live
@@ -23,6 +23,8 @@ declare let process : {
         CLEVERBOT_TOKEN: string
         ENV: string;
         DATABASE_URL: string;
+        HEROKU_API_TOKEN: string;
+        REDISCLOUD_URL: string;
     }
 };
 
@@ -67,33 +69,23 @@ export function getTokens(env: Environments) {
 }
 
 
-export function getDatabaseConnection(env: Environments) : PostgresDevLoginConfig|PostgresLiveLoginConfig {
-    if (env === Environments.Live){
-        let credentials = <PostgresLiveLoginConfig>{};
-        credentials.connectionString = process.env.DATABASE_URL;
-        credentials.ssl = true;
-        return credentials;
-    }
-    else {
-        let credentials = <PostgresDevLoginConfig>{};
-        credentials.user = 'postgres';
-        credentials.host = 'localhost';
-        credentials.port = 5432;
-        credentials.database = 'discord';
-        return credentials;
-    }
+export function getDatabaseConnection(env: Environments) : string {
+    if (env === Environments.Development)
+        return 'postgres://localhost/discord';
+    return process.env.DATABASE_URL;
 }
 
 // instances
-export function createInstance(BOT_TOKEN: string, CLEVERBOT_TOKEN: string, DATABASE_CONFIG: DatabaseConfig): Instance {
+export async function createInstance(bot: Client, BOT_TOKEN: string, CLEVERBOT_TOKEN: string, DATABASE_CONFIG: string): Promise<Instance> {
     // this is how we avoid scoping problems, a little ugly but
     // it gets the job done
-    let bot = new Client();
-    bot.login(BOT_TOKEN);
-    let alexa = new Alexa(CLEVERBOT_TOKEN);
-    let database = new Database(DATABASE_CONFIG, bot);
+    // TODO: Smarter Xetera to past Xetera, use singletons or
+    // TODO: dependency injections <- this is probably less stupid
+    let alexa = new Cleverbot(CLEVERBOT_TOKEN);
+    let database = new Database(DATABASE_CONFIG);
     let muteQueue = new MuteQueue();
     let tracklist = new Tracklist();
+    // probably not a good place to have this side effect but whatever
     let messageQueue = new MessageQueue(muteQueue, database, tracklist);
     let commandHandler = new CommandHandler();
     return {
@@ -104,9 +96,11 @@ export function createInstance(BOT_TOKEN: string, CLEVERBOT_TOKEN: string, DATAB
         messageQueue: messageQueue,
         commandHandler:commandHandler,
         trackList: tracklist,
+        heroku: new Heroku({token: process.env.HEROKU_API_TOKEN}),
         // this is to be able to eval through the context of all the instances
-        eval: (params: CommandParameters, message: Message, x : any) => eval(x)
+        eval: (params: CommandParameters, message: Message, x: any) => eval(x)
     }
+
 }
 
 export function setupProcess(){
@@ -114,3 +108,5 @@ export function setupProcess(){
     catchUnhandledRejections();
     catchSigterm(true);
 }
+
+

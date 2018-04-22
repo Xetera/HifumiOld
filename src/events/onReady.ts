@@ -2,14 +2,15 @@ import * as Discord from'discord.js'
 import {debug, startupTable} from '../utility/Logging'
 import {default as gb, emojiName, Instance} from "../misc/Globals";
 import {Environments} from "./systemStartup";
-import {Emoji} from "discord.js";
+import {Client, Emoji, Message} from "discord.js";
 import updatePresence from "../actions/UpdatePresence";
+
+
 const cli = require('heroku-cli-util');
+const Heroku = require('heroku-client');
 
 // returning owner id at the end
-export default function onReady( instance : Instance) : Promise<string> {
-    const bot = instance.bot;
-    const database = instance.database;
+export default function onReady(bot: Client): Promise<string> {
     gb.allMembers = 0;
 
     return bot.generateInvite().then(link => {
@@ -28,19 +29,16 @@ export default function onReady( instance : Instance) : Promise<string> {
         }
 
         startupTable(startupGuild);
-            return bot;
-        }).then((bot : Discord.Client) => {
-            setGlobals(bot);
-
-            instance.database.doPrep();
-            instance.trackList.initializeGuilds();
-            return updatePresence(bot);
-        }).then(() => {
-            return bot.fetchApplication();
-        }).then((app : Discord.OAuth2Application)=> {
-            debug.info(`${bot.user.username} is fully online.`, "Ready");
-            return app.owner.id;
-        });
+        return bot;
+    }).then((bot : Discord.Client) => {
+        setGlobals(bot);
+        return updatePresence(bot);
+    }).then(() => {
+        return bot.fetchApplication();
+    }).then((app : Discord.OAuth2Application)=> {
+        debug.info(`${bot.user.username} is fully online.`, "Ready");
+        return app.owner.id;
+    });
 }
 
 function setGlobals(bot : Discord.Client){

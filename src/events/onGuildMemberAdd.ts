@@ -7,27 +7,23 @@ import {default as gb, Instance} from "../misc/Globals";
 import guildMemberAddEmbed from "../embeds/events/onGuildMemberAddEmbed";
 import {Channel, GuildMember, Message, TextChannel} from "discord.js";
 import {LogManager} from "../handlers/logging/logManager";
+import {debug} from "../utility/Logging";
 
-export const debug = {
-    silly  : dbg('Bot:onGuildMemberAdd:Silly'),
-    info   : dbg('Bot:onGuildMemberAdd:Info'),
-    warning: dbg('Bot:onGuildMemberAdd:Warning'),
-    error  : dbg('Bot:onGuildMemberAdd:Error')
-};
-
-export default function onGuildMemberAdd(member : Discord.GuildMember, instance: Instance) : void {
-    const database = instance.database;
-    database.insertMember(member);
+export default async function onGuildMemberAdd(member : Discord.GuildMember): Promise<void> {
+    const database = gb.instance.database;
+    await database.addMember(member);
     gb.instance.trackList.add(member);
-    // we will change this later to fetch from a database instead of using a preset name
-    const welcomeChannel : Channel | undefined = database.getWelcomeChannel(member.guild.id);
-
-    const identifier     : string = member.user.bot ? 'A new bot' : 'A new human';
+    // we will change this later to fetch from a Database instead of using a preset name
+    const welcomeChannelId : string | undefined = await database.getWelcomeChannel(member.guild.id);
     const welcomeMessage : string = random(welcomeMessages(member));
 
-    if (welcomeChannel === undefined) {
+    if (welcomeChannelId === undefined) {
         return debug.info(`Could not send a member join message to ${member.guild.name} `+
-        `because a welcome channel was missing.`);
+        `because a welcome channel was missing.`, 'GuildMemberAdd');
+    }
+    const welcomeChannel: Channel | undefined = member.guild.channels.get(welcomeChannelId);
+    if (!welcomeChannel){
+        return void debug.error(`Welcome channel saved in the database for guild ${member.guild.name} no longer exists`, 'GuildMemberAdd')
     }
 
     else if (welcomeChannel instanceof Discord.TextChannel){
