@@ -11,7 +11,8 @@
     "start": "nodemon src/index.js",
     "postinstall": "tsc",
     "heroku-prebuild": "echo Heroku is installing dependencies.",
-    "heroku-postbuild": "echo Dependencies built!"
+    "heroku-postbuild": "echo Dependencies built!",
+    "migrate": "typeorm migration:run"
   },
   "author": "Xetera",
   "license": "ISC",
