@@ -19,6 +19,6 @@
 		"subscribersDir": "src/database/subscribers"
 	},
 	"cache": {
-		"duration": "3600000"
+		"duration": "0"
 	}
 }
