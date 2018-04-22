@@ -12,7 +12,7 @@ export async function handleInvalidParameters(channel : Channel, commandName: st
     if (!(channel instanceof TextChannel)){
         return;
     }
-
+    const prefix = await gb.instance.database.getPrefix(channel.guild.id);
     if (!command){
         debug.error(`Could not find command ${commandName}`, 'handleInvalidParameters');
         return;
@@ -25,10 +25,10 @@ export async function handleInvalidParameters(channel : Channel, commandName: st
     let embed = new RichEmbed()
         .setColor('#ffdd51')
         .setTitle(`Yikes, that's not how you do that! ⚠`)
-        .setDescription(`${command.name} takes **${command.arguments}** arguments.️`)
-        .addField(`Usage`, highlight(command.usage!))
-        .addField(`Example`, highlight(command.example!))
-        .setFooter(`${await gb.instance.database.getPrefix(channel.guild.id)}${command.name} for more info`);
+        .setDescription(`**${prefix}${command.name}** takes **${command.arguments}** arguments.️`)
+        .addField(`Usage`, highlight(prefix + command.usage!))
+        .addField(`Example`, highlight(prefix + command.example!))
+        .setFooter(`${prefix}${command.name} for more info`);
     if (await gb.instance.database.getReactions(channel.guild.id)){
         embed.setThumbnail(random(ReactionManager.getInstance().sorry));
     }

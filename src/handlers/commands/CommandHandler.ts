@@ -236,8 +236,7 @@ export default class CommandHandler implements indexSignature {
 
     @mod
     private ignore(params : CommandParameters){
-        const user = params.message.mentions.members.first();
-        ignore(params.message, user, params.database);
+        ignore(params.message, params.args);
     }
 
     @mod
