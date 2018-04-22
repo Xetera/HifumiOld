@@ -5,7 +5,7 @@ Moderation based discord bot written in Typescript using [Discord.js](https://gi
 
 Currently hosted on [heroku](https://www.heroku.com/)
 
-[Invite](https://discordapp.com/oauth2/authorize?client_id=372615866652557312&permissions=0&scope=bot)
+[Invite Me](https://discordapp.com/oauth2/authorize?client_id=372615866652557312&permissions=0&scope=bot) - Prefix: $
 
 
 ## Whatcha Got: 
@@ -44,9 +44,9 @@ Locking down guilds on demand, muting everyone for 10 minutes or longer, allowin
 * Send Messages - yeah...
 * Manage Messages - deleting spam and invites
 * Manage Roles - for adding the 'muted' role to users
-* Add Reactions - Alexa reacts to messages she hears with 👀 and 👋 when greeting new members
+* Add Reactions - Hifumi reacts to messages she hears with 👀 and 👋 when greeting new members
 * Ban Members - Banning users who post over 5 (later variable) invites, spammers and potentially people sitting in the mute queue
-* Change Nickname(?) Could implement a self-name change at some point but I'd ideally like to keep the Alexa theme
+* Change Nickname(?) Could implement a self-name change at some point but I'd ideally like to keep the Hifumi theme
 * Manage Nicknames(?) Potential automatic nicknaming of users with offensive names
 
 # TODO:
@@ -63,7 +63,7 @@ In order of importance per topic
 - [ ] Remind Me module
 - [ ] Add module that lets users give themselves roles **-Low priority**
 - [x] Safe handling of actions like message deletion and PMing users
-- [ ] Allow users to disable the cleverbot feature of alexa
+- [ ] Allow users to disable the cleverbot feature 
 
 ## Database: 🖥️
 - [x] Implement a relational database that works for heroku as well -> Postgres
@@ -98,7 +98,7 @@ In order of importance per topic
 - [ ] Get cleverbot to store CS per user **-Low priority**
 
 ## Way Later: 🧠 **-Very Low priority** cuzitsreallyhard 
-- [ ] Intent analysis for communicating with Alexa
-- [ ] Voice support for communicating with alexa 
+- [ ] Intent analysis for communicating with Hifumi
+- [ ] Voice support for communicating with Hifumi 
 
 #### Inspired by [HotBot](https://github.com/AberrantFox/hotbot) in [The Programmer's Hangout](https://discord.gg/programming) on discord
