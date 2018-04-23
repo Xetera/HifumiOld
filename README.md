@@ -1,5 +1,11 @@
-![travis](https://travis-ci.org/ilocereal/Hifumi.svg?branch=master)
 ![alexa](https://cdn.discordapp.com/attachments/418699380833648644/420917081131712512/alexanoinvite.png)
+<p align="center">
+  <img align="middle" style="max-width:100%;"  src="https://travis-ci.org/ilocereal/Hifumi.svg?branch=master">
+  <img align="middle" src="https://img.shields.io/npm/v/@cycle/core.svg">
+  <img align="middle" src="https://img.shields.io/badge/Typescript-v2.6.2-blue.svg">
+</p>
+<hr>
+
 
 Moderation based discord bot written in Typescript using [Discord.js](https://github.com/discordjs/discord.js)
 
