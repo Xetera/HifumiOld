@@ -1,4 +1,4 @@
-![alexa](https://cdn.discordapp.com/attachments/418699380833648644/420917081131712512/alexanoinvite.png)
+![alexa](assets/banners/hifuminoinvite.png)
 <p align="center">
   <img align="middle" style="max-width:100%;"  src="https://travis-ci.org/ilocereal/Hifumi.svg?branch=master">
   <img align="middle" src="https://img.shields.io/npm/v/@cycle/core.svg">

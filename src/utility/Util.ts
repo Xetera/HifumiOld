@@ -164,3 +164,5 @@ export function getOnOff(input: string): boolean | undefined {
 export function arrayFromValues(obj: {[id: string]: any}){
     return Object.keys(obj).map(k => obj[k]);
 }
+
+export const emptySpace: string = '\u200b';
