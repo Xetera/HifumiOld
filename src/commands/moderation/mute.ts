@@ -6,48 +6,30 @@ import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import {handleInvalidParameters} from "../../handlers/commands/invalidCommandHandler";
 
 /**
- *
+ * Mutes the user a certain duration
  * @param {Message} message
- * @param {string[]} args
+ * @param {any[]} input
  */
-export default async function muteUser(message: Message, args: string[]) {
-    if (args.length <3){
-        return void await handleInvalidParameters(message.channel, 'mute');
-    }
-    const userInput = args.shift()!;
-    const mention = message.mentions.members.first();
-    let member: GuildMember;
-    if (!mention){
-        const user: GuildMember | undefined = message.guild.members.get(userInput);
-        if (!user){
-            return void message.channel.send(handleFailedCommand(
-                message.channel, `User ${userInput} was not found`
-            ));
-        }
-        member = user;
-    }
-    else {
-        member = mention;
-    }
-    const durationInput = args.shift()!;
-    const duration = Number(durationInput);
+export default async function muteUser(message: Message, input: [GuildMember, number, string]) {
+    const [member, duration, reason] = input;
 
-    // edge cases
+    // controlling for edge cases
     if (duration == 0 || typeof duration !== 'number' || isNaN(duration)) {
-        return void message.channel.send(handleFailedCommand(
-            message.channel, `Got ${durationInput} when I was expecting a number in minutes.`
-        ))
+        return void await handleFailedCommand(
+            message.channel, `Got **${duration}** when I was expecting a number in minutes.`
+        );
     }
     else if(duration > 24 * 60){
-        return void message.channel.send(handleFailedCommand(
+        return void await handleFailedCommand(
             message.channel, `I currently can't mute people for longer than 1 day.`
-        ));
+        );
     }
+
+    // message.channel.send returns (Message|Message[]), typeguards guarantee Message here
     const placeholder = <Message> await message.channel.send(`Working on it...`);
-    const reason = args.join(' ');
 
     const unmuteDate = moment(new Date()).add(duration, 'm').toDate();
-    //const formattedDuration = formattedTimeString(duration * 60);
+
     gb.instance.muteQueue.add(
         member,
         message.member,
@@ -55,7 +37,7 @@ export default async function muteUser(message: Message, args: string[]) {
         reason,
         duration * 60 /* duration is in seconds */
     ).then(res => {
-        console.log(res);
-        return placeholder.edit(`Muted ${member.user.username} for ${formattedTimeString(duration)}`);
+        // editing the "Please wait" message we sent earlier on completion
+        return placeholder.edit(`Muted ${member.user.username} for ${formattedTimeString(duration * 60)}`);
     }).then(x => x.delete(30000));
 }

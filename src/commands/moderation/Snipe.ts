@@ -1,22 +1,27 @@
 import * as Discord from 'discord.js'
-import {Collection} from "discord.js";
-import * as dbg from "debug";
+import {Collection, GuildMember, Message} from "discord.js";
 import {randomRuntimeError} from "../../interfaces/Replies";
 import {debug} from '../../utility/Logging'
+import {safeGetArgs} from "../../utility/Util";
 /*
 * Removes a user's past messages in a certain channel
 * */
-export default function snipe(member: Discord.GuildMember, channel : Discord.Channel, messageCount:number = 100){
+export default async function snipe(message: Message, input: [GuildMember, (number | undefined)]){
+    const target = <GuildMember> input.shift()!;
+    const limit = safeGetArgs(input, 50);
+    const channel = message.channel;
     if (channel instanceof Discord.TextChannel){
-        channel.fetchMessages().then((messages: Collection<Discord.Snowflake, Discord.Message>) => {
-            const userMessages = messages.filter((value, key, collection) => {
-                return value.author.id === member.user.id;
+        channel.fetchMessages({limit: limit}).then((messages: Collection<Discord.Snowflake, Message>) => {
+            const userMessages = messages.filter((value) => {
+                return value.author.id === target.id;
             });
-            channel.bulkDelete(userMessages);
+            return channel.bulkDelete(userMessages);
+        }).then((r: Collection<string, Message>) => {
             debug.info(
-                `Deleted ${userMessages.array().length} messages from ${member.nickname||member.user.username} ` +
-                `in [${member.guild.name}:${channel.name}].`
+                `Deleted ${r.size} messages from ${target.user.username} ` +
+                `in [${target.guild.name}:${channel.name}].`
             );
+            message.channel.send(`Deleted ${r.size} messages from ${target.user.username}`)
         }).catch(err => {
             debug.error("Error sniping messages:\n", err);
             channel.send(randomRuntimeError());

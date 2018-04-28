@@ -5,18 +5,11 @@ import gb from "../../misc/Globals";
 import {debug} from "../../utility/Logging";
 import {DeleteResult} from "typeorm";
 
-export default async function deleteNote(message: Message, args: string[]){
-    if (!args.length){
-        return void await handleInvalidParameters(message.channel, 'deletenote');
-    }
-    let idInput = args.shift()!;
-    if (!Number.isSafeInteger(Number(idInput))){
-        return void handleFailedCommand(
-            message.channel, `I was expecting ${idInput} to be a valid number.`
-        );
-    }
+export default async function deleteNote(message: Message, args: [number]){
+    const [noteId] = args;
 
-    gb.instance.database.deleteNote(message.guild, idInput).then((res: DeleteResult) => {
+    gb.instance.database.deleteNote(message.guild, noteId.toString()).then((res: DeleteResult) => {
+        console.log(res);
         if (res == null){
             return void handleFailedCommand(
                 message.channel,
