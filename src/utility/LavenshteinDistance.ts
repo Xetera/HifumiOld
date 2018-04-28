@@ -1,4 +1,4 @@
-import {Command, Help} from "../commands/info/help/interface";
+import {Command, Help} from "../commands/info/help/help.interface";
 
 const help: Help = require('../commands/help.json');
 
@@ -51,6 +51,7 @@ interface DistanceType {
     name: string;
     distance: number;
 }
+
 
 export default function lavenshteinDistance(input: string, pool: string[] = help.commands.map(c => c.name)): string {
     if (input.length > 15)

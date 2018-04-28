@@ -133,7 +133,7 @@ export function formattedTimeString(sec: number): string{
         ?    days.toFixed(0) + 'd' : ''} ${hours 
         ?   hours.toFixed(0) + 'h' : ''} ${minutes 
         ? minutes.toFixed(0) + 'm' : ''} ${seconds 
-        ? seconds.toFixed(0) + 's' : ''}`.replace(/  +/g, ' ');
+        ? seconds.toFixed(0) + 's' : ''}`.replace(/  +/g, ' ').trim();
 }
 
 export function sanitizeUserInput(input: string){
@@ -157,12 +157,33 @@ export function getOnOff(input: string): boolean | undefined {
         return true;
     else if (input === 'off')
         return false;
-    else
-        return undefined;
+    return undefined;
+}
+// This should totally be a nested ternary but whateeever
+export function getYesNo(input: string){
+    if (input === 'y' || input === 'yes')
+        return true;
+    else if (input === 'n' || input === 'no')
+        return false;
+    return undefined;
 }
 
+export namespace UserUtilities {
+    export function lazyMatchesNickOrUsername(input: string, user: GuildMember){
+        const flexInput = input.toLowerCase();
+        return (user.nickname && user.nickname.toLowerCase().includes(flexInput)) || user.user.username.toLowerCase().includes(flexInput);
+    }
+    export function matchesNickOrUsername(input: string, user: GuildMember) {
+        const flexInput = input.toLowerCase();
+        return (user.nickname && user.nickname.toLowerCase() === flexInput) || user.user.username.toLowerCase() === flexInput;
+    }
+}
 export function arrayFromValues(obj: {[id: string]: any}){
     return Object.keys(obj).map(k => obj[k]);
+}
+
+export function safeGetArgs(input: any[] | undefined, defaultValue: any){
+    return Array.isArray(input) ? input.shift() : defaultValue;
 }
 
 export const emptySpace: string = '\u200b';
