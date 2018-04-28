@@ -1,8 +1,8 @@
 import {Guild, RichEmbed} from "discord.js";
 import gb from "../../misc/Globals";
 
-export default function passivesEmbed(guild: Guild){
-    const prefix = gb.instance.database.getPrefix(guild.id);
+export default async function passivesEmbed(guild: Guild){
+    const prefix = await gb.instance.database.getPrefix(guild.id);
     return new RichEmbed()
         .setTitle(`__**Passives**__`)
         .setDescription(`Here's everything I'm capable of without commands!`)

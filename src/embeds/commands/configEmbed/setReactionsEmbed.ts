@@ -3,7 +3,7 @@ import ReactionManager from "../../../handlers/reactions/reactionManager";
 import {random} from "../../../utility/Util";
 
 export default function setReactionsEmbed(state: boolean){
-    if (state){
+    if (!state){
         return new RichEmbed()
             .setColor('#eec2ff')
             .addField(`Reactions Off`, `Oh... ok this will be the last time I add reactions to my replies.`)

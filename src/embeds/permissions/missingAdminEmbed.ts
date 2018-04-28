@@ -1,8 +1,17 @@
-import {RichEmbed} from "discord.js";
+import {Guild, RichEmbed} from "discord.js";
+import ReactionManager from "../../handlers/reactions/reactionManager";
+import {missingPermissionsEmbedColor, warningEmbedColor} from "../../utility/Settings";
+import gb from "../../misc/Globals";
 
-export default function missingAdminEmbed(): RichEmbed{
-    return new RichEmbed()
-        .setTitle(`Nice try`)
-        .setDescription(`Can't let you do that unless you're an admin. 💅`)
-        .setColor('#ff0000');
+export default function missingAdminEmbed(guild: Guild): RichEmbed{
+    const embed = new RichEmbed()
+        .setTitle(`Admin Command`)
+        .setDescription(`I was told to only let admins use that, sorry...`)
+        .setColor(missingPermissionsEmbedColor);
+    //TODO: fix the async reaction fetching of this
+    //if (await gb.instance.database.getReactions(guild.id)){
+        embed.setThumbnail(ReactionManager.getInstance().sorry[0])
+    //}
+    return embed;
+
 }
