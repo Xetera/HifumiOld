@@ -5,13 +5,8 @@ import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import {debug} from "../../utility/Logging";
 import {DeleteResult} from "typeorm";
 
-export default async function deleteMacro(message: Message, args: string[]) {
-    if (!args.length){
-        return void await handleInvalidParameters(
-            message.channel, 'deletemacro'
-        )
-    }
-    const macroName = args.shift()!;
+export default async function deleteMacro(message: Message, input: [string]) {
+    const [macroName] = input;
     const existingMacro = gb.instance.database.getMacro(message.guild.id, macroName);
     if (!existingMacro){
         return void handleFailedCommand(

@@ -6,7 +6,7 @@ import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import gb from "../../misc/Globals";
 import {Guild} from "../../database/models/guild";
 
-export default async function getConfig(message : Message, db : Database) {
+export default async function getConfig(message : Message) {
     const guild = message.guild;
     const cache: Guild = await gb.instance.database.getGuild(guild.id);
     if (!cache) {

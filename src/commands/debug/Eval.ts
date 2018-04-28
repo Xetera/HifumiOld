@@ -6,9 +6,10 @@ import safeMessageUser from "../../handlers/safe/SafeMessageUser";
 import {debug} from "../../utility/Logging";
 import {CommandParameters} from "../../handlers/commands/CommandHandler";
 
-export default function systemsEval(params: CommandParameters){
+export default function systemsEval(params: CommandParameters, input: [string]){
     const message = params.message;
-    const req = params.args;
+    let [req] = input;
+
     debug.silly(`Owner ${message.author.username} called Eval in ${message.guild.name}`);
 
     if (message.author.id !== gb.ownerID)
@@ -18,24 +19,21 @@ export default function systemsEval(params: CommandParameters){
     let isDMResponse: boolean = false;
     if (req.includes('--debug')){
         isDMResponse = false;
-        const index = req.findIndex((item: string) => item === '--debug');
-        req.splice(index, 1);
-        return message.channel.send(req.join(' '));
+        req = req.replace('--debug', '');
+        return message.channel.send(req);
     }
     if (req.includes('--raw')){
         isCodeBlock = false;
-        const index = req.findIndex((item: string)=> item === '--raw');
-        req.splice(index, 1);
+        req = req.replace('--raw', '');
     }
     if (req.includes('--dm')){
         isDMResponse = true;
-        const index = req.findIndex((item: string) => item === '--dm');
-        req.splice(index, 1);
+        req = req.replace('--dm', '');
     }
 
     let response;
     try {
-        response = gb.instance.eval(params, message, req.join(' '));
+        response = gb.instance.eval(params, message, req);
     }
     catch (err) {
         response = err.toString();

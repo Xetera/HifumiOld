@@ -1,6 +1,6 @@
 import * as Discord from 'discord.js'
 import {Database} from "../../../database/Database";
-import {Command, Help} from "./interface";
+import {Command, Help} from "./help.interface";
 import {Message, RichEmbed} from "discord.js";
 import {handleInvalidParameters} from "../../../handlers/commands/invalidCommandHandler";
 import commandNotFoundEmbed from "../../../embeds/commands/commandNotFoundEmbed";
@@ -11,9 +11,10 @@ import gb from "../../../misc/Globals";
 import helpMacroEmbed from "../../../embeds/commands/helpMacroEmbed";
 const help = require('../../help.json');
 
-export async function getHelp(message : Message, args : string[]) {
+export async function getHelp(message : Message, input: [string] | undefined) {
+    const choice = Array.isArray(input) ? input.shift() : undefined;
     const prefix: string = await gb.instance.database.getPrefix(message.guild.id);
-    if (!args.length){
+    if (!choice){
         const prefix : string = await gb.instance.database.getPrefix(message.guild.id);
         let embed = new RichEmbed().addField("Your prefix", prefix, true);
 
@@ -37,7 +38,7 @@ export async function getHelp(message : Message, args : string[]) {
         return;
     }
     // searching specific command
-    getSpecificHelp(message, args[0], prefix);
+    getSpecificHelp(message, choice, prefix);
 }
 
 async function getSpecificHelp(message: Message, arg: string, prefix: string){
@@ -47,7 +48,7 @@ async function getSpecificHelp(message: Message, arg: string, prefix: string){
         if (macro){
             return message.channel.send(helpMacroEmbed(message.guild, macro));
         }
-        return message.channel.send(commandNotFoundEmbed(message.channel, arg));
+        return message.channel.send(await commandNotFoundEmbed(message.channel, arg));
     }
     const shortCommand: boolean = command.usage === command.example;
     let embed = new RichEmbed()

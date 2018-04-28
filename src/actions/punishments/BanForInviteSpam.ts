@@ -8,5 +8,4 @@ export default function banForInviteSpam(member : GuildMember){
     const reason : string = `Spamming invites as a fresh member <TRACKED>`;
 
     safeBanUser(member, reason, inviteSpamBanEmbed(member.guild));
-    LogManager.logBan(member.guild, member.user);
 }

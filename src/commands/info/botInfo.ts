@@ -16,7 +16,7 @@ export default function botInfo(message : Discord.Message) : void {
                 .setTitle('Hifumi')
                 .setColor('#ffd275')
                 .addField(`Owner`, `<@${gb.ownerID}>`, true)
-                .addField(`Version`, `0.1.0`, true)
+                .addField(`Version`, `1.1.0`, true)
                 .addField(`Language`, `Typescript`, true)
                 .addField(`Database`, `Postgres`, true)
                 .addField(`Hosting`, `Heroku`, true)

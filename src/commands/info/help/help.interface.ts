@@ -2,10 +2,9 @@ export interface Command {
     name: string;
     type:string;
     info:string;
-    usage?: string;
-    example?:string;
-    arguments?: string;
-    commands?: Command[];
+    usage: string;
+    example:string;
+    arguments: string;
     permissions?: 'MOD' | 'ADMIN' | 'OWNER'
 }
 

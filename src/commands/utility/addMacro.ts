@@ -2,24 +2,18 @@ import {Message} from "discord.js";
 import {handleInvalidParameters} from "../../handlers/commands/invalidCommandHandler";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import gb from "../../misc/Globals";
-import {Help} from "../info/help/interface";
+import {Help} from "../info/help/help.interface";
 import {debug} from "../../utility/Logging";
 import {Macro} from "../../database/models/macro";
 const help: Help = require('../../commands/help.json');
 
-export default async function addMacro(message: Message, args: string[]) {
-    if (args.length < 2) {
-        return void await handleInvalidParameters(
-            message.channel, 'addmacro'
-        );
-    }
-    else if (args.length > 200) {
+export default async function addMacro(message: Message, input: [string, string]) {
+    const [macroName, macroContent] = input;
+    if (macroContent.length > 200) {
         return void handleFailedCommand(
             message.channel, `${gb.emojis.get('alexa_boi')} How do you expect me to remember all that? Try something shorter.`
         );
     }
-    const macroName: string = args.shift()!;
-    const macroContent: string = args.join(' ');
 
     if (help.commands.map(command => command.name).includes(macroName)) {
         return void handleFailedCommand(
