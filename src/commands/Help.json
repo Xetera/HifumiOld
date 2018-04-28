@@ -6,6 +6,25 @@
     "Utility",
     "Moderation"
   ],
+  "private": [
+    {
+      "name": "eval",
+      "type": "Debug",
+      "info": "Evaluate typescript code\n**Modifiers**\n[--raw] - Sends response outside of code block\n[--dm] - DMs you the response",
+      "usage": "eval { code } { modifiers }",
+      "example": "eval params.bot.guilds.array().map(g => g.name).join('\\n')",
+      "arguments": "1-2",
+      "permissions": "OWNER"
+    },
+    {
+      "name": "setpfp",
+      "type": "Debug",
+      "info": "Sets the bot's profile picture to a URL",
+      "usage": "setpfp { URL }",
+      "example": "setpfp https://i.imgur.com/gA02p4xf",
+      "permissions": "OWNER"
+    }
+  ],
   "commands": [
     {
       "name": "help",
@@ -26,7 +45,7 @@
     {
       "name": "bump",
       "type": "Utility",
-      "info": "Bumps this server if ServerHound or DLM are present",
+      "info": "Bumps this server if ServerHound or DLM are present (this may not always work depending on the server).",
       "usage": "bump",
       "example": "bump",
       "arguments": "0"
@@ -34,7 +53,7 @@
     {
       "name": "setprefix",
       "type": "Self",
-      "info": "Changes my prefix settings. Currently only supporting single character commands, sorry.",
+      "info": "Changes my prefix settings. Only supports single character prefixes in order to allow stealth commands.",
       "usage": "setprefix { prefix }",
       "example": "setprefix >",
       "arguments": "1",
@@ -43,7 +62,7 @@
     {
       "name": "nuke",
       "type": "Moderation",
-      "info": "Deletes a certain number of past messages.",
+      "info": "Deletes a certain number of past messages in the current channel.",
       "usage": "nuke { # of messages to delete? }",
       "example": "nuke 100",
       "arguments": "0-1",
@@ -52,10 +71,10 @@
     {
       "name": "cleanse",
       "type": "Moderation",
-      "info": "Deletes a certain number of past bot related message.",
+      "info": "Deletes all messages from bots and those beginning with my prefix.",
       "usage": "cleanse { # of msgs to delete? }",
-      "arguments": "0-1",
       "example": "cleanse 200",
+      "arguments": "0-1",
       "permissions": "MOD"
     },
     {
@@ -98,7 +117,7 @@
       "name": "echo",
       "type": "Utility",
       "info": "Sends a custom message to a channel.",
-      "usage": "echo { #mention | channel ID } { message }",
+      "usage": "echo { channel } { message }",
       "example": "echo #lobby Hello World!",
       "arguments": "2",
       "permissions": "MOD"
@@ -107,8 +126,8 @@
       "name": "ignore",
       "type": "Moderation",
       "info": "Ignores or un-ignores all conversation and commands from a user.",
-      "usage": "ignore { @Mention }",
-      "example": "ignore @Xetera",
+      "usage": "ignore { member }",
+      "example": "ignore Xetera",
       "arguments": "1",
       "permissions": "MOD"
     },
@@ -172,7 +191,7 @@
     {
       "name": "mute",
       "type": "Moderation",
-      "info": "Mutes a user for a set amount of time. Muted users cannot react to or send messages.",
+      "info": "Mutes a user for a set amount of time. Muted users cannot send messages or add reactions.",
       "usage": "mute { @Member | userID } { duration (minutes) } { reason }",
       "example": "mute @Xetera 60 stop being rude to people",
       "arguments": "3",
@@ -227,7 +246,7 @@
       "name": "history",
       "type": "Moderation",
       "info": "Fetches the history of a user including things like infractions, notes, join date and watchlist status.",
-      "usage": "history { @Member | userID | username | nickname }",
+      "usage": "history { name | nick | ID | @Mention }",
       "example": "history Xetera",
       "arguments": "1",
       "permissions": "MOD"
@@ -270,10 +289,37 @@
       "name": "reactions",
       "type": "Self",
       "info": "Toggles the gif/image reactions I add to some of my replies",
-      "usage": "reactions {'on'|'off'}",
+      "usage": "reactions { 'on' | 'off' }",
       "example": "reactions off",
       "arguments": "1",
       "permissions": "ADMIN"
+    },
+    {
+      "name": "warn",
+      "type": "Moderation",
+      "info": "Sends a warning to a member in DMs, alias for a 0 weight strike.",
+      "usage": "warn { member } { reason }",
+      "example": "warn @Xetera Posting nsfw pics is not allowed.",
+      "arguments": "2",
+      "permissions": "MOD"
+    },
+    {
+      "name": "strike",
+      "type": "Moderation",
+      "info": "Infracts a user with a variable weight, this sends them a DM and adds the infraction to their record. The user is banned if the total of their non-expired strikes go over the strike limit of the server.",
+      "usage": "strike { member } { weight } { reason }",
+      "example": "strike Xetera 2 This is your last warning before getting banned.",
+      "arguments": "3",
+      "permissions": "MOD"
+    },
+    {
+      "name": "snipe",
+      "type": "Moderation",
+      "info": "Removes all messages by the user in the current channel going back X messages",
+      "usage": "snipe { member } { message search amount? (50)}",
+      "example": "snipe Xetera 50",
+      "arguments": "1-2",
+      "permissions": "MOD"
     }
   ]
 }
