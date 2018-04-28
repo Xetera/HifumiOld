@@ -25,7 +25,7 @@ export interface Instance {
     muteQueue: MuteQueue,
     messageQueue: MessageQueue,
     database : Database,
-    commandHandler?:CommandHandler,
+    commandHandler:CommandHandler,
     trackList: Tracklist,
     heroku: any
     eval(params: CommandParameters, message: Message, x : any): any
