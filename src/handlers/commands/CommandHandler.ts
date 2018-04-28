@@ -61,6 +61,7 @@ import ignoredUsers from "../../commands/moderation/ignoredUsers";
 import warn from "../../commands/moderation/warn";
 import {LogManager} from "../logging/logManager";
 import deleteStrike from "../../commands/moderation/deleteStrike";
+import setGreeting from "../../commands/config/setGreeting";
 
 export interface CommandParameters extends Instance {
     message: Discord.Message;
@@ -130,7 +131,7 @@ export default class CommandHandler implements indexSignature {
         };
 
         if (command.substring(0, 2) === prefix + prefix){
-            debug.silly(`[${message.guild.name}]<${message.author}> Entered a stealth command`, 'CommandHandler')
+            debug.silly(`[${message.guild.name}]<${message.author}> Entered a stealth command`, 'CommandHandler');
             out.stealth= true;
             out.command = command.substring(2);
             return out;
@@ -176,6 +177,10 @@ export default class CommandHandler implements indexSignature {
             catch (error) {
                 debug.error(`Unexpected error while executing ${inputData.command}\n` + error.stack)
             }
+            if (inputData.stealth) {
+                LogManager.logCommandExecution(message, params.name);
+            }
+
         }
 
         // User input is not a command, checking macros
@@ -206,7 +211,6 @@ export default class CommandHandler implements indexSignature {
                 return;
 
             this[command](params);
-            LogManager.logCommandExecution(message, command);
         }
         catch (error) {
             debug.error(`Unexpected error while executing ${command}\n` + error.stack)
@@ -246,6 +250,13 @@ export default class CommandHandler implements indexSignature {
     @expect(ArgType.String, {maxLength: 1})
     private setPrefix(params: CommandParameters){
         setPrefix(params.message, <[string]> params.input);
+    }
+
+    @admin
+    @throttle(60)
+    @expect(ArgType.Message)
+    private setGreeting(params: CommandParameters){
+        setGreeting(params.message, <[string]> params.input);
     }
 
     @admin
@@ -342,11 +353,6 @@ export default class CommandHandler implements indexSignature {
         addMacro(params.message, <[string, string]> params.input);
     }
 
-    @mod
-    @expect(ArgType.None)
-    private listMacros(params: CommandParameters){
-        listMacros(params.message)
-    }
 
     @mod
     @expect(ArgType.String)
@@ -465,6 +471,11 @@ export default class CommandHandler implements indexSignature {
     @expect(ArgType.None)
     private botInfo(params: CommandParameters){
         botInfo(params.message);
+    }
+
+    @expect(ArgType.None)
+    private listMacros(params: CommandParameters){
+        listMacros(params.message)
     }
 
     @throttle(20)
