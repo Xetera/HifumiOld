@@ -64,7 +64,7 @@ export class Cleverbot {
                 return;
             else if (message.content.startsWith('-') || message.content.startsWith(await gb.instance.database.getPrefix(message.guild.id)))
                 return;
-            
+
             else if (this.isRateLimited(message.member.id, message)){
                 return;
             }

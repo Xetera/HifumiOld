@@ -2,9 +2,10 @@
   "categories": [
     "Logging",
     "Info",
-    "Self",
+    "Chat",
     "Utility",
-    "Moderation"
+    "Moderation",
+    "Configuration"
   ],
   "private": [
     {
@@ -52,7 +53,7 @@
     },
     {
       "name": "setprefix",
-      "type": "Self",
+      "type": "Configuration",
       "info": "Changes my prefix settings. Only supports single character prefixes in order to allow stealth commands.",
       "usage": "setprefix { prefix }",
       "example": "setprefix >",
@@ -79,7 +80,7 @@
     },
     {
       "name": "setwelcome",
-      "type": "Logging",
+      "type": "Configuration",
       "info": "Changes the channel I send welcome messages to. This is for everyone to see, I log them separately in the logs channel.",
       "usage": "setwelcome",
       "example": "setwelcome",
@@ -88,7 +89,7 @@
     },
     {
       "name": "setlogs",
-      "type": "Logging",
+      "type": "Configuration",
       "info": "Changes the channel I keep logs in.",
       "usage": "setlogs",
       "example": "setlogs",
@@ -97,7 +98,7 @@
     },
     {
       "name": "setwarnings",
-      "type": "Logging",
+      "type": "Configuration",
       "info": "Changes the channel I send mod warnings to, log channel by default.",
       "usage": "setwarnings",
       "example": "setwarnings",
@@ -106,7 +107,7 @@
     },
     {
       "name": "setchat",
-      "type": "Self",
+      "type": "Configuration",
       "info": "Changes my chat channel. I respond to all messages in this channel regardless of hearing my name. I won't reply if you put a **-** in front of your message or mention someone else.",
       "usage": "setchat",
       "example": "setchat",
@@ -181,7 +182,7 @@
     },
     {
       "name": "setmood",
-      "type": "Self",
+      "type": "Chat",
       "info": "Change my chat settings. **currently WIP**",
       "usage": "setmood { number | 'random' }",
       "example": "setmood random",
@@ -199,7 +200,7 @@
     },
     {
       "name": "hints",
-      "type": "Self",
+      "type": "Configuration",
       "info": "Determines whether I respond to invalid commands with a hint or not.",
       "usage": "hints {'on' | 'off'}",
       "example": "hints off",
@@ -208,7 +209,7 @@
     },
     {
       "name": "config",
-      "type": "Self",
+      "type": "Configuration",
       "info": "Sends all the settings I remember about this server",
       "usage": "config",
       "example": "config",
@@ -217,7 +218,7 @@
     },
     {
       "name": "invitefilter",
-      "type": "Moderation",
+      "type": "Configuration",
       "info": "Changes my settings for deleting invites, mods can always send invites regardless.\n**On** => I DELETE ALL (╬ಠ益ಠ)\n**Off** => Everyone can send invites (/ω＼)",
       "usage": "invitefilter { 'on' | 'off' }",
       "example": "invitefilter off",
@@ -287,7 +288,7 @@
     },
     {
       "name": "reactions",
-      "type": "Self",
+      "type": "Configuration",
       "info": "Toggles the gif/image reactions I add to some of my replies",
       "usage": "reactions { 'on' | 'off' }",
       "example": "reactions off",
@@ -320,6 +321,15 @@
       "example": "snipe Xetera 50",
       "arguments": "1-2",
       "permissions": "MOD"
+    },
+    {
+      "name": "setgreeting",
+      "type": "Configuration",
+      "info": "Changes my random greeting message to a custom one.\n__Placeholders__ (these get replaced in the message when users join):\n\n**{greeting}** - random old greeting message\n**{mention}** - mentions the user\n**{id}** - user id\n**{discrim}** - the users discriminator\n**{status}** - the status of the user (online/offline)",
+      "usage": "setgreeting { message }",
+      "example": "setgreeting\nHey {mention}, welcome to the team!\nYour ID: {id}\nUser: {mention}",
+      "arguments": "1",
+      "permissions": "ADMIN"
     }
   ]
 }
