@@ -1,4 +1,12 @@
-import {createConnection, ConnectionOptions, Connection, getConnection, DeleteResult} from 'typeorm'
+import {
+    createConnection,
+    ConnectionOptions,
+    Connection,
+    getConnection,
+    DeleteResult,
+    InsertResult,
+    UpdateResult
+} from 'typeorm'
 import {IORMConfig} from "./ormconfig.interface";
 import gb from "../misc/Globals";
 import {Environments} from "../events/systemStartup";
@@ -11,38 +19,51 @@ import {Note} from "./models/note";
 import {arrayFromValues} from "../utility/Util";
 import 'reflect-metadata';
 import * as fs from 'fs'
+import {Infraction} from "./models/infraction";
+import moment = require("moment");
 const rootConfig: IORMConfig = require('../../ormconfig.json');
 
+interface IWelcomeMessage {
+    message: Message;
+    userId: string;
+}
 export class Database {
     env: Environments;
     connectionString: string;
     conn: Connection;
+    /**
+     * Tells when the database is ready for other instances to query
+     * @type {boolean}
+     */
     ready: boolean = false;
-    welcomeMessages: {[id: string]: Message[]};
+    welcomeMessages: {[id: string]: IWelcomeMessage[]} = {};
     constructor(url: string) {
         this.env = gb.ENV;
         this.connectionString = url;
-
         debug.info(`Logging into postgres in ${this.env === Environments.Development ? 'dev' : 'live'} mode.`, `Database`);
         this.connect(url).then(conn => {
             debug.info(`Logged into postgres`, `Database`);
             this.conn = conn;
-            return this.crossCheck();
+            return this.sync();
         }).then(() => {
             this.ready = true;
         })
     }
 
+    /**
+     * Connects to postgres, returns connection on successful connections
+     * @param {string} url
+     * @returns {Promise<Connection>}
+     */
     public connect(url: string): Promise<Connection> {
         return this.ormConfig(url).then(() => {
-            console.log(url);
             return createConnection({
                 type: 'postgres',
                 url: url,
                 entities: ['src/database/models/**/*.js'],
                 migrations: ['src/database/migrations/**/*.js'],
-                synchronize: /*false, */ this.env === Environments.Development,
-                dropSchema: /*false, */ this.env === Environments.Development,
+                synchronize: this.env === Environments.Development,
+                dropSchema: this.env === Environments.Development,
                 cli: {
                     migrationsDir: 'migrations'
                 },
@@ -64,6 +85,13 @@ export class Database {
         });
     }
 
+    /**
+     * Sets up the ormconfig.json file in the root folder.
+     * We need this hack because of migrations which can only be set up
+     * using these settings or environment variables which don't support URL types
+     * @param {string} url
+     * @returns {Promise<void>}
+     */
     private ormConfig(url: string): Promise<void> {
         return new Promise((resolve, reject) => {
             rootConfig.url = url;
@@ -75,17 +103,26 @@ export class Database {
         });
     }
 
-    public async crossCheck(): Promise<void> {
+    /**
+     * Syncs the database with currently
+     * @returns {Promise<void>}
+     */
+    public async sync(): Promise<void> {
         debug.silly(`Crosschecking database`, `Database`);
         const guilds = gb.instance.bot.guilds.array();
         for (let i in guilds) {
             const guild = guilds[i];
+            // setting each server
+            this.welcomeMessages[guilds[i].id] = [];
+
             await this.addGuild(guild);
+
             const users = guild.members.array();
+            let targetArray: GuildMember[] = [];
             for (let i in users) {
-                const user = users[i];
-                await this.addMember(user);
+                targetArray.push(users[i]);
             }
+            const x = await this.addMembers(targetArray);
         }
         debug.silly(`Crosschecked db`,`Database`);
         return Promise.resolve();
@@ -93,6 +130,7 @@ export class Database {
 
     public invalidateCache(table: string): Promise<void>{
         // always caching so we're force validating queryResultCache
+
         return this.conn.queryResultCache!.remove([table]);
     }
 
@@ -112,14 +150,15 @@ export class Database {
     }
 
     public getGuild(guildId: string): Promise<Guild> {
-        return this.conn.manager.findOne(Guild, {where: {id: guildId}, cache: true}).then((r: any) => {
+        return this.conn.manager.findOne(Guild, {where: {id: guildId}, cache: true}).then((r: Guild | undefined) => {
             if (!r)
                 return Promise.reject('Guild not found');
-            return r;
+            return Promise.resolve(r);
         }).catch((err: Error)=> {
             return Promise.reject(err);
         })
     }
+
 
     public getGuilds(): Promise<Guild[]>{
         return this.conn.manager.find(Guild, {cache: true});
@@ -163,13 +202,36 @@ export class Database {
 
     public addMember(target: GuildMember): Promise<Partial<User>> {
         return this.invalidateCache('users').then(() => {
-            return this.conn.manager.save(User, {id: target.id, guild_id: target.guild.id});
-        }).catch(err => {
+            return this.conn.manager.save(User, {id: target.id, guild_id: target.guild.id}, );
+        }).catch((err: Error)=> {
+            if (err.message.indexOf('duplicate key') >= 0)
+                return Promise.resolve(<Partial<User>> {
+                    id: target.id,
+                    guild_id: target.id
+                });
             return Promise.reject(err);
         });
     }
 
+    public addMembers(targets: GuildMember[]): Promise<InsertResult> {
+        const final = targets.reduce((a: Partial<User>[], t: GuildMember) => {
+            a.push({id: t.id, guild_id: t.guild.id});
+            return a;
+        }, <Partial<User>[]> []);
+
+        return this.invalidateCache('users').then(() => {
+            return this.conn.createQueryBuilder()
+                .insert()
+                .into(User)
+                .values(final)
+                .onConflict(`("id", "guild_id") DO NOTHING`)
+                .execute();
+        })
+    }
+
     public addGuild(guild: DiscordGuild): Promise<Partial<Guild>>{
+        // setting welcome messages to empty array
+        this.welcomeMessages[guild.id] = [];
         return this.invalidateCache('guilds').then(() => {
             return this.conn.manager.save(Guild, {
                 id: guild.id
@@ -208,7 +270,7 @@ export class Database {
                 note_date: new Date(),
                 note_content: noteContent
             });
-        })
+        });
     }
 
     public deleteNote(guild: DiscordGuild, noteId: string): Promise<DeleteResult> {
@@ -225,23 +287,18 @@ export class Database {
         return this.conn.manager.find(Note, {where: {target_id: memberId, guild_id: guildId}, cache: true});
     }
 
-    public cacheWelcomeMessage(member: GuildMember, welcomeMessage: Message) {
-        const target = this.welcomeMessages[member.guild.id];
-        if (!target.length){
-            this.welcomeMessages[member.guild.id] = [welcomeMessage];
-            return;
-        }
-        this.welcomeMessages[member.guild.id].push(welcomeMessage);
+    public cacheWelcomeMessage(member: GuildMember, welcomeMessage: Message)    {
+        this.welcomeMessages[member.guild.id].push({userId: member.id, message: welcomeMessage});
     }
 
-    public unCacheWelcomeMessage(member: GuildMember): Message|undefined {
+    public unCacheWelcomeMessage(member: GuildMember): Message | undefined {
         const target = this.welcomeMessages[member.guild.id];
-        if(!target.length){
+        if(!target || !target.length){
             const err = `A welcome message in ${member.guild.id} could not be removed because the list is empty`
-            debug.error(err, `Database`);
+            return void debug.error(err, `Database`);
         }
-        return target.find(t => t.member.id === member.id);
-
+        const out = target.find(t => t.userId === member.id);
+        return out ? out.message : undefined;
     }
 
     public setAllowGuildInvites(guildId: string, state: boolean): Promise<Partial<Guild>> {
@@ -269,12 +326,19 @@ export class Database {
     }
 
     public setLogsChannel(guildId: string, channelId: string): Promise<Partial<Guild>> {
-        return this.invalidateCache('guilds').then(() => {
+        return this.getGuild(guildId).then((r: Guild) => {
+            if (!r.warnings_channel) {
+                return void this.setWarningsChannel(guildId, channelId);
+            }
+        }).then(() => {
+            return this.invalidateCache('guilds');
+        }).then(() => {
             return this.conn.manager.save(Guild, {id: guildId, logs_channel: channelId});
-        }).catch(err => {
+        }).catch((err: Error) => {
             return Promise.reject(err);
         });
     }
+
 
     public setWarningsChannel(guildId: string, channelId: string): Promise<Partial<Guild>> {
         return this.invalidateCache('guilds').then(() => {
@@ -324,32 +388,40 @@ export class Database {
         })
     }
 
-    public setUserIgnore(member: GuildMember, state: boolean): Promise<Partial<User>> {
+    public setUserIgnore(member: GuildMember, state: boolean): Promise<UpdateResult> {
+
         return this.invalidateCache('users').then(() => {
-            return this.conn.manager.save(User, {guild_id: member.guild.id, id: member.id, ignoring: state});
+            // return this.conn.manager.save(User, {guild_id: member.guild.id, id: member.user.id, ignoring: state});
+            return this.conn.manager.createQueryBuilder()
+                .update(User)
+                .set({ignoring: state})
+                .where(`guild_id = :guild_id AND id = :id`, {guild_id: member.guild.id, id: member.id})
+                .execute();
         }).catch(err => {
             return Promise.reject(err);
-        })
+        });
     }
 
-    public getUserIgnore(member: GuildMember): Promise<boolean> {
+    public isUserIgnored(member: GuildMember): Promise<boolean> {
         return this.getUser(member.guild.id, member.id).then((r: User) => {
-            if (!r)
-                return true;
             return r.ignoring;
         }).catch(err => {
             return Promise.reject(err);
         });
     }
 
+    public getIgnoredUsers(guildId: string): Promise<User[]>{
+        return this.getUsers(guildId).then((r: User[]) => {
+            return r.filter(user => user.ignoring);
+        });
+    }
     public setCommandHints(guildId: string, state: boolean): Promise<Partial<Guild>> {
         return this.invalidateCache('guilds').then(() => {
             return this.conn.manager.save(Guild, {id: guildId, hints: state});
-        })
-
+        });
     }
 
-    public getCommandHints(guildId: string) {
+    public getCommandHints(guildId: string){
         return this.getGuild(guildId).then((r: Guild) => {
             return r.hints;
         }).catch(err => {
@@ -391,13 +463,75 @@ export class Database {
             });
         }).catch(err => {
             return Promise.reject(err);
-        })
+        });
     }
 
     public incrementCleverbotCalls(guildId: string){
         return this.invalidateCache('guilds').then(() => {
             return this.conn.manager.increment(Guild, {id: guildId}, 'cleverbot_calls', 1);
-        })
+        });
+    }
+
+    public addInfraction(staff: GuildMember, target: GuildMember, reason: string, weight: number): Promise<Partial<Infraction>> {
+        const expiration_date = moment(new Date()).add(2, 'w').toDate();
+        return this.invalidateCache('infractions').then(() => {
+            return this.conn.manager.save(Infraction, {
+                target_id: target.id,
+                guild_id: staff.guild.id,
+                guild_name: staff.guild.name,
+                staff_id: staff.id,
+                staff_name: staff.user.username,
+                infraction_reason: reason,
+                infraction_weight: weight,
+                infraction_date: new Date(),
+                expiration_date: expiration_date
+            });
+        }).catch(err => Promise.reject(err));
+    }
+
+    public getInfractionLimit(guildId: string){
+        return this.getGuild(guildId).then((r: Guild) => {
+            return r.infraction_limit;
+        }).catch(err => Promise.reject(err));
+    }
+
+
+    public getInfractions(guildId: string, targetId?: string): Promise<Infraction[]>{
+        if (targetId){
+            return this.conn.manager.find(Infraction, {where: {
+                    guild_id: guildId,
+                    target_id: targetId
+                }, cache: true});
+        }
+        return this.conn.manager.find(Infraction, {where: {guild_id: guildId}, cache: true});
+    }
+
+    public getInfractionById(id: number){
+        return this.conn.manager.findOne(Infraction, {where: {infraction_id: id},  cache: true});
+    }
+
+    public deleteInfractionById(id: number, guildId: string){
+        return this.conn.createQueryBuilder()
+            .delete()
+            .from(Infraction)
+            .where('infraction_id = :infraction_id AND guild_id = :guild_id', {infraction_id: id, guild_id: guildId})
+            .execute();
+    }
+    public getTrackNewMembers(guildId: string){
+        return this.getGuild(guildId).then((r: Guild) => {
+            return r.tracking_new_members;
+        }).catch(err => Promise.reject(err));
+    }
+
+    public setTrackNewMembers(guildId: string, state: boolean){
+        return this.conn.manager.save(Guild, {
+            id: guildId,
+            track_new_members: state
+        }).catch(err => Promise.reject(err));
+    }
+
+    public incrementBanCount(guildId: string){
+        return this.conn.manager.increment(Guild, {id: guildId}, `users_banned`, 1);
     }
 }
 
