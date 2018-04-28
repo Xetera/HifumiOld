@@ -17,12 +17,14 @@ import {Offense} from "../../moderation/interfaces";
 import logWatchlistInviteBanEmbed from "../../embeds/logging/tracklist/logTracklistInviteBanEmbed";
 import logEveryonePingEmbed from "../../embeds/logging/warnings/logEveryonePingEmbed";
 import logMentionSpamEmbed from "../../embeds/logging/warnings/logMentionSpamEmbed";
+import logCommandExecutionEmbed from "../../embeds/logging/logCommandExecutionEmbed";
 
 // static class
 export class LogManager {
 
+
     private static waitForAuditLogs(guild: Guild, func: (logs: GuildAuditLogs) => any){
-        setTimeout(() => guild.fetchAuditLogs().then((logs: GuildAuditLogs) => func(logs)), 500);
+        setTimeout(() => guild.fetchAuditLogs().then((logs: GuildAuditLogs) => func(logs)), 1000);
     }
 
     private static async logWarning(guild: Guild, embed: RichEmbed|string, action: string){
@@ -72,13 +74,13 @@ export class LogManager {
         LogManager.logMessage(member.guild, logMemberLeaveEmbed(member), 'member leave');
     }
 
-    public static logBan(guild:Guild, member: User){
+    public static logBan(guild:Guild, member: User, banningUser?: GuildMember){
         // race condition but audit log should be winning 99% of the time
         LogManager.waitForAuditLogs(guild, (audit: GuildAuditLogs) => {
             const entry = audit.entries.first();
-            if (entry.reason && entry.reason.indexOf('<TRACKED>') >= 0)
+            if (entry.reason && entry.reason.includes('<TRACKED>'))
                 return; // this is a tracked member ban, we don't want to log it normally
-            LogManager.logWarning(guild, logBanEmbed(member, entry.reason, entry.executor), 'member ban')
+            LogManager.logWarning(guild, logBanEmbed(member, entry.reason, banningUser ? banningUser.user : entry.executor), 'member ban')
         });
 
     }
@@ -106,7 +108,7 @@ export class LogManager {
 
     public static logChannelCreate(channel: Channel){
         if (!(channel instanceof TextChannel) && !(channel instanceof VoiceChannel))
-            return void debug.warning(`New channel was created with the type ${channel.type}`);
+            return void debug.warning(`A new DM channel was created with a user.`, `onChannelCreate`);
 
         LogManager.waitForAuditLogs(channel.guild, (audit: GuildAuditLogs) => {
             const creator = audit.entries.first().executor;
@@ -134,5 +136,9 @@ export class LogManager {
             message.content,
             message.mentions.members.array()
         ), '')
+    }
+
+    public static logCommandExecution(message: Message, command: string){
+        LogManager.logMessage(message.guild, logCommandExecutionEmbed(message.member, command), 'command execution');
     }
 }
