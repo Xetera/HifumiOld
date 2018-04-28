@@ -27,6 +27,7 @@ export default  function onGuildMemberRemove(member : Discord.GuildMember) {
 
         if (isBan)
             return;
+
         LogManager.logMemberLeave(member);
     })
 }
