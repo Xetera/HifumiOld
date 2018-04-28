@@ -18,23 +18,25 @@ export default async function inviteListener(message : Message, database : Datab
     if (!message.content.match(discordInviteRegex) || await gb.instance.database.getAllowGuildInvites(message.guild.id)) {
         return;
     }
-    debug.warning(`${sender} in ${message.guild} sent an invite link.`);
+    debug.warning(`${sender} in ${message.guild} sent an invite link.`, `InviteListener`);
 
     if (securityLevel === SecurityLevels.Dangerous) return;
     const trackList = gb.instance.trackList;
 
-    if (trackList.isNewMember(message.member)){
-        return trackList.punishNewMember(message.member, Offense.InviteLink);
-    }
-
     safeDeleteMessage(message).then(()=> {
         debug.info(`Deleted invite link from ${sender}`);
         return gb.instance.database.incrementInviteStrike(message.member)
-    }).then((strikeCount : number) => {
-        debug.silly(`${message.member.displayName} has ` + strikeCount + " strikes on record");
-        // hardcoding but we shouldn't really need to change this for anything
+    }).then(async(strikeCount : number) => {
+        debug.silly(`${message.member.displayName} has ` + strikeCount + " strikes on record", `InviteListener`);
 
-        if (strikeCount >= 5){
+        if (trackList.isNewMember(message.member)
+            && await gb.instance.database.getTrackNewMembers(message.guild.id)
+            && strikeCount > 1){
+
+            debug.info(`Advertiser ${message.author.username} was a tracked member, attempting to ban...`, `InviteListener`);
+            return trackList.punishNewMember(message.member, Offense.InviteLink);
+        }
+        else if (strikeCount >= 5){
             banForInviteSpam(message.member);
         }
         else if (strikeCount === 4){
