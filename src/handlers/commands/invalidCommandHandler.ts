@@ -5,9 +5,10 @@ import findCommand from "../../commands/info/help/findCommand";
 import gb from "../../misc/Globals";
 import ReactionManager from "../reactions/reactionManager";
 import {highlight} from "../../utility/Markdown";
+import invalidParametersEmbed from "../../embeds/commands/invalidParametersEmbed";
 
 export async function handleInvalidParameters(channel : Channel, commandName: string){
-    const command = findCommand(commandName);
+    const command = findCommand(commandName.toLowerCase());
 
     if (!(channel instanceof TextChannel)){
         return;
@@ -22,15 +23,6 @@ export async function handleInvalidParameters(channel : Channel, commandName: st
         return;
     }
 
-    let embed = new RichEmbed()
-        .setColor('#ffdd51')
-        .setTitle(`Yikes, that's not how you do that! ⚠`)
-        .setDescription(`**${prefix}${command.name}** takes **${command.arguments}** arguments.️`)
-        .addField(`Usage`, highlight(prefix + command.usage!))
-        .addField(`Example`, highlight(prefix + command.example!))
-        .setFooter(`${prefix}${command.name} for more info`);
-    if (await gb.instance.database.getReactions(channel.guild.id)){
-        embed.setThumbnail(random(ReactionManager.getInstance().sorry));
-    }
+    const embed = await invalidParametersEmbed(prefix, command, channel);
     channel.send(embed);
 }

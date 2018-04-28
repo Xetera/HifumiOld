@@ -8,7 +8,6 @@ export default class ReactionManager /* extends Singleton */{
     public readonly shocked: string[] = [
         'https://i.imgur.com/WptWHg1.gif',
         'https://i.imgur.com/NZGvl1J.gif',
-        'https://i.imgur.com/If6kDmM.jpg',
         'https://i.imgur.com/zbNcJlu.gif',
         'https://i.imgur.com/8OXUnoZ.gif',
         'https://i.imgur.com/Xy55jDc.gif'
