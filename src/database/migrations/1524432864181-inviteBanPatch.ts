@@ -1,4 +1,5 @@
 import {MigrationInterface, QueryRunner, Table, TableColumn, TableForeignKey} from "typeorm";
+import {User} from "../models/user";
 
 export class inviteBanPatch1524432864181 implements MigrationInterface {
 
@@ -68,6 +69,12 @@ export class inviteBanPatch1524432864181 implements MigrationInterface {
             referencedColumnNames: ['id'],
             columnNames: ['guild_id'],
             referencedTableName: 'guilds'
+        }));
+
+        await queryRunner.addColumn('users', new TableColumn({
+            name: 'strike_count',
+            type: 'integer',
+            default: 0,
         }));
     }
 

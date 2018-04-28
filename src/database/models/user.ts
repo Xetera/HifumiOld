@@ -6,10 +6,11 @@ import {
     PrimaryColumn,
     ManyToOne,
     JoinColumn,
-    OneToOne, JoinTable, Index
+    OneToOne, JoinTable, Index, OneToMany
 } from "typeorm";
 import {Guild} from "./guild";
 import 'reflect-metadata';
+import {Infraction} from "./infraction";
 
 @Entity({name: 'users'})
 export class User {
@@ -29,7 +30,13 @@ export class User {
     @Column({default: 0})
     invite_strikes: number;
 
+    @Column({default: 0})
+    strike_count: number;
+
+    @JoinTable()
+    @OneToMany(() => Infraction, i => i.infraction_id)
+    infractions: Infraction[];
+
     @Column({default: false})
     ignoring: boolean;
-
 }

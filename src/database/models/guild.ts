@@ -18,6 +18,9 @@ export class Guild {
     allows_invites: boolean;
 
     @Column({nullable: true})
+    welcome_message: string;
+
+    @Column({nullable: true})
     welcome_channel: string;
 
     @Column({nullable: true})
@@ -29,6 +32,10 @@ export class Guild {
     // channel for easy chatting using cleverbot
     @Column({nullable: true})
     chat_channel: string;
+
+    // The maximum amount of infractions you can
+    @Column({default: 3})
+    infraction_limit: number;
 
     @Column({default: false})
     lockdown: boolean;
@@ -47,12 +54,13 @@ export class Guild {
     @Column({default: true})
     hints: boolean;
 
-
     // Whether Hifumi includes gif reactions
     // in some of her commands
     @Column({default: true})
     reactions: boolean;
 
+    @Column({default: false})
+    tracking_new_members: boolean;
 
     /* Stats */
     @Column({default: 0})
