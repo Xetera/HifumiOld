@@ -1,4 +1,3 @@
-///<reference path="../namespace.ts"/>
 import * as Discord from 'discord.js'
 import {debug} from '../../utility/Logging'
 

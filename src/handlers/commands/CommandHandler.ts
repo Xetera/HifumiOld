@@ -1,4 +1,3 @@
-///<reference path="../../commands/namespace.ts"/>
 import nuke from "../../commands/utility/Nuke";
 import * as Discord from "discord.js";
 import * as dbg from "debug";
