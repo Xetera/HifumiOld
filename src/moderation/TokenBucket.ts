@@ -1,4 +1,3 @@
-import {register} from "../handlers/commands/registry";
 import moment = require("moment");
 
 interface Ticket {
@@ -44,8 +43,6 @@ export default class TokenBucket {
         const target = this.cleverbot[user];
         const diff = moment(new Date()).diff(target.lastRequest);
         const seconds = diff / 1000;
-        console.log(target.tokens);
-
 
         if (seconds * command.tokenRefillRate + target.tokens > command.tokenCap){
             target.tokens = command.tokenCap;

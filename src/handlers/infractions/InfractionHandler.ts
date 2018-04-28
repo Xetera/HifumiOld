@@ -33,6 +33,7 @@ export default class InfractionHandler {
         const date = new Date();
         return infractions.filter(i => i.expiration_date <= date);
     }
+
     public static formatInfraction(i: Infraction, anonymous: boolean = false){
         return '' +
             `**ID**: ${i.infraction_id}  **Issued By**: ${anonymous ? `[REDACTED]` : i.staff_name}\n` +
@@ -103,7 +104,8 @@ export default class InfractionHandler {
     public async addInfraction(message: Message, staff: GuildMember, target: GuildMember, reason: string, weight: number): Promise<boolean> {
         return InfractionHandler.memberCanInfract(staff, target, weight).then(async(infractionLimit: number) => {
             const currentUserStrikes: Infraction[] = await gb.instance.database.getInfractions(target.guild.id, target.id);
-            const currentWeight = currentUserStrikes.reduce((total, inf) => total + inf.infraction_weight, 0);
+            const activeInfractions = this.getActiveInfractions(currentUserStrikes);
+            const currentWeight = activeInfractions.reduce((total, inf) => total + inf.infraction_weight, 0);
 
             let isBan: boolean = false;
             if (weight + currentWeight >= infractionLimit){

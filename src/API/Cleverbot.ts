@@ -58,15 +58,16 @@ export class Cleverbot {
                 message.channel.send(`😰 give me some time to get set up first.`);
                 return void debug.info(`Got message from ${message.guild.name} but the DB hasn't finished caching.`);
             }
-            else if (this.isRateLimited(message.member.id, message)){
-                return;
-            }
 
             // don't respond to messages not meant for me
             if (message.mentions.users.array().length !== 0 && !message.isMentioned(bot.user))
                 return;
             else if (message.content.startsWith('-') || message.content.startsWith(await gb.instance.database.getPrefix(message.guild.id)))
                 return;
+            
+            else if (this.isRateLimited(message.member.id, message)){
+                return;
+            }
 
             debug.info(`[${message.member.guild}]::${message.channel.name}::<${message.author.username}> cleverbot call`, "Cleverbot");
             message.react('👀');
