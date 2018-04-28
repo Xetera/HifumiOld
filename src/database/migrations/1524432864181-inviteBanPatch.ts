@@ -57,8 +57,7 @@ export class inviteBanPatch1524432864181 implements MigrationInterface {
                     default: 0
                 }), new TableColumn({
                     name: 'infraction_date',
-                    type: 'date',
-                    default: new Date()
+                    type: 'date'
                 }), new TableColumn({
                     name: 'expiration_date',
                     type: 'date'
