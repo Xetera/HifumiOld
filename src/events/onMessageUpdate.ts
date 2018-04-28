@@ -2,11 +2,20 @@ import * as Discord from 'discord.js'
 import {discordInviteRegex} from "../listeners/Regex";
 import safeDeleteMessage from "../handlers/safe/SafeDeleteMessage";
 import {debug} from '../utility/Logging'
+import {Message} from "discord.js";
+import {LogManager} from "../handlers/logging/logManager";
+import logEditedInviteMessageEmbed from "../embeds/logging/logEditedInviteMessageEmbed";
+import deleteInvite from "../moderation/InviteRemover";
 export default function onMessageUpdate(oldMessage : Discord.Message, newMessage : Discord.Message){
-    if (newMessage.content.match(discordInviteRegex)){
-        safeDeleteMessage(newMessage).then((message : Discord.Message) => {
-            debug.warning(`Deleted an edited invite from ${message.author.username}\n`, message.content);
-            // TODO: add a staff log for this part
+    if (newMessage.content.match(discordInviteRegex)
+         && !(newMessage.member.hasPermission('BAN_MEMBERS')
+            || newMessage.member.hasPermission('ADMINISTRATOR')) ){
+
+        deleteInvite(newMessage, true).then((message : number) => {
+            if (message) {
+                debug.warning(`Deleted an edited invite from ${oldMessage.author.username}\n` +  newMessage.content, 'onMessageUpdate');
+                LogManager.logIllegalEditedInvited(oldMessage, newMessage);
+            }
         });
     }
 }
