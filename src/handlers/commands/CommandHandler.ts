@@ -62,6 +62,7 @@ import warn from "../../commands/moderation/warn";
 import {LogManager} from "../logging/logManager";
 import deleteStrike from "../../commands/moderation/deleteStrike";
 import setGreeting from "../../commands/config/setGreeting";
+import safeDeleteMessage from "../safe/SafeDeleteMessage";
 
 export interface CommandParameters extends Instance {
     message: Discord.Message;
@@ -152,7 +153,7 @@ export default class CommandHandler implements indexSignature {
         if (inputData === undefined)
             return;
         else if (inputData.stealth){
-            message.delete();
+            safeDeleteMessage(message);
         }
 
         if (message.channel instanceof TextChannel)
@@ -172,7 +173,7 @@ export default class CommandHandler implements indexSignature {
             const execution = this.commands[i];
             //message.react(gb.emojis.get('alexa_ack')!);
             try {
-                return this._run(message, execution, params);
+                this._run(message, execution, params);
             }
             catch (error) {
                 debug.error(`Unexpected error while executing ${inputData.command}\n` + error.stack)
@@ -180,7 +181,7 @@ export default class CommandHandler implements indexSignature {
             if (inputData.stealth) {
                 LogManager.logCommandExecution(message, params.name);
             }
-
+            return;
         }
 
         // User input is not a command, checking macros

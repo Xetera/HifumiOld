@@ -455,6 +455,12 @@ export class Database {
             }).catch(err =>  Promise.reject(err));
     }
 
+    public getInviteStrikes(guildId: string, userId: string){
+        return this.getUser(guildId, userId).then((r: User) => {
+            return r.invite_strikes;
+        })
+    }
+
     public setReactions(guildId: string, state: boolean){
         return this.invalidateCache('guilds').then(() => {
             return this.conn.manager.save(Guild, {
@@ -532,6 +538,27 @@ export class Database {
 
     public incrementBanCount(guildId: string){
         return this.conn.manager.increment(Guild, {id: guildId}, `users_banned`, 1);
+    }
+
+    public setWelcomeMessage(guildId: string, message: string): Promise<Partial<Guild>>{
+        return this.invalidateCache('guilds').then(() => {
+            this.conn.manager.save(Guild, {
+                id: guildId,
+                welcome_message: message
+            });
+        }).catch(err => {
+            debug.error(err, `Database:setWelcomeMessage`);
+            return err;
+        });
+    }
+
+    public getWelcomeMessage(guildId: string){
+        return this.getGuild(guildId).then((r: Guild) => {
+            return r.welcome_message;
+        }).catch( err => {
+            debug.error(err);
+            return err;
+        })
     }
 }
 
