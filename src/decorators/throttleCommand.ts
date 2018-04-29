@@ -3,6 +3,7 @@ import {Command} from "../commands/info/help/help.interface";
 import moment = require("moment");
 import commandThrottleEmbed from "../embeds/commands/commandThrottleEmbed";
 import gb from "../misc/Globals";
+import {debug} from "../utility/Logging";
 let userCommands: {[id:string]: Date} = {};
 let throttleMap: {[user_id: string]: {[id:string]: Date}} = {};
 
@@ -27,7 +28,7 @@ export function throttle(duration: number) {
                 }
 
                 else if (moment(date).add(duration ,'s').toDate() > new Date() && params.message.author.id !== gb.ownerID){
-                    console.log(`User ${params.message.author.username} was throttled`);
+                    debug.info(`User ${params.message.author.username} was throttled`, `ThrottleCommand`);
                     params.message.channel.send(commandThrottleEmbed(duration));
                     return;
                 }
