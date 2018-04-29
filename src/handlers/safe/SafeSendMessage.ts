@@ -1,20 +1,17 @@
 import * as Discord from 'discord.js'
-import {DiscordAPIError, Message, RichEmbed, VoiceChannel} from "discord.js";
+import {DiscordAPIError, Message, MessageOptions, RichEmbed, VoiceChannel} from "discord.js";
 import {APIErrors} from "../../interfaces/Errors";
 import {debug} from '../../utility/Logging'
 import safeDeleteMessage from "./SafeDeleteMessage";
 
 export default function safeSendMessage
-(channel : Discord.Channel, message: string | number | object | RichEmbed, deleteAfter?: number): Promise<Message|Message[]|void> {
-    let out : string|RichEmbed;
+(channel : Discord.Channel, message: string | number  | RichEmbed | MessageOptions, deleteAfter?: number): Promise<Message|Message[]|void> {
+    let out : string|RichEmbed|MessageOptions;
     if (typeof message === 'number'){
         out = message.toString().trim();
     }
     else if (message instanceof RichEmbed){
         out = message;
-    }
-    else if (typeof message === 'object'){
-        out = JSON.stringify(message, null, '\t');
     }
     else {
         out = message;

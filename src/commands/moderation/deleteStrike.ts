@@ -4,6 +4,8 @@ import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {DeleteResult} from "typeorm";
 import {Infraction} from "../../database/models/infraction";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
+import safeMessageUser from "../../handlers/safe/SafeMessageUser";
+import deleteStrikeDMEmbed from "../../embeds/moderation/deleteStrikeDMEmbed";
 
 enum EStrikeRejections {
     NO_STRIKE = 'no such strike',
@@ -26,10 +28,19 @@ export default function deleteStrike(message: Message, input: [number]){
             return Promise.reject(EStrikeRejections.ILLEGAL_DELETE);
         }
         return Promise.resolve(r);
-    }).then(() => {
-        return gb.instance.database.deleteInfractionById(id, message.guild.id);
-    }).then(() => {
-        return safeSendMessage(message.channel, `Strike #${id} has vanished.`);
+    }).then((r: Infraction) => {
+        return Promise.all([gb.instance.database.deleteInfractionById(id, message.guild.id), r]);
+    }).then((r: [DeleteResult, Infraction]) => {
+        const [_, infraction] = r;
+        return Promise.all([safeSendMessage(message.channel, `Strike #${id} has vanished.`), infraction]);
+    }).then((r: [Message | Message[] | void, Infraction]) => {
+        const [_, infraction] = r;
+        const user = message.guild.members.get(infraction.target_id);
+        if (user){
+            safeMessageUser(user, deleteStrikeDMEmbed(message, infraction))
+        } else {
+            message.channel.send(`However, I didn't message the user about it because I couldn't find them in the server.`);
+        }
     }).catch((err: any) => {
         return Promise.reject(err);
     });

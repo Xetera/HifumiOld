@@ -9,7 +9,6 @@ import gb from "../../misc/Globals";
 
 export default async function safeBanUser(member : GuildMember, reason: string, banMessage?: string|RichEmbed) : Promise<void>{
     const memberName : string = member.nickname||member.user.username;
-
     if (!member.bannable || !member.guild.me.hasPermission("BAN_MEMBERS")){
         debug.warning(
             `Could not ban ${memberName} from ` +

@@ -36,7 +36,7 @@ export default class InfractionHandler {
 
     public static formatInfraction(i: Infraction, anonymous: boolean = false){
         return '' +
-            `**ID**: ${i.infraction_id}  **Issued By**: ${anonymous ? `[REDACTED]` : i.staff_name}\n` +
+            `${anonymous ? `**ID**: ${i.infraction_id}  **Issued By**: ${i.staff_name}\n` : ''}` +
             `**Expired**: ${i.expiration_date <= new Date() ? 'Yes' : '__No__'}  ` +
             `**Weight**: ${i.infraction_weight}\n` +
             `**Date**: ${moment(i.infraction_date).calendar()}\n` +
