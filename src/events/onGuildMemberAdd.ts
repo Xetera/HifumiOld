@@ -4,10 +4,10 @@ import {random} from "../utility/Util";
 import {welcomeMessages} from "../interfaces/Replies";
 import {Database} from "../database/Database";
 import {default as gb, Instance} from "../misc/Globals";
-import guildMemberAddEmbed from "../embeds/events/onGuildMemberAddEmbed";
 import {Channel, GuildMember, Message, TextChannel} from "discord.js";
 import {LogManager} from "../handlers/logging/logManager";
 import {debug} from "../utility/Logging";
+import guildMemberAddEmbed from "../embeds/events/onGuildMemberAddEmbed";
 
 export default async function onGuildMemberAdd(member : Discord.GuildMember): Promise<void> {
     const database = gb.instance.database;
@@ -15,7 +15,7 @@ export default async function onGuildMemberAdd(member : Discord.GuildMember): Pr
     gb.instance.trackList.add(member);
     // we will change this later to fetch from a Database instead of using a preset name
     const welcomeChannelId : string | undefined = await database.getWelcomeChannel(member.guild.id);
-    const welcomeMessage : string = random(welcomeMessages(member));
+    const customMessage: string | undefined = await database.getWelcomeMessage(member.guild.id);
 
     if (welcomeChannelId === undefined) {
         return debug.info(`Could not send a member join message to ${member.guild.name} `+
@@ -27,13 +27,13 @@ export default async function onGuildMemberAdd(member : Discord.GuildMember): Pr
     }
 
     else if (welcomeChannel instanceof Discord.TextChannel){
-        sendEmbed(welcomeChannel, member, welcomeMessage)
+        sendEmbed(welcomeChannel, member, customMessage)
     }
 
     LogManager.logMemberJoin(member);
 }
 
-function sendEmbed(channel: TextChannel, member: GuildMember, welcomeMessage: string, ){
+function sendEmbed(channel: TextChannel, member: GuildMember, welcomeMessage?: string, ){
     let defaultChannelEmbed : Discord.RichEmbed = guildMemberAddEmbed(member, welcomeMessage);
     channel.send(defaultChannelEmbed).then((welcomeMessage: Message | Message[])=> {
         if (Array.isArray(welcomeMessage)) {

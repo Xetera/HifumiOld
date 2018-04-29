@@ -1,5 +1,5 @@
 import {
-    Channel, Guild, GuildAuditLogs, GuildAuditLogsEntry, GuildMember, Message, RichEmbed, TextChannel,
+    Channel, DiscordAPIError, Guild, GuildAuditLogs, GuildAuditLogsEntry, GuildMember, Message, RichEmbed, TextChannel,
     User, VoiceChannel
 } from "discord.js";
 import {debug, log} from "../../utility/Logging";
@@ -18,6 +18,10 @@ import logWatchlistInviteBanEmbed from "../../embeds/logging/tracklist/logTrackl
 import logEveryonePingEmbed from "../../embeds/logging/warnings/logEveryonePingEmbed";
 import logMentionSpamEmbed from "../../embeds/logging/warnings/logMentionSpamEmbed";
 import logCommandExecutionEmbed from "../../embeds/logging/logCommandExecutionEmbed";
+import {APIErrors} from "../../interfaces/Errors";
+import safeSendMessage from "../safe/SafeSendMessage";
+import logInviteMessageEmbed from "../../embeds/logging/logInviteMessageEmbed";
+import logEditedInviteMessageEmbed from "../../embeds/logging/logEditedInviteMessageEmbed";
 
 // static class
 export class LogManager {
@@ -27,7 +31,7 @@ export class LogManager {
         setTimeout(() => guild.fetchAuditLogs().then((logs: GuildAuditLogs) => func(logs)), 1000);
     }
 
-    private static async logWarning(guild: Guild, embed: RichEmbed|string, action: string){
+    public static async logWarning(guild: Guild, embed: RichEmbed|string, action: string){
         const channelId : string = await gb.instance.database.getWarningsChannel(guild.id);
         if (!channelId)
             return void debug.info(`Could not log a ${action ? action + ' action' : 'message'} in ${guild.name}, missing warnings channel`, 'LogManager');
@@ -44,18 +48,17 @@ export class LogManager {
         return void debug.error(`Warning channel for ${guild.name} was not recorded as TextChanel.`, 'LogManager');
     }
 
-    private static async logMessage(guild: Guild, embed: RichEmbed|string, action: string){
+    public static async logMessage(guild: Guild, embed: RichEmbed|string, action: string){
         const channelId : string = await gb.instance.database.getLogsChannel(guild.id);
         if (!channelId)
-            return void debug.info(`Could not log a ${action ? action + ' action' : 'message'} in ${guild.name}, missing logs channel`, 'LogManager');
+            return void (debug.error(`Could not log a ${action ? action + ' action' : 'message'} in ${guild.name}, missing logs channel`, 'LogManager'));
         const logsChannel = guild.channels.get(channelId);
         if (!logsChannel){
             // User probably deleted the channel and didn't update their logs setting
-            debug.error(channelId);
-            return void debug.error(`Could not resolve a logs channel saved in the database`, `Database`);
+            return void debug.error(`Could not resolve a logs channel saved in the database`, `LogManager`);
         }
         if (logsChannel instanceof TextChannel){
-            logsChannel.send(embed);
+            safeSendMessage(logsChannel, embed);
             debug.silly(`Logged a ${action ? action + ' action' : 'message'} in ${guild.name}`, 'LogManager');
             return;
         }
@@ -139,6 +142,14 @@ export class LogManager {
     }
 
     public static logCommandExecution(message: Message, command: string){
-        LogManager.logMessage(message.guild, logCommandExecutionEmbed(message.member, command), 'command execution');
+        LogManager.logMessage(message.guild, logCommandExecutionEmbed(message.member, <TextChannel> message.channel, command), 'command execution');
+    }
+
+    public static async logIllegalInvite(message: Message){
+        LogManager.logWarning(message.guild, await logInviteMessageEmbed(message), 'invite deletion')
+    }
+
+    public static async logIllegalEditedInvited(oldM: Message, newM: Message){
+        LogManager.logWarning(oldM.guild, await logEditedInviteMessageEmbed(oldM, oldM, newM.content), 'edited invite deletion')
     }
 }
