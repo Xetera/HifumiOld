@@ -83,7 +83,6 @@ export default async function argParse(params: CommandParameters){
             break;
         case ArgType.Message:
             const minWords = decorator.options ? decorator.options.minWords : undefined;
-            console.log(decorator.options);
             if (decorator.options && minWords && params.args.length < minWords){
                 if (params.name === 'strike' || params.name === 'warn'){
                     return void handleFailedCommand(

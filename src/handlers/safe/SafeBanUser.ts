@@ -38,5 +38,5 @@ export default async function safeBanUser(member : GuildMember, reason: string, 
         }
         debug.warning(`Error while banning user ${member.user.username}`);
         return Promise.reject(err);
-    })
+    });
 }
