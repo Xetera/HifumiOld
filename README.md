@@ -1,4 +1,4 @@
-![alexa](assets/banners/hifuminoinvite.png)
+![alexa](assets/banners/hifumi_wide.png)
 <p align="center">
   <img align="middle" style="max-width:100%;"  src="https://travis-ci.org/ilocereal/Hifumi.svg?branch=master">
   <img align="middle" src="https://img.shields.io/npm/v/@cycle/core.svg">
