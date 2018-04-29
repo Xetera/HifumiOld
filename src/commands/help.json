@@ -325,7 +325,7 @@
     {
       "name": "setgreeting",
       "type": "Configuration",
-      "info": "Changes my random greeting message to a custom one.\n__Placeholders__ (these get replaced in the message when users join):\n\n**{greeting}** - random old greeting message\n**{mention}** - mentions the user\n**{id}** - user id\n**{discrim}** - the users discriminator\n**{status}** - the status of the user (online/offline)",
+      "info": "Changes my random greeting message to a custom one.\n__Placeholders__ (these get replaced in the message when users join):\n\n**{greeting}** - random old greeting message\n**{mention}** - mentions the user\n**{username}** - user's username\n**{id}** - user id\n**{discrim}** - the users discriminator\n**{status}** - the status of the user (online/offline)",
       "usage": "setgreeting { message }",
       "example": "setgreeting\nHey {mention}, welcome to the team!\nYour ID: {id}\nUser: {mention}",
       "arguments": "1",

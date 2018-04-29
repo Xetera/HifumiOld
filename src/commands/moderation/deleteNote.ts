@@ -9,7 +9,6 @@ export default async function deleteNote(message: Message, args: [number]){
     const [noteId] = args;
 
     gb.instance.database.deleteNote(message.guild, noteId.toString()).then((res: DeleteResult) => {
-        console.log(res);
         if (res == null){
             return void handleFailedCommand(
                 message.channel,

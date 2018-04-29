@@ -11,7 +11,6 @@ import {UpdateResult} from "typeorm";
 
 export default async function ignore(message : Discord.Message, input: [GuildMember]){
     const member = input.shift()!;
-    console.log(message.member.highestRole.comparePositionTo(member.highestRole))
     if (member.id === gb.ownerID)
         return message.channel.send(`${gb.emojis.get('alexa_hurr')} heY hiFuMi, PlEasE iGnOrE <@${gb.ownerID}>`);
 
