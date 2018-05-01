@@ -16,6 +16,12 @@ export default async function strike(message: Message, input: [GuildMember, numb
         );
     }
 
+    else if (target.id === gb.ownerID){
+        return handleFailedCommand(
+            message.channel, `${weight ? 'strike' : 'warn'} senpai? But I don't want him to spank me again...`
+        );
+    }
+
     InfractionHandler.getInstance().addInfraction(message, message.member, target, reason, weight).then(banned => {
         if (banned){
             return message.channel.send(`Banned ${target.user.username}.`);

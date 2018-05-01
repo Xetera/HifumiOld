@@ -27,6 +27,7 @@ export interface ArgOptions {
         maxLength?: number;
         channelType?: typeof TextChannel | typeof VoiceChannel | (typeof TextChannel & typeof VoiceChannel);
         minWords?: number;
+        raw?: boolean;
     }
 }
 
@@ -37,7 +38,7 @@ export function expect(type: ArgType.Member, options?: {optional?: boolean, glob
 export function expect(type: ArgType.String, options?: {optional?: boolean, maxLength?: number}): DecoratorReturnSignature;
 export function expect(type: ArgType.Channel, options?: {optional?: boolean, channelType?: AllChannelTypes}): DecoratorReturnSignature;
 export function expect(type: ArgType.Boolean, options?: {optional?: boolean}): DecoratorReturnSignature;
-export function expect(type: ArgType.Message, options?: {optional?: boolean, minWords?: number}): DecoratorReturnSignature;
+export function expect(type: ArgType.Message, options?: {optional?: boolean, minWords?: number, raw?: boolean}): DecoratorReturnSignature;
 export function expect(type: ArgType.None): DecoratorReturnSignature;
 
 export function expect(type: ArgType, options?: any): DecoratorReturnSignature{
