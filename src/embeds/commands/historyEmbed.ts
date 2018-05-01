@@ -7,7 +7,7 @@ import {emptySpace} from "../../utility/Util";
 import {Infraction} from "../../database/models/infraction";
 import InfractionHandler from "../../handlers/infractions/InfractionHandler";
 
-export default function historyEmbed(member: GuildMember | User, notes: Note[], infractions: Infraction[], infractionLimit: number){
+export default async function historyEmbed(member: GuildMember | User, notes: Note[], infractions: Infraction[], infractionLimit: number){
     const username     = member instanceof User ? member.username : member.user.username;
     const discrim      = member instanceof User ? member.discriminator : member.user.discriminator;
     const nickname     = member instanceof User ? undefined : member.nickname;
@@ -15,6 +15,7 @@ export default function historyEmbed(member: GuildMember | User, notes: Note[], 
     const joinDate     = member instanceof User ? undefined : member.joinedAt;
     const creationDate = member instanceof User ? member.createdAt : member.user.createdAt;
     const tracked      = member instanceof User ? undefined : gb.instance.trackList.getMember(member);
+    const history_calls= member instanceof User ? '?' : await gb.instance.database.getHistoryCalls(member.guild.id, member.id);
 
     const embed = new RichEmbed()
         .setTitle(`${username}'s History`)
@@ -31,6 +32,7 @@ export default function historyEmbed(member: GuildMember | User, notes: Note[], 
 
     summaryValue += `**Join Date**: ${joinDate ? moment(joinDate).calendar() : 'Not in server'}\n`;
     summaryValue += `**Account Creation Date**: ${moment(creationDate).calendar()}\n`;
+    summaryValue += `**Number of History Requests**: ${history_calls} time${history_calls > 1 ? 's' : ''}`;
 
     if (tracked){
         summaryValue += `__This user is tracked until__: ${moment(tracked.join_date.toISOString()).subtract(getMemberTrackDuration()).calendar()}\n\n`
@@ -45,8 +47,6 @@ export default function historyEmbed(member: GuildMember | User, notes: Note[], 
     }
     notesValue = notes.length !== 0 ? notesValue : 'Nothing noted so far.\n';
 
-    notesValue = notesValue ? notesValue : 'Super ';
-
     /* Infractions */
     const date = new Date();
     const activeInfractions = infractions.reduce((sum, i: Infraction ) => {
@@ -59,7 +59,7 @@ export default function historyEmbed(member: GuildMember | User, notes: Note[], 
     infractionsValue += infractions.map(i => InfractionHandler.formatInfraction(i))
         .join('\n');
 
-    infractionsValue = infractions.length !== 0 ? infractionsValue : 'Squeaky clean sir!\n';
+    infractionsValue = infractions.length ? infractionsValue : 'Squeaky clean sir!\n';
 
     embed.addField(`__**Infractions**__`, infractionsValue + emptySpace)
     embed.addField(`__**Notes**__`, notesValue + emptySpace);

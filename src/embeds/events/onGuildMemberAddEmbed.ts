@@ -2,23 +2,28 @@ import * as Discord from "discord.js";
 import {GuildMember} from "discord.js";
 import {capitalize, random} from "../../utility/Util";
 import {welcomeMessages} from "../../interfaces/Replies";
-export default function guildMemberAddEmbed(member: GuildMember, welcomeMessage?: string){
-
-    if (welcomeMessage){
-        welcomeMessage = welcomeMessage
-            .replace(/{mention}/g, `<@${member.id}>`)
-            .replace(/{id}/g, member.id)
-            .replace(/{username}/g, member.user.username)
-            .replace(/{discrim}/g, member.user.discriminator)
-            .replace(/{status}/g, capitalize(member.user.presence.status))
-            .replace(/{greeting}/g, random(welcomeMessages(member))).trim()
+import parseEmbedPlaceholders from "../../parsers/parseEmbedPlaceholders";
+export default function guildMemberAddEmbed(member: GuildMember, message?: string, title?: string, footer?: string){
+    if (message){
+        message = parseEmbedPlaceholders(member, message);
     } else {
-        welcomeMessage = random(welcomeMessages(member));
+        message = random(welcomeMessages(member));
     }
 
-    return new Discord.RichEmbed()
+    const embed = new Discord.RichEmbed()
         .setThumbnail(member.user.displayAvatarURL)
+        .setTitle(title)
+        .setDescription(message)
         .setColor("GREEN")
-        .addField(`${member.user.username} has joined ${member.guild.name}!`, welcomeMessage)
-        .setTimestamp()
+        .setTimestamp();
+
+    if (title){
+        title = parseEmbedPlaceholders(member, title);
+        embed.setTitle(title);
+    }
+    if (footer){
+        footer = parseEmbedPlaceholders(member, footer);
+        embed.setFooter(footer);
+    }
+    return embed;
 }
