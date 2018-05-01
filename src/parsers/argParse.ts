@@ -1,19 +1,19 @@
 import {CommandParameters} from "../handlers/commands/CommandHandler";
 import {ArgOptions, ArgType} from "../decorators/expect";
 import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
-import {resolveMember} from "./memberResolver";
+import {resolveMember} from "../resolvers/memberResolver";
 import {handleInvalidParameters} from "../handlers/commands/invalidCommandHandler";
 import {Channel, GuildMember, MessageMentions} from "discord.js";
 import {getOnOff} from "../utility/Util";
 import {isBoolean} from "util";
-import {channelResolver} from "./channelResolver";
+import {channelResolver} from "../resolvers/channelResolver";
 
 export default async function argParse(params: CommandParameters){
     // Only Expect.None is given, passing all test regardless
     if (params.expect.length === 1 && params.expect[0].type === ArgType.None){
         return true;
     }
-
+    
     // filtering out the commands that are optional to check against the length
     const nonOptionalArgs = params.expect.reduce((arr: ArgOptions[], e: ArgOptions)=> {
         if (!e.options || !e.options.optional){
@@ -83,6 +83,7 @@ export default async function argParse(params: CommandParameters){
             break;
         case ArgType.Message:
             const minWords = decorator.options ? decorator.options.minWords : undefined;
+            const raw = decorator.options ? decorator.options.raw : false;
             if (decorator.options && minWords && params.args.length < minWords){
                 if (params.name === 'strike' || params.name === 'warn'){
                     return void handleFailedCommand(
@@ -95,9 +96,15 @@ export default async function argParse(params: CommandParameters){
                     )
                 }
             }
-            const rest = params.args.join(' ');
-            const joined = rest ? input! + ' ' + rest : input;
-            params.input.push(joined);
+            if (raw){
+                const joined = params.args.length ? [input].concat(params.args): [input];
+                params.input.push(joined);
+            }
+            else {
+                const rest = params.args.join(' ');
+                const joined = rest ? input! + ' ' + rest : input;
+                params.input.push(joined);
+            }
             // resetting the args passed to make sure
             // misplacing the decorator throws an error
             params.args = [];
