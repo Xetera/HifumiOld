@@ -25,11 +25,6 @@ export class persistentMutes1525024992361 implements MigrationInterface {
             })]
         }));
         await queryRunner.createForeignKey('muted_users', new TableForeignKey({
-            columnNames: ['user_id'],
-            referencedColumnNames: ['id'],
-            referencedTableName: 'users'
-        }));
-        await queryRunner.createForeignKey('muted_users', new TableForeignKey({
             columnNames: ['guild_id'],
             referencedTableName: 'guilds',
             referencedColumnNames: ['id']
