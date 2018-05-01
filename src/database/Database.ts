@@ -21,6 +21,8 @@ import 'reflect-metadata';
 import * as fs from 'fs'
 import {Infraction} from "./models/infraction";
 import moment = require("moment");
+import {MutedUserSubscriber} from "./subscribers/mutedUser.subscriber";
+import {MutedUser} from "./models/mutedUser";
 const rootConfig: IORMConfig = require('../../ormconfig.json');
 
 interface IWelcomeMessage {
@@ -117,12 +119,8 @@ export class Database {
 
             await this.addGuild(guild);
 
-            const users = guild.members.array();
-            let targetArray: GuildMember[] = [];
-            for (let i in users) {
-                targetArray.push(users[i]);
-            }
-            const x = await this.addMembers(targetArray);
+            const g = await guild.fetchMembers();
+            await this.addMembers(g.members.array());
         }
         debug.silly(`Crosschecked db`,`Database`);
         return Promise.resolve();
@@ -234,6 +232,7 @@ export class Database {
         this.welcomeMessages[guild.id] = [];
         return this.invalidateCache('guilds').then(() => {
             return this.conn.manager.save(Guild, {
+                name: guild.name,
                 id: guild.id
             });
         }).catch(err => {
@@ -523,6 +522,7 @@ export class Database {
             .where('infraction_id = :infraction_id AND guild_id = :guild_id', {infraction_id: id, guild_id: guildId})
             .execute();
     }
+
     public getTrackNewMembers(guildId: string){
         return this.getGuild(guildId).then((r: Guild) => {
             return r.tracking_new_members;
@@ -559,6 +559,66 @@ export class Database {
             debug.error(err);
             return err;
         })
+    }
+
+    public getGuildEnabled(guildId: string){
+        return this.getGuild(guildId).then((r: Guild) => {
+            return r.enabled;
+        }).catch(err => {
+            return err;
+        });
+    }
+
+    public setGuildEnabled(guildId: string, state: boolean){
+        return this.invalidateCache('guilds').then(() => {
+            return this.conn.manager.save(Guild, {id: guildId, enabled: state});
+        }).catch(err => err);
+    }
+
+    public incrementHistoryCalls(guildId: string, userId: string){
+        return this.conn.manager.increment(User, {id: userId, guild_id: guildId}, `history_calls`, 1);
+    }
+
+    public getHistoryCalls(guildId: string, userId: string){
+        return this.getUser(guildId, userId).then((r: User) => {
+            return r.history_calls;
+        })
+    }
+
+    public addMutedUser(guildId: string, userId: string, muteAmount: Date){
+        this.conn.manager.save(MutedUser, {
+            user_id: userId,
+            guild_id: guildId,
+            start_date: new Date(),
+            end_date: muteAmount
+        }).catch(err => Promise.reject(err))
+    }
+
+    public getMutedUsers(guildId: string){
+        return this.conn.manager.find(MutedUser, {where: {guild_id: guildId}}).then((r: MutedUser[]) => {
+            return r.filter(p => p.end_date > new Date());
+        }).catch(err => Promise.reject(err));
+    }
+
+    public getExpiredMutes(guildId: string){
+        return this.conn.manager.find(MutedUser, {where: {guild_id: guildId}}).then((r: MutedUser[]) => {
+            return r.filter(p => p.end_date < new Date());
+        }).catch(err => Promise.reject(err));
+    }
+
+    public setMuteRole(guildId: string, role: string){
+        return this.invalidateCache('guilds').then(() => {
+            this.conn.manager.save(Guild, {
+                id: guildId,
+                mute_role: role
+            })
+        }).catch(err => Promise.reject(err));
+    }
+
+    public getMuteRole(guildId: string){
+        return this.getGuild(guildId).then((r:Guild) => {
+            return r.mute_role;
+        }).catch(err => Promise.reject(err));
     }
 }
 
