@@ -7,6 +7,9 @@ export class Guild {
     @PrimaryColumn('varchar', {unique: true})
     id: string;
 
+    @Column()
+    name: string;
+
     @OneToMany(type => User, user => user.guild_id)
     @JoinTable({name: 'guild_users'})
     users: User[];
@@ -14,7 +17,10 @@ export class Guild {
     @Column('character', {default: '$', length: 1})
     prefix: string;
 
-    @Column({default: false})
+    @Column({default: true})
+    enabled: boolean;
+
+    @Column({default: true})
     allows_invites: boolean;
 
     @Column({nullable: true})
@@ -32,6 +38,10 @@ export class Guild {
     // channel for easy chatting using cleverbot
     @Column({nullable: true})
     chat_channel: string;
+
+    @Column({nullable: true})
+    mute_role: string;
+
 
     // The maximum amount of infractions you can
     @Column({default: 3})

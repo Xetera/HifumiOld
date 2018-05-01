@@ -33,6 +33,9 @@ export class User {
     @Column({default: 0})
     strike_count: number;
 
+    @Column({default: 0})
+    history_calls: number;
+
     @JoinTable()
     @OneToMany(() => Infraction, i => i.infraction_id)
     infractions: Infraction[];

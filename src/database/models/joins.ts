@@ -10,27 +10,25 @@ import {
 } from "typeorm";
 import {Guild} from "./guild";
 import 'reflect-metadata';
-import {User} from "./user";
 
-@Entity({name: 'muted_users'})
-export class MutedUser {
+@Entity({name: 'guild_joins'})
+export class Joins {
     @PrimaryGeneratedColumn()
-    mute_id: number;
+    join_id: number;
 
-    @ManyToMany(() => User, user => user.id)
-    @JoinColumn({name: 'user_id', referencedColumnName: 'id'})
-    user_id: string;
+    @Column()
+    user_id: number;
 
-
-    @ManyToOne(type => Guild, guild => guild.id, {
+    @PrimaryColumn()
+    @ManyToOne(() => Guild, guild => guild.id, {
         nullable: false
     })
     @JoinColumn({name: 'guild_id', referencedColumnName: 'id'})
     guild_id: string;
 
     @Column()
-    start_date: Date;
+    join_date: Date;
 
-    @Column()
-    end_date: Date;
+    @Column({nullable: true})
+    leave_date: Date;
 }
