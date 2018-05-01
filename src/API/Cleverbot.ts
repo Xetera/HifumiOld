@@ -72,32 +72,37 @@ export class Cleverbot {
             debug.info(`[${message.member.guild}]::${message.channel.name}::<${message.author.username}> cleverbot call`, "Cleverbot");
             message.react('👀');
 
-            this.say(message.content, message.member.id).then((resp : string) => {
-                gb.instance.database.incrementCleverbotCalls(message.guild.id);
+            this.say(message, message.content, message.member.id).then(async(resp : string) => {
+                // sometimes randomly the messages are empty for no reason
+                console.log('MY RESPONSE');
+                console.log(resp);
                 message.channel.send(resp);
             });
 
         }
     }
 
-    public say(phrase : string, id: string, replaceKeyword : boolean = true) : Promise<string>{
-        return new Promise<string>( (resolve, reject) => {
-            let parsedArg :string;
-            if (replaceKeyword)
-                parsedArg = this.replaceKeyword(phrase);
-            else
-                parsedArg = phrase;
-            this.cleverbot.say(parsedArg, id).then((response : string) => {
-                resolve(response);
-            }).catch(err => {
-                reject(err);
-            });
+    public say(message: Message, phrase: string, id: string, replaceKeyword: boolean = true) : Promise<string>{
+        let parsedArg :string;
+        if (replaceKeyword)
+            parsedArg = this.replaceKeyword(phrase);
+        else
+            parsedArg = phrase;
+
+        return this.cleverbot.say(parsedArg, id).then((response: string) => {
+            gb.instance.database.incrementCleverbotCalls(message.guild.id);
+            if (!response) {
+                debug.warning(`Couldn't get a response...`, `Cleverbot`);
+                return this.say(message, phrase, id, replaceKeyword);
+            }
+            return response;
+        }).catch(err => {
+            return (err);
         });
     }
 
     public isRateLimited(id: string, message: Message): boolean {
         if (this.users[id] && this.users[id].ignores.ignoring){
-            console.log(this.users[id].ignores.ignoreUntil! < new Date())
             if (this.users[id].ignores.ignoreUntil! < new Date()){
                 this.users[id].ignores.ignoring = false;
                 this.users[id].ignores.ignoreUntil = undefined;
