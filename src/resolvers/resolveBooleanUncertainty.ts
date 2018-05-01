@@ -2,6 +2,7 @@ import {Collection, Message, RichEmbed} from "discord.js";
 import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import {debug} from "../utility/Logging";
 import {getOnOff, getYesNo} from "../utility/Util";
+import safeSendMessage from "../handlers/safe/SafeSendMessage";
 
 export default function resolveBooleanUncertainty(message: Message, queryMessage: string | RichEmbed, waitAmount: number): Promise<boolean | undefined>{
     return message.channel.send(queryMessage).then((query: Message|Message[]) => {
@@ -23,12 +24,12 @@ export default function resolveBooleanUncertainty(message: Message, queryMessage
         // resolved is automatically undefined when
         // the user lets the promise time out
         if (!resolved && !collection.size){
-            message.channel.send('Ignored? Feels bad man...');
+            safeSendMessage(message.channel, 'Ignored? Feels bad man...');
         }
         // resolved can also be false
         else if (resolved === undefined){
             await handleFailedCommand(
-                message.channel, `I was looking for a yes or no response there, not ${collection.first().content}.`
+                message.channel, `I was looking for a **y/yes** or **n/no** response there, not ${collection.first().content}.`
             );
         }
         return resolved;

@@ -6,7 +6,7 @@ import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import {userResolvedEmbed} from "../embeds/resolvers/userResolvedEmbed";
 import resolveNumberedUncertainty from "./resolveNumberedUncertainty";
 import resolveBooleanUncertainty from "./resolveBooleanUncertainty";
-import {UserUtilities} from "../utility/Util";
+import {UserUtils} from "../utility/Util";
 export function resolveMember(arg: string, message: Message): Promise<GuildMember | undefined>;
 export function  resolveMember(arg: string, message: Message, global: boolean): Promise<GuildMember | User | undefined>;
 
@@ -26,7 +26,7 @@ export async function resolveMember(arg: string, message: Message, global: any =
     }
 
     const resolvedNick: GuildMember[] = message.guild.members.array().reduce((arr: GuildMember[], m: GuildMember) => {
-        if (UserUtilities.lazyMatchesNickOrUsername(arg, m)){
+        if (UserUtils.lazyMatchesNickOrUsername(arg, m)){
             arr.push(m);
         }
         return arr;
@@ -43,7 +43,7 @@ export async function resolveMember(arg: string, message: Message, global: any =
         // if we have a perfect match, send it off automatically
         // case insensitive is ok since any more matching nicks would
         // mean that this block doesn't get called
-        if (UserUtilities.matchesNickOrUsername(arg, target)){
+        if (UserUtils.matchesNickOrUsername(arg, target)){
             return target;
         }
         const embed = userResolvedEmbed(target, arg);

@@ -1,14 +1,15 @@
 import {
     CategoryChannel,
-    Channel,
+    Channel, Collection,
     DiscordAPIError,
     Guild,
-    GuildMember,
+    GuildMember, Invite,
     Message, PermissionOverwrites,
     PermissionResolvable,
     Permissions, Role
 } from "discord.js";
 import {debug} from "../events/onMessage";
+import {discordInviteRegex} from "../listeners/Regex";
 
 
 /**
@@ -161,6 +162,7 @@ export function getOnOff(input: string): boolean | undefined {
 }
 // This should totally be a nested ternary but whateeever
 export function getYesNo(input: string){
+    input  = input.toLowerCase();
     if (input === 'y' || input === 'yes')
         return true;
     else if (input === 'n' || input === 'no')
@@ -168,7 +170,7 @@ export function getYesNo(input: string){
     return undefined;
 }
 
-export namespace UserUtilities {
+export namespace UserUtils {
     export function lazyMatchesNickOrUsername(input: string, user: GuildMember){
         const flexInput = input.toLowerCase();
         return (user.nickname && user.nickname.toLowerCase().includes(flexInput)) || user.user.username.toLowerCase().includes(flexInput);
@@ -178,6 +180,20 @@ export namespace UserUtilities {
         return (user.nickname && user.nickname.toLowerCase() === flexInput) || user.user.username.toLowerCase() === flexInput;
     }
 }
+
+export namespace InviteUtils {
+    export async function isGuildInvite(message: Message, link: string): Promise<boolean>{
+        return message.guild.fetchInvites().then((r: Collection<string, Invite>) => {
+            return Boolean(r.find(i => {
+                const url = i.url.split('/');
+                const inviteCode = url[url.length - 1];
+                console.log(link, url);
+                return inviteCode === link;
+            }));
+        });
+    }
+}
+
 export function arrayFromValues(obj: {[id: string]: any}){
     return Object.keys(obj).map(k => obj[k]);
 }

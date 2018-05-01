@@ -1,6 +1,7 @@
 import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import {debug} from "../utility/Logging";
 import {Collection, Message, RichEmbed} from "discord.js";
+import safeSendMessage from "../handlers/safe/SafeSendMessage";
 
 export default function resolveNumberedUncertainty(message: Message, queryMessage: string | RichEmbed, entities: any[], waitAmount: number, type: 'user' | 'channel'){
     return message.channel.send(queryMessage).then((query: Message|Message[]) => {
@@ -22,7 +23,7 @@ export default function resolveNumberedUncertainty(message: Message, queryMessag
         // resolved is automatically undefined when
         // the user lets the promise time out
         if (!resolved && !collection.size){
-            message.channel.send('Ignored? Feels bad man...');
+            safeSendMessage(message.channel, 'Ignored? Feels bad man...');
         }
         else if (!resolved && !global){
             await handleFailedCommand(
