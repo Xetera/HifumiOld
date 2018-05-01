@@ -13,10 +13,12 @@ export default async function getHistory(message: Message, input: [GuildMember])
     return Promise.all([
         database.getNotes(target.id, message.guild.id),
         database.getInfractions(message.guild.id, target.id),
-        database.getInfractionLimit(message.guild.id)
-    ]).then((r: [Note[], Infraction[], number]) => {
+        database.getInfractionLimit(message.guild.id),
+        database.incrementHistoryCalls(message.guild.id, target.id)
+    ]).then(async(r: [Note[], Infraction[], number, void]) => {
         const [notes, infractions, limit] = r;
-        const embed = historyEmbed(target, notes, infractions, limit);
+        console.log(infractions);
+        const embed = await historyEmbed(target, notes, infractions, limit);
         return safeSendMessage(message.channel, embed);
     }).catch(err => {
         debug.error(err.stack);
