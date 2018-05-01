@@ -1,5 +1,5 @@
 <a href="https://discordapp.com/oauth2/authorize?client_id=372615866652557312&scope=bot&permissions=268463300">
-    <img src="assets/reactions/hifumi_new.png">
+    <img src="assets/banners/hifumi_new.png">
 </a>
 <hr>
 
