@@ -16,9 +16,9 @@ export async function getHelp(message : Message, input: [string] | undefined) {
     const prefix: string = await gb.instance.database.getPrefix(message.guild.id);
     if (!choice){
         const prefix : string = await gb.instance.database.getPrefix(message.guild.id);
-        let embed = new RichEmbed().addField("Your prefix", prefix, true);
+        let embed = new RichEmbed();
 
-        const sortedCommands = help.commands.reduce((obj: {[type:string]: Command[]}, command: Command) => {
+        let sortedCommands: {[type:string]: Command[]} = help.commands.reduce((obj: {[type:string]: Command[]}, command: Command) => {
             if (!obj[command.type]){
                 obj[command.type] = [];
             }
@@ -26,9 +26,17 @@ export async function getHelp(message : Message, input: [string] | undefined) {
             return obj;
         }, {});
         // this may be a little
+
         for(let key in sortedCommands){
-            const command = sortedCommands[key].map((cmd: Command)=> '\`' + cmd.name + '\`').join(', ');
-            embed.addField(sortedCommands[key][0].type, command);
+            // sorting alphabetically
+            sortedCommands[key] = sortedCommands[key].sort(function(a, b){
+                if(a.name < b.name) return -1;
+                if(a.name > b.name) return 1;
+                return 0;
+            });
+
+            const command = sortedCommands[key].map((cmd: Command)=> '`' + prefix + cmd.name + '`').join(', ');
+            embed.addField('⇨ ' + sortedCommands[key][0].type + ' ⇦', command);
         }
 
         embed.setTitle(`__Commands__`)
