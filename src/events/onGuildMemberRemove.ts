@@ -12,14 +12,19 @@ export const debug = {
     error  : dbg('Bot:onGuildMemberRemove:Error')
 };
 
-export default  function onGuildMemberRemove(member : Discord.GuildMember) {
+export default async function onGuildMemberRemove(member : Discord.GuildMember) {
     // we will change this later to fetch from a Database instead of using a preset name
+
+    if (!await gb.instance.database.getGuildEnabled(member.guild.id)){
+        return;
+    }
+
     return member.guild.fetchAuditLogs().then((logs: GuildAuditLogs)=> {
         return logs.entries.first().action === 'MEMBER_BAN_ADD';
     }).then((isBan: boolean) => {
         const welcomeMessage: Message | undefined = gb.instance.database.unCacheWelcomeMessage(member);
         if (!welcomeMessage) {
-            debug.error(`Could not delete the message for user ${member.user.username}`);
+            return; // debug.error(`Could not delete the message for user ${member.user.username}`);
         }
         else {
             safeDeleteMessage(welcomeMessage);

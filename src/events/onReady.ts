@@ -12,30 +12,24 @@ const Heroku = require('heroku-client');
 // returning owner id at the end
 export default function onReady(bot: Client): Promise<string> {
     gb.allMembers = 0;
+    debug.info(`Invite link: https://discordapp.com/oauth2/authorize?client_id=372615866652557312&scope=bot&permissions=268463300`);
 
-    return bot.generateInvite().then(link => {
-        debug.info(`Invite link: ${link}`);
+    let guilds = bot.guilds.array();
+    let startupGuild = [];
 
-        let guilds = bot.guilds.array();
-        let startupGuild = [];
+    for (let guild of guilds) {
+        gb.allMembers += guild.members.array().length;
+        startupGuild.push({
+            name: guild.name,
+            members: guild.members.array().length,
+            channels: guild.channels.array().length
+        });
+    }
 
-        for (let guild of guilds) {
-            gb.allMembers += guild.members.array().length;
-            startupGuild.push({
-                name: guild.name,
-                members: guild.members.array().length,
-                channels: guild.channels.array().length
-            });
-        }
-
-        startupTable(startupGuild);
-        return bot;
-    }).then((bot : Discord.Client) => {
-        setGlobals(bot);
-        return updatePresence(bot);
-    }).then(() => {
-        return bot.fetchApplication();
-    }).then((app : Discord.OAuth2Application)=> {
+    startupTable(startupGuild);
+    setGlobals(bot);
+    updatePresence(bot);
+    return bot.fetchApplication().then((app : Discord.OAuth2Application)=> {
         debug.info(`${bot.user.username} is fully online.`, "Ready");
         return app.owner.id;
     });

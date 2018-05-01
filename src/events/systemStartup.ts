@@ -98,7 +98,14 @@ export async function createInstance(bot: Client, BOT_TOKEN: string, CLEVERBOT_T
         trackList: tracklist,
         heroku: new Heroku({token: process.env.HEROKU_API_TOKEN}),
         // this is to be able to eval through the context of all the instances
-        eval: (params: CommandParameters, message: Message, x: any) => eval(x)
+        eval: (params: CommandParameters, message: Message, x: any) => {
+            try {
+                return eval(x);
+            }
+            catch (e) {
+                return e.toString();
+            }
+        }
     }
 
 }

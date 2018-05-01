@@ -24,7 +24,7 @@ interface Message extends Discord.Message {
     sent : Date;
 }
 
-function middleWare(msg: Discord.Message){
+function middleWare(msg: Discord.Message, ignored: boolean){
     const messageQueue = gb.instance.messageQueue;
     const alexa = gb.instance.alexa;
     const watchlist = gb.instance.trackList;
@@ -36,28 +36,33 @@ function middleWare(msg: Discord.Message){
     messageQueue.add(message);
     alexa.checkMessage(message, bot);
     pingListener(message, database);
-    inviteListener(message, database);
-    memeListener(message);
+    inviteListener(message);
+    if (!ignored)
+        memeListener(message);
 }
 
 export default async function onMessage(message: Discord.Message){
     // we don't want to look at bot messages at all
-    if (message.author.bot)
+    if (message.author.bot){
         return;
-
+    }
     else if (!gb.instance || !gb.instance.database.ready) {
         //message.channel.send(`😰 give me some time to get set up first.`);
         return void debug.info(`Got message from ${message.guild.name} but the DB hasn't finished caching.`);
     }
-    if (await gb.instance.database.isUserIgnored(message.member))
-        return;
 
-    const messageType : MessageType = message.guild ? MessageType.GuildMessage : MessageType.PrivateMessage;
 
+    const messageType: MessageType = message.guild ? MessageType.GuildMessage : MessageType.PrivateMessage;
 
     // no need listening for anything for pms since it can be flooded and it's literally useless
-    if (messageType === MessageType.GuildMessage)
-        middleWare(message);
+    let guildEnabled;
+    let userIgnored;
+    if (messageType === MessageType.GuildMessage){
+        guildEnabled = await gb.instance.database.getGuildEnabled(message.guild.id);
+        userIgnored = await gb.instance.database.isUserIgnored(message.member);
+        if (guildEnabled)
+            middleWare(message, userIgnored);
+    }
 
     // we want to serve the help page to the user even if they have the wrong
     // prefix in case they don't know what the prefix is
@@ -70,5 +75,7 @@ export default async function onMessage(message: Discord.Message){
         return;
 
     // right now this only supports 1 char length prefix but we can change that later
-    return gb.instance.commandHandler.handler(message);
+    if (guildEnabled && !userIgnored){
+        return gb.instance.commandHandler.handler(message);
+    }
 }
