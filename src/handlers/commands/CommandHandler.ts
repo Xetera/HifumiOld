@@ -53,7 +53,7 @@ import {throttle} from '../../decorators/throttleCommand'
 import snipe from "../../commands/moderation/Snipe";
 import {ArgOptions, ArgType, expect} from "../../decorators/expect";
 import { REGISTRY} from "./registry";
-import argParse from "../../resolvers/argParse";
+import argParse from "../../parsers/argParse";
 import {setName} from "../../commands/self/ChangeName";
 import setPfp from "../../commands/self/ChangePicture";
 import reactions from "../../commands/config/reactions";
@@ -63,6 +63,8 @@ import {LogManager} from "../logging/logManager";
 import deleteStrike from "../../commands/moderation/deleteStrike";
 import setGreeting from "../../commands/config/setGreeting";
 import safeDeleteMessage from "../safe/SafeDeleteMessage";
+import listGuilds from "../../commands/debug/listGuilds";
+import EmbedBuilder from "./embedBuilder";
 
 export interface CommandParameters extends Instance {
     message: Discord.Message;
@@ -117,13 +119,13 @@ export default class CommandHandler implements indexSignature {
         let args : string[] = [];
         const prefix = await gb.instance.database.getPrefix(message.guild.id);
         // removing excess whitespace between words that can't be removed with .trim()
-        const messageContent = message.content.replace(/\s+/, ' ');
+        const messageContent = message.content.replace(/\s+/g, ' ').trim();
         if (isMessage(message))
             args = messageContent.split(' ');
         else
             throw new TypeError(`'${message}' is not a Message object.`);
 
-        let command : string | undefined = args.shift()!;
+        let input : string | undefined = args.shift()!;
 
         // detecting stealth command
         // setting the rest of the properties later
@@ -131,19 +133,24 @@ export default class CommandHandler implements indexSignature {
             args: args
         };
 
-        if (command.substring(0, 2) === prefix + prefix){
+        if (input === prefix || input === prefix + prefix){
+            return;
+        }
+
+        else if (input.substring(0, 2) === prefix + prefix){
             debug.silly(`[${message.guild.name}]<${message.author}> Entered a stealth command`, 'CommandHandler');
             out.stealth= true;
-            out.command = command.substring(2);
+            out.command = input.substring(2);
             return out;
         }
-        else if (command[0] === prefix){
+        else if (input[0] === prefix){
             out.stealth = false;
-            out.command=command.substring(1);
+            out.command=input.substring(1);
             return out;
         }
+
         // not a command
-        return undefined;
+        return;
     }
 
     public async handler(message : Message) {
@@ -241,7 +248,7 @@ export default class CommandHandler implements indexSignature {
     @botOwner
     @expect(ArgType.None)
     private guilds(params: CommandParameters){
-        params.message.channel.send(params.bot.guilds.array().map(g => `${g.name}: ${g.id} Members:${g.memberCount}`).join('\n'));
+        listGuilds(params.message);
     }
 
     /* Admin Commands */
@@ -254,10 +261,9 @@ export default class CommandHandler implements indexSignature {
     }
 
     @admin
-    @throttle(60)
-    @expect(ArgType.Message)
+    @expect(ArgType.Message, {raw: true})
     private setGreeting(params: CommandParameters){
-        setGreeting(params.message, <[string]> params.input);
+        setGreeting(params.message, <[string[]]> params.input);
     }
 
     @admin
@@ -282,7 +288,42 @@ export default class CommandHandler implements indexSignature {
     private deleteStrike(params: CommandParameters){
         deleteStrike(params.message, <[number]> params.input);
     }
+
+    @admin
+    @throttle(10)
+    @expect(ArgType.None)
+    private setWelcome(params : CommandParameters){
+        setWelcome(params.message);
+    }
+
+    @admin
+    @throttle(10)
+    @expect(ArgType.None)
+    private setLogs(params : CommandParameters){
+        setLogsChannel(params.message);
+    }
+
+    @admin
+    @expect(ArgType.None)
+    private setWarnings(params: CommandParameters){
+        setWarningsChannel(params.message);
+    }
+
+    @admin
+    @expect(ArgType.None)
+    private setChat(params: CommandParameters){
+        setChatChannel(params.message);
+    }
+
+    @admin
+    @expect(ArgType.String)
+    private setMute(params: CommandParameters){
+        //setMuteRole()
+    }
+
+
     /* Mod Commands */
+
     @mod
     @expect(ArgType.None)
     private config(params : CommandParameters){
@@ -316,34 +357,6 @@ export default class CommandHandler implements indexSignature {
     @expect(ArgType.Message)
     private mute(params: CommandParameters){
         muteUser(params.message, <[GuildMember, number, string]> params.input);
-    }
-
-    @mod
-    @throttle(10)
-    @expect(ArgType.None)
-    private setWelcome(params : CommandParameters){
-        setWelcome(params.message);
-    }
-
-    @mod
-    @throttle(10)
-    @expect(ArgType.None)
-    private setLogs(params : CommandParameters){
-        setLogsChannel(params.message);
-    }
-
-    @mod
-    @throttle(10)
-    @expect(ArgType.None)
-    private setWarnings(params: CommandParameters){
-        setWarningsChannel(params.message);
-    }
-
-    @mod
-    @throttle(10)
-    @expect(ArgType.None)
-    private setChat(params: CommandParameters){
-        setChatChannel(params.message);
     }
 
     @mod
@@ -427,6 +440,20 @@ export default class CommandHandler implements indexSignature {
     }
 
     /* Public Commands */
+    @expect(ArgType.Message)
+    private embed(params: CommandParameters){
+        EmbedBuilder.getInstance().embed(params.message, <[string]> params.input)
+    }
+
+    @expect(ArgType.Message)
+    private editEmbed(params: CommandParameters){
+        EmbedBuilder.getInstance().editEmbed(params.message);
+    }
+
+    @expect(ArgType.None)
+    private sendEmbed(params: CommandParameters){
+        EmbedBuilder.getInstance().sendEmbed(params.message);
+    }
 
     @throttle(15)
     @expect(ArgType.String, {optional: true})
