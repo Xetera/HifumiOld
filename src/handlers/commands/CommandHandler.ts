@@ -29,7 +29,7 @@ import setLogsChannel from "../../commands/config/setLogsChannel";
 import ignore from "../../commands/self/Ignore";
 import botInfo from "../../commands/info/botInfo";
 import {debug} from "../../utility/Logging";
-import {GuildMember, Message, TextChannel} from "discord.js";
+import {Channel, GuildMember, Message, TextChannel} from "discord.js";
 import createMuteRole from "../../commands/config/createMuteRole";
 import muteUser from "../../commands/moderation/mute";
 import commandNotFoundEmbed from "../../embeds/commands/commandNotFoundEmbed";
@@ -64,7 +64,16 @@ import deleteStrike from "../../commands/moderation/deleteStrike";
 import setGreeting from "../../commands/config/setGreeting";
 import safeDeleteMessage from "../safe/SafeDeleteMessage";
 import listGuilds from "../../commands/debug/listGuilds";
-import EmbedBuilder from "./embedBuilder";
+import EmbedBuilder from "../internal/embedBuilder";
+import iHateYou from "../../commands/info/iHateYou";
+import doggo from "../../commands/fun/doggo";
+import suggest from "../../commands/suggestions/suggest";
+import setSuggestionsChannel from "../../commands/config/setSuggestionsChannel";
+import getSuggestions from "../../commands/suggestions/getSuggestions";
+import approveSuggestion from "../../commands/suggestions/approveSuggestion";
+import {Command} from "../../commands/info/help/help.interface";
+import respondToSuggestion, {SuggestionResponse} from "../../commands/suggestions/respondToSuggestion";
+import denySuggestion from "../../commands/suggestions/denySuggestion";
 
 export interface CommandParameters extends Instance {
     message: Discord.Message;
@@ -197,6 +206,7 @@ export default class CommandHandler implements indexSignature {
         if (macros.length){
             targetMacro = macros.find(macro => macro.macro_name === inputData.command);
             if (targetMacro){
+                gb.instance.database.incrementMacroCalls(message.guild.id, message.author.id);
                 return void message.channel.send(targetMacro.macro_content);
             }
         }
@@ -206,7 +216,7 @@ export default class CommandHandler implements indexSignature {
         if (hints){
             message.channel.send(
                 await commandNotFoundEmbed(message.channel, inputData.command, macros.map(macro => macro.macro_name))
-            );
+            ).then((m: Message|Message[]) =>  (<Message> m).delete(30000));
         }
     }
 
@@ -217,8 +227,8 @@ export default class CommandHandler implements indexSignature {
             const legal = await argParse(params);
             if (!legal)
                 return;
-
             this[command](params);
+            gb.instance.database.incrementCommandCalls(message.guild.id, message.author.id);
         }
         catch (error) {
             debug.error(`Unexpected error while executing ${command}\n` + error.stack)
@@ -439,6 +449,26 @@ export default class CommandHandler implements indexSignature {
         ignoredUsers(params.message);
     }
 
+    @mod
+    @expect(ArgType.None)
+    private suggestions(params: CommandParameters){
+        getSuggestions(params.message);
+    }
+
+    @mod
+    @expect(ArgType.Number)
+    @expect(ArgType.Message)
+    private accept(params: CommandParameters){
+        respondToSuggestion(params.message, <[string, string]> params.input, SuggestionResponse.ACCEPTED);
+    }
+
+    @mod
+    @expect(ArgType.Number)
+    @expect(ArgType.Message)
+    private reject(params: CommandParameters){
+        respondToSuggestion(params.message, <[string, string]> params.input, SuggestionResponse.REJECTED);
+    }
+
     /* Public Commands */
     @expect(ArgType.Message)
     private embed(params: CommandParameters){
@@ -475,7 +505,7 @@ export default class CommandHandler implements indexSignature {
     @throttle(10)
     @expect(ArgType.None)
     private uptime(params : CommandParameters){
-        uptime(params.message, params.bot);
+        uptime(params.message);
     }
 
     @expect(ArgType.String, {optional: true})
@@ -516,5 +546,26 @@ export default class CommandHandler implements indexSignature {
     @expect(ArgType.None)
     private randomQuote(params: CommandParameters){
         randomQuote(params.message);
+    }
+
+    @expect(ArgType.None)
+    private doggo(params: CommandParameters){
+        doggo(params.message);
+    }
+
+    @expect(ArgType.None)
+    private iHateYou(params: CommandParameters){
+        iHateYou(params.message);
+    }
+
+    @throttle(10)
+    @expect(ArgType.Message)
+    private suggest(params: CommandParameters){
+        suggest(params.message, <[string]> params.input);
+    }
+
+    @expect(ArgType.None)
+    private setSuggestions(params: CommandParameters){
+        setSuggestionsChannel(params.message);
     }
 }
