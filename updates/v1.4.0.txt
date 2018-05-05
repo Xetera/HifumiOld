@@ -1,0 +1,20 @@
+%field1% Added Suggestions
+%value1%
+Suggestions are browsed through a reaction menu and only displayed publicly upon mod review
+Currently (and likely never) supporting multiple mods reviewing suggestions at once
+Suggestions by mods automatically get past the review stage
+
+%field2% New Commands
+%value2%
+**$suggest** - makes a suggestion
+**$suggestions** - browses suggestions awaiting approval
+**$accept** - accepts a pending suggestion
+**$deny** - denies a pending suggestion
+**$doggo** - sends a random picture of a dog including its breed
+**$ihateyou** - links the support server
+
+%field3% Bug Fixes
+%value3%
+Fixed a bug that caused a guild to not be added to the database after joining
+Fixed a bug where welcome messages wouldn't send if a logging channel wasn't sent
+Embeds with titles greater than 256 characters now properly trigger an error
