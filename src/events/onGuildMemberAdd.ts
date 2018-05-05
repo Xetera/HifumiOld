@@ -11,33 +11,32 @@ import guildMemberAddEmbed from "../embeds/events/onGuildMemberAddEmbed";
 import {TemplatedMessage} from "../parsers/parsers.interface";
 import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import templateParser from "../parsers/templateParser";
+import safeSendMessage from "../handlers/safe/SafeSendMessage";
 
 export default async function onGuildMemberAdd(member : Discord.GuildMember): Promise<void> {
-    if (gb.instance.database.ready || !await gb.instance.database.getGuildEnabled(member.guild.id)){
-        return;
+    if (!gb.instance.database.ready || !await gb.instance.database.getGuildEnabled(member.guild.id)){
+        return
     }
 
     const database = gb.instance.database;
     await database.addMember(member);
     gb.instance.trackList.add(member);
     // we will change this later to fetch from a Database instead of using a preset name
-    const [welcomeChannelId, customMessage] = await Promise.all([database.getWelcomeChannel(member.guild.id),
+    const [welcomeChannelId, customMessage] = await Promise.all([
+        database.getWelcomeChannel(member.guild.id),
         database.getWelcomeMessage(member.guild.id)
     ]);
 
-    if (!welcomeChannelId) {
-        return;
-    }
+    if (welcomeChannelId) {
+        const welcomeChannel: Channel | undefined = member.guild.channels.get(welcomeChannelId);
+        if (!welcomeChannel) {
+            debug.error(`Welcome channel saved in the database for guild ${member.guild.name} no longer exists`, 'GuildMemberAdd')
+        }
 
-    const welcomeChannel: Channel | undefined = member.guild.channels.get(welcomeChannelId);
-    if (!welcomeChannel){
-        return void debug.error(`Welcome channel saved in the database for guild ${member.guild.name} no longer exists`, 'GuildMemberAdd')
+        else if (welcomeChannel instanceof Discord.TextChannel) {
+            sendEmbed(welcomeChannel, member, customMessage)
+        }
     }
-
-    else if (welcomeChannel instanceof Discord.TextChannel){
-        sendEmbed(welcomeChannel, member, customMessage)
-    }
-
     LogManager.logMemberJoin(member);
 }
 

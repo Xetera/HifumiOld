@@ -8,7 +8,9 @@ import {debug} from "../utility/Logging";
 
 
 export default async function onGuildCreate(guild : Discord.Guild){
-    if (gb.instance.database.ready || !await gb.instance.database.getGuildEnabled(guild.id)){
+    const database = gb.instance.database;
+
+    if (!database.ready || !await gb.instance.database.getGuildEnabled(guild.id)){
         return;
     }
 

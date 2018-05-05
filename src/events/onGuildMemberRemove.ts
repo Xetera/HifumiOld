@@ -23,10 +23,7 @@ export default async function onGuildMemberRemove(member : Discord.GuildMember) 
         return logs.entries.first().action === 'MEMBER_BAN_ADD';
     }).then((isBan: boolean) => {
         const welcomeMessage: Message | undefined = gb.instance.database.unCacheWelcomeMessage(member);
-        if (!welcomeMessage) {
-            return; // debug.error(`Could not delete the message for user ${member.user.username}`);
-        }
-        else {
+        if (welcomeMessage) {
             safeDeleteMessage(welcomeMessage);
         }
 

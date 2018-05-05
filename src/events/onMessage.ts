@@ -12,6 +12,7 @@ import {getHelp} from "../commands/info/help/Help";
 import DMCommandHandler from "../handlers/commands/DMCommandHandler";
 import pingListener from "../listeners/pingListener";
 import memeListener from "../listeners/memeListener";
+import {MessageMentions} from "discord.js";
 
 export const debug = {
     silly: dbg('Bot:onMessage:Silly'),
@@ -69,9 +70,9 @@ export default async function onMessage(message: Discord.Message){
     else if (messageType === MessageType.PrivateMessage)
         return DMCommandHandler(message);
 
+    const prefix = await gb.instance.database.getPrefix(message.guild.id)
 
-
-    else if (!message.content.startsWith(await gb.instance.database.getPrefix(message.guild.id)))
+    if (!message.content.startsWith(prefix))
         return;
 
     // right now this only supports 1 char length prefix but we can change that later
