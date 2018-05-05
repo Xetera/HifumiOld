@@ -9,9 +9,10 @@ import {TemplatedMessage} from "../../parsers/parsers.interface";
 
 export default function setGreeting(message: Message, input: [string[]]){
     const [welcome] = input;
-    if (welcome.length > 600){
+    // to handle database spam
+    if (welcome.length > 800){
         return void handleFailedCommand(
-            message.channel, `That message is WAY too long, my welcomes will become really annoying`
+            message.channel, `That message is **WAY** too long, my welcomes will become really annoying.`
         );
     }
     const x = message.content.split(' ');
@@ -20,9 +21,9 @@ export default function setGreeting(message: Message, input: [string[]]){
         const firstArg = x[0].split('\n');
         firstArg.shift();
         final = firstArg.concat(x.splice(1)).join(' ');
-        console.log(final);
     }
     else {
+        x.shift();
         final = x.join(' ');
     }
 
@@ -33,7 +34,13 @@ export default function setGreeting(message: Message, input: [string[]]){
         );
     }
 
-    const description = fields._default.concat(fields['description']);
+    if (fields['title'].length > 256){
+        return void handleFailedCommand(
+            message.channel, `The title field cannot be more than 256 characters long.`
+        )
+    }
+
+    const description = fields['description'];
     const title = fields['title'];
     const footer = fields['footer'];
 

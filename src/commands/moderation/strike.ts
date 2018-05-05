@@ -4,7 +4,7 @@ import {resolveMember} from "../../resolvers/memberResolver";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import gb from "../../misc/Globals";
 import {max} from "moment";
-import InfractionHandler from "../../handlers/infractions/InfractionHandler";
+import InfractionHandler from "../../handlers/internal/infractions/InfractionHandler";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 
 export default async function strike(message: Message, input: [GuildMember, number, string]) {

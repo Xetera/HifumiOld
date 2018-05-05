@@ -5,7 +5,7 @@ import {Message, RichEmbed} from "discord.js";
 import {handleInvalidParameters} from "../../../handlers/commands/invalidCommandHandler";
 import commandNotFoundEmbed from "../../../embeds/commands/commandNotFoundEmbed";
 import {highlight} from "../../../utility/Markdown";
-import {capitalize} from "../../../utility/Util";
+import {capitalize, random} from "../../../utility/Util";
 import {commandEmbedColor} from "../../../utility/Settings";
 import gb from "../../../misc/Globals";
 import helpMacroEmbed from "../../../embeds/commands/helpMacroEmbed";
@@ -38,8 +38,9 @@ export async function getHelp(message : Message, input: [string] | undefined) {
             const command = sortedCommands[key].map((cmd: Command)=> '`' + prefix + cmd.name + '`').join(', ');
             embed.addField('⇨ ' + sortedCommands[key][0].type + ' ⇦', command);
         }
-
+        const randomCategory = sortedCommands[random(Object.keys(sortedCommands))];
         embed.setTitle(`__Commands__`)
+            .setDescription(`I auto delete messages starting with 2 of your prefixes like so \`${prefix + prefix}${randomCategory[random(Object.keys(randomCategory))].name}\`\n`)
             .setColor(commandEmbedColor)
             .setFooter(`${prefix}help {command} for more info`);
         message.channel.send(embed);

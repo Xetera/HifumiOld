@@ -12,11 +12,12 @@ export default function botInfo(message : Discord.Message) : void {
         const commands = help.commands.length;
         message.channel.send(
             new RichEmbed()
-                .setThumbnail(avatar)
+                .setThumbnail(message.guild.me.user.avatarURL)
                 .setTitle('Hifumi')
                 .setColor('#ffd275')
-                .addField(`Owner`, `<@${gb.ownerID}>`, true)
-                .addField(`Version`, `1.1.0`, true)
+                .addField(`Owner`, `Xetera#9596`, true)
+                .addField(`Version`, `1.4.0`, true)
+                .addField(`Lines of Code`, 8636, true)
                 .addField(`Language`, `Typescript`, true)
                 .addField(`Database`, `Postgres`, true)
                 .addField(`Hosting`, `Heroku`, true)

@@ -13,7 +13,7 @@ export default function createMuteRole(message: Message): Promise<Role> {
         name: 'muted',
         color: '#7c6666',
         hoist: false,
-        position: message.guild.roles.array().length - 1,
+        position: message.guild.roles.size - 1,
         permissions: ["READ_MESSAGE_HISTORY", "READ_MESSAGES"],
         // just to mess with them lol
         mentionable: true
