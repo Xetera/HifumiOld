@@ -19,6 +19,18 @@ export default async function muteUser(message: Message, input: [GuildMember, nu
             message.channel, `Got **${duration}** when I was expecting a number in minutes.`
         );
     }
+    else if (member === message.guild.me){
+        return void await handleFailedCommand(
+            message.channel, `Rude... If you want me to be quiet just don't talk to me.`
+        )
+    }
+    else if (member.hasPermission('ADMINISTRATOR')){
+        return void await handleFailedCommand(
+            message.channel,
+            `Muting an admin huh? Someone's about to get really mad at you.\n` +
+            `Besides, permission overrides don't work for administrators.`
+        )
+    }
     else if(duration > 24 * 60){
         return void await handleFailedCommand(
             message.channel, `I currently can't mute people for longer than 1 day.`
