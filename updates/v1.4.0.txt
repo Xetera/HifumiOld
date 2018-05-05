@@ -9,7 +9,8 @@ Suggestions by mods automatically get past the review stage
 **$suggest** - makes a suggestion
 **$suggestions** - browses suggestions awaiting approval
 **$accept** - accepts a pending suggestion
-**$deny** - denies a pending suggestion
+**$reject** - denies a pending suggestion
+**$ignoredusers** - gets a list of ignored users
 **$doggo** - sends a random picture of a dog including its breed
 **$ihateyou** - links the support server
 

@@ -7,7 +7,8 @@
     "Moderation",
     "Configuration",
     "Fun",
-    "Embeds"
+    "Embeds",
+    "Suggestions"
   ],
   "private": [
     {
@@ -347,6 +348,66 @@
       "usage": "editembed",
       "example": "editembed",
       "arguments": "0"
+    },
+    {
+      "name": "ihateyou",
+      "type": "Info",
+      "info": "Breaks my heart.",
+      "usage": "ihateyou",
+      "example": "ihateyou",
+      "arguments": "0"
+    },
+    {
+      "name": "doggo",
+      "type": "Fun",
+      "info": "Sends a random pupperino.",
+      "usage": "doggo",
+      "example": "doggo",
+      "arguments": "0"
+    },
+    {
+      "name": "suggest",
+      "type": "Suggestions",
+      "info": "Make a suggestion to the server, this gets sent to the moderators first to be reviewed before getting posted publicly.",
+      "usage": "suggest { message }",
+      "example": "suggest add a #cute-animals channel",
+      "arguments": "1"
+    },
+    {
+      "name": "suggestions",
+      "type": "Suggestions",
+      "info": "Searches through the queue of unread suggestions, approved suggestions get posted to a public channel to be voted on by everyone.\n\n__Reactions__\n**Prev** goes to the previous suggestion\n**Next** Goes to the next suggestion\n**Approve** Approves the suggestion and posts it publicly\n**Deny** Discards the suggestion\n**Quit** Quits the menu",
+      "usage": "suggestions",
+      "example": "suggestions",
+      "arguments": "0",
+      "permissions": "MOD"
+    },
+    {
+      "name": "accept",
+      "type": "Suggestions",
+      "info": "Accepts a public suggestion, changing its status in the suggestions channel. The member that made the suggestion also gets notified with a DM",
+      "usage": "accept { suggestion ID } { reason }",
+      "example": "accept 88 fixed typo in the rules",
+      "arguments": "2",
+      "permissions": "MOD"
+    },
+    {
+      "name": "reject",
+      "type": "Suggestions",
+      "info": "Rejects a public suggestion, changing its status in the suggestions channel. The member that made the suggestion also gets notified with a DM",
+      "usage": "reject { suggestion ID } { reason }",
+      "example": "reject 44 we're never adding a nsfw channel",
+      "arguments": "2",
+      "Permissions": "MOD"
+    },
+    {
+      "name": "ignoredusers",
+      "type": "Info",
+      "info": "Gets a list of everyone I'm ignoring.",
+      "usage": "ignoredusers",
+      "example": "ignoredusers",
+      "arguments": "0",
+      "permissions": "MOD"
     }
   ]
 }
