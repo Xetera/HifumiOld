@@ -1,7 +1,7 @@
 import {Guild, RichEmbed} from "discord.js";
 import gb from "../../misc/Globals";
 import {missingPermissionsEmbedColor} from "../../utility/Settings";
-import ReactionManager from "../../handlers/reactions/reactionManager";
+import ReactionManager from "../../handlers/internal/reactions/reactionManager";
 
 export default async function missingModEmbed(guild: Guild): Promise<RichEmbed>{
     const embed =  new RichEmbed()

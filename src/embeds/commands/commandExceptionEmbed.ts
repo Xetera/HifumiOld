@@ -1,7 +1,7 @@
 import {Channel, RichEmbed, TextChannel} from "discord.js";
 import gb from "../../misc/Globals";
 import {random} from "../../utility/Util";
-import ReactionManager from "../../handlers/reactions/reactionManager";
+import ReactionManager from "../../handlers/internal/reactions/reactionManager";
 import {warningEmbedColor} from "../../utility/Settings";
 
 export async function handleFailedCommand(channel: Channel, message: string, footer?: string){
@@ -19,9 +19,10 @@ export async function handleFailedCommand(channel: Channel, message: string, foo
     if (footer){
         embed.setFooter(footer);
     }
+    const rm = ReactionManager.getInstance()
     if (channel instanceof TextChannel){
         if (await gb.instance.database.getReactions(channel.guild.id))
-            embed.setThumbnail(random(ReactionManager.getInstance().shocked));
+            embed.setThumbnail(random(rm.shocked.concat(rm.shy)));
         channel.send(embed);
     }
 }

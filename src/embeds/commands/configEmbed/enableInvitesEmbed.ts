@@ -1,5 +1,5 @@
 import {Guild, RichEmbed} from "discord.js";
-import ReactionManager from "../../../handlers/reactions/reactionManager";
+import ReactionManager from "../../../handlers/internal/reactions/reactionManager";
 
 export default function enableInvitesEmbed(guild: Guild) {
     const embed =  new RichEmbed()

@@ -5,7 +5,7 @@ import gb from "../../misc/Globals";
 import {getMemberTrackDuration} from "../../utility/Settings";
 import {emptySpace} from "../../utility/Util";
 import {Infraction} from "../../database/models/infraction";
-import InfractionHandler from "../../handlers/infractions/InfractionHandler";
+import InfractionHandler from "../../handlers/internal/infractions/InfractionHandler";
 
 export default async function historyEmbed(member: GuildMember | User, notes: Note[], infractions: Infraction[], infractionLimit: number){
     const username     = member instanceof User ? member.username : member.user.username;
@@ -62,7 +62,6 @@ export default async function historyEmbed(member: GuildMember | User, notes: No
     infractionsValue = infractions.length ? infractionsValue : 'Squeaky clean sir!\n';
 
     embed.addField(`__**Infractions**__`, infractionsValue + emptySpace)
-    embed.addField(`__**Notes**__`, notesValue + emptySpace);
-    embed.addField(`__**Watchlist Info**__`, `Nothing to see here`);
+    embed.addField(`__**Notes**__`, notesValue);
     return embed;
 }

@@ -1,6 +1,6 @@
 import {Guild, RichEmbed} from "discord.js";
 import {advertiseOnBan} from "../../interfaces/Replies";
-import ReactionManager from "../../handlers/reactions/reactionManager";
+import ReactionManager from "../../handlers/internal/reactions/reactionManager";
 
 export default function inviteSpamBanEmbed(guild: Guild): RichEmbed{
     // for now we don't need this to be a variable amount but maybe

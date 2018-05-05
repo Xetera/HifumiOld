@@ -1,5 +1,5 @@
 import {GuildMember, RichEmbed} from "discord.js";
-import ReactionManager from "../../handlers/reactions/reactionManager";
+import ReactionManager from "../../handlers/internal/reactions/reactionManager";
 
 export default async function conflictOnNameResolveEmbed(members: GuildMember[], identifier: string){
     const memberArray = members.map(m => `${m.user.username}#${m.user.discriminator} ${m.nickname != null ? `**Nick:** ${m.nickname}` : ''}`);

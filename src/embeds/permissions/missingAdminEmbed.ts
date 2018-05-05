@@ -1,5 +1,5 @@
 import {Guild, RichEmbed} from "discord.js";
-import ReactionManager from "../../handlers/reactions/reactionManager";
+import ReactionManager from "../../handlers/internal/reactions/reactionManager";
 import {missingPermissionsEmbedColor, warningEmbedColor} from "../../utility/Settings";
 import gb from "../../misc/Globals";
 

@@ -4,10 +4,11 @@ export const ConfigChannelEmojis: {[id: string]: string}  = {
     logs: '📑',
     warnings: '⚠',
     welcome: '👋',
-    chat: '🗣'
+    chat: '🗣',
+    suggestions: '❓'
 };
 
-export type ConfigChannelType = 'logs' | 'warnings' | 'welcome' | 'chat';
+export type ConfigChannelType = 'logs' | 'warnings' | 'welcome' | 'chat' | 'suggestions';
 
 export default function setConfigChannelEmbed(channel: Channel, type: ConfigChannelType){
     const emoji = ConfigChannelEmojis[type];

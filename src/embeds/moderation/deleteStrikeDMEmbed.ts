@@ -1,6 +1,6 @@
 import {Infraction} from "../../database/models/infraction";
 import {Message, RichEmbed} from "discord.js";
-import InfractionHandler from "../../handlers/infractions/InfractionHandler";
+import InfractionHandler from "../../handlers/internal/infractions/InfractionHandler";
 
 export default function deleteStrikeDMEmbed(message: Message, infraction: Infraction){
     return new RichEmbed()

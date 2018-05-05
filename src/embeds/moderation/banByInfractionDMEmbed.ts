@@ -1,6 +1,6 @@
 import {GuildMember, RichEmbed} from "discord.js";
 import {Infraction} from "../../database/models/infraction";
-import InfractionHandler from "../../handlers/infractions/InfractionHandler";
+import InfractionHandler from "../../handlers/internal/infractions/InfractionHandler";
 
 export default function banByInfractionDMEmbed(member: GuildMember,lastInfraction: Infraction, previousStrikes: Infraction[]){
     const banInfraction: string = InfractionHandler.formatInfraction(lastInfraction, true);

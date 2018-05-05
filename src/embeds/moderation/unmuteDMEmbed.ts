@@ -2,7 +2,7 @@ import {GuildMember, RichEmbed} from "discord.js";
 import {Offense} from "../../moderation/interfaces";
 import {formattedTimeString} from "../../utility/Util";
 import {getMuteTime} from "../../utility/Settings";
-import ReactionManager from "../../handlers/reactions/reactionManager";
+import ReactionManager from "../../handlers/internal/reactions/reactionManager";
 
 export default function unmuteDMEmbed(member: GuildMember, reason: string | Offense, duration?: number | string): RichEmbed{
     let reasonMessage;

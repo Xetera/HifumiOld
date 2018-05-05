@@ -1,7 +1,7 @@
 import {Channel, RichEmbed, TextChannel} from "discord.js";
 import lavenshteinDistance from "../../utility/LavenshteinDistance";
 import {Help} from "../../commands/info/help/help.interface";
-import ReactionManager from "../../handlers/reactions/reactionManager";
+import ReactionManager from "../../handlers/internal/reactions/reactionManager";
 import gb from "../../misc/Globals";
 const help: Help = require('../../commands/help.json');
 

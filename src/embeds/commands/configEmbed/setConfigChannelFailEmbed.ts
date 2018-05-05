@@ -1,6 +1,6 @@
 import {Channel, RichEmbed} from "discord.js";
 import {ConfigChannelEmojis, ConfigChannelType} from "./setConfigChannelEmbed";
-import ReactionManager from "../../../handlers/reactions/reactionManager";
+import ReactionManager from "../../../handlers/internal/reactions/reactionManager";
 import {random} from "../../../utility/Util";
 
 export default function setConfigChannelFailEmbed(channel: Channel, type: ConfigChannelType){

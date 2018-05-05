@@ -12,7 +12,7 @@ export default function guildMemberAddEmbed(member: GuildMember, message?: strin
 
     const embed = new Discord.RichEmbed()
         .setThumbnail(member.user.displayAvatarURL)
-        .setTitle(title)
+        .setTitle(`${member.user.username} has joined ${member.guild.name}!`)
         .setDescription(message)
         .setColor("GREEN")
         .setTimestamp();
