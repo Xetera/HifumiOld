@@ -1,23 +1,23 @@
 import {Collection, GuildMember, Message, MessageCollector} from "discord.js";
-import {debug} from "../../utility/Logging";
-import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
-import gb from "../../misc/Globals";
-import {Infraction} from "../../database/models/infraction";
-import infractionAreYouSureEmbed from "../../embeds/commands/infractionAreYouSureEmbed";
+import {debug} from "../../../utility/Logging";
+import {handleFailedCommand} from "../../../embeds/commands/commandExceptionEmbed";
+import gb from "../../../misc/Globals";
+import {Infraction} from "../../../database/models/infraction";
+import areYouSureEmbed from "../../../embeds/commands/areYouSureEmbed";
 import {
     InfractionRejectionReason,
     InfractionRequestRejection,
     isInfractionRequestRejection
 } from "./infractions.interface";
-import {APIErrors} from "../../interfaces/Errors";
-import {runtimeErrorResponses} from "../../interfaces/Replies";
-import {emptySpace, random} from "../../utility/Util";
-import infractionDMEmbed from "../../embeds/moderation/infractionDMEmbed";
-import resolveBooleanUncertainty from "../../resolvers/resolveBooleanUncertainty";
-import banByInfractionDMEmbed from "../../embeds/moderation/banByInfractionDMEmbed";
+import {APIErrors} from "../../../interfaces/Errors";
+import {runtimeErrorResponses} from "../../../interfaces/Replies";
+import {emptySpace, random} from "../../../utility/Util";
+import infractionDMEmbed from "../../../embeds/moderation/infractionDMEmbed";
+import resolveBooleanUncertainty from "../../../resolvers/resolveBooleanUncertainty";
+import banByInfractionDMEmbed from "../../../embeds/moderation/banByInfractionDMEmbed";
 import moment = require("moment");
-import safeSendMessage from "../safe/SafeSendMessage";
-import safeBanUser from "../safe/SafeBanUser";
+import safeSendMessage from "../../safe/SafeSendMessage";
+import safeBanUser from "../../safe/SafeBanUser";
 
 export default class InfractionHandler {
     private static _instance: InfractionHandler;
@@ -115,7 +115,7 @@ export default class InfractionHandler {
                     return Promise.reject(`Target ${target.user.username} in guild ${target.guild.name} not bannable by infraction.`);
                 }
 
-                const areYouSureMessage = infractionAreYouSureEmbed(`Striking this member will put them at ${weight + currentWeight}/${infractionLimit} total strikes, getting them banned.`, 30);
+                const areYouSureMessage = await areYouSureEmbed(`Striking this member will put them at ${weight + currentWeight}/${infractionLimit} total strikes, getting them banned.`, 30, message.guild);
                 let response = await resolveBooleanUncertainty(message, areYouSureMessage, 30000);
                 if (response === undefined)
                     return Promise.reject(`User denied boolean confirmation`);

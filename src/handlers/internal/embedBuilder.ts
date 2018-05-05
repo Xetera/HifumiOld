@@ -166,4 +166,12 @@ export default class EmbedBuilder {
         return embed;
     }
 
+    public checkEmbedBounds(fields: TemplatedMessage) {
+        //TODO: stub
+        if (fields['title'].length > 256){
+            return `The title field cannot be more than 256 characters long.`;
+        }
+
+    }
+
 }
