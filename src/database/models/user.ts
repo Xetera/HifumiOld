@@ -42,4 +42,10 @@ export class User {
 
     @Column({default: false})
     ignoring: boolean;
+
+    @Column({default: 0})
+    commands_used: number;
+
+    @Column({default: 0})
+    macros_used: number;
 }

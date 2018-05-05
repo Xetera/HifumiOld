@@ -40,8 +40,17 @@ export class Guild {
     chat_channel: string;
 
     @Column({nullable: true})
+    suggestions_channel: string;
+
+    @Column({nullable: true})
     mute_role: string;
 
+    /* Invite Settings */
+    @Column({default: 4})
+    invite_warn_threshold: number;
+
+    @Column({default: 5})
+    invite_ban_threshold: number;
 
     // The maximum amount of infractions you can
     @Column({default: 3})
@@ -84,4 +93,5 @@ export class Guild {
 
     @Column({default: 0})
     lockdowns: number;
+
 }
