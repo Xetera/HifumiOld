@@ -65,8 +65,8 @@ export class Database {
                 url: url,
                 entities: ['src/database/models/**/*.js'],
                 migrations: ['src/database/migrations/**/*.js'],
-                synchronize: false, //this.env === Environments.Development,
-                dropSchema: false, // this.env === Environments.Development,
+                synchronize: this.env === Environments.Development,
+                dropSchema:  this.env === Environments.Development,
                 cli: {
                     migrationsDir: 'migrations'
                 },

@@ -8,13 +8,13 @@ const acceptedSuggestionColor = '#4f88ff';
 export default function suggestionEmbed(message: Message, suggestion: Suggestion){
     let color;
     let status;
-    if (suggestion.suggestion_status === SuggestionStatus.APPROVED){
+    if (suggestion.suggestion_status === 'APPROVED'){
         color = pendingSuggestionColor;
         status = 'Pending'
-    } else if (suggestion.suggestion_status === SuggestionStatus.ACCEPTED) {
+    } else if (suggestion.suggestion_status === 'ACCEPTED') {
         color = acceptedSuggestionColor;
         status = `Accepted!`;
-    } else if (suggestion.suggestion_status === SuggestionStatus.REJECTED) {
+    } else if (suggestion.suggestion_status === 'REJECTED') {
         color = rejectedSuggestionColor;
         status = `Rejected`;
     }

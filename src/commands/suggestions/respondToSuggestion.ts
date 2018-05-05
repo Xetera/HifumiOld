@@ -39,7 +39,7 @@ export default async function respondToSuggestion(message: Message, input: [stri
         )
     }
 
-    if (suggestion.suggestion_status !== SuggestionStatus.APPROVED
+    if (suggestion.suggestion_status !== 'APPROVED'
         && !await resolveBooleanUncertainty(message,
             await areYouSureEmbed(`This suggestion was already resolved, are you sure you want to respond to it again?`, 30, message.guild), 30000)){
         return;

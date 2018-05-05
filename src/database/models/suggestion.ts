@@ -15,6 +15,7 @@ export enum SuggestionStatus {
     REJECTED,
     AWAITING_APPROVAL
 }
+
 @Entity({name: 'suggestions'})
 export class Suggestion {
     @PrimaryGeneratedColumn()
@@ -47,12 +48,8 @@ export class Suggestion {
     @Column()
     user_name: string;
 
-    @Column({
-        type: 'enum',
-        enum: SuggestionStatus,
-        default: SuggestionStatus.AWAITING_APPROVAL
-    })
-    suggestion_status: SuggestionStatus;
+    @Column({default: 'AWAITING_APPROVAL'})
+    suggestion_status: string;
 
     @Column()
     suggestion_date: Date;
