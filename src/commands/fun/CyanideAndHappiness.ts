@@ -11,7 +11,7 @@ const debug = {
 };
 
 export default function ch(message : Discord.Message) : void {
-    axios.get(CHBaseEndpoint + 'random').then((res) => {
+    axios.get(CHBaseEndpoint).then((res) => {
         const $ = cheerio.load(res.data);
         message.channel.send('http:' + $('#main-comic').attr('src'));
     }).catch(err => {
