@@ -57,12 +57,12 @@ export class suggestions1525245572331 implements MigrationInterface {
                 isNullable: true
             }),new TableColumn({
                 name: 'upvotes',
-                type: 'number',
+                type: 'integer',
                 isNullable: true,
                 default: 0
             }),new TableColumn({
                 name: 'downvotes',
-                type: 'number',
+                type: 'integer',
                 isNullable: true,
                 default: 0
             })]
