@@ -174,6 +174,7 @@ export class MuteQueue {
             this.queue.set(guild.id, []);
         }
     }
+
     public release(members: GuildMember | GuildMember[]) : void {
         if (!Array.isArray(members))
             members = [members];

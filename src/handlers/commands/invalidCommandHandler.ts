@@ -3,7 +3,7 @@ import {debug} from '../../utility/Logging'
 import {random, sanitizeUserInput} from "../../utility/Util";
 import findCommand from "../../commands/info/help/findCommand";
 import gb from "../../misc/Globals";
-import ReactionManager from "../reactions/reactionManager";
+import ReactionManager from "../internal/reactions/reactionManager";
 import {highlight} from "../../utility/Markdown";
 import invalidParametersEmbed from "../../embeds/commands/invalidParametersEmbed";
 

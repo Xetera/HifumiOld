@@ -194,6 +194,7 @@ export namespace InviteUtils {
     }
 }
 
+
 export function arrayFromValues(obj: {[id: string]: any}){
     return Object.keys(obj).map(k => obj[k]);
 }

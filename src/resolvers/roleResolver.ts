@@ -7,7 +7,7 @@ import conflictOnRoleResolveEmbed from "../embeds/resolvers/conflictOnRoleResolv
 
 export default async function roleResolver(message: Message, arg: string) {
 
-    if (message.mentions.roles.array().length || arg.match(MessageMentions.ROLES_PATTERN)) {
+    if (message.mentions.roles.size || arg.match(MessageMentions.ROLES_PATTERN)) {
         return message.mentions.roles.array().shift();
     }
     const resolvedRole = message.guild.roles.get(arg);

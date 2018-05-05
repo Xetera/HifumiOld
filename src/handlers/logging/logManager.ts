@@ -1,6 +1,16 @@
 import {
-    Channel, DiscordAPIError, Guild, GuildAuditLogs, GuildAuditLogsEntry, GuildMember, Message, RichEmbed, TextChannel,
-    User, VoiceChannel
+    Channel,
+    DiscordAPIError,
+    Guild,
+    GuildAuditLogs,
+    GuildAuditLogsEntry,
+    GuildMember,
+    Message,
+    Permissions,
+    RichEmbed,
+    TextChannel,
+    User,
+    VoiceChannel
 } from "discord.js";
 import {debug, log} from "../../utility/Logging";
 import muteDMEmbed from "../../embeds/moderation/muteDMEmbed";
@@ -22,13 +32,21 @@ import {APIErrors} from "../../interfaces/Errors";
 import safeSendMessage from "../safe/SafeSendMessage";
 import logInviteMessageEmbed from "../../embeds/logging/logInviteMessageEmbed";
 import logEditedInviteMessageEmbed from "../../embeds/logging/logEditedInviteMessageEmbed";
+import {Suggestion} from "../../database/models/suggestion";
+import logNewSuggestionEmbed from "../../embeds/logging/suggestions/logNewSuggestionEmbed";
 
 // static class
 export class LogManager {
 
 
     private static waitForAuditLogs(guild: Guild, func: (logs: GuildAuditLogs) => any){
-        setTimeout(() => guild.fetchAuditLogs().then((logs: GuildAuditLogs) => func(logs)), 1000);
+        setTimeout(() => {
+            guild.fetchAuditLogs()
+                .then((logs: GuildAuditLogs) => func(logs))
+                .catch(err => {
+                    debug.error(`Could not fetch audit logs for server ${guild.name}, missing permissions`,`LogManager`)
+                });
+        }, 1000);
     }
 
     public static async logWarning(guild: Guild, embed: RichEmbed|string, action: string){
@@ -151,5 +169,9 @@ export class LogManager {
 
     public static async logIllegalEditedInvited(oldM: Message, newM: Message){
         LogManager.logWarning(oldM.guild, await logEditedInviteMessageEmbed(oldM, oldM, newM.content), 'edited invite deletion')
+    }
+
+    public static async logNewSuggestion(member: GuildMember) {
+        LogManager.logMessage(member.guild, await logNewSuggestionEmbed(member), 'new suggestion');
     }
 }

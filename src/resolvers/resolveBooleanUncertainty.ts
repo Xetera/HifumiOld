@@ -5,6 +5,7 @@ import {getOnOff, getYesNo} from "../utility/Util";
 import safeSendMessage from "../handlers/safe/SafeSendMessage";
 
 export default function resolveBooleanUncertainty(message: Message, queryMessage: string | RichEmbed, waitAmount: number): Promise<boolean | undefined>{
+
     return message.channel.send(queryMessage).then((query: Message|Message[]) => {
         return Promise.all([message.channel.awaitMessages((arg: Message) => {
             return arg.author.username === message.author.username;

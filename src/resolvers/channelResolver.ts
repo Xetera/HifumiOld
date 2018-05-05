@@ -20,7 +20,7 @@ export async function channelResolver(arg: string, message: Message, channelType
         return;
     }
 
-    else if (message.mentions.channels.array().length || arg.match(MessageMentions.CHANNELS_PATTERN)) {
+    else if (message.mentions.channels.size || arg.match(MessageMentions.CHANNELS_PATTERN)) {
         return message.mentions.channels.array().shift();
     }
 
