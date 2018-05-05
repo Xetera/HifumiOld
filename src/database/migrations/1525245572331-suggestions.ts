@@ -3,6 +3,10 @@ import {MigrationInterface, QueryRunner, Table, TableColumn, TableForeignKey} fr
 export class suggestions1525245572331 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<any> {
+        await queryRunner.connection.query(
+            `CREATE TABLE "suggestions" ("suggestion_id" SERIAL NOT NULL, "message_id" varchar, "channel_id" varchar, "suggestion_message" varchar NOT NULL, "guild_id" varchar NOT NULL, "guild_name" varchar NOT NULL, "user_id" varchar NOT NULL, "user_name" varchar NOT NULL, "suggestion_status" varchar NOT NULL DEFAULT 'AWAITING_APPROVAL', "suggestion_date" date NOT NULL, "status_reason" varchar, "response_date" varchar, "upvotes" integer DEFAULT 0, "downvotes" integer DEFAULT 0, CONSTRAINT "PK_a1c81286009e1bf401eefb7bd1a" PRIMARY KEY ("suggestion_id"))`
+        )
+        /*
         await queryRunner.createTable(new Table({
             name: 'suggestions',
             columns: [new TableColumn({
@@ -60,7 +64,7 @@ export class suggestions1525245572331 implements MigrationInterface {
                 default: 0
             })]
         }));
-
+        */
         await queryRunner.addColumns('guilds', [new TableColumn({
             name: 'suggestions_channel',
             type: 'varchar',
