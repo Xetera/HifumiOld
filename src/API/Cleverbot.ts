@@ -2,7 +2,7 @@ import * as Discord from 'discord.js'
 import {Cleverbot as Clevertype, Config, Mood, User} from 'clevertype'
 import {debug} from '../utility/Logging'
 import gb from "../misc/Globals";
-import {Channel, Message} from "discord.js";
+import {Channel, Message, MessageMentions} from "discord.js";
 import moment = require("moment");
 import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import TokenBucket from "../moderation/TokenBucket";
@@ -10,6 +10,7 @@ import ignore from "../commands/self/Ignore";
 import {UpdateResult} from "typeorm";
 import safeSendMessage from "../handlers/safe/SafeSendMessage";
 import {formattedTimeString} from "../utility/Util";
+import prefixReminderEmbed from "../embeds/misc/prefixReminderEmbed";
 
 interface Ignores {
     ignoreUntil: Date | undefined;
@@ -49,7 +50,12 @@ export class Cleverbot {
             || !(message.channel instanceof Discord.TextChannel)){
             return;
         }
+
         let cleverbotCall = message.content.match(this.identifier);
+        if (message.isMentioned(bot.user) && !message.content.replace(MessageMentions.USERS_PATTERN, '')){
+            return void safeSendMessage(message.channel, prefixReminderEmbed(await gb.instance.database.getPrefix(message.guild.id)), 30000);
+        }
+
         const chatChannelId = await gb.instance.database.getChatChannel(message.guild.id);
 
         if (message.channel.id === chatChannelId || cleverbotCall || message.isMentioned(bot.user)) {
@@ -74,8 +80,6 @@ export class Cleverbot {
 
             this.say(message, message.content, message.member.id).then(async(resp : string) => {
                 // sometimes randomly the messages are empty for no reason
-                console.log('MY RESPONSE');
-                console.log(resp);
                 message.channel.send(resp);
             });
 
