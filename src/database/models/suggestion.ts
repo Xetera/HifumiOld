@@ -8,6 +8,13 @@ import {
 import 'reflect-metadata';
 import {Guild} from "./guild";
 
+export enum SuggestionStatus {
+    APPROVED,
+    DENIED,
+    ACCEPTED,
+    REJECTED,
+    AWAITING_APPROVAL
+}
 @Entity({name: 'suggestions'})
 export class Suggestion {
     @PrimaryGeneratedColumn()
@@ -42,16 +49,10 @@ export class Suggestion {
 
     @Column({
         type: 'enum',
-        enum: [
-            'APPROVED',
-            'DENIED',
-            'ACCEPTED',
-            'REJECTED',
-            'AWAITING_APPROVAL'
-        ],
-        default: 'AWAITING_APPROVAL'
+        enum: SuggestionStatus,
+        default: SuggestionStatus.AWAITING_APPROVAL
     })
-    suggestion_status: 'APPROVED' | 'DENIED' | 'ACCEPTED' | 'REJECTED' | 'AWAITING_APPROVAL';
+    suggestion_status: SuggestionStatus;
 
     @Column()
     suggestion_date: Date;

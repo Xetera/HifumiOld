@@ -2,7 +2,7 @@ import {Message, TextChannel} from "discord.js";
 import gb from "../../misc/Globals";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import suggestionEmbed from "../../embeds/commands/suggestions/suggestionEmbed";
-import {Suggestion} from "../../database/models/suggestion";
+import {Suggestion, SuggestionStatus} from "../../database/models/suggestion";
 import resolveBooleanUncertainty from "../../resolvers/resolveBooleanUncertainty";
 import areYouSureEmbed from "../../embeds/commands/areYouSureEmbed";
 import suggestionAcceptedDMEmbed from "../../embeds/commands/suggestions/suggestionAcceptedDMEmbed";
@@ -39,7 +39,7 @@ export default async function respondToSuggestion(message: Message, input: [stri
         )
     }
 
-    if (suggestion.suggestion_status !== 'APPROVED'
+    if (suggestion.suggestion_status !== SuggestionStatus.APPROVED
         && !await resolveBooleanUncertainty(message,
             await areYouSureEmbed(`This suggestion was already resolved, are you sure you want to respond to it again?`, 30, message.guild), 30000)){
         return;

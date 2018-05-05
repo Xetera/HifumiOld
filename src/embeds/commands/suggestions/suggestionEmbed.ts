@@ -1,5 +1,5 @@
 import {Message, RichEmbed} from "discord.js";
-import {Suggestion} from "../../../database/models/suggestion";
+import {Suggestion, SuggestionStatus} from "../../../database/models/suggestion";
 
 const pendingSuggestionColor = '#fff9ae';
 const rejectedSuggestionColor = '#ff2e47';
@@ -8,13 +8,13 @@ const acceptedSuggestionColor = '#4f88ff';
 export default function suggestionEmbed(message: Message, suggestion: Suggestion){
     let color;
     let status;
-    if (suggestion.suggestion_status === 'APPROVED'){
+    if (suggestion.suggestion_status === SuggestionStatus.APPROVED){
         color = pendingSuggestionColor;
         status = 'Pending'
-    } else if (suggestion.suggestion_status === 'ACCEPTED') {
+    } else if (suggestion.suggestion_status === SuggestionStatus.ACCEPTED) {
         color = acceptedSuggestionColor;
         status = `Accepted!`;
-    } else if (suggestion.suggestion_status === 'REJECTED') {
+    } else if (suggestion.suggestion_status === SuggestionStatus.REJECTED) {
         color = rejectedSuggestionColor;
         status = `Rejected`;
     }
