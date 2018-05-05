@@ -23,6 +23,7 @@ import {Infraction} from "./models/infraction";
 import moment = require("moment");
 import {MutedUserSubscriber} from "./subscribers/mutedUser.subscriber";
 import {MutedUser} from "./models/mutedUser";
+import {Suggestion} from "./models/suggestion";
 const rootConfig: IORMConfig = require('../../ormconfig.json');
 
 interface IWelcomeMessage {
@@ -64,8 +65,8 @@ export class Database {
                 url: url,
                 entities: ['src/database/models/**/*.js'],
                 migrations: ['src/database/migrations/**/*.js'],
-                synchronize: this.env === Environments.Development,
-                dropSchema: this.env === Environments.Development,
+                synchronize: false, //this.env === Environments.Development,
+                dropSchema: false, // this.env === Environments.Development,
                 cli: {
                     migrationsDir: 'migrations'
                 },
@@ -154,7 +155,8 @@ export class Database {
             return Promise.resolve(r);
         }).catch((err: Error)=> {
             return Promise.reject(err);
-        })
+        });
+
     }
 
 
@@ -175,6 +177,12 @@ export class Database {
     public getMacroCount(guildId: string): Promise<number> {
         return this.getMacros(guildId).then((r: Macro[]) => {
             return r.length;
+        });
+    }
+
+    public getPremium(guildId: string){
+        return this.getGuild(guildId).then((r: Guild) => {
+            return r.premium;
         });
     }
 
@@ -388,7 +396,6 @@ export class Database {
     }
 
     public setUserIgnore(member: GuildMember, state: boolean): Promise<UpdateResult> {
-
         return this.invalidateCache('users').then(() => {
             // return this.conn.manager.save(User, {guild_id: member.guild.id, id: member.user.id, ignoring: state});
             return this.conn.manager.createQueryBuilder()
@@ -405,6 +412,7 @@ export class Database {
         return this.getUser(member.guild.id, member.id).then((r: User) => {
             return r.ignoring;
         }).catch(err => {
+            debug.error(`User ${member.user.username} in guild ${member.guild.id} isn't saved in the Database`, `Database`);
             return Promise.reject(err);
         });
     }
@@ -576,7 +584,9 @@ export class Database {
     }
 
     public incrementHistoryCalls(guildId: string, userId: string){
-        return this.conn.manager.increment(User, {id: userId, guild_id: guildId}, `history_calls`, 1);
+        return this.invalidateCache('users').then(() => {
+            return this.conn.manager.increment(User, {id: userId, guild_id: guildId}, `history_calls`, 1);
+        });
     }
 
     public getHistoryCalls(guildId: string, userId: string){
@@ -586,22 +596,24 @@ export class Database {
     }
 
     public addMutedUser(guildId: string, userId: string, muteAmount: Date){
-        this.conn.manager.save(MutedUser, {
-            user_id: userId,
-            guild_id: guildId,
-            start_date: new Date(),
-            end_date: muteAmount
-        }).catch(err => Promise.reject(err))
+        return this.invalidateCache('muted_users').then(() => {
+            return this.conn.manager.save(MutedUser, {
+                user_id: userId,
+                guild_id: guildId,
+                start_date: new Date(),
+                end_date: muteAmount
+            }).catch(err => Promise.reject(err))
+        });
     }
 
     public getMutedUsers(guildId: string){
-        return this.conn.manager.find(MutedUser, {where: {guild_id: guildId}}).then((r: MutedUser[]) => {
+        return this.conn.manager.find(MutedUser, {where: {guild_id: guildId}, cache: true}).then((r: MutedUser[]) => {
             return r.filter(p => p.end_date > new Date());
         }).catch(err => Promise.reject(err));
     }
 
     public getExpiredMutes(guildId: string){
-        return this.conn.manager.find(MutedUser, {where: {guild_id: guildId}}).then((r: MutedUser[]) => {
+        return this.conn.manager.find(MutedUser, {where: {guild_id: guildId}, cache: true}).then((r: MutedUser[]) => {
             return r.filter(p => p.end_date < new Date());
         }).catch(err => Promise.reject(err));
     }
@@ -619,6 +631,105 @@ export class Database {
         return this.getGuild(guildId).then((r:Guild) => {
             return r.mute_role;
         }).catch(err => Promise.reject(err));
+    }
+
+    public addSuggestion(message: Message, suggestion: string){
+        return this.invalidateCache('suggestions').then(() => {
+            return this.conn.manager.save(Suggestion, {
+                guild_id: message.guild.id,
+                guild_name: message.guild.name,
+                user_id: message.author.id,
+                user_name: message.author.username,
+                suggestion_date: new Date(),
+                suggestion_message: suggestion
+            });
+        });
+    }
+
+    private changeSuggestionStatus(id: string, status: string, reason?: string){
+        return this.invalidateCache('suggestions').then(() => {
+            const set: {[id: string]: string} = {
+                suggestion_status: status
+            };
+
+            if (reason){
+                set['status_reason'] = reason;
+            }
+
+            return this.conn.manager.createQueryBuilder()
+                .update(Suggestion)
+                .set(set)
+                .where(`suggestion_id = :id`, {id: id})
+                .returning('*')
+                .execute();
+        });
+    }
+
+    public setSuggestionMetadata(suggestionId: string, channelId: string, embedId: string){
+        return this.conn.manager.createQueryBuilder()
+            .update(Suggestion)
+            .set({channel_id: channelId, message_id: embedId})
+            .where(`suggestion_id = :suggestion_id`, {suggestion_id: suggestionId})
+            .returning('*')
+            .execute();
+    }
+
+    public approveSuggestion(id: string): Promise<UpdateResult> {
+        return this.changeSuggestionStatus(id, 'APPROVED');
+    }
+
+    public denySuggestion(id: string): Promise<UpdateResult> {
+        return this.changeSuggestionStatus(id, 'DENIED');
+    }
+
+    public acceptSuggestion(id: string, reason: string){
+        return this.changeSuggestionStatus(id, 'ACCEPTED', reason);
+    }
+
+    public rejectSuggestion(id: string, reason: string){
+        return this.changeSuggestionStatus(id, 'REJECTED', reason);
+    }
+
+    public setSuggestionsChannel(guildId: string, channelId: string){
+        return this.invalidateCache('guilds').then(() => {
+            return this.conn.manager.save(Guild, {id: guildId, suggestions_channel: channelId});
+        })
+    }
+
+    public getSuggestionsChannel(guildId: string): Promise<string | undefined>{
+        return this.getGuild(guildId).then((r: Guild) => {
+            return r.suggestions_channel;
+        })
+    }
+
+    public getSuggestion(guildId: string, suggestionId: string){
+        return this.conn.manager.findOne(Suggestion, {where: {guild_id: guildId, suggestion_id: suggestionId}, cache: true});
+    }
+
+    public getSuggestions(guildId: string){
+        return this.conn.getRepository(Suggestion)
+            .createQueryBuilder('suggestions')
+            .where(`guild_id = :id`, {id: guildId})
+            .orderBy('suggestions.suggestion_date')
+            .getMany();
+    }
+
+    public getPendingSuggestions(guildId: string){
+        return this.conn.getRepository(Suggestion)
+            .createQueryBuilder('suggestions')
+            .where(`guild_id = :id AND suggestion_status = 'AWAITING_APPROVAL'`, {id: guildId})
+            .orderBy('suggestions.suggestion_date', 'DESC')
+            .getMany();
+    }
+
+    public incrementCommandCalls(guildId: string, userId: string){
+        return this.conn.manager.increment(User, {id: userId, guild_id: guildId}, 'commands_used', 1);
+    }
+
+    public incrementMacroCalls(guildId: string, userId: string){
+        return this.invalidateCache('users').then(() => {
+            return this.conn.manager.increment(User, {id: userId, guild_id: guildId}, 'macros_used', 1);
+        });
     }
 }
 
