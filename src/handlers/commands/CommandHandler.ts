@@ -77,6 +77,7 @@ import denySuggestion from "../../commands/suggestions/denySuggestion";
 import removeWelcome from "../../commands/config/settings/removeWelcome";
 import removeLogs from "../../commands/config/settings/removeLogs";
 import removeWarnings from "../../commands/config/settings/removeWarnings";
+import invite from "../../commands/self/invite";
 
 export interface CommandParameters extends Instance {
     message: Discord.Message;
@@ -592,5 +593,10 @@ export default class CommandHandler implements indexSignature {
     @expect(ArgType.None)
     private setSuggestions(params: CommandParameters){
         setSuggestionsChannel(params.message);
+    }
+
+    @expect(ArgType.None)
+    private invite(params: CommandParameters){
+        invite(params.message);
     }
 }

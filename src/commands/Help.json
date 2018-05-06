@@ -408,6 +408,14 @@
       "example": "ignoredusers",
       "arguments": "0",
       "permissions": "MOD"
+    },
+    {
+      "name": "invite",
+      "type": "Info",
+      "info": "Sends a link to invite me to your server and to join my support server.",
+      "usage": "invite",
+      "example": "invite",
+      "arguments": "0"
     }
   ]
 }

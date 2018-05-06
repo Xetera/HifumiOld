@@ -12,5 +12,4 @@ export default async function listGuilds(message: Message) {
         return `${guild.name} => ${guild.memberCount} members | ${g.cleverbot_calls} API calls`;
     });
     return message.channel.send(codeBlock(rows.join('\n')));
-
 }
