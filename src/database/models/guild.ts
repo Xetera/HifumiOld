@@ -99,7 +99,7 @@ export class Guild {
     visible: boolean;
 
     // Toggles 'did you mean' replies
-    @Column({default: true})
+    @Column({default: false})
     hints: boolean;
 
     // Whether Hifumi includes gif reactions
