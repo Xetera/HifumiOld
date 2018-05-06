@@ -74,6 +74,9 @@ import approveSuggestion from "../../commands/suggestions/approveSuggestion";
 import {Command} from "../../commands/info/help/help.interface";
 import respondToSuggestion, {SuggestionResponse} from "../../commands/suggestions/respondToSuggestion";
 import denySuggestion from "../../commands/suggestions/denySuggestion";
+import removeWelcome from "../../commands/config/settings/removeWelcome";
+import removeLogs from "../../commands/config/settings/removeLogs";
+import removeWarnings from "../../commands/config/settings/removeWarnings";
 
 export interface CommandParameters extends Instance {
     message: Discord.Message;
@@ -300,10 +303,15 @@ export default class CommandHandler implements indexSignature {
     }
 
     @admin
-    @throttle(10)
     @expect(ArgType.None)
     private setWelcome(params : CommandParameters){
         setWelcome(params.message);
+    }
+
+    @admin
+    @expect(ArgType.None)
+    private removeWelcome(params : CommandParameters){
+        removeWelcome(params.message);
     }
 
     @admin
@@ -315,8 +323,20 @@ export default class CommandHandler implements indexSignature {
 
     @admin
     @expect(ArgType.None)
+    private removeLogs(params : CommandParameters){
+        removeLogs(params.message);
+    }
+
+    @admin
+    @expect(ArgType.None)
     private setWarnings(params: CommandParameters){
         setWarningsChannel(params.message);
+    }
+
+    @admin
+    @expect(ArgType.None)
+    private removeWarnings(params : CommandParameters){
+        removeWarnings(params.message);
     }
 
     @admin
@@ -331,6 +351,12 @@ export default class CommandHandler implements indexSignature {
         //setMuteRole()
     }
 
+    // @admin
+    // @expect(ArgType.String)
+    // @expect(ArgType.Boolean)
+    // private log(params: CommandParameters){
+    //
+    // }
 
     /* Mod Commands */
 
@@ -485,7 +511,6 @@ export default class CommandHandler implements indexSignature {
         EmbedBuilder.getInstance().sendEmbed(params.message);
     }
 
-    @throttle(15)
     @expect(ArgType.String, {optional: true})
     private help(params: CommandParameters){
         getHelp(params.message, <[string] | undefined > params.input)

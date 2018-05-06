@@ -26,6 +26,7 @@ export class Guild {
     @Column({nullable: true})
     welcome_message: string;
 
+    /* Channel Destinations */
     @Column({nullable: true})
     welcome_channel: string;
 
@@ -35,13 +36,41 @@ export class Guild {
     @Column({nullable: true})
     logs_channel: string;
 
-    // channel for easy chatting using cleverbot
     @Column({nullable: true})
     chat_channel: string;
 
     @Column({nullable: true})
     suggestions_channel: string;
 
+    /* TODO: $logs update
+    @Column({nullable: true})
+    joins_logging_channel: string;
+
+    @Column({nullable: true})
+    leave_logging_channel: string;
+
+    @Column({nullable: true})
+    mute_logging_channel: string;
+
+    @Column({nullable: true})
+    invite_logging_channel: string;
+
+    @Column({nullable: true})
+    ban_logging_channel: string;
+
+    @Column({nullable: true})
+    suggestion_logging_channel: string;
+
+    @Column({nullable: true})
+    ping_logging_channel: string;
+
+    @Column({nullable: true})
+    spam_logging_channel: string;
+
+    @Column({nullable: true})
+    command_logging_channel: string;
+    */
+    /*END $logs update*/
     @Column({nullable: true})
     mute_role: string;
 
@@ -80,6 +109,8 @@ export class Guild {
 
     @Column({default: false})
     tracking_new_members: boolean;
+
+
 
     /* Stats */
     @Column({default: 0})

@@ -30,6 +30,11 @@ interface IWelcomeMessage {
     message: Message;
     userId: string;
 }
+
+export interface ORMUpdateResult<T> extends UpdateResult {
+    raw: T[];
+}
+
 export class Database {
     env: Environments;
     connectionString: string;
@@ -332,6 +337,19 @@ export class Database {
         })
     }
 
+    public removeWelcomeChannel(guildId: string){
+        return this.invalidateCache('guilds').then(() => {
+            return this.conn.manager.createQueryBuilder()
+                .update(Guild)
+                .set({welcome_channel: null})
+                .where(`id = :id`, {id: guildId})
+                .returning('*')
+                .execute();
+        }).catch(err => {
+            return Promise.reject(err);
+        });
+    }
+
     public setLogsChannel(guildId: string, channelId: string): Promise<Partial<Guild>> {
         return this.getGuild(guildId).then((r: Guild) => {
             if (!r.warnings_channel) {
@@ -346,6 +364,15 @@ export class Database {
         });
     }
 
+    public removeLogsChannel(guildId: string){
+        return this.conn.createQueryBuilder()
+            .update(Guild)
+            .set({logs_channel: null})
+            .where(`id = :id`, {id: guildId})
+            .returning('*')
+            .execute();
+    }
+
 
     public setWarningsChannel(guildId: string, channelId: string): Promise<Partial<Guild>> {
         return this.invalidateCache('guilds').then(() => {
@@ -353,6 +380,15 @@ export class Database {
         }).catch(err => {
             return Promise.reject(err);
         });
+    }
+
+    public removeWarningsChannel(guildId: string){
+        return this.conn.createQueryBuilder()
+            .update(Guild)
+            .set({warnings_channel: null})
+            .where(`id = :id`, {id: guildId})
+            .returning('*')
+            .execute();
     }
 
     public setChatChannel(guildId: string, channelId:string): Promise<Partial<Guild>> {
