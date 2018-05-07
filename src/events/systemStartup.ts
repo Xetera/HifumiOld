@@ -70,8 +70,12 @@ export function getTokens(env: Environments) {
 
 
 export function getDatabaseConnection(env: Environments) : string {
-    if (env === Environments.Development)
+    if (env === Environments.Development && !process.env.DATABASE_URL){
+        console.error(`DATABASE_URL ENV SETTING NOT SET`);
         return 'postgres://localhost/discord';
+    }
+    else if (env === Environments.Development && process.env.DATABASE_URL)
+        return process.env.DATABASE_URL;
     return process.env.DATABASE_URL;
 }
 

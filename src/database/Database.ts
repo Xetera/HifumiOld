@@ -12,7 +12,7 @@ import gb from "../misc/Globals";
 import {Environments} from "../events/systemStartup";
 import {debug} from "../utility/Logging";
 import {User} from "./models/user";
-import {Guild} from "./models/guild";
+import {Guild, LoggingChannelType} from "./models/guild";
 import {GuildMember, Message, Guild as DiscordGuild, GuildAuditLogsFetchOptions} from "discord.js";
 import {Macro} from "./models/macro";
 import {Note} from "./models/note";
@@ -64,14 +64,15 @@ export class Database {
      * @returns {Promise<Connection>}
      */
     public connect(url: string): Promise<Connection> {
+        debug.silly(`Connecting to postgres on url ${url}`, `Database`);
         return this.ormConfig(url).then(() => {
             return createConnection({
                 type: 'postgres',
                 url: url,
                 entities: ['src/database/models/**/*.js'],
                 migrations: ['src/database/migrations/**/*.js'],
-                synchronize: this.env === Environments.Development,
-                dropSchema:  this.env === Environments.Development,
+                synchronize: false, // this.env === Environments.Development,
+                dropSchema:  false, // this.env === Environments.Development,
                 cli: {
                     migrationsDir: 'migrations'
                 },
@@ -79,7 +80,8 @@ export class Database {
                     type: 'redis',
                     duration: Infinity,
                     options: {
-                        url: this.env === Environments.Development ? 'redis://localhost:6379' : process.env.REDISCLOUD_URL
+                        // setting via gb.ENV creates problems with docker
+                        url: process.env.REDISCLOUD_URL ? process.env.REDISCLOUD_URL  : 'redis://localhost:6379'
                     }
                 }
             }).catch(err => {
@@ -767,5 +769,15 @@ export class Database {
             return this.conn.manager.increment(User, {id: userId, guild_id: guildId}, 'macros_used', 1);
         });
     }
+
+    public changeSpecificLoggingChannel(guildId: string, type: LoggingChannelType, channelId: string | undefined){
+        return this.invalidateCache('guilds').then(() => {
+            return this.conn.manager.save(Guild, {
+                id: channelId,
+                [type]: channelId
+            })
+        }).catch(e => debug.error(e))
+    }
+
 }
 
