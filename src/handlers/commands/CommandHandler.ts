@@ -24,7 +24,7 @@ import mod from "../../decorators/onlyMod";
 import getQueue from "../../commands/debug/getQueue";
 import cleanse from "../../commands/utility/Cleanse";
 import bump from "../../commands/self/Bump";
-import getConfig from "../../commands/config/getConfig";
+import settings from "../../commands/config/settings";
 import setLogsChannel from "../../commands/config/setLogsChannel";
 import ignore from "../../commands/self/Ignore";
 import botInfo from "../../commands/info/botInfo";
@@ -78,6 +78,8 @@ import removeWelcome from "../../commands/config/settings/removeWelcome";
 import removeLogs from "../../commands/config/settings/removeLogs";
 import removeWarnings from "../../commands/config/settings/removeWarnings";
 import invite from "../../commands/self/invite";
+import log from "../../commands/config/settings/log";
+import ping from "../../commands/info/ping";
 
 export interface CommandParameters extends Instance {
     message: Discord.Message;
@@ -152,7 +154,7 @@ export default class CommandHandler implements indexSignature {
 
         else if (input.substring(0, 2) === prefix + prefix){
             debug.silly(`[${message.guild.name}]<${message.author}> Entered a stealth command`, 'CommandHandler');
-            out.stealth= true;
+            out.stealth = true;
             out.command = input.substring(2);
             return out;
         }
@@ -191,7 +193,7 @@ export default class CommandHandler implements indexSignature {
             if (!match)
                 continue;
             const execution = this.commands[i];
-            //message.react(gb.emojis.get('alexa_ack')!);
+
             try {
                 this._run(message, execution, params);
             }
@@ -346,26 +348,34 @@ export default class CommandHandler implements indexSignature {
         setChatChannel(params.message);
     }
 
-    @admin
-    @expect(ArgType.String)
-    private setMute(params: CommandParameters){
-        //setMuteRole()
-    }
-
     // @admin
     // @expect(ArgType.String)
-    // @expect(ArgType.Boolean)
-    // private log(params: CommandParameters){
-    //
+    // private setMute(params: CommandParameters){
+    //     //setMuteRole()
     // }
 
-    /* Mod Commands */
+    @admin
+    @expect(ArgType.String, {maxLength: 15})
+    @expect([ArgType.Boolean, ArgType.Channel])
+    private log(params: CommandParameters){
+        log(params.message, <[string, (TextChannel | string)]> params.input)
+    }
+
+    @admin
+    @expect(ArgType.String, {maxLength: 15})
+    @expect([ArgType.Boolean, ArgType.Channel])
+    private logs(params: CommandParameters){
+        log(params.message, <[string, (TextChannel | string)]> params.input)
+    }
 
     @mod
-    @expect(ArgType.None)
-    private config(params : CommandParameters){
-        getConfig(params.message);
+    @expect(ArgType.String, {optional: true})
+    @expect(ArgType.String, {optional: true})
+    private settings(params : CommandParameters){
+        settings(params.message, <[string, string]> params.input);
     }
+
+    /* Mod Commands */
 
     @mod
     @throttle(10)
@@ -403,7 +413,6 @@ export default class CommandHandler implements indexSignature {
     private addMacro(params: CommandParameters){
         addMacro(params.message, <[string, string]> params.input);
     }
-
 
     @mod
     @expect(ArgType.String)
@@ -512,7 +521,7 @@ export default class CommandHandler implements indexSignature {
         EmbedBuilder.getInstance().sendEmbed(params.message);
     }
 
-    @expect(ArgType.String, {optional: true})
+    @expect(ArgType.Message, {optional: true})
     private help(params: CommandParameters){
         getHelp(params.message, <[string] | undefined > params.input)
     }
@@ -558,7 +567,7 @@ export default class CommandHandler implements indexSignature {
     }
 
     @expect(ArgType.None)
-    private listMacros(params: CommandParameters){
+    private macros(params: CommandParameters){
         listMacros(params.message)
     }
 
@@ -598,5 +607,10 @@ export default class CommandHandler implements indexSignature {
     @expect(ArgType.None)
     private invite(params: CommandParameters){
         invite(params.message);
+    }
+
+    @expect(ArgType.None)
+    private ping(params: CommandParameters){
+        ping(params.message);
     }
 }
