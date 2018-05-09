@@ -12,13 +12,17 @@ import helpMacroEmbed from "../../../embeds/commands/helpMacroEmbed";
 const help = require('../../help.json');
 
 export async function getHelp(message : Message, input: [string] | undefined) {
-    const choice = Array.isArray(input) ? input.shift() : undefined;
+    const choice = Array.isArray(input) ? input.join(' ') : undefined;
+    console.log(choice);
     const prefix: string = await gb.instance.database.getPrefix(message.guild.id);
     if (!choice){
         const prefix : string = await gb.instance.database.getPrefix(message.guild.id);
         let embed = new RichEmbed();
 
         let sortedCommands: {[type:string]: Command[]} = help.commands.reduce((obj: {[type:string]: Command[]}, command: Command) => {
+            // we don't want to send ALL the settings commands in help
+            if (command.hidden)
+                return obj;
             if (!obj[command.type]){
                 obj[command.type] = [];
             }
@@ -61,9 +65,9 @@ async function getSpecificHelp(message: Message, arg: string, prefix: string){
     }
     const shortCommand: boolean = command.usage === command.example;
     let embed = new RichEmbed()
-        .setTitle('__' + command.name + '__')
+        .setTitle('__' + prefix + command.name + '__')
         .setColor(commandEmbedColor)
-        .addField('Info', command.info)
+        .addField('Info', command.info.replace(/{{prefix}}/g, prefix))
         .addField('Usage', highlight(prefix + command.usage))
         .addField('Example', highlight(prefix + command.example))
         .addField('Permissions', command.permissions ? command.permissions : 'Everyone', true)

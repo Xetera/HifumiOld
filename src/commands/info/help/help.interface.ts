@@ -3,6 +3,7 @@ export interface Command {
     type:string;
     info:string;
     usage: string;
+    hidden?: boolean;
     example:string;
     arguments: string;
     permissions?: 'MOD' | 'ADMIN' | 'OWNER'

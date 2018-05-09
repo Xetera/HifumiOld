@@ -5,10 +5,11 @@
     "Chat",
     "Utility",
     "Moderation",
-    "Configuration",
+    "Settings",
     "Fun",
     "Embeds",
-    "Suggestions"
+    "Suggestions",
+    "Settings"
   ],
   "private": [
     {
@@ -56,7 +57,7 @@
     },
     {
       "name": "setprefix",
-      "type": "Configuration",
+      "type": "Settings",
       "info": "Changes my prefix settings. Only supports single character prefixes in order to allow stealth commands.",
       "usage": "setprefix { prefix }",
       "example": "setprefix >",
@@ -83,7 +84,7 @@
     },
     {
       "name": "setwelcome",
-      "type": "Configuration",
+      "type": "Settings",
       "info": "Changes the channel I send public welcome messages to. Welcome messages are removed when users leave.",
       "usage": "setwelcome",
       "example": "setwelcome",
@@ -92,7 +93,7 @@
     },
     {
       "name": "setlogs",
-      "type": "Configuration",
+      "type": "Settings",
       "info": "Changes the channel I keep logs in.",
       "usage": "setlogs",
       "example": "setlogs",
@@ -101,7 +102,7 @@
     },
     {
       "name": "setwarnings",
-      "type": "Configuration",
+      "type": "Settings",
       "info": "Changes the channel I send mod warnings to, log channel by default.",
       "usage": "setwarnings",
       "example": "setwarnings",
@@ -110,7 +111,7 @@
     },
     {
       "name": "setchat",
-      "type": "Configuration",
+      "type": "Settings",
       "info": "Changes my chat channel. I respond to all messages in this channel regardless of hearing my name. I won't reply if you put a **-** in front of your message or mention someone else.",
       "usage": "setchat",
       "example": "setchat",
@@ -139,8 +140,8 @@
       "name": "pfp",
       "type": "Utility",
       "info": "Fetches the profile picture of the user.",
-      "usage": "pfp { @Member | user ID }",
-      "example": "pfp @Xetera` OR `pfp 4563862635863",
+      "usage": "pfp { member }",
+      "example": "pfp xetera",
       "arguments": "1"
     },
     {
@@ -194,7 +195,7 @@
     },
     {
       "name": "hints",
-      "type": "Configuration",
+      "type": "Settings",
       "info": "Determines whether I respond to invalid commands with a hint or not.",
       "usage": "hints {'on' | 'off'}",
       "example": "hints off",
@@ -202,20 +203,92 @@
       "permissions": "MOD"
     },
     {
-      "name": "config",
-      "type": "Configuration",
-      "info": "Sends all the settings I remember about this server",
-      "usage": "config",
-      "example": "config",
-      "arguments": "0",
+      "name": "settings",
+      "type": "Settings",
+      "info": "Allows changing my settings for the server. Use the **{{prefix}}log** command to change my logging and warning settings\n**{{prefix}}help settings {option} for more info ({{prefix}}help settings invitewarn)** .\n\n__Options__\n**{{prefix}}settings prefix**\n**{{prefix}}settings hints**\n**{{prefix}}settings strikelimit**\n**{{prefix}}settings reactions**\n**{{prefix}}settings tracking**\n**{{prefix}}settings invites**\n**{{prefix}}settings invitewarn**\n**{{prefix}}settings inviteban**",
+      "usage": "settings { options } { value }",
+      "example": "settings reactions off",
+      "arguments": "0-2",
       "permissions": "MOD"
     },
     {
-      "name": "invitefilter",
-      "type": "Configuration",
-      "info": "Changes my settings for deleting invites, mods can always send invites regardless.\n**On** => I DELETE ALL (╬ಠ益ಠ)\n**Off** => Everyone can send invites (/ω＼)",
-      "usage": "invitefilter { 'on' | 'off' }",
-      "example": "invitefilter off",
+      "name": "settings prefix",
+      "type": "Settings",
+      "info": "Changes the prefix for the server, currently only supporting single characters.",
+      "usage": "settings prefix { prefix }",
+      "hidden": true,
+      "example": "settings prefix %",
+      "arguments": "1",
+      "permissions": "ADMIN"
+    },
+    {
+      "name": "settings hints",
+      "type": "Settings",
+      "info": "Determines whether I respond to invalid commands with a hint or not.",
+      "usage": "settings hints { 'on' | 'off' }",
+      "hidden": true,
+      "example": "settings hints on",
+      "arguments": "1",
+      "permissions": "ADMIN"
+    },
+    {
+      "name": "settings strikelimit",
+      "type": "Settings",
+      "info": "Sets the limit of maximum strikes a user can have before getting banned **{{prefix}}help strike** for more info on infractions.",
+      "usage": "settings strikelimit { number }",
+      "hidden": true,
+      "example": "settings strikelimit 8",
+      "arguments": "1",
+      "permissions": "ADMIN"
+    },
+    {
+      "name": "settings reactions",
+      "type": "Settings",
+      "info": "Toggles the reaction thumbnails I put on some of replies.",
+      "usage": "settings reactions { 'on' | 'off' }",
+      "hidden": true,
+      "example": "settings reactions on",
+      "arguments": "1",
+      "permissions": "ADMIN"
+    },
+
+    {
+      "name": "settings tracking",
+      "type": "Settings",
+      "info": "Toggles my tracking mode for new members. When enabled, people who have joined in the past 5 minutes will get banned after 2 server invites rather than waiting for the invite limit and get banned instead of getting muted once I detect them spamming.",
+      "usage": "settings tracking { 'on' | 'off' }",
+      "hidden": true,
+      "example": "settings tracking on",
+      "arguments": "1",
+      "permissions": "ADMIN"
+    },
+    {
+      "name": "settings invites",
+      "type": "Settings",
+      "info": "Changes my settings for removing invites.\n**on** - invites are allowed, I don't check messages for them\n**off** - All invites by non-mods get removed, logged and added to the user's history.",
+      "usage": "settings invites { 'on' | 'off' }",
+      "hidden": true,
+      "example": "settings invites on",
+      "arguments": "1",
+      "permissions": "ADMIN"
+    },
+    {
+      "name": "settings invitewarn",
+      "type": "Settings",
+      "info": "Number of discord invites required to DM a user about getting banned for advertising.",
+      "usage": "settings invitewarn { number }",
+      "hidden": true,
+      "example": "settings invitewarn 1",
+      "arguments": "1",
+      "permissions": "ADMIN"
+    },
+    {
+      "name": "settings inviteban",
+      "type": "Settings",
+      "info": "Number of discord invites required to ban a user for advertising.",
+      "usage": "settings inviteban { number }",
+      "hidden": true,
+      "example": "settings inviteban 3",
       "arguments": "1",
       "permissions": "ADMIN"
     },
@@ -256,11 +329,11 @@
       "permissions": "MOD"
     },
     {
-      "name": "listmacros",
+      "name": "macros",
       "type": "Utility",
       "info": "Lists all the macros I have saved on this server.",
-      "usage": "listmacros",
-      "example": "listmacros",
+      "usage": "macros",
+      "example": "macros",
       "arguments": "0"
     },
     {
@@ -282,7 +355,7 @@
     },
     {
       "name": "reactions",
-      "type": "Configuration",
+      "type": "Settings",
       "info": "Toggles the gif/image reactions I add to some of my replies",
       "usage": "reactions { 'on' | 'off' }",
       "example": "reactions off",
@@ -318,8 +391,8 @@
     },
     {
       "name": "setgreeting",
-      "type": "Configuration",
-      "info": "Changes my random greeting message to a custom one.\n__Placeholders__ (these get replaced in the message when users join):\n\n**{greeting}** - random old greeting message\n**{mention}** - mentions the user\n**{username}** - user's username\n**{id}** - user id\n**{discrim}** - the users discriminator\n**{status}** - the status of the user (online/offline)\n __Fields__\n**%title%** - changes the title\n**%description%** - changes the description\n**%footer%** - changes the footer",
+      "type": "Settings",
+      "info": "Changes my random greeting message to a custom one.\n__Placeholders__ (these get replaced in the message when users join):\n\n**{greeting}** - random old greeting message\n**{mention}** - mentions the user\n**{username}** - user's username\n**{id}** - user id\n**{discrim}** - the users discriminator\n**{status}** - the status of the user (online/offline)\n __Fields__\n**%title%** - changes the title\n**%description%** - changes the description\n**%footer%** - changes the footer.",
       "usage": "setgreeting { message }",
       "example": "setgreeting\n%title% Hey {mention}, welcome to the team!\n%description% Check out #rules first {mention}!\n%footer% Your ID: {id}",
       "arguments": "1",
@@ -328,7 +401,7 @@
     {
       "name": "embed",
       "type": "Embeds",
-      "info": "Creates a new embed using a template, possible fields include\n**%title%**\n**%description%**\n**%field1(2, 3, 4 etc)%**\n**%value1(2, 3, 4 etc)%**\n**%thumbnail%**\n**%image%**\n**%footer%**\n**%color%** (name or hex)",
+      "info": "Creates a new embed using a template, possible fields include\n**%title%**\n**%description%**\n**%field1(2, 3, 4 etc)%**\n**%value1(2, 3, 4 etc)%**\n**%thumbnail%**\n**%image%**\n**%footer%**\n**%color%** (name or hex).",
       "usage": "embed { template }",
       "example": "embed\n%title% Rules\n%description% Here are the rules!\n%field1% No spamming\n%value1% Thanks\n%color% red\n%footer% boi",
       "arguments": "1"
@@ -344,7 +417,7 @@
     {
       "name": "editembed",
       "type": "Embeds",
-      "info": "Edits an embed you've previously created. This just modifies the existing instead of creating a new one",
+      "info": "Edits an embed you've previously created. This just modifies the existing instead of creating a new one.",
       "usage": "editembed",
       "example": "editembed",
       "arguments": "0"
@@ -416,6 +489,15 @@
       "usage": "invite",
       "example": "invite",
       "arguments": "0"
+    },
+    {
+      "name": "log",
+      "type": "Settings",
+      "info": "Changes the channels where I keep my logs at or turns them off completely.\n\n__Categories__\n**everything** - changes all logging settings\n**warnings** - sets all warning channels\n**logs** - sets all non-warning, log channels\n**channels** - channel creation and deletion\n**joins** - when members join the server\n**leaves** - when members leave the server\n**mutes** - on assigning the muted role to someone\n**invites** - on deleting invites to other servers\n**bans** - when someone is banned or unbanned (pulls the ban reason from audit logs)\n**unbans** - when a user is unbanned\n**suggestions** - when someone submits a new suggestion via **{{prefix}}suggest**\n**pings** - when someone mentions `@`everyone or `@`here\n**commands** - when someone uses a stealth command",
+      "usage": "log { category } { #Channel | 'off' }",
+      "example": "log bans #bot-warnings",
+      "arguments": "2",
+      "permissions": "MOD"
     }
   ]
 }

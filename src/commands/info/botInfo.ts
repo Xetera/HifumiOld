@@ -17,11 +17,12 @@ export default function botInfo(message : Discord.Message) : void {
                 .setColor('#ffd275')
                 .addField(`Owner`, `Xetera#9596`, true)
                 .addField(`Version`, `1.4.0`, true)
-                .addField(`Lines of Code`, 8636, true)
+                .addField(`Lines of Code`, 9924, true)
                 .addField(`Language`, `Typescript`, true)
                 .addField(`Database`, `Postgres`, true)
                 .addField(`Hosting`, `Heroku`, true)
                 .addField(`Commands`, commands, true)
+                .setFooter(`Hifumi is a character from the anime "New Game!"`)
                 .setTimestamp()
         )
     }).catch(err => {
