@@ -28,7 +28,7 @@ export default async function resolveBooleanUncertainty(message: Message, queryM
         // resolved is automatically undefined when
         // the user lets the promise time out
         if (!resolved && !collection.size){
-            safeSendMessage(message.channel, 'Ignored? Feels bad man...');
+            safeSendMessage(message.channel, 'Ignored? Feels bad man...').then(m => (<Message> m).delete(20000));;
         }
         // resolved can also be false
         else if (resolved === undefined){
