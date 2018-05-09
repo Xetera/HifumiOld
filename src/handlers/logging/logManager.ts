@@ -35,10 +35,23 @@ import logEditedInviteMessageEmbed from "../../embeds/logging/logEditedInviteMes
 import {Suggestion} from "../../database/models/suggestion";
 import logNewSuggestionEmbed from "../../embeds/logging/suggestions/logNewSuggestionEmbed";
 
+enum LogAction {
+    JOIN = 'join',
+    LEAVE = 'leave',
+    COMMAND = 'command',
+    SUGGESTION = 'suggestion',
+    MUTE = 'mute',
+    INVITE = 'invite',
+    PING = 'ping',
+    SPAM = 'spam',
+    BAN = 'ban',
+    UNBAN = 'unban',
+    CHANNEL_CREATE = 'channel_create',
+    CHANNEL_DELETE = 'channel_delete',
+    INFRACTION = 'infraction'
+}
 // static class
 export class LogManager {
-
-
     private static waitForAuditLogs(guild: Guild, func: (logs: GuildAuditLogs) => any){
         setTimeout(() => {
             guild.fetchAuditLogs()
@@ -49,13 +62,10 @@ export class LogManager {
         }, 1000);
     }
 
-    public static async logWarning(guild: Guild, embed: RichEmbed|string, action: string){
-        const channelId : string = await gb.instance.database.getWarningsChannel(guild.id);
-        if (!channelId)
-            return void debug.info(`Could not log a ${action ? action + ' action' : 'message'} in ${guild.name}, missing warnings channel`, 'LogManager');
+    public static async logWarning(guild: Guild, channelId: string, embed: RichEmbed|string, action: LogAction){
         const warningsChannel = guild.channels.get(channelId);
         if (!warningsChannel){
-            // User probably deleted the channel and didn't update their logs setting
+            // User probably deleted the channel and didn't update their log setting
             return void debug.error(`Could not resolve a warnings channel saved in the database`, `LogManager`);
         }
         if (warningsChannel instanceof TextChannel){
@@ -66,14 +76,11 @@ export class LogManager {
         return void debug.error(`Warning channel for ${guild.name} was not recorded as TextChanel.`, 'LogManager');
     }
 
-    public static async logMessage(guild: Guild, embed: RichEmbed|string, action: string){
-        const channelId : string = await gb.instance.database.getLogsChannel(guild.id);
-        if (!channelId)
-            return void (debug.error(`Could not log a ${action ? action + ' action' : 'message'} in ${guild.name}, missing logs channel`, 'LogManager'));
+    public static async logMessage(guild: Guild, channelId: string, embed: RichEmbed|string, action: LogAction){
         const logsChannel = guild.channels.get(channelId);
         if (!logsChannel){
-            // User probably deleted the channel and didn't update their logs setting
-            return void debug.error(`Could not resolve a logs channel saved in the database`, `LogManager`);
+            // User probably deleted the channel and didn't update their log setting
+            return void debug.error(`Could not resolve a channel saved in the database`, `LogManager`);
         }
         if (logsChannel instanceof TextChannel){
             safeSendMessage(logsChannel, embed);
@@ -83,37 +90,73 @@ export class LogManager {
         return void debug.error(`Log channel for ${guild.name} was not recorded as TextChanel.`, 'LogManager');
     }
 
-    public static logMutedUser(member: GuildMember, mutedBy: GuildMember, reason: string, duration: number){
-        LogManager.logWarning(member.guild, logMutedEmbed(member, mutedBy, reason, duration), 'mute');
+    public static async logMutedUser(member: GuildMember, mutedBy: GuildMember, reason: string, duration: number){
+        const channel = await gb.instance.database.getGuildProperty(
+            member.guild.id,
+            'mute_logging_channel'
+        );
+        if (!channel)
+            return;
+        LogManager.logWarning(member.guild, <string> channel, logMutedEmbed(member, mutedBy, reason, duration), LogAction.MUTE);
     }
 
-    public static logMemberJoin(member: GuildMember){
-        LogManager.logMessage(member.guild, logMemberJoinEmbed(member), 'member join');
+    public static async logMemberJoin(member: GuildMember){
+        const channel = await gb.instance.database.getGuildProperty(
+            member.guild.id,
+            'joins_logging_channel'
+        );
+        if (!channel)
+            return;
+        LogManager.logMessage(member.guild, <string> channel, logMemberJoinEmbed(member), LogAction.JOIN);
     }
 
-    public static logMemberLeave(member: GuildMember){
-        LogManager.logMessage(member.guild, logMemberLeaveEmbed(member), 'member leave');
+    public static async  logMemberLeave(member: GuildMember){
+        const channel = await gb.instance.database.getGuildProperty(
+            member.guild.id,
+            'leave_logging_channel'
+        );
+        if (!channel)
+            return;
+        LogManager.logMessage(member.guild, <string> channel, logMemberLeaveEmbed(member), LogAction.LEAVE);
     }
 
-    public static logBan(guild:Guild, member: User, banningUser?: GuildMember){
+    public static async logBan(guild:Guild, member: User, banningUser?: GuildMember){
+        const channel = await gb.instance.database.getGuildProperty(
+            guild.id,
+            'ban_logging_channel'
+        );
+        if (!channel)
+            return;
         // race condition but audit log should be winning 99% of the time
         LogManager.waitForAuditLogs(guild, (audit: GuildAuditLogs) => {
             const entry = audit.entries.first();
             if (entry.reason && entry.reason.includes('<TRACKED>'))
                 return; // this is a tracked member ban, we don't want to log it normally
-            LogManager.logWarning(guild, logBanEmbed(member, entry.reason, banningUser ? banningUser.user : entry.executor), 'member ban')
+            LogManager.logWarning(guild, <string> channel, logBanEmbed(member, entry.reason, banningUser ? banningUser.user : entry.executor), LogAction.BAN)
         });
 
     }
 
-    public static logTrackedBan(guild: Guild, member: User, offense: Offense){
+    public static async logTrackedBan(guild: Guild, member: User, offense: Offense){
+        const channel = await gb.instance.database.getGuildProperty(
+            guild.id,
+            'ban_logging_channel'
+        );
+        if (!channel)
+            return;
         if (offense === Offense.Spam)
-            LogManager.logWarning(guild, logWatchlistSpamBanEmbed(member), 'tracked spam ban');
+            LogManager.logWarning(guild, <string> channel, logWatchlistSpamBanEmbed(member), LogAction.BAN);
         else if (offense === Offense.InviteLink)
-            LogManager.logWarning(guild, logWatchlistInviteBanEmbed(member), 'tracked invite ban');
+            LogManager.logWarning(guild, <string> channel, logWatchlistInviteBanEmbed(member), LogAction.BAN);
     }
 
-    public static logUnban(guild:Guild, user: User){
+    public static async logUnban(guild:Guild, user: User){
+        const channel = await gb.instance.database.getGuildProperty(
+            guild.id,
+            'unban_logging_channel'
+        );
+        if (!channel)
+            return;
         LogManager.waitForAuditLogs(guild, (audit: GuildAuditLogs) => {
             const auditEntries = audit.entries;
             const unbanningStaff: User = auditEntries.first().executor;
@@ -123,55 +166,111 @@ export class LogManager {
             if (!originalBan)
                 debug.error(`Could not find the original ban reason for unbanned member in ${guild.name}`);
             const banningStaff: User | 'unknown' = originalBan ? originalBan.executor : 'unknown';
-            LogManager.logWarning(guild, logUnbanEmbed(user, unbanningStaff, banningStaff, originalBan ? originalBan.reason : 'unknown'), 'member unban');
+            LogManager.logWarning(guild, <string> channel, logUnbanEmbed(user, unbanningStaff, banningStaff, originalBan ? originalBan.reason : 'unknown'), LogAction.UNBAN);
         });
     }
 
-    public static logChannelCreate(channel: Channel){
-        if (!(channel instanceof TextChannel) && !(channel instanceof VoiceChannel))
+    public static async logChannelCreate(target: Channel){
+        if (!(target instanceof TextChannel) && !(target instanceof VoiceChannel))
             return void debug.warning(`A new DM channel was created with a user.`, `onChannelCreate`);
 
-        LogManager.waitForAuditLogs(channel.guild, (audit: GuildAuditLogs) => {
+        const channel = await gb.instance.database.getGuildProperty(
+            target.guild.id,
+            'channel_management_logging_channel'
+        );
+        if (!channel)
+            return;
+
+
+        LogManager.waitForAuditLogs(target.guild, (audit: GuildAuditLogs) => {
             const creator = audit.entries.first().executor;
-            LogManager.logMessage(channel.guild, logChannelCreateEmbed(channel, creator, channel.name), 'channel create');
+            LogManager.logMessage(target.guild, <string> channel, logChannelCreateEmbed(target, creator, target.name), LogAction.CHANNEL_CREATE);
         });
     }
 
-    public static logChannelDelete(channel: Channel){
+    public static async logChannelDelete(target: Channel){
+        if (!(target instanceof TextChannel) && !(target instanceof VoiceChannel))
+            return;
+
+        const channel = await gb.instance.database.getGuildProperty(
+            target.guild.id,
+            'channel_management_logging_channel'
+        );
+        if (!channel)
+            return;
+
+        LogManager.waitForAuditLogs(target.guild, (audit: GuildAuditLogs) => {
+            const creator = audit.entries.first().executor;
+            LogManager.logMessage(target.guild, <string> channel,  logChannelDeleteEmbed(target, creator, target.name), LogAction.CHANNEL_DELETE);
+        });
+    }
+
+    public static async logPingEveryoneAttempt(member: GuildMember, channel: Channel, content: string){
         if (!(channel instanceof TextChannel) && !(channel instanceof VoiceChannel))
             return;
-        LogManager.waitForAuditLogs(channel.guild, (audit: GuildAuditLogs) => {
-            const creator = audit.entries.first().executor;
-            LogManager.logMessage(channel.guild, logChannelDeleteEmbed(channel, creator, channel.name), 'channel delete');
-        });
+
+        const target = await gb.instance.database.getGuildProperty(
+            channel.guild.id,
+            'ping_logging_channel'
+        );
+        if (!target)
+            return;
+        LogManager.logWarning(member.guild, <string> target, logEveryonePingEmbed(member, channel, content), LogAction.PING);
     }
 
-    public static logPingEveryoneAttempt(member: GuildMember, channel: Channel, content: string){
-        LogManager.logWarning(member.guild, logEveryonePingEmbed(member, channel, content), 'everyone ping');
-    }
+    public static async logMentionSpam(message: Message){
+        const target = await gb.instance.database.getGuildProperty(
+            message.guild.id,
+            'ping_logging_channel'
+        );
+        if (!target)
+            return;
 
-    public static logMentionSpam(message: Message){
-        LogManager.logWarning(message.member.guild,  logMentionSpamEmbed(
+        LogManager.logWarning(message.member.guild, <string> target, logMentionSpamEmbed(
             message.member,
             message.channel,
             message.content,
             message.mentions.members.array()
-        ), '')
+        ), LogAction.PING)
     }
 
-    public static logCommandExecution(message: Message, command: string){
-        LogManager.logMessage(message.guild, logCommandExecutionEmbed(message.member, <TextChannel> message.channel, command), 'command execution');
+    public static async logCommandExecution(message: Message, command: string){
+        const target = await gb.instance.database.getGuildProperty(
+            message.guild.id,
+            'command_logging_channel'
+        );
+        if (!target)
+            return;
+        LogManager.logMessage(message.guild, <string> target, logCommandExecutionEmbed(message.member, <TextChannel> message.channel, command), LogAction.COMMAND);
     }
 
     public static async logIllegalInvite(message: Message){
-        LogManager.logWarning(message.guild, await logInviteMessageEmbed(message), 'invite deletion')
+        const target = await gb.instance.database.getGuildProperty(
+            message.guild.id,
+            'invite_logging_channel'
+        );
+        if (!target)
+            return;
+        LogManager.logWarning(message.guild, <string> target, await logInviteMessageEmbed(message), LogAction.INVITE)
     }
 
     public static async logIllegalEditedInvited(oldM: Message, newM: Message){
-        LogManager.logWarning(oldM.guild, await logEditedInviteMessageEmbed(oldM, oldM, newM.content), 'edited invite deletion')
+        const target = await gb.instance.database.getGuildProperty(
+            newM.guild.id,
+            'invite_logging_channel'
+        );
+        if (!target)
+            return;
+        LogManager.logWarning(oldM.guild,<string> target, await logEditedInviteMessageEmbed(oldM, oldM, newM.content), LogAction.INVITE)
     }
 
     public static async logNewSuggestion(member: GuildMember) {
-        LogManager.logMessage(member.guild, await logNewSuggestionEmbed(member), 'new suggestion');
+        const target = await gb.instance.database.getGuildProperty(
+            member.guild.id,
+            'suggestion_logging_channel'
+        );
+        if (!target)
+            return;
+        LogManager.logMessage(member.guild,<string> target, await logNewSuggestionEmbed(member), LogAction.SUGGESTION);
     }
 }
