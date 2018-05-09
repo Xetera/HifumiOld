@@ -54,7 +54,7 @@ interface DistanceType {
 
 
 export default function lavenshteinDistance(input: string, pool: string[] = help.commands.map(c => c.name)): string {
-    if (input.length > 15)
+    if (input.length > 20 && input.split( ' ')[0] !== 'settings')
         return 'to spam me like some kind of dummy';
 
     const commands: string[] = pool;
