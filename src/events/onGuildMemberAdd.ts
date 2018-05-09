@@ -14,7 +14,9 @@ import templateParser from "../parsers/templateParser";
 import safeSendMessage from "../handlers/safe/SafeSendMessage";
 
 export default async function onGuildMemberAdd(member : Discord.GuildMember): Promise<void> {
-    if (!gb.instance.database.ready || !await gb.instance.database.getGuildEnabled(member.guild.id)){
+    if (!gb.instance.database.ready
+        || member.user.bot
+        || !await gb.instance.database.getGuildEnabled(member.guild.id)){
         return
     }
 
@@ -37,6 +39,7 @@ export default async function onGuildMemberAdd(member : Discord.GuildMember): Pr
             sendEmbed(welcomeChannel, member, customMessage)
         }
     }
+
     LogManager.logMemberJoin(member);
 }
 
