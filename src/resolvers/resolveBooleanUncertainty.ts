@@ -3,13 +3,16 @@ import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import {debug} from "../utility/Logging";
 import {getOnOff, getYesNo} from "../utility/Util";
 import safeSendMessage from "../handlers/safe/SafeSendMessage";
+import areYouSureEmbed from "../embeds/commands/areYouSureEmbed";
 
-export default function resolveBooleanUncertainty(message: Message, queryMessage: string | RichEmbed, waitAmount: number): Promise<boolean | undefined>{
-
+export default async function resolveBooleanUncertainty(message: Message, queryMessage: string | RichEmbed, waitAmountinSec: number): Promise<boolean | undefined>{
+    if (typeof queryMessage === 'string'){
+        queryMessage = await areYouSureEmbed(queryMessage, waitAmountinSec, message.guild);
+    }
     return message.channel.send(queryMessage).then((query: Message|Message[]) => {
         return Promise.all([message.channel.awaitMessages((arg: Message) => {
             return arg.author.username === message.author.username;
-        }, {max: 1, time:waitAmount}), <Message> query]);
+        }, {max: 1, time:waitAmountinSec * 1000}), <Message> query]);
     }).then(async(r: [Collection<string, Message>, Message]) => {
         // guaranteed 0 or 1 response
         let [collection, msg] = r;
