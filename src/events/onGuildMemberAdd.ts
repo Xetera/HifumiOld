@@ -22,7 +22,7 @@ export default async function onGuildMemberAdd(member : Discord.GuildMember): Pr
 
     const database = gb.instance.database;
     await database.addMember(member);
-    gb.instance.trackList.add(member);
+    await gb.instance.trackList.add(member);
     // we will change this later to fetch from a Database instead of using a preset name
     const [welcomeChannelId, customMessage] = await Promise.all([
         database.getWelcomeChannel(member.guild.id),

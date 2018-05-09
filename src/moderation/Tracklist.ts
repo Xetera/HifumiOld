@@ -54,7 +54,11 @@ export default class Tracklist {
         return out;
     }
 
-    public add(member: Discord.GuildMember){
+    public async add(member: Discord.GuildMember){
+        if (!await gb.instance.database.getTrackNewMembers(member.guild.id)){
+            return;
+        }
+
         const trackDuration = getMemberTrackDuration();
 
         if (!trackDuration)

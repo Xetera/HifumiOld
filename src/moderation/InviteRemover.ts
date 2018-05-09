@@ -6,6 +6,7 @@ import {debug} from "../events/onMessage";
 import banForInviteSpam from "../actions/punishments/BanForInviteSpam";
 import {GuildMember, Message} from "discord.js";
 import {LogManager} from "../handlers/logging/logManager";
+import inviteWarningDMEmbed from "../embeds/moderation/inviteWarningDM";
 
 export default function deleteInvite(message: Message, editedMessage: boolean = false): Promise<number> {
     const sender = message.author.username;
@@ -18,18 +19,16 @@ export default function deleteInvite(message: Message, editedMessage: boolean = 
 
         if (trackList.isNewMember(message.member)
             && await gb.instance.database.getTrackNewMembers(message.guild.id)
-            && strikeCount > 1){
+            && strikeCount > 2){
 
             debug.info(`Advertiser ${message.author.username} was a tracked member, attempting to ban...`, `InviteListener`);
             trackList.punishNewMember(message.member, Offense.InviteLink);
         }
-        else if (strikeCount >= 5){
-            banForInviteSpam(message.member);
+        else if (strikeCount >= await gb.instance.database.getInviteBanThreshold(message.guild.id)){
+            await banForInviteSpam(message.member);
         }
-        else if (strikeCount === 4){
-            safeMessageUser(message.member,
-                `Warning: You've attempted to post 4 invites in ${message.guild.name}, the next one will get you banned.\n` +
-                `I don't go advertising in your server, so please don't do that in mine.`);
+        else if (strikeCount === await gb.instance.database.getInviteWarnThreshold(message.guild.id)){
+            safeMessageUser(message.member, await inviteWarningDMEmbed(message.guild));
         }
         if (!editedMessage){
             LogManager.logIllegalInvite(message);
