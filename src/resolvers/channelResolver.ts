@@ -15,13 +15,21 @@ import conflictOnChannelResolveEmbed from "../embeds/resolvers/conflictOnChannel
 import {AllChannelTypes} from "../decorators/expect";
 import resolveNumberedUncertainty from "./resolveNumberedUncertainty";
 
-export async function channelResolver(arg: string, message: Message, channelType: AllChannelTypes): Promise<Channel | undefined> {
+export async function channelResolver(arg: string, message: Message, channelType: AllChannelTypes, onlyMention: boolean = false, fail: boolean = true): Promise<Channel | undefined> {
     if (channelType === typeof DMChannel){
         return;
     }
 
     else if (message.mentions.channels.size || arg.match(MessageMentions.CHANNELS_PATTERN)) {
         return message.mentions.channels.array().shift();
+    }
+    else if (onlyMention && fail){
+        return void handleFailedCommand(
+            message.channel, `This command requires a channel mention.`
+        )
+    }
+    else if (onlyMention){
+        return;
     }
 
     const resolvedChannels = <TextChannel[] & VoiceChannel[]> message.guild.channels.array().reduce((arr: Channel[], c: Channel) => {
@@ -43,14 +51,16 @@ export async function channelResolver(arg: string, message: Message, channelType
         return arr;
     }, <(TextChannel | VoiceChannel)[]>[]);
 
-    if (!resolvedChannels.length) {
+    if (!resolvedChannels.length && fail) {
         return void await handleFailedCommand(
             message.channel, `I couldn't find any channel with the name or ID **${arg}**.`
         );
     }
+
     else if (resolvedChannels.length === 1){
         return resolvedChannels[0];
     }
+    console.log(resolvedChannels.map(c => c instanceof TextChannel ? c.name : ''));
     let out = await conflictOnChannelResolveEmbed(resolvedChannels, arg);
 
     return resolveNumberedUncertainty(message, out, resolvedChannels, 30000, 'channel');

@@ -7,10 +7,10 @@ import {userResolvedEmbed} from "../embeds/resolvers/userResolvedEmbed";
 import resolveNumberedUncertainty from "./resolveNumberedUncertainty";
 import resolveBooleanUncertainty from "./resolveBooleanUncertainty";
 import {UserUtils} from "../utility/Util";
-export function resolveMember(arg: string, message: Message): Promise<GuildMember | undefined>;
+export function resolveMember(arg: string, message: Message, global: boolean, fail: boolean): Promise<GuildMember | undefined>;
 export function  resolveMember(arg: string, message: Message, global: boolean): Promise<GuildMember | User | undefined>;
 
-export async function resolveMember(arg: string, message: Message, global: any = false): Promise<GuildMember | User | undefined> {
+export async function resolveMember(arg: string, message: Message, global: any = false, fail: boolean = true): Promise<GuildMember | User | undefined> {
     const numberArg: number = Number(arg);
     const userId = Number.isInteger(numberArg);
     // userIDs have a length of 18
@@ -33,7 +33,7 @@ export async function resolveMember(arg: string, message: Message, global: any =
     }, []);
 
     // finding a single user with the given nickname
-    if (!resolvedNick.length){
+    if (!resolvedNick.length && fail){
         return void await handleFailedCommand(
             message.channel, `I couldn't find that user anywhere, sorry.`
         );
