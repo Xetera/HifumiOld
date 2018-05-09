@@ -1,4 +1,4 @@
-import {Channel, RichEmbed, TextChannel} from "discord.js";
+ import {Channel, RichEmbed, TextChannel} from "discord.js";
 import gb from "../../misc/Globals";
 import {random} from "../../utility/Util";
 import ReactionManager from "../../handlers/internal/reactions/reactionManager";

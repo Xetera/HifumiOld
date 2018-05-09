@@ -1,11 +1,12 @@
 import {Guild, RichEmbed} from "discord.js";
 import ReactionManager from "../../../handlers/internal/reactions/reactionManager";
+import {random} from "../../../utility/Util";
 
-export default function enableInvitesEmbed(guild: Guild) {
+export default async function enableInvitesEmbed(guild: Guild) {
     const embed =  new RichEmbed()
-        .setTitle(`Invite Filter Off`)
-        .setDescription(`Oh um... I don't think this is a good idea but I\nguess I'll let everyone send invites now.`)
+        .setTitle(`Invite Now Allowed`)
+        .setDescription(`O ... ok sure I guess I'll let people send invites now.`)
         .setColor('#a7ffec');
-    ReactionManager.canSendReactions(guild.id) ? embed.setImage(ReactionManager.getInstance().peek) : '';
+    await ReactionManager.canSendReactions(guild.id) ? embed.setThumbnail(random(ReactionManager.getInstance().blink)) : '';
     return embed;
 }

@@ -11,7 +11,7 @@ export default async function invalidParametersEmbed(prefix: string, command: Co
     let embed = new RichEmbed()
         .setColor(warningEmbedColor)
         .setTitle(`What? huh?? I don't think you used that correctly...`)
-        .setDescription(`**${prefix}${command.name}** needs **${command.arguments}** pieces of information.️`)
+        .setDescription(`**${prefix}${command.name}** needs **${command.arguments}** piece${command.arguments !== '1' ? 's' : ''} of information.️`)
         .addField(`Usage`, highlight(prefix + command.usage!))
         .addField(`Example`, highlight(prefix + command.example!))
         .setFooter(`=> ${prefix}help ${command.name} <= for more info`);

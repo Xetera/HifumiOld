@@ -6,6 +6,6 @@ export default function deleteStrikeDMEmbed(message: Message, infraction: Infrac
     return new RichEmbed()
         .setTitle(`Hooray!`)
         .setColor('#91e6ff')
-        .setDescription(`The mods in **${message.guild.name}** have deleted one of your previous infractions`)
-        .addField(`Details`, InfractionHandler.formatInfraction(infraction, true))
+        .setDescription(`The mods in **${message.guild.name}** have deleted one of your previous infractions.`)
+        .addField(`Deleted Strike`, InfractionHandler.formatInfraction(infraction, true))
 }

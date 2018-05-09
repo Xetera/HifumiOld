@@ -17,6 +17,10 @@ export default async function commandNotFoundEmbed(channel: Channel, commandName
         pool = help.commands.map(c => c.name);
     }
     let suggestion: string = lavenshteinDistance(commandName, pool);
+    if (commandName.length > 20){
+        const substr = commandName.substring(0, 20);
+        commandName = `${substr}...`
+    }
     let didYouMean = `I don't know what **${commandName}** is, perhaps you meant`;
 
 

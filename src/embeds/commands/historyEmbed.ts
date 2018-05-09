@@ -32,20 +32,20 @@ export default async function historyEmbed(member: GuildMember | User, notes: No
 
     summaryValue += `**Join Date**: ${joinDate ? moment(joinDate).calendar() : 'Not in server'}\n`;
     summaryValue += `**Account Creation Date**: ${moment(creationDate).calendar()}\n`;
-    summaryValue += `**Number of History Requests**: ${history_calls} time${history_calls > 1 ? 's' : ''}`;
+    summaryValue += `**Number of History Requests**: ${history_calls} time${history_calls > 1 ? 's' : ''}\n`;
 
     if (tracked){
-        summaryValue += `__This user is tracked until__: ${moment(tracked.join_date.toISOString()).subtract(getMemberTrackDuration()).calendar()}\n\n`
+        summaryValue += `__This user is tracked until__: ${moment(tracked.join_date.toISOString()).subtract(getMemberTrackDuration()).calendar()}`
     }
-    embed.addField(`__**Summary**__`, summaryValue + emptySpace);
+    embed.addField(`__**Summary**__`, summaryValue);
 
 
     /* Notes */
-    let notesValue = `**${notes.length}** notes on record\n\n`;
+    let notesValue:string[] = [`**${notes.length}** notes on record\n`];
     for (let i in notes){
-        notesValue += `**ID**: __**${notes[i].note_id}**__ **Staff**: __**${notes[i].staff_name}**__\n**Date**: ${moment(notes[i].note_date).calendar()}\n${notes[i].note_content}\n` + emptySpace
+        notesValue.push(`**ID**: __**${notes[i].note_id}**__ **Staff**: __**${notes[i].staff_name}**__\n**Date**: ${moment(notes[i].note_date).calendar()}\n${notes[i].note_content}`)
     }
-    notesValue = notes.length !== 0 ? notesValue : 'Nothing noted so far.\n';
+    const notesTotal = notes.length !== 0 ? notesValue.join('\n') : 'Nothing noted so far.';
 
     /* Infractions */
     const date = new Date();
@@ -59,9 +59,9 @@ export default async function historyEmbed(member: GuildMember | User, notes: No
     infractionsValue += infractions.map(i => InfractionHandler.formatInfraction(i))
         .join('\n');
 
-    infractionsValue = infractions.length ? infractionsValue : 'Squeaky clean sir!\n';
+    infractionsValue = infractions.length ? infractionsValue : 'Squeaky clean sir!';
 
-    embed.addField(`__**Infractions**__`, infractionsValue + emptySpace)
-    embed.addField(`__**Notes**__`, notesValue);
+    embed.addField(`__**Infractions**__`, infractionsValue);
+    embed.addField(`__**Notes**__`, notesTotal);
     return embed;
 }

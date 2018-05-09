@@ -8,7 +8,7 @@ export default function infractionDMEmbed(guild: Guild, weight: number, reason: 
         .setDescription(`You've been ${weight ? 'striked' : 'warned'} by a moderator in **${guild.name}**`)
         .setColor(warningEmbedColor)
         .addField(`__Weight__`, weight)
-        .addField(`__Current Strikes__`, `${currentStrikes}/${strikeCap}`)
+        .addField(`__Current Strikes__`, `${currentStrikes}/${strikeCap}`, true)
         .addField(`__Reason__`, reason);
     // TODO: add $appeal
 }
