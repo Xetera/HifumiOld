@@ -40,8 +40,9 @@ export function expect(type: ArgType.Channel, options?: {optional?: boolean, cha
 export function expect(type: ArgType.Boolean, options?: {optional?: boolean}): DecoratorReturnSignature;
 export function expect(type: ArgType.Message, options?: {optional?: boolean, minWords?: number, raw?: boolean}): DecoratorReturnSignature;
 export function expect(type: ArgType.None): DecoratorReturnSignature;
+export function expect(type: ArgType[], options?: {optional?: boolean}): DecoratorReturnSignature;
 
-export function expect(type: ArgType, options?: any): DecoratorReturnSignature{
+export function expect(type: ArgType | ArgType[], options?: any): DecoratorReturnSignature{
     return function decorator(t: any, name: string){
         const argOptions = <ArgOptions> {
             type: type
