@@ -13,7 +13,7 @@ export default function setPfp(message: Discord.Message, input: [string]) {
         if (err instanceof Discord.DiscordAPIError) {
             debug.error("API error when trying to change my own avatar picture.", err.stack);
         }
-        message.channel.send("Hmm, Discord wasn't a big fan of that URL you gave me there, go check the logs.");
+        message.channel.send("Hmm, Discord wasn't a big fan of that URL you gave me there, go check the log.");
     })
 
 }

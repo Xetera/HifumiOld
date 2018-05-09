@@ -71,8 +71,13 @@ export class Database {
                 url: url,
                 entities: ['src/database/models/**/*.js'],
                 migrations: ['src/database/migrations/**/*.js'],
+                // DO NOT TURN THESE ON FOR PRODUCTION
+                // I'M SERIOUS DON'T DO IT
+
                 synchronize: false, // this.env === Environments.Development,
                 dropSchema:  false, // this.env === Environments.Development,
+
+                // DUDE I'M 100% SERIOUSLY RN I'LL GET SUPER MAD OK
                 cli: {
                     migrationsDir: 'migrations'
                 },
@@ -215,13 +220,23 @@ export class Database {
 
     public addMember(target: GuildMember): Promise<Partial<User>> {
         return this.invalidateCache('users').then(() => {
-            return this.conn.manager.save(User, {id: target.id, guild_id: target.guild.id}, );
-        }).catch((err: Error)=> {
-            if (err.message.indexOf('duplicate key') >= 0)
+            return this.conn.manager.save(User, {
+                id: target.id,
+                guild_id: target.guild.id
+            });
+        }).catch(async(err: Error)=> {
+            if (err.message.indexOf('duplicate key') >= 0){
+                await this.conn.manager.createQueryBuilder()
+                    .update(User)
+                    .set({invite_strikes: 0})
+                    .where(`id = :id AND guild_id = :guild_id`, {id: target.id, guild_id: target.guild.id})
+                    .execute();
                 return Promise.resolve(<Partial<User>> {
                     id: target.id,
-                    guild_id: target.id
+                    guild_id: target.id,
+                    invite_strikes: 0
                 });
+            }
             return Promise.reject(err);
         });
     }
@@ -546,6 +561,15 @@ export class Database {
         }).catch(err => Promise.reject(err));
     }
 
+    public setInfractionLimit(guildId: string, limit: number){
+        return this.conn.createQueryBuilder()
+            .update(Guild)
+            .set({infraction_limit: limit})
+            .where(`id = :id`, {id: guildId})
+            .returning('*')
+            .execute();
+    }
+
 
     public getInfractions(guildId: string, targetId?: string): Promise<Infraction[]>{
         if (targetId){
@@ -578,7 +602,7 @@ export class Database {
     public setTrackNewMembers(guildId: string, state: boolean){
         return this.conn.manager.save(Guild, {
             id: guildId,
-            track_new_members: state
+            tracking_new_members: state
         }).catch(err => Promise.reject(err));
     }
 
@@ -745,11 +769,13 @@ export class Database {
     }
 
     public getSuggestions(guildId: string){
-        return this.conn.getRepository(Suggestion)
-            .createQueryBuilder('suggestions')
-            .where(`guild_id = :id`, {id: guildId})
-            .orderBy('suggestions.suggestion_date')
-            .getMany();
+        return this.invalidateCache('suggestions').then(() => {
+            return this.conn.getRepository(Suggestion)
+                .createQueryBuilder('suggestions')
+                .where(`guild_id = :id`, {id: guildId})
+                .orderBy('suggestions.suggestion_date')
+                .getMany();
+        });
     }
 
     public getPendingSuggestions(guildId: string){
@@ -761,7 +787,9 @@ export class Database {
     }
 
     public incrementCommandCalls(guildId: string, userId: string){
-        return this.conn.manager.increment(User, {id: userId, guild_id: guildId}, 'commands_used', 1);
+        return this.invalidateCache('users').then(() => {
+            return this.conn.manager.increment(User, {id: userId, guild_id: guildId}, 'commands_used', 1);
+        });
     }
 
     public incrementMacroCalls(guildId: string, userId: string){
@@ -770,13 +798,61 @@ export class Database {
         });
     }
 
-    public changeSpecificLoggingChannel(guildId: string, type: LoggingChannelType, channelId: string | undefined){
-        return this.invalidateCache('guilds').then(() => {
+    public async changeSpecificLoggingChannel(guild: DiscordGuild, type: LoggingChannelType | LoggingChannelType[], channelId: string | undefined){
+        await this.invalidateCache('guilds');
+
+        if (Array.isArray(type)){
+            const o = type.reduce((obj: {[t: string]: string | null}, item: LoggingChannelType) => {
+                obj[item] = channelId ? channelId : null;
+                return obj;
+            }, <{[t: string]: string}>{});
+
             return this.conn.manager.save(Guild, {
-                id: channelId,
-                [type]: channelId
+                id: guild.id,
+                name: guild.name,
+                ...o
             })
-        }).catch(e => debug.error(e))
+        }
+        return this.conn.manager.save(Guild, {
+            id: guild.id,
+            name: guild.name,
+            [type]: channelId ? channelId : null
+        })
+    }
+
+    public async getGuildProperty(guildId: string, property: keyof Guild): Promise<string | number | undefined | boolean> {
+        const r = await this.getGuild(guildId);
+        return r[property];
+    }
+
+    public async getInviteWarnThreshold(guildId: string){
+        const r = await this.getGuild(guildId);
+        return r.invite_warn_threshold;
+    }
+
+    public async setInviteWarnThreshold(guildId: string, value: number){
+        await this.invalidateCache('guilds');
+        return this.conn.createQueryBuilder()
+            .update(Guild)
+            .set({invite_warn_threshold: value})
+            .where(`id = :id`, {id: guildId})
+            .returning('*')
+            .execute();
+    }
+
+    public async getInviteBanThreshold(guildId: string): Promise<number> {
+        const r = await this.getGuild(guildId);
+        return r.invite_ban_threshold;
+    }
+
+    public async setInviteBanThreshold(guildId: string, value: number){
+        await this.invalidateCache('guilds');
+        return this.conn.createQueryBuilder()
+            .update(Guild)
+            .set({invite_ban_threshold: value})
+            .where(`id = :id`, {id: guildId})
+            .returning('*')
+            .execute();
     }
 
 }

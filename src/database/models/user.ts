@@ -24,9 +24,6 @@ export class User {
     @JoinColumn({name: 'guild_id', referencedColumnName: 'id'})
     guild_id: string;
 
-    @ManyToMany(t => Guild, guild => guild)
-    guilds: Guild[];
-
     @Column({default: 0})
     invite_strikes: number;
 

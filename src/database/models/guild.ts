@@ -1,6 +1,19 @@
 import {Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, OneToMany, JoinTable} from "typeorm";
-import {User} from "./user";
 import 'reflect-metadata';
+
+export enum LoggingChannelType{
+    JOINS = 'joins_logging_channel',
+    LEAVES = 'leave_logging_channel',
+    MUTES = 'mute_logging_channel',
+    INVITES = 'invite_logging_channel',
+    BANS = 'ban_logging_channel',
+    UNBANS = 'unban_logging_channel',
+    CHANNEL_MANAGENT = 'channel_management_logging_channel',
+    SUGGESTIONS = 'suggestion_logging_channel',
+    PINGS = 'ping_logging_channel',
+    SPAM = 'spam_logging_channel',
+    COMMANDS = 'command_logging_channel'
+}
 
 @Entity({name: 'guilds'})
 export class Guild {
@@ -9,10 +22,6 @@ export class Guild {
 
     @Column()
     name: string;
-
-    @OneToMany(type => User, user => user.guild_id)
-    @JoinTable({name: 'guild_users'})
-    users: User[];
 
     @Column('character', {default: '$', length: 1})
     prefix: string;
@@ -42,7 +51,7 @@ export class Guild {
     @Column({nullable: true})
     suggestions_channel: string;
 
-    /* TODO: $logs update
+    /* TODO: $logs update*/
     @Column({nullable: true})
     joins_logging_channel: string;
 
@@ -59,6 +68,12 @@ export class Guild {
     ban_logging_channel: string;
 
     @Column({nullable: true})
+    unban_logging_channel: string;
+
+    @Column({nullable: true})
+    channel_management_logging_channel: string;
+
+    @Column({nullable: true})
     suggestion_logging_channel: string;
 
     @Column({nullable: true})
@@ -69,8 +84,8 @@ export class Guild {
 
     @Column({nullable: true})
     command_logging_channel: string;
-    */
     /*END $logs update*/
+
     @Column({nullable: true})
     mute_role: string;
 
