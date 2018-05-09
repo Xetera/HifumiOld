@@ -31,16 +31,16 @@ export default class InfractionHandler {
 
     public getActiveInfractions(infractions: Infraction[]): Infraction[]{
         const date = new Date();
-        return infractions.filter(i => i.expiration_date <= date);
+        return infractions.filter(i => i.expiration_date >= date);
     }
 
     public static formatInfraction(i: Infraction, anonymous: boolean = false){
         return '' +
-            `${anonymous ? `**ID**: ${i.infraction_id}  **Issued By**: ${i.staff_name}\n` : ''}` +
+            `${anonymous ? '' : `**ID**: ${i.infraction_id}  **Issued By**: ${i.staff_name}\n`}` +
             `**Expired**: ${i.expiration_date <= new Date() ? 'Yes' : '__No__'}  ` +
             `**Weight**: ${i.infraction_weight}\n` +
             `**Date**: ${moment(i.infraction_date).calendar()}\n` +
-            `**Reason Given**:\n${i.infraction_reason}\n ${emptySpace}`;
+            `${i.infraction_reason}`;
     }
     /**
      * Checks requirements for striking members, returns max strike weight of the members guild
@@ -104,7 +104,9 @@ export default class InfractionHandler {
     public async addInfraction(message: Message, staff: GuildMember, target: GuildMember, reason: string, weight: number): Promise<boolean> {
         return InfractionHandler.memberCanInfract(staff, target, weight).then(async(infractionLimit: number) => {
             const currentUserStrikes: Infraction[] = await gb.instance.database.getInfractions(target.guild.id, target.id);
+            console.log(currentUserStrikes);
             const activeInfractions = this.getActiveInfractions(currentUserStrikes);
+            console.log(activeInfractions)
             const currentWeight = activeInfractions.reduce((total, inf) => total + inf.infraction_weight, 0);
 
             let isBan: boolean = false;
@@ -115,22 +117,23 @@ export default class InfractionHandler {
                     return Promise.reject(`Target ${target.user.username} in guild ${target.guild.name} not bannable by infraction.`);
                 }
 
-                const areYouSureMessage = await areYouSureEmbed(`Striking this member will put them at ${weight + currentWeight}/${infractionLimit} total strikes, getting them banned.`, 30, message.guild);
-                let response = await resolveBooleanUncertainty(message, areYouSureMessage, 30000);
-                if (response === undefined)
+                let response = await resolveBooleanUncertainty(message,
+                    `Striking this member will put them at ${weight + currentWeight}/${infractionLimit} total strikes, getting them banned.`, 30);
+                if (!response)
                     return Promise.reject(`User denied boolean confirmation`);
                 isBan = true;
             }
 
-            return Promise.all([gb.instance.database.addInfraction(staff, target, reason, weight), staff, target, infractionLimit, isBan]);
-        }).then(async(r: [Partial<Infraction>, GuildMember, GuildMember, number, boolean]) => {
-            const [response, staff, target, strikeLimit, isBan] = r;
+            return Promise.all([gb.instance.database.addInfraction(staff, target, reason, weight), staff, target, infractionLimit, isBan, currentWeight]);
+        }).then(async(r: [Partial<Infraction>, GuildMember, GuildMember, number, boolean, number]) => {
+            const [response, staff, target, strikeLimit, isBan, currentWeight] = r;
+
             if (isBan && target.bannable){
                 const infractions: Infraction[] = await gb.instance.database.getInfractions(target.guild.id);
                 const currentIndex = infractions.findIndex(i => i.infraction_id === response.infraction_id);
                 const currentInfraction = infractions.splice(currentIndex, 1)[0];
                 const embed = banByInfractionDMEmbed(target, currentInfraction, infractions);
-                const banReason =  `Banned for exceeding the strike cap for the server.\n\nBan Reason:\n${response.infraction_reason!}`;
+                const banReason = `Banned for exceeding the strike limit for the server.\n\nBan Reason:\n${response.infraction_reason!}`;
                 target.send(embed);
 
                 await safeBanUser(target, banReason).catch((err) => {
@@ -139,13 +142,14 @@ export default class InfractionHandler {
                 });
                 return Promise.resolve(true);
             }
+
             // We are already checking for isBan && !target.bannable before we enter the promise
             staff.send(`Infracted user <@${target.id}> with weight **${weight}** and reason:\n${reason}`);
             target.send(infractionDMEmbed(
                 staff.guild,
                 weight,
                 reason,
-                weight,
+                currentWeight + weight,
                 strikeLimit
             ));
             return Promise.resolve(false);
