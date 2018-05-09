@@ -8,7 +8,6 @@ export default function logs(message: Message, input: [string, (TextChannel | st
     const [setting, choice] = input;
 
     let destination: string | null;
-    console.log(choice)
     if (choice instanceof TextChannel){
         if (!message.guild.me.permissionsIn(choice).has('SEND_MESSAGES')){
             return void handleFailedCommand(

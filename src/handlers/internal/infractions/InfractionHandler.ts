@@ -104,9 +104,7 @@ export default class InfractionHandler {
     public async addInfraction(message: Message, staff: GuildMember, target: GuildMember, reason: string, weight: number): Promise<boolean> {
         return InfractionHandler.memberCanInfract(staff, target, weight).then(async(infractionLimit: number) => {
             const currentUserStrikes: Infraction[] = await gb.instance.database.getInfractions(target.guild.id, target.id);
-            console.log(currentUserStrikes);
             const activeInfractions = this.getActiveInfractions(currentUserStrikes);
-            console.log(activeInfractions)
             const currentWeight = activeInfractions.reduce((total, inf) => total + inf.infraction_weight, 0);
 
             let isBan: boolean = false;

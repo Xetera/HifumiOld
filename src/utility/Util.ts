@@ -187,7 +187,6 @@ export namespace InviteUtils {
             return Boolean(r.find(i => {
                 const url = i.url.split('/');
                 const inviteCode = url[url.length - 1];
-                console.log(link, url);
                 return inviteCode === link;
             }));
         });
