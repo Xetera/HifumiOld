@@ -39,7 +39,8 @@ export default function deleteStrike(message: Message, input: [number]){
         if (user){
             safeMessageUser(user, deleteStrikeDMEmbed(message, infraction))
         } else {
-            safeSendMessage(message.channel, `However, I didn't message the user about it because I couldn't find them in the server.`);
+            safeSendMessage(message.channel,
+                `However, I didn't message the user about it. They're either not in the server or they disabled their DMs.`);
         }
     }).catch((err: any) => {
         return Promise.reject(err);
