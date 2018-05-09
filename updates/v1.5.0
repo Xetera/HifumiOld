@@ -1,0 +1,5 @@
+- Revamped settings logging
+- All logging settings are now modular
+- $config -> $settings
+- @expect now accepts multiple types of arguments for the same arg
+- Updated $ch to use embeds
