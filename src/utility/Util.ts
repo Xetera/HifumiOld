@@ -35,6 +35,28 @@ export function capitalize(word: string){
     return word.replace(/^./, word => word[0].toUpperCase() + word.slice(1));
 }
 
+export function normalizeString(input: string, titleCase?: boolean){
+    const words = input.replace(/_/, '');
+    const wordArray = words.split(' ');
+    const formatted = wordArray.map((w: string, index: number)=> {
+        let firstLetter = w.substring(0, 1);
+        if (index === 0 || titleCase) {
+            firstLetter = firstLetter.toUpperCase();
+        }
+        const rest = w.substring(1).toLowerCase();
+        return firstLetter + rest;
+    });
+    return formatted.join(' ');
+}
+
+export function HtmltoMarkdown(input: string){
+    return input
+        .replace(/<\/?i>/g, '_')
+        .replace(/<\/?b>/g, '**')
+        .replace(/<br>/g, '')
+        .replace(/&bull;/g, '->')
+}
+
 export function randBool() : boolean{
     return Math.random () >= 0.5;
 }
