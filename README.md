@@ -10,6 +10,7 @@ Currently hosted on [heroku](https://www.heroku.com/)
 
 [Invite Me](https://discordapp.com/oauth2/authorize?client_id=372615866652557312&permissions=0&scope=bot) - Prefix: $
 
+[Support Server](https://discordapp.com/oauth2/authorize?client_id=372615866652557312&scope=bot&permissions=268463300)
 
 ## Whatcha Got:
 
