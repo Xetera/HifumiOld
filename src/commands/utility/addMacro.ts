@@ -27,7 +27,7 @@ export default async function addMacro(message: Message, input: [string, string]
     }
 
     gb.instance.database.getMacroCount(message.guild.id).then(async (count: number) => {
-        if (count >= 50) {
+        if (count >= 50 && !await gb.instance.database.getPremium(message.guild.id)) {
             return void handleFailedCommand(
                 message.channel, "Whoa, you already have 50 macros saved, time to delete some"
             );
