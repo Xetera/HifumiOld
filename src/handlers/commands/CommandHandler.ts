@@ -1,13 +1,10 @@
 import nuke from "../../commands/utility/Nuke";
 import * as Discord from "discord.js";
-import * as dbg from "debug";
 import {Database} from "../../database/Database";
 import setWelcome from "../../commands/config/setWelcomeChannel";
 import setPrefix from "../../commands/config/SetPrefix";
 import systemsEval from "../../commands/debug/Eval";
-import manualRestockUsers from "../../actions/ManualRestockUsers";
 import getPfp, {default as pfp} from "../../commands/info/GetPfp";
-
 import uptime from "../../commands/info/Uptime";
 import source from "../../commands/info/Source";
 import ch from "../../commands/fun/CyanideAndHappiness";
@@ -21,7 +18,6 @@ import {MuteQueue} from "../../moderation/MuteQueue";
 import {MessageQueue} from "../../moderation/MessageQueue";
 import botOwner from "../../decorators/onlyOwner";
 import mod from "../../decorators/onlyMod";
-import getQueue from "../../commands/debug/getQueue";
 import cleanse from "../../commands/utility/Cleanse";
 import bump from "../../commands/self/Bump";
 import settings from "../../commands/config/settings";
@@ -35,7 +31,6 @@ import muteUser from "../../commands/moderation/mute";
 import commandNotFoundEmbed from "../../embeds/commands/commandNotFoundEmbed";
 import setHints from "../../commands/self/hints";
 import setInvites from "../../commands/config/setInvites";
-import getMuted from "../../commands/moderation/getMuted";
 import setNote from "../../commands/moderation/setNote";
 import getHistory from "../../commands/moderation/history";
 import deleteNote from "../../commands/moderation/deleteNote";
@@ -80,6 +75,7 @@ import removeWarnings from "../../commands/config/settings/removeWarnings";
 import invite from "../../commands/self/invite";
 import log from "../../commands/config/settings/log";
 import ping from "../../commands/info/ping";
+import Anime from "../../API/anime";
 
 export interface CommandParameters extends Instance {
     message: Discord.Message;
@@ -378,14 +374,12 @@ export default class CommandHandler implements indexSignature {
     /* Mod Commands */
 
     @mod
-    @throttle(10)
     @expect(ArgType.Member)
     private ignore(params : CommandParameters){
         ignore(params.message, <[GuildMember]> params.input);
     }
 
     @mod
-    @throttle(15)
     @expect(ArgType.Number, {maxRange: 500, optional: true})
     private nuke(params: CommandParameters){
         nuke(params.message, <[number] | undefined > params.input);
@@ -434,7 +428,6 @@ export default class CommandHandler implements indexSignature {
     }
 
     @mod
-    @throttle(10)
     @expect(ArgType.Member)
     @expect(ArgType.Message)
     private note(params: CommandParameters){
@@ -442,7 +435,6 @@ export default class CommandHandler implements indexSignature {
     }
 
     @mod
-    @throttle(10)
     @expect(ArgType.Number)
     private deleteNote(params: CommandParameters){
         deleteNote(params.message, <[number]> params.input);
@@ -455,7 +447,6 @@ export default class CommandHandler implements indexSignature {
     }
 
     @mod
-    @throttle(15)
     @expect(ArgType.Member)
     @expect(ArgType.Number)
     @expect(ArgType.Message, {minWords: 2})
@@ -464,7 +455,6 @@ export default class CommandHandler implements indexSignature {
     }
 
     @mod
-    @throttle(15)
     @expect(ArgType.Member)
     @expect(ArgType.Message, {minWords: 2})
     private warn(params: CommandParameters){
@@ -472,7 +462,6 @@ export default class CommandHandler implements indexSignature {
     }
 
     @mod
-    @throttle(30)
     @expect(ArgType.Member)
     @expect(ArgType.Number, {optional: true, minRange: 5, maxRange: 500})
     private snipe(params: CommandParameters){
@@ -531,13 +520,11 @@ export default class CommandHandler implements indexSignature {
         passives(params.message);
     }
 
-    @throttle(10)
     @expect(ArgType.Member)
     private pfp(params : CommandParameters){
         pfp(params.message, <[GuildMember]> params.input);
     }
 
-    @throttle(10)
     @expect(ArgType.None)
     private uptime(params : CommandParameters){
         uptime(params.message);
@@ -548,19 +535,17 @@ export default class CommandHandler implements indexSignature {
         source(params.message, <[string] | undefined> params.input);
     }
 
-    @throttle(5)
+    @throttle(3)
     @expect(ArgType.None)
     private ch(params: CommandParameters){
         ch(params.message);
     }
 
-    @throttle(20)
     @expect(ArgType.None)
     private serverInfo(params: CommandParameters){
         serverInfo(params.message);
     }
 
-    @throttle(20)
     @expect(ArgType.None)
     private botInfo(params: CommandParameters){
         botInfo(params.message);
@@ -571,13 +556,11 @@ export default class CommandHandler implements indexSignature {
         listMacros(params.message)
     }
 
-    @throttle(20)
     @expect(ArgType.None)
     private bump(params : CommandParameters){
         bump(params.message);
     }
 
-    @throttle(10)
     @expect(ArgType.None)
     private randomQuote(params: CommandParameters){
         randomQuote(params.message);
@@ -613,4 +596,15 @@ export default class CommandHandler implements indexSignature {
     private ping(params: CommandParameters){
         ping(params.message);
     }
+
+    @throttle(3)
+    @expect(ArgType.Message)
+    private anime(params: CommandParameters){
+        Anime.getInstance().getAnime(params.message, <[string]> params.input);
+    }
+
+    // @expect(ArgType.Message)
+    // private character(params: CommandParameters){
+    //     Anime.getInstance().getCharacter(params.message, <[string]> params.input);
+    // }
 }
