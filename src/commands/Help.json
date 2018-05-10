@@ -498,6 +498,14 @@
       "example": "log bans #bot-warnings",
       "arguments": "2",
       "permissions": "MOD"
+    },
+    {
+      "name": "anime",
+      "type": "Fun",
+      "info": "Sends a bunch of info about an anime",
+      "usage": "anime { anime name }",
+      "example": "anime New Game!",
+      "arguments": "1"
     }
   ]
 }
