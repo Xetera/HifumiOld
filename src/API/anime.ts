@@ -7,7 +7,8 @@ import getAnimeEmbed from "../embeds/commands/fun/anime/getAnimeEmbed";
 import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import animeNotFoundEmbed from "../embeds/commands/fun/anime/animeNotFoundEmbed";
 import nsfwAnimeWarningEmbed from "../embeds/commands/fun/anime/nsfwAnimeWarningEmbed";
-const config = require('../../config0.json');
+import gb from "../misc/Globals";
+import {Environments} from "../events/systemStartup";
 const fs = require('fs');
 const readFile = promisify(fs.readFile);
 
@@ -20,9 +21,9 @@ export default class Anime {
     private tokenExpiration: number;
 
     private constructor() {
-        if (config){
-            this.clientId = config.anilist.client_id;
-            this.clientSecret = config.anilist.client_secret;
+        if (gb.ENV === Environments.Development){
+            this.clientId = require('../../config0.json').anilist.client_id;
+            this.clientSecret = require('../../config0.json').anilist.client_secret;
         } else {
             this.clientId = process.env['ANILIST_CLIENT_ID']!;
             this.clientSecret = process.env['ANILIST_CLIENT_SECRET']!;
