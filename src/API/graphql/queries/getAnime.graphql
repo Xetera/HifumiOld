@@ -1,0 +1,54 @@
+query ($search: String){
+    Media (search: $search) {
+        title {
+            native
+            english
+            romaji
+            userPreferred
+        }
+        description(asHtml: false)
+        episodes
+        status
+        duration
+        siteUrl
+        bannerImage
+        coverImage {
+            large
+            medium
+        }
+        characters(role: MAIN) {
+            nodes {
+                name {
+                    first
+                    last
+                    native
+                }
+            }
+        }
+        averageScore
+        nextAiringEpisode {
+            episode
+            timeUntilAiring
+        }
+        startDate {
+            year
+            month
+            day
+        }
+        endDate {
+            year
+            month
+            day
+        }
+        modNotes
+        isAdult
+        genres
+        studios(isMain: true) {
+            edges {
+                node {
+                    name
+                }
+            }
+        }
+    }
+}

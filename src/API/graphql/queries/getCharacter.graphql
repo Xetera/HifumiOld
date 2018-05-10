@@ -1,0 +1,14 @@
+query ($search: String) {
+    Character(search: $search) {
+        name {
+            first
+            last
+            native
+        }
+        image {
+            large
+            medium
+        }
+        description(asHtml: false)
+    }
+}
