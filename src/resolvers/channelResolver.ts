@@ -16,12 +16,15 @@ import {AllChannelTypes} from "../decorators/expect";
 import resolveNumberedUncertainty from "./resolveNumberedUncertainty";
 
 export async function channelResolver(arg: string, message: Message, channelType: AllChannelTypes, onlyMention: boolean = false, fail: boolean = true): Promise<Channel | undefined> {
-    if (channelType === typeof DMChannel){
-        return;
+    if (channelType !== 'BOTH'
+        && message.mentions.channels.size
+        && message.mentions.channels.first().type !== channelType){
+        return void handleFailedCommand(
+            message.channel, `That is not a valid channel type`
+        );
     }
-
     else if (message.mentions.channels.size || arg.match(MessageMentions.CHANNELS_PATTERN)) {
-        return message.mentions.channels.array().shift();
+        return message.mentions.channels.first();
     }
     else if (onlyMention && fail){
         return void handleFailedCommand(
@@ -60,7 +63,6 @@ export async function channelResolver(arg: string, message: Message, channelType
     else if (resolvedChannels.length === 1){
         return resolvedChannels[0];
     }
-    console.log(resolvedChannels.map(c => c instanceof TextChannel ? c.name : ''));
     let out = await conflictOnChannelResolveEmbed(resolvedChannels, arg);
 
     return resolveNumberedUncertainty(message, out, resolvedChannels, 30000, 'channel');

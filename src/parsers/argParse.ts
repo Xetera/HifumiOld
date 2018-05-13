@@ -147,13 +147,12 @@ export default async function argParse(params: CommandParameters){
                     break;
                 case ArgType.Channel:
                     const channel = await _resolveChannel(params, input, options);
-                    if (channel)
+                    if (!channel)
                         return;
                     params.input.push(channel);
                     break;
             }
         }
-
     }
     return true;
 }
@@ -218,5 +217,5 @@ async function _resolveBoolean(params: any, input: any, fail: boolean = true): P
 
 async function _resolveChannel(params: any, input: any, options: any, fail: boolean = true){
     const searchOpts = !options ? 'BOTH' : !options.channelType ? 'BOTH' : options.channelType ;
-    return await channelResolver(input!, params.message, searchOpts, true, fail);
+    return await channelResolver(input, params.message, searchOpts, true, fail);
 }

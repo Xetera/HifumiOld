@@ -25,14 +25,14 @@ export interface ArgOptions {
         maxRange?: number;
         optional?: boolean;
         maxLength?: number;
-        channelType?: typeof TextChannel | typeof VoiceChannel | (typeof TextChannel & typeof VoiceChannel);
+        channelType?: AllChannelTypes;
         minWords?: number;
         raw?: boolean;
     }
 }
 
 type DecoratorReturnSignature = (t: any, name: string, descriptor: any) => void;
-export type AllChannelTypes = typeof TextChannel | typeof VoiceChannel | 'BOTH';
+export type AllChannelTypes = 'text' | 'voice' | 'BOTH';
 export function expect(type: ArgType.Number, options?: {optional?: boolean, minRange?: number, maxRange?: number}): DecoratorReturnSignature;
 export function expect(type: ArgType.Member, options?: {optional?: boolean, global?: boolean}): DecoratorReturnSignature;
 export function expect(type: ArgType.String, options?: {optional?: boolean, maxLength?: number}): DecoratorReturnSignature;
@@ -62,7 +62,7 @@ export function expect(type: ArgType | ArgType[], options?: any): DecoratorRetur
                 argOptions.options.optional = options.optional;
             }
             if (options.channelType){
-
+                argOptions.options.channelType = options.channelType;
             }
         }
 
