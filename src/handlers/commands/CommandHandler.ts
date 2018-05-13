@@ -76,6 +76,9 @@ import invite from "../../commands/self/invite";
 import log from "../../commands/config/settings/log";
 import ping from "../../commands/info/ping";
 import Anime from "../../API/anime";
+import EconomyHandler from "../economy/economyHandler";
+import daily from "../../commands/economy/daily";
+import balance from "../../commands/economy/balance";
 
 export interface CommandParameters extends Instance {
     message: Discord.Message;
@@ -415,7 +418,7 @@ export default class CommandHandler implements indexSignature {
     }
 
     @mod
-    @expect(ArgType.Channel, {channelType: TextChannel})
+    @expect(ArgType.Channel, {channelType: 'text'})
     @expect(ArgType.Message)
     private echo(params : CommandParameters){
         echo(params.message, <[TextChannel, string]> params.input)
@@ -601,6 +604,16 @@ export default class CommandHandler implements indexSignature {
     @expect(ArgType.Message)
     private anime(params: CommandParameters){
         Anime.getInstance().getAnime(params.message, <[string]> params.input);
+    }
+
+    @expect(ArgType.None)
+    private daily(params: CommandParameters){
+        daily(params.message);
+    }
+
+    @expect(ArgType.Member, {optional: true})
+    private balance(params: CommandParameters){
+        balance(params.message, <[(GuildMember | undefined)]> params.input);
     }
 
     // @expect(ArgType.Message)

@@ -151,7 +151,6 @@ export function formattedTimeString(sec: number): string{
     const minutes = currentUptime.m;
     const hours = currentUptime.h;
     const days= currentUptime.d;
-
     return `${days 
         ?    days.toFixed(0) + 'd' : ''} ${hours 
         ?   hours.toFixed(0) + 'h' : ''} ${minutes 
