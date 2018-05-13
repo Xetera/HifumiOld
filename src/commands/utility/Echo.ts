@@ -7,19 +7,13 @@ import hasMessagingPermissions from "../../handlers/permissions/missingPermissio
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 export default async function echo(message:Message, input: [TextChannel, string]) {
     const [channel, echo] = input;
-
     if(!message.member.permissionsIn(channel).has('SEND_MESSAGES')){
         return void handleFailedCommand(message.channel,
             `I can only send messages in channels you're allowed to send messages to.`
         );
-
     }
 
     if (message.channel instanceof TextChannel){
-        if (!hasMessagingPermissions(message.guild.me, channel, message.channel)){
-            return;
-        }
-
         let out;
         // we still want admins to be able to make announcements with this
         if (!message.member.hasPermission('ADMINISTRATOR')){
@@ -28,7 +22,7 @@ export default async function echo(message:Message, input: [TextChannel, string]
         else {
             out = echo;
         }
-        channel.send(out);
+        safeSendMessage(channel, out);
     }
     else if (channel instanceof VoiceChannel){
         handleFailedCommand(message.channel, channel + ' is not a text channel.');
