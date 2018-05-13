@@ -9,7 +9,8 @@
     "Fun",
     "Embeds",
     "Suggestions",
-    "Settings"
+    "Settings",
+    "Economy"
   ],
   "private": [
     {
@@ -506,6 +507,27 @@
       "usage": "anime { anime name }",
       "example": "anime New Game!",
       "arguments": "1"
+    },
+    {
+      "name": "setsuggestions",
+      "type": "Settings",
+      "info": "Changes the channel for suggestions"
+    },
+    {
+      "name": "daily",
+      "type": "Economy",
+      "info": "Checks to see if it's time to be paid by the Bank of Hifumi.",
+      "usage": "daily",
+      "example": "daily",
+      "arguments": "0"
+    },
+    {
+      "name": "balance",
+      "type": "Economy",
+      "info": "Peek at your own or someone else's balance.",
+      "usage": "balance { user }",
+      "example": "balance Xetera",
+      "arguments": "0-1"
     }
   ]
 }
