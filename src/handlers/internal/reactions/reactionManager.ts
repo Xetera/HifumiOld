@@ -22,7 +22,7 @@ export default class ReactionManager /* extends Singleton */{
         'https://i.imgur.com/6zFwVUC.png',
         'https://i.imgur.com/yqhQOcR.gif',
         'https://i.imgur.com/ZZ7wPqa.gif',
-        'https://i.imgur.com/Uef8ORJ.png?1',
+        //'https://i.imgur.com/Uef8ORJ.png',
         'https://i.imgur.com/jJll2Av.jpg',
         'https://i.imgur.com/NDnCn6h.png'
     ];
