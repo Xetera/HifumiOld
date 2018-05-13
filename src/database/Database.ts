@@ -71,13 +71,13 @@ export class Database {
                 url: url,
                 entities: ['src/database/models/**/*.js'],
                 migrations: ['src/database/migrations/**/*.js'],
-                // DO NOT TURN THESE ON FOR PRODUCTION
-                // I'M SERIOUS DON'T DO IT
+                    // DO NOT TURN THESE ON FOR PRODUCTION
+                    // I'M SERIOUS DON'T DO IT
 
-                synchronize: false, // this.env === Environments.Development,
-                dropSchema:  false, // this.env === Environments.Development,
+                    synchronize: this.env === Environments.Development,
+                    dropSchema:  this.env === Environments.Development,
 
-                // DUDE I'M 100% SERIOUSLY RN I'LL GET SUPER MAD OK
+                    // DUDE I'M 100% SERIOUSLY RN I'LL GET SUPER MAD OK
                 cli: {
                     migrationsDir: 'migrations'
                 },
@@ -855,5 +855,46 @@ export class Database {
             .execute();
     }
 
+    public async triggerDaily(guildId: string, userId: string, amount: number, streak: number){
+        await this.invalidateCache('users');
+        const copper = await this.getCopper(guildId, userId);
+        return this.conn.createQueryBuilder()
+            .update(User)
+            .set({last_daily: new Date(), copper: copper + amount, streak: streak})
+            .where(`id = :id AND guild_id = :guild_id`, {guild_id: guildId, id: userId})
+            .returning('copper')
+            .execute();
+    }
+
+    public async getCopper(guildId: string, userId: string){
+        const u = await this.getUser(guildId, userId);
+        return u.copper;
+    }
+
+    public async getStreak(guildId: string, userId: string){
+        const u = await this.getUser(guildId, userId);
+        return u.streak;
+    }
+
+    /**
+     *
+     * @param {string} guildId
+     * @param {string} userId
+     * @returns {Promise<"fresh" | true | number>}
+     * Returns 'fresh' for new users doing daily for the first time
+     * Returns true if daily is usable
+     * or the time delta if it's not
+     */
+    public async isDailyUsable(guildId: string, userId: string): Promise<'fresh' | true | number> {
+        const d = await this.getUser(guildId, userId);
+        const lastUsed = d.last_daily;
+        if (!lastUsed)
+            return 'fresh';
+        const limit = moment(new Date()).subtract(23, 'h').toDate();
+        if (lastUsed < limit){
+            return true;
+        }
+        return moment(lastUsed).add(23, 'h').diff(new Date())
+    }
 }
 
