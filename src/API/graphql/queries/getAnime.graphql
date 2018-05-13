@@ -1,5 +1,5 @@
 query ($search: String){
-    Media (search: $search) {
+    Media (search: $search, type: ANIME) {
         title {
             native
             english
@@ -16,7 +16,7 @@ query ($search: String){
             large
             medium
         }
-        characters(role: MAIN) {
+        characters(perPage: 3) {
             nodes {
                 name {
                     first
@@ -43,7 +43,7 @@ query ($search: String){
         modNotes
         isAdult
         genres
-        studios(isMain: true) {
+        studios {
             edges {
                 node {
                     name
