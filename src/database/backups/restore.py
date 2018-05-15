@@ -8,7 +8,7 @@ BUCKET_NAME = 'hifumibackup'
 
 
 def log(message):
-    print(f'[DB:RESTORE]: {message}')
+    print('[DB:RESTORE]: {}'.format(message))
 
 
 def fetch_credentials() -> Tuple[str, str, str] or None:
@@ -19,7 +19,7 @@ def fetch_credentials() -> Tuple[str, str, str] or None:
             os.environ['AWS_SECRET_ACCESS_KEY']
         )
     except KeyError as key:
-        log(f'Missing mandatory environment variable {key}, quitting backup.')
+        log('Missing mandatory environment variable {}, quitting backup.'.format(key))
         quit(1)
 
 
@@ -48,7 +48,7 @@ if __name__ == '__main__':
 
     file_name = get_backup(bucket)
     output_name = file_name.split('-').pop()
-    output_target = f'db-restore-{output_name}'
+    output_target = 'db-restore-{}'.format(output_name)
 
     client.download_file(BUCKET_NAME, file_name, os.path.join('pg_restore', output_target))
 
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     # Database restore doesn't work if the database 'discord' is missing
     try:
         subprocess.check_call(
-            f'pg_restore -Ft -c -d discord --no-owner {output_path}',
+            'pg_restore -Ft -c -d discord --no-owner {}'.format(output_path),
             shell=True
         )
     except Exception as e:
