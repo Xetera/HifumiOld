@@ -55,7 +55,8 @@ export class Database {
             return this.sync();
         }).then(() => {
             this.ready = true;
-        })
+        });
+
     }
 
     /**

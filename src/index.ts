@@ -19,6 +19,9 @@ import {LogManager} from "./handlers/logging/logManager";
 import onChannelCreate from "./events/onChannelCreate";
 import onChannelDelete from "./events/onChannelDelete";
 import {Client} from "discord.js";
+import uncaughtException from "./handlers/process/uncaughtException";
+import websocketErrorHandler from "./handlers/process/websocketErrorHandler";
+import websocketWarningHandler from "./handlers/process/websocketWarningHandler";
 
 setupProcess();
 gb.ENV  = getEnvironmentSettings();
@@ -27,55 +30,56 @@ const [BOT_TOKEN, CLEVERBOT_TOKEN] : string[] = getTokens(gb.ENV);
 const DATABASE_CONFIG : string = getDatabaseConnection(gb.ENV);
 
 main();
+
 async function main(){
     const bot = new Client();
     bot.login(BOT_TOKEN);
 
-    bot.on('ready', async function(){
+    bot.on('ready', async() =>{
         gb.ownerID = await onReady(bot);
         gb.instance = await createInstance(bot, BOT_TOKEN, CLEVERBOT_TOKEN, DATABASE_CONFIG);
         gb.instance.trackList.initializeGuilds();
-        setInterval(function(){
+        setInterval(() => {
             updatePresence(bot);
         }, 1000 * 60 * 10);
     });
 
 
 // === === === === MESSAGE === === === === === //
-    bot.on('message', function(message : Discord.Message){
+    bot.on('message', (message : Discord.Message) => {
         onMessage(message);
     });
 
-    bot.on('messageUpdate', function(oldMessage: Discord.Message, newMessage: Discord.Message){
+    bot.on('messageUpdate', (oldMessage: Discord.Message, newMessage: Discord.Message) => {
         onMessageUpdate(oldMessage, newMessage);
     });
 
-    bot.on('messageDelete', function(oldMessage: Discord.Message, newMessage: Discord.Message){
+    bot.on('messageDelete', (oldMessage: Discord.Message, newMessage: Discord.Message) => {
         // (oldMessage, newMessage);
     });
 
 
 // === === === === GUILD MEMBER === === === === === //
-    bot.on('guildMemberAdd', function(member : Discord.GuildMember){
+    bot.on('guildMemberAdd', (member : Discord.GuildMember) => {
         onGuildMemberAdd(member);
     });
 
 
-    bot.on('guildMemberRemove', function(member : Discord.GuildMember){
+    bot.on('guildMemberRemove', (member : Discord.GuildMember) => {
         onGuildMemberRemove(member);
     });
 
-    bot.on('guildMemberUpdate', function(oldMember: Discord.GuildMember, newMember: Discord.GuildMember){
+    bot.on('guildMemberUpdate', (oldMember: Discord.GuildMember, newMember: Discord.GuildMember) => {
         onGuildMemberUpdate(oldMember, newMember);
     });
 
 
 // === === === === GUILD === === === === === //
-    bot.on('guildUpdate', function(oldMember: Discord.Guild, newMember: Discord.Guild){
+    bot.on('guildUpdate', (oldMember: Discord.Guild, newMember: Discord.Guild) => {
         onGuildUpdate(oldMember, newMember);
     });
 
-    bot.on('guildCreate', function(guild : Discord.Guild){
+    bot.on('guildCreate', (guild : Discord.Guild) => {
         onGuildCreate(guild);
     });
 
@@ -88,12 +92,16 @@ async function main(){
     });
 
 // === === === === CHANNEL === === === === === //
-    bot.on('channelCreate', function(channel :Discord.Channel){
+    bot.on('channelCreate', (channel :Discord.Channel) => {
         onChannelCreate(channel)
     });
 
-    bot.on('channelDelete', function(channel :Discord.Channel){
+    bot.on('channelDelete', (channel :Discord.Channel) => {
         onChannelDelete(channel);
     });
 
+// === === === === EXCEPTIONS === === === === === //
+    bot.on('error', (err) => websocketErrorHandler(err));
+
+    bot.on('warn', (warning) => websocketWarningHandler(warning));
 }

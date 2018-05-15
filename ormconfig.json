@@ -1,6 +1,6 @@
 {
 	"type": "postgres",
-	"url": "postgres://localhost/discord",
+	"url": "postgres://postgres:@host.docker.internal:5432/discord",
 	"synchronize": true,
 	"logging": true,
 	"dropSchema": true,
