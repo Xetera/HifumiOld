@@ -1,0 +1,1 @@
+The script is run by a cron job every 2 days to
