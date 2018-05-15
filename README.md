@@ -12,99 +12,48 @@ Currently hosted on [heroku](https://www.heroku.com/)
 
 [Support Server](https://discordapp.com/oauth2/authorize?client_id=372615866652557312&scope=bot&permissions=268463300)
 
-## Whatcha Got:
+## Features:
 
-### Interaction: 🗣️
-
-![](https://cdn.discordapp.com/emojis/414332109407387649.png?v=1)
-
-Hifumi talks to you when she hears you say her name.
-- Optional: She responds to every message if you make a channel called 'chat-with-alexa' unless starting your message with a dash
-#### Note: This might become very expensive as (if) more people start using her which could eventually make it a donator feature.
-
-She will greet new users in a channel of your choice
-
-### Bans and moderation: 🚫
-
-Detecting spammers and automatically muting them for a set amount of time.
-* This requires a role called 'muted' that has no permissions other than reading chat and history
-* The muted rule must be overriding category permissions
-* The channel permissions must either be synched with the category or have its own mute permission
-
-By default she doesn't allow advertising on your server (discord invite links), you can make exceptions or completely enable it.
-
-Locking down guilds on demand, muting everyone for 10 minutes or longer, allowing Admins to sanely take care of situations. **PLANNED:**
-
-### Bookkeeping: 📚
-
-* Logging join and leave times
-* Logging user mutes and duration
-* Optionally logging deleted and edited messages **PLANNED**
-* Warning mods on detecting potential raids **PLANNED:**
-
-
-## Currently required permissions: ❓
-* Read Messages - I mean,
-* Send Messages - yeah...
-* Manage Messages - deleting spam and invites
-* Manage Roles - for adding the 'muted' role to users
-* Add Reactions - Hifumi reacts to messages she hears with 👀 and 👋 when greeting new members
-* Ban Members - Banning users who post over 5 (later variable) invites, spammers and potentially people sitting in the mute queue
-* Change Nickname(?) Could implement a self-name change at some point but I'd ideally like to keep the Hifumi theme
-* Manage Nicknames(?) Potential automatic nicknaming of users with offensive names
-
-# TODO:
-In order of importance per topic
-
-## General: 📖
-- [x] Overhaul bot.js to typescript
-- [x] Move hosting to heroku
-- [x] Removed compiled js files from project
-- [x] Rework the way commands are called
-- [x] Add exceptions for bot owner and mods for invite and spam
-- [x] Split debugging on a per/module basis
-- [x] Remaining files converted to typescript
-- [ ] Remind Me module
-- [ ] Add module that lets users give themselves roles **-Low priority**
-- [x] Safe handling of actions like message deletion and PMing users
-- [ ] Allow users to disable the cleverbot feature
-
-## Database: 🖥️
-- [x] Implement a relational Database that works for heroku as well -> Postgres
-- [x] Guild specific prefix change
-- [x] Save the amount of invites a user has sent invites
-- [x] Option to set default channels for welcome messages other than 'welcome'
-- [ ] Add the users' mute duration to postgres along with caching
-- [ ] Save the security level of guilds to postgres
-
-## Moderation: 🛠️
-- [x] Muting spamming users
-- [x] Removing invite links
-- [x] Remove invite links
-- [x] Unmuting users based on security level
-- [ ] Option for mass banning muted users from a short interval
-- [ ] Add a persistent user infraction system
-- [ ] Save autobanned (not manually) users to a global trackList
-- [x] Option to set default moderator warnings channel
-- [ ] Alert mods when users on a trackList from another server joins
-- [ ] Blacklisted / restricted words
-- [ ] Blacklisted links
-
-## Music: 🎼 **-Low priority**
-- [x] Play basic songs off youtube
-- [ ] Adjustable volume
-- [ ] Queuing up songs
-
-## API: 📡
-- [x] Cleverbot module rewritten - [clevertype](https://github.com/ilocereal/Clevertype)
-- [ ] Brawlhalla API rewritten for typescript **-Low priority**
-- [ ] Integrate own battlerite API **-Low priority**
-- [ ] Reintroduce the weather module
-- [ ] Get cleverbot to store CS per user **-Low priority**
-
-
-## Way Later: 🧠 **-Very Low priority** cuzitsreallyhard
-- [ ] Intent analysis for communicating with Hifumi
-- [ ] Voice support for communicating with Hifumi
-
-#### Inspired by [HotBot](https://github.com/AberrantFox/hotbot) in [The Programmer's Hangout](https://discord.gg/programming) on discord
+* Moderation: 🚫 Get all your moderators on the same page 
+    * _**Anti-Spam**_ Hifumi automatically removes messages and mutes people when she detects spamming.
+    * _**Invite Filtering**_ Invites are automatically removed and added to a users history, offenders are banned after 5 invites by default or a custom value if needed.
+    * _**New Member Tracking**_ To combat raiders, she has an option to track people who have joined in the past 5 minutes more closely. Banning on 2 invites instead of the custom limit (if invites are not allowed) and banning on detecting first spam instead of muting.
+    * `$history`- Pull up a user's history with information on their previous strikes, notes, invites, mutes and join dates.
+    * `$strike` - Warn members when they break rules anonymously, adding to their total strikes (or not with `$warn`), strikes are automatically expire after 2 weeks, users who go past the strike limit of the server are banned automatically
+    * `$note` - Note something about a specific user for a later time, saving it in the members history
+    * `$mute` - Mute a user for a specific time with a given reason
+    * `$cleanse` - Remove messages sent by bots in a channel
+    * `$nuke` - Clean all previous messages in a channel of a given amount
+    * `$snipe` - Remove messages in a channel from a specific user
+    * `$ignore` - Stop listening for commands and conversations from a specific user or channel
+    
+* Management: 🛠️ Tools to make server management easier
+    * `$suggest`- Suggest something that you would like to see get added in the server
+    * `$suggestions` - Look through suggestions that are waiting approval, approve the serious ones, deny the jokes by clicking on reactions
+    * `$accept` - Accept someone's suggestion with a reason. Accepting suggestions DMs the user to let them know they contributed
+    * `$reject` - Reject someone's suggestion with a reason. Rejecting suggestions also DMs the user to let them know they contributed
+    * `$addmacro` - Add a new custom command for Hifumi to reply to with a response of your choosing
+    * `$macros` - List all the macros in the server
+    * `$deletemacro` - Deletes one of the previous saved macros
+* Customization: ⚙ Change Hifumi to fit your server
+    * `$setgreeting` - Customize the message you want Hifumi to greet new members with
+    * `$log` - Change logging settings by assigning a channel for a specific category of logs or turning it off entirely
+        * Logging options: **joins**, **leaves**, **mutes**, **bans**, **unbans**, **channel management**, **suggestions**, **commands**, **invites**, **ping spam**, 
+    * `$settings` - Changes bot settings
+        * `$settings prefix` - Changes the prefix I reply to
+        * `$settings hints` - Hifumi tries to guess what you meant when you enter incorrect commands
+        * `$settings reactions` - Reactions are added to certain messages, or not, if you find that annoying
+        * `$settings tracking` - Enable/disable tracking of new members
+        * `$settings invites` - Are invites ok to send in this server?
+        * `$settings invitewarn` - Threshold for warning members for sending invites
+        * `$settings inviteban` - Threshold for banning members for sending invites
+        * `$settings strikelimit` - Max number of strikes a user can have before getting banned (3 by default)
+        
+* Fun: 🎉
+    * `$anime` - Sends details about a specific anime and the date the next ep comes out on (if still airing)
+    * `$doggo` - Sends a cute 🐶 and its breed
+    * `$randomquote` - A quote... that is random
+    * `$ch` - Random cyanide and happiness comic
+    
+* Some setting commands are left out
+#### Inspired by [HotBot](https://github.com/AberrantFox/hotbot) in [The Programmer's Hangout](https://discord.gg/programming)
