@@ -16,7 +16,8 @@ import safeSendMessage from "../handlers/safe/SafeSendMessage";
 export default async function onGuildMemberAdd(member : Discord.GuildMember): Promise<void> {
     if (!gb.instance.database.ready
         || member.user.bot
-        || !await gb.instance.database.getGuildEnabled(member.guild.id)){
+        || !await gb.instance.database.getGuildEnabled(member.guild.id)
+        || !member.guild.available){
         return
     }
 

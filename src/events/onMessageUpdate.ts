@@ -9,7 +9,7 @@ import deleteInvite from "../moderation/InviteRemover";
 import {default as gb} from "../misc/Globals";
 
 export default async function onMessageUpdate(oldMessage : Discord.Message, newMessage : Discord.Message){
-    if (newMessage.guild && !await gb.instance.database.getGuildEnabled(newMessage.guild.id)){
+    if (!newMessage.guild.available ||(newMessage.guild && !await gb.instance.database.getGuildEnabled(newMessage.guild.id))){
         return
     }
 

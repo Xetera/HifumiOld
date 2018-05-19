@@ -105,7 +105,7 @@ export class LogManager {
             member.guild.id,
             'joins_logging_channel'
         );
-        if (!channel)
+        if (!member.guild.available || !channel)
             return;
         LogManager.logMessage(member.guild, <string> channel, logMemberJoinEmbed(member), LogAction.JOIN);
     }
@@ -115,7 +115,7 @@ export class LogManager {
             member.guild.id,
             'leave_logging_channel'
         );
-        if (!channel)
+        if (!member.guild.available || !channel)
             return;
         LogManager.logMessage(member.guild, <string> channel, logMemberLeaveEmbed(member), LogAction.LEAVE);
     }
@@ -125,7 +125,7 @@ export class LogManager {
             guild.id,
             'ban_logging_channel'
         );
-        if (!channel)
+        if (!guild.available || !channel)
             return;
         // race condition but audit log should be winning 99% of the time
         LogManager.waitForAuditLogs(guild, (audit: GuildAuditLogs) => {
@@ -142,7 +142,7 @@ export class LogManager {
             guild.id,
             'ban_logging_channel'
         );
-        if (!channel)
+        if (guild.available || !channel)
             return;
         if (offense === Offense.Spam)
             LogManager.logWarning(guild, <string> channel, logWatchlistSpamBanEmbed(member), LogAction.BAN);
@@ -155,7 +155,7 @@ export class LogManager {
             guild.id,
             'unban_logging_channel'
         );
-        if (!channel)
+        if (!guild.available || !channel)
             return;
         LogManager.waitForAuditLogs(guild, (audit: GuildAuditLogs) => {
             const auditEntries = audit.entries;
@@ -178,7 +178,7 @@ export class LogManager {
             target.guild.id,
             'channel_management_logging_channel'
         );
-        if (!channel)
+        if (!target.guild.available || !channel)
             return;
 
 
@@ -196,7 +196,7 @@ export class LogManager {
             target.guild.id,
             'channel_management_logging_channel'
         );
-        if (!channel)
+        if (!target.guild.available ||!channel)
             return;
 
         LogManager.waitForAuditLogs(target.guild, (audit: GuildAuditLogs) => {
@@ -213,7 +213,7 @@ export class LogManager {
             channel.guild.id,
             'ping_logging_channel'
         );
-        if (!target)
+        if (!member.guild.available ||!target)
             return;
         LogManager.logWarning(member.guild, <string> target, logEveryonePingEmbed(member, channel, content), LogAction.PING);
     }
@@ -223,7 +223,7 @@ export class LogManager {
             message.guild.id,
             'ping_logging_channel'
         );
-        if (!target)
+        if (!message.guild.available ||!target)
             return;
 
         LogManager.logWarning(message.member.guild, <string> target, logMentionSpamEmbed(
@@ -239,7 +239,7 @@ export class LogManager {
             message.guild.id,
             'command_logging_channel'
         );
-        if (!target)
+        if (!message.guild.available ||!target)
             return;
         LogManager.logMessage(message.guild, <string> target, logCommandExecutionEmbed(message.member, <TextChannel> message.channel, command), LogAction.COMMAND);
     }
@@ -249,7 +249,7 @@ export class LogManager {
             message.guild.id,
             'invite_logging_channel'
         );
-        if (!target)
+        if (!message.guild.available ||!target)
             return;
         LogManager.logWarning(message.guild, <string> target, await logInviteMessageEmbed(message), LogAction.INVITE)
     }
@@ -259,7 +259,7 @@ export class LogManager {
             newM.guild.id,
             'invite_logging_channel'
         );
-        if (!target)
+        if (!newM.guild.available ||!target)
             return;
         LogManager.logWarning(oldM.guild,<string> target, await logEditedInviteMessageEmbed(oldM, oldM, newM.content), LogAction.INVITE)
     }
@@ -269,7 +269,7 @@ export class LogManager {
             member.guild.id,
             'suggestion_logging_channel'
         );
-        if (!target)
+        if (!member.guild.available ||!target)
             return;
         LogManager.logMessage(member.guild,<string> target, await logNewSuggestionEmbed(member), LogAction.SUGGESTION);
     }

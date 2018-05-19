@@ -13,6 +13,7 @@ import DMCommandHandler from "../handlers/commands/DMCommandHandler";
 import pingListener from "../listeners/pingListener";
 import memeListener from "../listeners/memeListener";
 import {MessageMentions} from "discord.js";
+import hexListener from "../listeners/hexListener";
 
 export const debug = {
     silly: dbg('Bot:onMessage:Silly'),
@@ -38,13 +39,15 @@ function middleWare(msg: Discord.Message, ignored: boolean){
     alexa.checkMessage(message, bot);
     pingListener(message, database);
     inviteListener(message);
-    if (!ignored)
+    if (!ignored) {
         memeListener(message);
+        hexListener(message);
+    }
 }
 
 export default async function onMessage(message: Discord.Message){
     // we don't want to look at bot messages at all
-    if (message.author.bot){
+    if (message.author.bot || !message.guild.available){
         return;
     }
     else if (!gb.instance || !gb.instance.database.ready) {

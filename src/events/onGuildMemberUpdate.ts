@@ -6,7 +6,7 @@ import gb from "../misc/Globals";
  *
  */
 export default async function onGuildMemberUpdate(oldMember : GuildMember, newMember : GuildMember){
-    if (!await gb.instance.database.getGuildEnabled(oldMember.guild.id)){
+    if (!newMember.guild.available || !await gb.instance.database.getGuildEnabled(oldMember.guild.id)){
         return;
     }
 

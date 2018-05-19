@@ -10,7 +10,7 @@ import {debug} from "../utility/Logging";
 export default async function onGuildMemberRemove(member : Discord.GuildMember) {
     // we will change this later to fetch from a Database instead of using a preset name
 
-    if (!await gb.instance.database.getGuildEnabled(member.guild.id)){
+    if (!member.guild.available || !await gb.instance.database.getGuildEnabled(member.guild.id)){
         return;
     }
     let logs;
