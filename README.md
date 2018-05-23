@@ -3,14 +3,17 @@
 </a>
 <hr>
 
-
-Moderation based discord bot written in Typescript using [Discord.js](https://github.com/discordjs/discord.js)
-
-Currently hosted on [heroku](https://www.heroku.com/)
-
-[Invite Me](https://discordapp.com/oauth2/authorize?client_id=372615866652557312&scope=bot&permissions=268463300) - Prefix: $
-
-[Support Server](https://discord.gg/RM6KUrf)
+<table style="width:100%">
+  <tr>
+    <td><strong>Prefix:</strong> $</td>
+      <td><strong>Language:</strong> Typescript</td>
+      <td><strong>Hosting:</strong> Heroku</td>
+      <td><strong>Library:</strong> Discord.js</td>
+    <td><a href="https://discordapp.com/oauth2/authorize?client_id=372615866652557312&scope=bot&permissions=268463300">Invite Me!</a>       </td> 
+    <td><a href="https://discord.gg/RM6KUrf">Support Server</a></td>
+      
+  </tr>
+</table>
 
 ## Features:
 
