@@ -8,9 +8,9 @@ Moderation based discord bot written in Typescript using [Discord.js](https://gi
 
 Currently hosted on [heroku](https://www.heroku.com/)
 
-[Invite Me](https://discordapp.com/oauth2/authorize?client_id=372615866652557312&permissions=0&scope=bot) - Prefix: $
+[Invite Me](https://discordapp.com/oauth2/authorize?client_id=372615866652557312&scope=bot&permissions=268463300) - Prefix: $
 
-[Support Server](https://discordapp.com/oauth2/authorize?client_id=372615866652557312&scope=bot&permissions=268463300)
+[Support Server](https://discord.gg/RM6KUrf)
 
 ## Features:
 
