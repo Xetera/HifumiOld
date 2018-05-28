@@ -7,8 +7,8 @@
   <tr>
     <td><strong>Prefix:</strong> $</td>
       <td><strong>Language:</strong> Typescript</td>
-      <td><strong>Host:</strong> Digital Ocean</td>
       <td><strong>Library:</strong> Discord.js</td>
+      <td><a href="https://www.hifumi.io">Hifumi's Website</a></td>
       <td><a href="https://discordapp.com/oauth2/authorize?client_id=372615866652557312&scope=bot&permissions=268463300">Invite Me!</a>       </td> 
       <td><a href="https://discord.gg/RM6KUrf">Join the Support Server</a></td>
   </tr>
