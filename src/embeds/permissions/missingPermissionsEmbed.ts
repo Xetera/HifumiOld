@@ -1,5 +1,6 @@
 import {Channel, PermissionResolvable, RichEmbed} from "discord.js";
 import gb from "../../misc/Globals";
+import {missingPermissionsEmbedColor} from "../../utility/Settings";
 
 export default function missingPermissionsEmbed(channel: Channel, permission: PermissionResolvable[], sendMessageError?: boolean): RichEmbed{
 
@@ -18,5 +19,5 @@ export default function missingPermissionsEmbed(channel: Channel, permission: Pe
             `Missing`, missingPermissions !== ''
                 ? missingPermissions
                 : permission.map(perm => '`' + perm + '`').join(', '))
-        .setColor('#ff4e5f')
+        .setColor(missingPermissionsEmbedColor)
 }

@@ -85,15 +85,27 @@ export class MuteQueue {
     /**
      * Adds user to the muteQueue
      * @param {GuildMember} member
-     * @param {Role} role
+     * @param {GuildMember} mutedBy
      * @param {Date} unmuteDate
      * @param {string | Offense} reason
      * @param {number} duration - in seconds
      */
-    public add(member : GuildMember, mutedBy: GuildMember, unmuteDate : Date, reason: string | Offense, duration?: number) : Promise<boolean> {
+    public async add(member : GuildMember, mutedBy: GuildMember, unmuteDate : Date, reason: string | Offense, duration?: number) : Promise<boolean> {
         let guild : MutedMember[] | undefined = this.queue.get(member.guild.id);
 
-        const role: Discord.Role = member.guild.roles.find('name', 'muted');
+        let role: Discord.Role | undefined;
+        const savedRoleId = await gb.instance.database.getMuteRole(member.guild.id);
+        if (savedRoleId){
+            role = member.guild.roles.get(savedRoleId);
+        }
+        else {
+            role = member.guild.roles.find(r => r.name === 'muted');
+        }
+        //TODO: change this to return some sort of error
+        if (!role){
+            return false;
+        }
+
         let mutedMember : MutedMember = new MutedMember(
             member, mutedBy, role, unmuteDate, reason, duration ? duration : getMuteTime(), this
         );
@@ -112,7 +124,6 @@ export class MuteQueue {
             guild.push(mutedMember);
         }
         else {
-
             if (!mutedMember.muted){
                 debug.warning(`Could not mute user ${member.user.username}`);
                 return Promise.resolve(false);
@@ -127,11 +138,27 @@ export class MuteQueue {
                 this.sortGuild(member.guild.id);
             if (result){
                 gb.instance.messageQueue.removeUsersRecentMessages(member);
+                gb.instance.database.addMutedUser(member.guild.id, member.id, unmuteDate);
                 this.scheduleUnmute(member, reason, duration);
                 return true;
             }
             return false;
         });
+    }
+
+    public getMutedUsers(guild: Guild){
+        const targetGuild: MutedMember[] | undefined = this.queue.get(guild.id);
+        if (!targetGuild){
+            return undefined;
+        }
+        let out = '';
+        for (let user in  targetGuild){
+            out += `${targetGuild[user].name}: ${targetGuild[user].muteDate}`;
+        }
+        if (out === ''){
+            out = `No users muted`;
+        }
+        return out;
     }
 
     public getMutedUserCount(guild : Discord.Guild) : number {
@@ -147,6 +174,7 @@ export class MuteQueue {
             this.queue.set(guild.id, []);
         }
     }
+
     public release(members: GuildMember | GuildMember[]) : void {
         if (!Array.isArray(members))
             members = [members];
@@ -173,7 +201,7 @@ export class MuteQueue {
         const members : MutedMember[] | undefined  =this.queue.get(member.guild.id);
         if (members === undefined) return;
 
-        //const raidStatus = database.getRaids
+        //const raidStatus = Database.getRaids
         const muteDates = members.map((user : MutedMember) => user.muteDate);
         const recentlyMuted : Date[] = muteDates.filter((date : Date)=>
             date > moment(date).subtract(raidDetectionInterval).toDate()
@@ -249,8 +277,12 @@ export class MuteQueue {
                 `You were mass banned by a mod for raiding ${youTried}\n${advertiseOnBan}`);
             raidGuild.splice(i, 1);
 
-            // we also need to remove them from the database when we implement that
+            // we also need to remove them from the Database when we implement that
         }
         message.channel.send(`Banned ${raiderCount - raidGuild.length} muted raiders. ${youTried}`)
+    }
+
+    public crossCheckMutes(){
+
     }
 }

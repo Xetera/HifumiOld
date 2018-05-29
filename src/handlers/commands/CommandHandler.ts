@@ -1,11 +1,9 @@
 import nuke from "../../commands/utility/Nuke";
 import * as Discord from "discord.js";
-import * as dbg from "debug";
 import {Database} from "../../database/Database";
 import setWelcome from "../../commands/config/setWelcomeChannel";
 import setPrefix from "../../commands/config/SetPrefix";
 import systemsEval from "../../commands/debug/Eval";
-import manualRestockUsers from "../../actions/ManualRestockUsers";
 import getPfp, {default as pfp} from "../../commands/info/GetPfp";
 import uptime from "../../commands/info/Uptime";
 import source from "../../commands/info/Source";
@@ -13,28 +11,23 @@ import ch from "../../commands/fun/CyanideAndHappiness";
 import {getHelp} from "../../commands/info/help/Help";
 import serverInfo from "../../commands/info/ServerInfo";
 import echo from "../../commands/utility/Echo";
-import {Instance} from "../../misc/Globals";
-import onlyAdmin from "../permissions/decorators/onlyAdmin";
-import {Alexa} from "../../API/Alexa";
+import gb, {Instance} from "../../misc/Globals";
+import admin from "../../decorators/onlyAdmin";
+import {Cleverbot} from "../../API/Cleverbot";
 import {MuteQueue} from "../../moderation/MuteQueue";
 import {MessageQueue} from "../../moderation/MessageQueue";
-import onlyOwner from "../permissions/decorators/onlyOwner";
-import setName from "../../commands/self/ChangeName";
-import setAvatar from "../../commands/self/ChangePicture";
-import onlyMod from "../permissions/decorators/onlyMod";
-import getQueue from "../../commands/debug/getQueue";
+import botOwner from "../../decorators/onlyOwner";
+import mod from "../../decorators/onlyMod";
 import cleanse from "../../commands/utility/Cleanse";
 import bump from "../../commands/self/Bump";
-import getConfig from "../../commands/config/getConfig";
+import settings from "../../commands/config/settings";
 import setLogsChannel from "../../commands/config/setLogsChannel";
-import getCache from "../../commands/debug/Cache";
 import ignore from "../../commands/self/Ignore";
 import botInfo from "../../commands/info/botInfo";
 import {debug} from "../../utility/Logging";
 import {Channel, GuildMember, Message, Permissions, TextChannel} from "discord.js";
 import createMuteRole from "../../commands/config/createMuteRole";
 import muteUser from "../../commands/moderation/mute";
-import setupMutePermissions from "../../commands/config/setupMutePermissions";
 import commandNotFoundEmbed from "../../embeds/commands/commandNotFoundEmbed";
 import setHints from "../../commands/self/hints";
 import setInvites from "../../commands/config/setInvites";
@@ -88,16 +81,25 @@ import {requires} from "../../decorators/requires";
 
 export interface CommandParameters extends Instance {
     message: Discord.Message;
-    args: string[];
     bot: Discord.Client;
-    alexa: Alexa,
-    muteQueue: MuteQueue,
-    messageQueue: MessageQueue,
-    database : Database
+    alexa: Cleverbot;
+    muteQueue: MuteQueue;
+    messageQueue: MessageQueue;
+    database : Database;
+    args: string[];
+    input: any[];
+    expect: ArgOptions[];
+    name: string;
 }
 
 interface indexSignature {
     [method:string]: (CommandParameters);
+}
+
+interface UserInputData {
+    stealth: boolean;
+    command: string;
+    args: string[];
 }
 
 
@@ -108,73 +110,136 @@ function isMessage(message : any) : message is Discord.Message {
 export default class CommandHandler implements indexSignature {
     [method:string]: any;
     commands : string[];
-
+    restarting: boolean = false;
     constructor(){
-        this.commands = (Object.getOwnPropertyNames(Object.getPrototypeOf(this))
-            .filter(method=>{
-            return method !== 'constructor' && method !== 'handler' && method !== 'parseInput';
-        }));
+        this.commands = Object.getOwnPropertyNames(Object.getPrototypeOf(this))
+            .filter(method=> {
+            return method !== 'constructor'
+                && method !== 'handler'
+                && method !== 'parseInput'
+                && method !== 'restarting'
+                && method !== 'getListOfAttributeDecorators'
+                && method !== '_run';
+        });
     }
 
-    public static parseInput(message : Discord.Message) : [string, string[]]{
+    private getListOfAttributeDecorators(property: string): ArgOptions[] {
+        const name = this.constructor.name;
+        return !REGISTRY.has(name) ? [] : REGISTRY.get(name)!.get(property)!;
+    }
+
+    public static async parseInput(message : Discord.Message): Promise<UserInputData | undefined> {
         let args : string[] = [];
+        const prefix = await gb.instance.database.getPrefix(message.guild.id);
         // removing excess whitespace between words that can't be removed with .trim()
-        const messageContent = message.content.replace(/\s+/, ' ');
+        const messageContent = message.content.replace(/\s+/g, ' ').trim();
         if (isMessage(message))
             args = messageContent.split(' ');
         else
             throw new TypeError(`'${message}' is not a Message object.`);
 
-        let command : string | undefined = args.shift();
-        if (command !== undefined) {
-            command = command.substring(1);
-            return [command, args];
+        let input : string | undefined = args.shift()!;
+
+        // detecting stealth command
+        // setting the rest of the properties later
+        let out = <UserInputData> {
+            args: args
+        };
+
+        if (input === prefix || input === prefix + prefix){
+            return;
         }
-        else {
-            return ['', ['']]
+
+        else if (input.substring(0, 2) === prefix + prefix){
+            debug.silly(`[${message.guild.name}]<${message.author}> Entered a stealth command`, 'CommandHandler');
+            out.stealth = true;
+            out.command = input.substring(2);
+            return out;
         }
+        else if (input[0] === prefix){
+            out.stealth = false;
+            out.command=input.substring(1);
+            return out;
+        }
+
+        // not a command
+        return;
     }
 
-    public handler(message : Discord.Message,instance : Instance) {
-        const [command, args] = CommandHandler.parseInput(message);
-        if (command == '') return;
+    public async handler(message : Message) {
+        if (this.restarting)
+            return;
+        const inputData: UserInputData | undefined = await CommandHandler.parseInput(message);
+        if (inputData === undefined)
+            return;
+        else if (inputData.stealth){
+            safeDeleteMessage(message);
+        }
 
         if (message.channel instanceof TextChannel)
             debug.info(`[${message.guild.name}]::${message.channel.name}::<${message.author.username}>: ${message.content}`, 'CommandHandler');
         else
             debug.error(`A non text channel command was forwarded to CommandHandler`, 'CommandHandler');
 
-        const params = <CommandParameters> instance;
-        params.args = args;
+        const params = <CommandParameters> gb.instance;
+        params.args = inputData.args;
         params.message = message;
+        params.input = [];
 
         for (let i in this.commands) {
-            const match = this.commands[i].toLowerCase() === command.toLowerCase() ? command : undefined;
+            const match = this.commands[i].toLowerCase() === inputData.command.toLowerCase() ? inputData.command : undefined;
             if (!match)
                 continue;
             const execution = this.commands[i];
+
             try {
-                return this[execution](params);
+                this._run(message, execution, params);
             }
             catch (error) {
-                debug.error(`Unexpected error while executing ${command}\n` + error.stack)
+                debug.error(`Unexpected error while executing ${inputData.command}\n` + error.stack)
+            }
+            if (inputData.stealth) {
+                LogManager.logCommandExecution(message, params.name);
+            }
+            return;
+        }
+
+        // User input is not a command, checking macros
+        const macros: Macro[] = await gb.instance.database.getMacros(message.guild.id);
+        let targetMacro: Macro | undefined;
+        if (macros.length){
+            targetMacro = macros.find(macro => macro.macro_name === inputData.command);
+            if (targetMacro){
+                gb.instance.database.incrementMacroCalls(message.guild.id, message.author.id);
+                return void message.channel.send(targetMacro.macro_content);
             }
         }
-        if (command === null)
-            return;
-        const hints = instance.database.getCommandHints(message.guild);
+
+        // User input is not a command OR a macro, checking if guild has hints enabled
+        const hints = await gb.instance.database.getCommandHints(message.guild.id);
         if (hints){
             message.channel.send(
-                commandNotFoundEmbed(message.channel, command)
-            );
+                await commandNotFoundEmbed(message.channel, inputData.command, macros.map(macro => macro.macro_name))
+            ).then((m: Message|Message[]) =>  (<Message> m).delete(30000));
         }
     }
 
-    @onlyOwner
-    private setName(params: CommandParameters){
-        const name = params.args.join(' ');
-        setName(params.message, name);
+    private async _run(message: Message, command: string, params: CommandParameters){
+        params.expect = this.getListOfAttributeDecorators(command);
+        params.name = command;
+        try {
+            const legal = await argParse(params);
+            if (!legal)
+                return;
+            this[command](params);
+            gb.instance.database.incrementCommandCalls(message.guild.id, message.author.id);
+        }
+        catch (error) {
+            debug.error(`Unexpected error while executing ${command}\n` + error.stack)
+        }
+
     }
+
     /* Owner Commands */
     @botOwner
     @expects(ArgType.Message)
@@ -221,15 +286,16 @@ export default class CommandHandler implements indexSignature {
         reactions(params.message, <[boolean]> params.input);
     }
 
-    @onlyAdmin
+    @admin
     private setup(params: CommandParameters){
         createMuteRole(params.message);
     }
 
     @admin
+    @requires('MANAGE_MESSAGES')
     @expects(ArgType.Boolean)
     private inviteFilter(params: CommandParameters){
-        setInvites(params.message, params.args);
+        setInvites(params.message, <[boolean]> params.input);
     }
 
     @admin
@@ -307,15 +373,14 @@ export default class CommandHandler implements indexSignature {
     @mod
     @expects(ArgType.Member)
     private ignore(params : CommandParameters){
-        const user = params.message.mentions.members.first();
-        ignore(params.message, user, params.database);
+        ignore(params.message, <[GuildMember]> params.input);
     }
 
     @mod
     @requires('MANAGE_MESSAGES')
     @expects(ArgType.Number, {maxRange: 500, optional: true})
     private nuke(params: CommandParameters){
-        nuke(params.message.channel, parseInt(params.args[0]));
+        nuke(params.message, <[number] | undefined > params.input);
     }
 
     @mod
@@ -323,8 +388,7 @@ export default class CommandHandler implements indexSignature {
     @requires('MANAGE_MESSAGES')
     @expects(ArgType.Number, {maxRange: 500, optional: true})
     private cleanse(params: CommandParameters){
-        const limit : string | undefined = params.args.shift()!;
-        cleanse(params.message.channel, params.database, parseInt(limit))
+        cleanse(params.message.channel, <[number] | undefined> params.input)
     }
 
     @mod
@@ -333,7 +397,7 @@ export default class CommandHandler implements indexSignature {
     @expects(ArgType.Number, {maxRange: 60 * 24})
     @expects(ArgType.Message)
     private mute(params: CommandParameters){
-        muteUser(params.message, params.args);
+        muteUser(params.message, <[GuildMember, number, string]> params.input);
     }
 
     @mod
@@ -354,13 +418,13 @@ export default class CommandHandler implements indexSignature {
     @expects(ArgType.Channel, {channelType: 'text'})
     @expects(ArgType.Message)
     private echo(params : CommandParameters){
-        echo(params.message, params.args)
+        echo(params.message, <[TextChannel, string]> params.input)
     }
 
     @mod
     @expects(ArgType.Boolean)
     private hints(params: CommandParameters){
-        setHints(params.message, params.args);
+        setHints(params.message, <[boolean]> params.input);
     }
 
     @mod
@@ -383,7 +447,6 @@ export default class CommandHandler implements indexSignature {
     }
 
     @mod
-    @requires('BAN_MEMBERS')
     @expects(ArgType.Member)
     @expects(ArgType.Number)
     @expects(ArgType.Message, {minWords: 2})
@@ -451,7 +514,7 @@ export default class CommandHandler implements indexSignature {
 
     @expects(ArgType.Message, {optional: true})
     private help(params: CommandParameters){
-        getHelp(params.message, params.args, params.database)
+        getHelp(params.message, <[string] | undefined > params.input)
     }
 
     @expects(ArgType.None)
@@ -461,17 +524,17 @@ export default class CommandHandler implements indexSignature {
 
     @expects(ArgType.Member)
     private pfp(params : CommandParameters){
-        pfp(params.message, params.args);
+        pfp(params.message, <[GuildMember]> params.input);
     }
 
     @expects(ArgType.None)
     private uptime(params : CommandParameters){
-        uptime(params.message, params.bot);
+        uptime(params.message);
     }
 
     @expects(ArgType.String, {optional: true})
     private source(params: CommandParameters){
-        source(params.message, params.args);
+        source(params.message, <[string] | undefined> params.input);
     }
 
     @throttle(3)
@@ -515,6 +578,7 @@ export default class CommandHandler implements indexSignature {
         iHateYou(params.message);
     }
 
+    @throttle(10)
     @expects(ArgType.Message)
     private suggest(params: CommandParameters){
         suggest(params.message, <[string]> params.input);

@@ -71,7 +71,6 @@ export function expects(type: ArgType | ArgType[], options?: any): DecoratorRetu
                 argOptions.options.strict = options.strict;
             }
         }
-
         register(t.constructor.name, name, argOptions);
     };
 }

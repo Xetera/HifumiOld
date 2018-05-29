@@ -4,7 +4,7 @@ import {debug} from "../../utility/Logging";
 import getInvite from "../../commands/DM/getInvite";
 import getDMHelp from "../../commands/DM/DMHelp";
 
-export default function DMCommandHandler(message : Message, instance : Instance) : void {
+export default function DMCommandHandler(message : Message) : void {
     debug.info(`[DM]<${message.author.username}>: ${message.content}`);
 
     // kind of a bad way to check but there won't be many DM

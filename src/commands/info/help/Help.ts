@@ -1,21 +1,28 @@
 import * as Discord from 'discord.js'
 import {Database} from "../../../database/Database";
-import {Command, Help} from "./interface";
+import {Command, Help} from "./help.interface";
 import {Message, RichEmbed} from "discord.js";
 import {handleInvalidParameters} from "../../../handlers/commands/invalidCommandHandler";
 import commandNotFoundEmbed from "../../../embeds/commands/commandNotFoundEmbed";
 import {highlight} from "../../../utility/Markdown";
-import {capitalize} from "../../../utility/Util";
+import {capitalize, random} from "../../../utility/Util";
 import {commandEmbedColor} from "../../../utility/Settings";
+import gb from "../../../misc/Globals";
+import helpMacroEmbed from "../../../embeds/commands/helpMacroEmbed";
 const help = require('../../help.json');
 
-export function getHelp(message : Message, args : string[],  database : Database) {
-    const prefix: string = database.getPrefix(message.guild.id);
-    if (!args.length){
-        const prefix : string = database.getPrefix(message.guild.id);
-        let embed = new RichEmbed().addField("Your prefix", prefix, true);
+export async function getHelp(message : Message, input: [string] | undefined) {
+    const choice = Array.isArray(input) ? input.join(' ') : undefined;
+    console.log(choice);
+    const prefix: string = await gb.instance.database.getPrefix(message.guild.id);
+    if (!choice){
+        const prefix : string = await gb.instance.database.getPrefix(message.guild.id);
+        let embed = new RichEmbed();
 
-        const sortedCommands = help.commands.reduce((obj: {[type:string]: Command[]}, command: Command) => {
+        let sortedCommands: {[type:string]: Command[]} = help.commands.reduce((obj: {[type:string]: Command[]}, command: Command) => {
+            // we don't want to send ALL the settings commands in help
+            if (command.hidden)
+                return obj;
             if (!obj[command.type]){
                 obj[command.type] = [];
             }
@@ -23,31 +30,44 @@ export function getHelp(message : Message, args : string[],  database : Database
             return obj;
         }, {});
         // this may be a little
-        for(let key in sortedCommands){
-            const command = sortedCommands[key].map((cmd: Command)=> '\`' + cmd.name + '\`').join(' ');
-            embed.addField(sortedCommands[key][0].type, command);
-        }
 
+        for(let key in sortedCommands){
+            // sorting alphabetically
+            sortedCommands[key] = sortedCommands[key].sort(function(a, b){
+                if(a.name < b.name) return -1;
+                if(a.name > b.name) return 1;
+                return 0;
+            });
+
+            const command = sortedCommands[key].map((cmd: Command)=> '`' + prefix + cmd.name + '`').join(', ');
+            embed.addField('⇨ ' + sortedCommands[key][0].type + ' ⇦', command);
+        }
+        const randomCategory = sortedCommands[random(Object.keys(sortedCommands))];
         embed.setTitle(`__Commands__`)
+            .setDescription(`I auto delete messages starting with 2 of your prefixes like so \`${prefix + prefix}${randomCategory[random(Object.keys(randomCategory))].name}\`\n`)
             .setColor(commandEmbedColor)
             .setFooter(`${prefix}help {command} for more info`);
         message.channel.send(embed);
         return;
     }
     // searching specific command
-    getSpecificHelp(message, args[0], prefix);
-
+    getSpecificHelp(message, choice, prefix);
 }
 
-function getSpecificHelp(message: Message, arg: string, prefix: string){
+async function getSpecificHelp(message: Message, arg: string, prefix: string){
     const command: Command = help.commands.find((command: Command)=> command.name === arg);
-    if (!command)
-        return message.channel.send(commandNotFoundEmbed(message.channel, arg));
+    if (!command) {
+        const macro = await gb.instance.database.getMacro(message.guild.id, arg);
+        if (macro){
+            return message.channel.send(helpMacroEmbed(message.guild, macro));
+        }
+        return message.channel.send(await commandNotFoundEmbed(message.channel, arg));
+    }
     const shortCommand: boolean = command.usage === command.example;
     let embed = new RichEmbed()
-        .setTitle('__' + command.name + '__')
-        .setColor('#FFE5B4')
-        .addField('Info', command.info)
+        .setTitle('__' + prefix + command.name + '__')
+        .setColor(commandEmbedColor)
+        .addField('Info', command.info.replace(/{{prefix}}/g, prefix))
         .addField('Usage', highlight(prefix + command.usage))
         .addField('Example', highlight(prefix + command.example))
         .addField('Permissions', command.permissions ? command.permissions : 'Everyone', true)

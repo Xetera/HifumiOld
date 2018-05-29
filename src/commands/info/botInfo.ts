@@ -6,8 +6,6 @@ const help = require('../help.json');
 export default function botInfo(message : Discord.Message) : void {
     if (!message.guild.available)
         return;
-
-
     const commands = help.commands.length;
     message.channel.send(
         new RichEmbed()
@@ -21,6 +19,7 @@ export default function botInfo(message : Discord.Message) : void {
             .addField(`Database`, `Postgres`, true)
             .addField(`Hosting`, `Heroku`, true)
             .addField(`Commands`, commands, true)
+            .setFooter(`Hifumi is the best girl from the anime "New Game!"`)
             .setTimestamp()
     )
 }

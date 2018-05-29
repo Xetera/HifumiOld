@@ -1,0 +1,2 @@
+- added $anime command
+- working with graphQL now

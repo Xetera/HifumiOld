@@ -2,24 +2,65 @@
   "categories": [
     "Logging",
     "Info",
-    "Self",
+    "Chat",
     "Utility",
-    "Moderation"
+    "Moderation",
+    "Settings",
+    "Fun",
+    "Embeds",
+    "Suggestions",
+    "Settings",
+    "Economy"
+  ],
+  "private": [
+    {
+      "name": "eval",
+      "type": "Debug",
+      "info": "Evaluate typescript code\n**Modifiers**\n[--raw] - Sends response outside of code block\n[--dm] - DMs you the response",
+      "usage": "eval { code } { modifiers }",
+      "example": "eval params.bot.guilds.array().map(g => g.name).join('\\n')",
+      "arguments": "1-2",
+      "permissions": "OWNER"
+    },
+    {
+      "name": "setpfp",
+      "type": "Debug",
+      "info": "Sets the bot's profile picture to a URL",
+      "usage": "setpfp { URL }",
+      "example": "setpfp https://i.imgur.com/gA02p4xf",
+      "permissions": "OWNER"
+    }
   ],
   "commands": [
     {
       "name": "help",
       "type": "Info",
-      "info": "Sends you, well... this message.",
-      "usage": "help",
-      "example": "help",
+      "info": "Sends you, well... this message (/ω＼). Enter a specific command to get more help.",
+      "usage": "help { command }",
+      "example": "help ignore",
+      "arguments": "0-1"
+    },
+    {
+      "name": "passives",
+      "type": "Info",
+      "info": "Sends information about what my non-command abilities.",
+      "usage": "passives",
+      "example": "passives",
+      "arguments": "0"
+    },
+    {
+      "name": "bump",
+      "type": "Utility",
+      "info": "Bumps this server if ServerHound or DLM are present (this may not always work depending on the server).",
+      "usage": "bump",
+      "example": "bump",
       "arguments": "0"
     },
     {
       "name": "setprefix",
-      "type": "Self",
-      "info": "Changes my prefix settings.",
-      "usage": "setprefix {prefix}",
+      "type": "Settings",
+      "info": "Changes my prefix settings. Only supports single character prefixes in order to allow stealth commands.",
+      "usage": "setprefix { prefix }",
       "example": "setprefix >",
       "arguments": "1",
       "permissions": "ADMIN"
@@ -27,8 +68,8 @@
     {
       "name": "nuke",
       "type": "Moderation",
-      "info": "Deletes a certain number of past messages",
-      "usage": "nuke {# of messages to delete} (default 50)",
+      "info": "Deletes a certain number of past messages in the current channel.",
+      "usage": "nuke { # of messages to delete? }",
       "example": "nuke 100",
       "arguments": "0-1",
       "permissions": "MOD"
@@ -36,35 +77,45 @@
     {
       "name": "cleanse",
       "type": "Moderation",
-      "info": "Deletes a certain number of past bot related message.",
-      "usage": "cleanse <# of msgs to delete> (default 50)",
-      "arguments": "0-1",
+      "info": "Deletes all messages from bots and those beginning with my prefix.",
+      "usage": "cleanse { # of msgs to delete? }",
       "example": "cleanse 200",
+      "arguments": "0-1",
       "permissions": "MOD"
     },
     {
       "name": "setwelcome",
-      "type": "Logging",
-      "info": "Changes the channel I send welcome messages to.",
-      "usage": "channel welcome",
-      "example": "channel welcome",
+      "type": "Settings",
+      "info": "Changes the channel I send public welcome messages to. Welcome messages are removed when users leave.",
+      "usage": "setwelcome",
+      "example": "setwelcome",
       "arguments": "0",
-      "permissions": "MOD"
+      "permissions": "ADMIN"
     },
     {
       "name": "setlogs",
-      "type": "Logging",
+      "type": "Settings",
       "info": "Changes the channel I keep logs in.",
-      "usage": "channel logs",
-      "example": "channel logs",
+      "usage": "setlogs",
+      "example": "setlogs",
       "arguments": "0",
-      "permissions": "MOD"
+      "permissions": "ADMIN"
     },
     {
       "name": "setwarnings",
-      "type": "Logging",
+      "type": "Settings",
       "info": "Changes the channel I send mod warnings to, log channel by default.",
       "usage": "setwarnings",
+      "example": "setwarnings",
+      "arguments": "0",
+      "permissions": "ADMIN"
+    },
+    {
+      "name": "setchat",
+      "type": "Settings",
+      "info": "Changes my chat channel. I respond to all messages in this channel regardless of hearing my name. I won't reply if you put a **-** in front of your message or mention someone else.",
+      "usage": "setchat",
+      "example": "setchat",
       "arguments": "0",
       "permissions": "MOD"
     },
@@ -72,17 +123,17 @@
       "name": "echo",
       "type": "Utility",
       "info": "Sends a custom message to a channel.",
-      "usage": "echo {#mention OR channel ID} {message}",
+      "usage": "echo { channel } { message }",
       "example": "echo #lobby Hello World!",
       "arguments": "2",
       "permissions": "MOD"
     },
     {
       "name": "ignore",
-      "type": "Self",
-      "info": "Ignores or unignores all conversation and commands from a user.",
-      "usage": "ignore {@Mention}",
-      "example": "ignore @Xetera",
+      "type": "Moderation",
+      "info": "Ignores or un-ignores all conversation and commands from a user.",
+      "usage": "ignore { member }",
+      "example": "ignore Xetera",
       "arguments": "1",
       "permissions": "MOD"
     },
@@ -90,8 +141,8 @@
       "name": "pfp",
       "type": "Utility",
       "info": "Fetches the profile picture of the user.",
-      "usage": "pfp {@Member OR userId}",
-      "example": "pfp @Xetera` OR `pfp 4563862635863",
+      "usage": "pfp { member }",
+      "example": "pfp xetera",
       "arguments": "1"
     },
     {
@@ -130,43 +181,44 @@
       "name": "source",
       "type": "Info",
       "info": "Sends my source code on github.",
-      "usage": "source {command name}",
+      "usage": "source { command name? }",
       "example": "source setprefix",
       "arguments": "0-1"
     },
     {
-      "name": "setmood",
-      "type": "Self",
-      "info": "Change my chat settings. **currently WIP**",
-      "usage": "setmood {number or 'random'}",
-      "example": "setmood random",
-      "arguments": "1",
-      "permissions": "MOD"
-    },
-    {
       "name": "mute",
       "type": "Moderation",
-      "info": "Mutes a user for a set amount of time. Muted users cannot react to or send messages.",
-      "usage": "mute {@Member or userID} {duration (minutes)} {reason}",
+      "info": "Mutes a user for a set amount of time. Muted users cannot send messages or add reactions.",
+      "usage": "mute { @Member | userID } { duration (minutes) } { reason }",
       "example": "mute @Xetera 60 stop being rude to people",
       "arguments": "3",
       "permissions": "MOD"
     },
     {
       "name": "hints",
-      "type": "Self",
-      "info": "Changes my response for when users enter an invalid command.",
-      "usage": "hints {on or off}",
+      "type": "Settings",
+      "info": "Determines whether I respond to invalid commands with a hint or not.",
+      "usage": "hints {'on' | 'off'}",
       "example": "hints off",
       "arguments": "1",
       "permissions": "MOD"
     },
     {
-      "name": "invitefilter",
-      "type": "Self",
-      "info": "Changes my settings for filtering invites, mods can always send invites regardless.",
-      "usage": "invitefilter {on or off}",
-      "example": "invitefilter off",
+      "name": "settings",
+      "type": "Settings",
+      "info": "Allows changing my settings for the server. Use the **{{prefix}}log** command to change my logging and warning settings\n**{{prefix}}help settings {option} for more info ({{prefix}}help settings invitewarn)** .\n\n__Options__\n**{{prefix}}settings prefix**\n**{{prefix}}settings hints**\n**{{prefix}}settings strikelimit**\n**{{prefix}}settings reactions**\n**{{prefix}}settings tracking**\n**{{prefix}}settings invites**\n**{{prefix}}settings invitewarn**\n**{{prefix}}settings inviteban**",
+      "usage": "settings { options } { value }",
+      "example": "settings reactions off",
+      "arguments": "0-2",
+      "permissions": "MOD"
+    },
+    {
+      "name": "settings prefix",
+      "type": "Settings",
+      "info": "Changes the prefix for the server, currently only supporting single characters.",
+      "usage": "settings prefix { prefix }",
+      "hidden": true,
+      "example": "settings prefix %",
       "arguments": "1",
       "permissions": "ADMIN"
     },

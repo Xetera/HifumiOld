@@ -2,12 +2,12 @@ import * as Discord from 'discord.js'
 import {Cleverbot as Clevertype} from 'clevertype'
 import {debug} from '../utility/Logging'
 import gb from "../misc/Globals";
-import {Channel, Message, MessageMentions} from "discord.js";
+import {Channel, Message, MessageMentions, TextChannel} from "discord.js";
 import moment = require("moment");
 import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import TokenBucket from "../moderation/TokenBucket";
 import safeSendMessage from "../handlers/safe/SafeSendMessage";
-import {formattedTimeString} from "../utility/Util";
+import {formattedTimeString, StringUtils} from "../utility/Util";
 import prefixReminderEmbed from "../embeds/misc/prefixReminderEmbed";
 
 interface Ignores {
@@ -41,11 +41,13 @@ export class Cleverbot {
         this.cleverbot.setRegard(mood);
     }
 
-    public async checkMessage(message : Discord.Message, bot :Discord.Client) : Promise<void> {
+    public async checkMessage(message : Message, bot :Discord.Client) : Promise<void> {
         if (message.system
-            || message.attachments.array().length
-            || await gb.instance.database.isUserIgnored(message.member)
-            || !(message.channel instanceof Discord.TextChannel)){
+            || message.attachments.size
+            || !(message.channel instanceof TextChannel)
+            || StringUtils.isUrl(message.content)
+            || StringUtils.isEmoji(message.content)
+            || await gb.instance.database.isUserIgnored(message.member)){
             return;
         }
 

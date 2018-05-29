@@ -2,47 +2,43 @@ import {Message} from 'discord.js'
 import {discordInviteRegex} from "./Regex";
 import {debug} from '../events/onMessage'
 import {securityLevel, SecurityLevels} from "../utility/Settings";
-import safeDeleteMessage from "../handlers/safe/SafeDeleteMessage";
-import {Database} from "../database/Database";
-import banForInviteSpam from "../actions/punishments/BanForInviteSpam";
-import safeMessageUser from "../handlers/safe/SafeMessageUser";
 import gb from "../misc/Globals";
-import Watchlist from "../moderation/Tracklist";
-import {Offense} from "../moderation/interfaces";
+import deleteInvite from "../moderation/InviteRemover";
+import {InviteUtils} from "../utility/Util";
+import isGuildInvite = InviteUtils.isGuildInvite;
 
-export default function inviteListener(message : Message, database : Database){
-    if (message.author.id === gb.ownerID || message.member.hasPermission('BAN_MEMBERS'))
-        return; // heh
-
-    const sender :string = message.member.nickname || message.author.username;
-    //TODO: Add telegram and whatsapp links in here as optional as well
-    if (!message.content.match(discordInviteRegex) || database.getInvitesAllowed(message.guild)) {
+export default async function inviteListener(message: Message){
+    const sentInvites: RegExpMatchArray | null = message.content.match(discordInviteRegex);
+    if (!sentInvites
+        || !message.guild.me.hasPermission('BAN_MEMBERS')
+        || !sentInvites.length
+        || securityLevel === SecurityLevels.Dangerous
+        || message.member.hasPermission('BAN_MEMBERS')
+        || message.author.id === gb.ownerID
+        || await gb.instance.database.getAllowGuildInvites(message.guild.id)) {
         return;
     }
-    debug.warning(`${sender} in ${message.guild} sent an invite link.`);
 
-    if (securityLevel === SecurityLevels.Dangerous) return;
-    const trackList = gb.instance.trackList;
+    const guildInviteCollection = await message.guild.fetchInvites();
+    const guildInvites = guildInviteCollection.array();
 
-    if (trackList.isNewMember(message.member)){
-        return trackList.punishNewMember(message.member, Offense.InviteLink);
-    }
-
-    safeDeleteMessage(message).then(()=> {
-        debug.info(`Deleted invite link from ${sender}`);
-        return database.incrementMemberInviteStrikes(message.member)
-    }).then((strikeCount : number) => {
-        debug.silly(`${message.member.displayName} has ` + strikeCount + " strikes on record");
-        // hardcoding but we shouldn't really need to change this for anything
-
-        if (strikeCount >= 5){
-            banForInviteSpam(message.member);
-        }
-        else if (strikeCount === 4){
-            safeMessageUser(message.member,
-                `Warning: You've attempted to post 4 invites in ${message.guild.name}, the next one will get you banned.\n` +
-                `I don't go advertising in your server, so please don't do that in mine.`);
-        }
+    const valid = sentInvites.every(i => {
+        // for every invite that was sent
+        const url = i.split('/');
+        const code = url.pop();
+        // make sure that at least ONE matches
+        // a URL that belongs to the current server
+        return guildInvites.some(i => {
+            const url = i.url.split('/');
+            return url.pop() === code;
+        });
     });
+
+    if (valid)
+        return;
+
+    debug.warning(`${message.author.username} in ${message.guild} sent an invite link.`, `InviteListener`);
+
+    return deleteInvite(message)
 }
 

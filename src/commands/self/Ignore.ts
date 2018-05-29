@@ -3,21 +3,31 @@ import {Database} from "../../database/Database";
 import {GuildMember} from "discord.js";
 import {underline} from "../../utility/Markdown";
 import gb from "../../misc/Globals";
+import {User} from "../../database/models/user";
+import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
+import {handleInvalidParameters} from "../../handlers/commands/invalidCommandHandler";
+import {resolveMember} from "../../resolvers/memberResolver";
+import {UpdateResult} from "typeorm";
 
-export default function ignore(message : Discord.Message, member : GuildMember, database : Database) {
-    if (member === undefined){
-        return message.channel.send(`Couldn't find a mentioned member.`);
-    }
-    else if (member.id === member.client.user.id)
-        // could potentially make the name variable if we add a change name feature
-        return message.channel.send(`${gb.emojis.get('alexa_hurr')} heY aLeXa, PlEasE iGnOrE <@${gb.ownerID}>`);
+export default async function ignore(message : Discord.Message, input: [GuildMember]){
+    const member = input.shift()!;
+    if (member.id === gb.ownerID)
+        return message.channel.send(`${gb.emojis.get('alexa_hurr')} heY hiFuMi, PlEasE iGnOrE <@${gb.ownerID}>`);
+
+    else if (member.id === message.guild.me.id)
+        return handleFailedCommand(message.channel, `Why would you want me to ignore myself? :(`);
+
     else if (member.hasPermission('ADMINISTRATOR'))
-        return message.channel.send(`I have a really hard time ignoring admins, sorry.`);
+        return handleFailedCommand(message.channel, `I have a really hard time ignoring admins, sorry.`);
 
+    else if (message.member.highestRole.comparePositionTo(member.highestRole) < 0 && !message.member.hasPermission('ADMINISTRATOR')){
+        return handleFailedCommand(message.channel, `I can't be forced to ignore users that have a higher role than you.`);
+    }
 
-    const status = database.getIgnored(member);
-    database.setIgnored(member, !status).then((state: boolean) => {
-        if (state)
+    const status = await gb.instance.database.isUserIgnored(member);
+
+    return gb.instance.database.setUserIgnore(member, !status).then((r: UpdateResult) => {
+        if (!status)
             message.channel.send(`Ignoring everything from ${member.user.username}.`);
         else
             message.channel.send(`Unignored ${member.user.username}`);

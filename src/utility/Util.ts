@@ -1,16 +1,15 @@
 import {
     CategoryChannel,
-    Channel,
+    Channel, Collection,
     DiscordAPIError,
     Guild,
-    GuildMember,
+    GuildMember, Invite,
     Message, PermissionOverwrites,
     PermissionResolvable,
     Permissions, Role
 } from "discord.js";
 import {debug} from "../events/onMessage";
-import {discordInviteRegex} from "../listeners/Regex";
-import gb from "../misc/Globals";
+import {discordInviteRegex, emojiRegex, urlRegex} from "../listeners/Regex";
 
 
 /**
@@ -37,7 +36,7 @@ export function capitalize(word: string){
 }
 
 export function normalizeString(input: string, titleCase?: boolean){
-    const words = input.replace(/_/, ' ');
+    const words = input.replace(/_/, '');
     const wordArray = words.split(' ');
     const formatted = wordArray.map((w: string, index: number)=> {
         let firstLetter = w.substring(0, 1);
@@ -152,16 +151,15 @@ export function formattedTimeString(sec: number): string{
     const minutes = currentUptime.m;
     const hours = currentUptime.h;
     const days= currentUptime.d;
-
     return `${days 
-        ? days.toFixed(0) + 'd' : ''} ${hours 
-        ? hours.toFixed(0) + 'h' : ''} ${minutes 
+        ?    days.toFixed(0) + 'd' : ''} ${hours 
+        ?   hours.toFixed(0) + 'h' : ''} ${minutes 
         ? minutes.toFixed(0) + 'm' : ''} ${seconds 
-        ? seconds.toFixed(0) + 's' : ''}`.trim();
+        ? seconds.toFixed(0) + 's' : ''}`.replace(/  +/g, ' ').trim();
 }
 
 export function sanitizeUserInput(input: string){
-    return input.replace('@', '\`@\`');
+    return input.replace('@', '`@`').trim();
 }
 
 export function subtractArrays(first: any[], second: any[]): any[] | undefined {
@@ -181,18 +179,16 @@ export function getOnOff(input: string): boolean | undefined {
         return true;
     else if (input === 'off')
         return false;
-    else
-        return undefined;
+    return undefined;
 }
-
-export namespace BotUtils {
-    export function getGuilds(){
-        return gb.instance.bot.guilds;
-    }
-    export function getGuildCount(){
-        return BotUtils.getGuilds().size;
-    }
-
+// This should totally be a nested ternary but whateeever
+export function getYesNo(input: string){
+    input  = input.toLowerCase();
+    if (input === 'y' || input === 'yes')
+        return true;
+    else if (input === 'n' || input === 'no')
+        return false;
+    return undefined;
 }
 
 export namespace UserUtils {
@@ -218,6 +214,14 @@ export namespace InviteUtils {
     }
 }
 
+export namespace StringUtils {
+    export function isUrl(input: string){
+        return urlRegex.test(input)
+    }
+    export function isEmoji(input: string){
+        return emojiRegex.test(input);
+    }
+}
 
 export function arrayFromValues(obj: {[id: string]: any}){
     return Object.keys(obj).map(k => obj[k]);
@@ -228,3 +232,7 @@ export function safeGetArgs(input: any[] | undefined, defaultValue: any){
 }
 
 export const emptySpace: string = '\u200b';
+
+export function stringify(...items: string[]){
+    return items.map(i => i != null ? i : '').join(' ')
+}

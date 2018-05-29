@@ -1,19 +1,10 @@
+
 import {
     createInstance, getDatabaseConnection, getEnvironmentSettings, getTokens,
     setupProcess
 } from "./events/systemStartup";
 import gb from './misc/Globals';
-
-setupProcess();
-gb.ENV  = getEnvironmentSettings();
-
-// lol @ me passing in "global" variables
-const [BOT_TOKEN, CLEVERBOT_TOKEN] : string[] = getTokens(gb.ENV);
-const DATABASE_CONFIG : DatabaseConfig = getDatabaseConnection(gb.ENV);
-
-
-// modules
-import {DatabaseConfig} from "./database/Database";
+import 'reflect-metadata';
 import onReady from './events/onReady'
 import onMessage from './events/onMessage'
 import onGuildMemberAdd from "./events/onGuildMemberAdd";
@@ -27,72 +18,90 @@ import onGuildUpdate from "./events/onGuildUpdate";
 import {LogManager} from "./handlers/logging/logManager";
 import onChannelCreate from "./events/onChannelCreate";
 import onChannelDelete from "./events/onChannelDelete";
+import {Client} from "discord.js";
+import uncaughtException from "./handlers/process/uncaughtException";
+import websocketErrorHandler from "./handlers/process/websocketErrorHandler";
+import websocketWarningHandler from "./handlers/process/websocketWarningHandler";
 
+setupProcess();
+gb.ENV  = getEnvironmentSettings();
+// lol @ me passing in "global" variables
+const [BOT_TOKEN, CLEVERBOT_TOKEN] : string[] = getTokens(gb.ENV);
+const DATABASE_CONFIG : string = getDatabaseConnection(gb.ENV);
 
-const instance = createInstance(BOT_TOKEN, CLEVERBOT_TOKEN, DATABASE_CONFIG);
-gb.instance = instance;
+main();
 
+async function main(){
+    const bot = new Client();
+    bot.login(BOT_TOKEN);
 
-setInterval(function(){
-    updatePresence(instance.bot);
-}, 1000 * 60 * 10);
-
-instance.bot.on('ready', async function(){
-    gb.ownerID = await onReady(instance);
-});
+    bot.on('ready', async() =>{
+        gb.ownerID = await onReady(bot);
+        gb.instance = await createInstance(bot, BOT_TOKEN, CLEVERBOT_TOKEN, DATABASE_CONFIG);
+        gb.instance.trackList.initializeGuilds();
+        setInterval(() => {
+            updatePresence(bot);
+        }, 1000 * 60 * 10);
+    });
 
 
 // === === === === MESSAGE === === === === === //
-instance.bot.on('message', function(message : Discord.Message){
-    onMessage(message, instance);
-});
+    bot.on('message', (message : Discord.Message) => {
+        onMessage(message);
+    });
 
-instance.bot.on('messageUpdate', function(oldMessage: Discord.Message, newMessage: Discord.Message){
-    onMessageUpdate(oldMessage, newMessage);
-});
+    bot.on('messageUpdate', (oldMessage: Discord.Message, newMessage: Discord.Message) => {
+        onMessageUpdate(oldMessage, newMessage);
+    });
 
-instance.bot.on('messageDelete', function(oldMessage: Discord.Message, newMessage: Discord.Message){
-    // (oldMessage, newMessage);
-});
+    bot.on('messageDelete', (oldMessage: Discord.Message, newMessage: Discord.Message) => {
+        // (oldMessage, newMessage);
+    });
 
 
 // === === === === GUILD MEMBER === === === === === //
-instance.bot.on('guildMemberAdd', function(member : Discord.GuildMember){
-    onGuildMemberAdd(member, instance);
-});
+    bot.on('guildMemberAdd', (member : Discord.GuildMember) => {
+        onGuildMemberAdd(member);
+    });
 
 
-instance.bot.on('guildMemberRemove', function(member : Discord.GuildMember){
-    onGuildMemberRemove(member);
-});
+    bot.on('guildMemberRemove', (member : Discord.GuildMember) => {
+        onGuildMemberRemove(member);
+    });
 
-instance.bot.on('guildMemberUpdate', function(oldMember: Discord.GuildMember, newMember: Discord.GuildMember){
-    onGuildMemberUpdate(oldMember, newMember);
-});
+    bot.on('guildMemberUpdate', (oldMember: Discord.GuildMember, newMember: Discord.GuildMember) => {
+        onGuildMemberUpdate(oldMember, newMember);
+    });
 
 
 // === === === === GUILD === === === === === //
-instance.bot.on('guildUpdate', function(oldMember: Discord.Guild, newMember: Discord.Guild){
-    onGuildUpdate(oldMember, newMember);
-});
+    bot.on('guildUpdate', (oldMember: Discord.Guild, newMember: Discord.Guild) => {
+        onGuildUpdate(oldMember, newMember);
+    });
 
-instance.bot.on('guildCreate', function(guild : Discord.Guild){
-    onGuildCreate(guild, instance);
-});
+    bot.on('guildCreate', (guild : Discord.Guild) => {
+        onGuildCreate(guild);
+    });
 
-instance.bot.on('guildBanAdd', (guild:Discord.Guild, member: Discord.User) => {
-    LogManager.logBan(guild, member);
-});
+    bot.on('guildBanAdd', (guild:Discord.Guild, member: Discord.User) => {
+        LogManager.logBan(guild, member);
+    });
 
-instance.bot.on('guildBanRemove', (guild:Discord.Guild, member: Discord.User) => {
-    LogManager.logUnban(guild, member);
-});
+    bot.on('guildBanRemove', (guild:Discord.Guild, member: Discord.User) => {
+        LogManager.logUnban(guild, member);
+    });
 
 // === === === === CHANNEL === === === === === //
-instance.bot.on('channelCreate', function(channel :Discord.Channel){
-    onChannelCreate(channel)
-});
+    bot.on('channelCreate', (channel :Discord.Channel) => {
+        onChannelCreate(channel)
+    });
 
-instance.bot.on('channelDelete', function(channel :Discord.Channel){
-    onChannelDelete(channel);
-});
+    bot.on('channelDelete', (channel :Discord.Channel) => {
+        onChannelDelete(channel);
+    });
+
+// === === === === EXCEPTIONS === === === === === //
+    bot.on('error', (err) => websocketErrorHandler(err));
+
+    bot.on('warn', (warning) => websocketWarningHandler(warning));
+}

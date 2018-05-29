@@ -1,11 +1,10 @@
 import * as Discord from 'discord.js'
 import {debug} from '../../utility/Logging'
 
-export default function setName(message : Discord.Message, name : string){
+export function setName(message : Discord.Message, input: [string]){
     const me : Discord.ClientUser = message.client.user;
     const oldName = me.username;
-    if (name === '' || name === undefined)
-        return;
+    const [name] = input;
     return me.setUsername(name).then(response => {
         debug.info(`Changed my name from ${oldName} to ${response.username}.`);
         return message.channel.send(`Changed my name from ${oldName} to ${response.username}.`)
@@ -15,3 +14,5 @@ export default function setName(message : Discord.Message, name : string){
         }
     })
 }
+
+

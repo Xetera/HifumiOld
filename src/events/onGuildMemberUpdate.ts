@@ -5,7 +5,11 @@ import gb from "../misc/Globals";
 /**
  *
  */
-export default function onGuildMemberUpdate(oldMember : GuildMember, newMember : GuildMember){
+export default async function onGuildMemberUpdate(oldMember : GuildMember, newMember : GuildMember){
+    if (!newMember.guild.available || !await gb.instance.database.getGuildEnabled(oldMember.guild.id)){
+        return;
+    }
+
     const oldRoles = oldMember.roles.array().filter(role => !role.hasPermission('SEND_MESSAGES'));
     const newRoles = newMember.roles.array().filter(role => !role.hasPermission('SEND_MESSAGES'));
     const unmuted: Role[] | undefined = subtractArrays(oldRoles, newRoles);

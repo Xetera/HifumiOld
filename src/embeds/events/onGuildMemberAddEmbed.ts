@@ -1,9 +1,29 @@
 import * as Discord from "discord.js";
 import {GuildMember} from "discord.js";
-export default function guildMemberAddEmbed(member: GuildMember, welcomeMessage: string){
-    return new Discord.RichEmbed()
+import {capitalize, random} from "../../utility/Util";
+import {welcomeMessages} from "../../interfaces/Replies";
+import parseEmbedPlaceholders from "../../parsers/parseEmbedPlaceholders";
+export default function guildMemberAddEmbed(member: GuildMember, message?: string, title?: string, footer?: string){
+    if (message){
+        message = parseEmbedPlaceholders(member, message);
+    } else {
+        message = random(welcomeMessages(member));
+    }
+
+    const embed = new Discord.RichEmbed()
         .setThumbnail(member.user.displayAvatarURL)
+        .setTitle(`${member.user.username} has joined ${member.guild.name}!`)
+        .setDescription(message)
         .setColor("GREEN")
-        .addField(`${member.user.username} has joined the server!`, welcomeMessage)
-        .setTimestamp()
+        .setTimestamp();
+
+    if (title){
+        title = parseEmbedPlaceholders(member, title);
+        embed.setTitle(title);
+    }
+    if (footer){
+        footer = parseEmbedPlaceholders(member, footer);
+        embed.setFooter(footer);
+    }
+    return embed;
 }

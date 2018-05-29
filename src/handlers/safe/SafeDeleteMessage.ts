@@ -1,22 +1,18 @@
 import {DiscordAPIError, Message} from "discord.js";
 import * as dbg from 'debug'
 import {APIErrors} from "../../interfaces/Errors";
+import {debug} from "../../utility/Logging";
 
-const debug = {
-    info: dbg('Bot:DeleteMessage:Info'),
-    warning: dbg('Bot:DeleteMessage:Warning'),
-    error: dbg('Bot:DeleteMessage:Error')
-};
 
-export default function safeDeleteMessage(message : Message) : Promise<Message>{
+export default function safeDeleteMessage(message : Message, timeout?: number) : Promise<Message|void>{
 
-    return message.delete().then((message : Message) => {
+    return message.delete(timeout).then((message : Message) => {
         return message;
     }).catch(error => {
         if (error instanceof DiscordAPIError){
             if (error.message === APIErrors.MISSING_PERMISSIONS){
                 debug.error(`Could not delete message from ${message.author.username}`+
-                    ` in ${message.guild.name}, missing permissions.`);
+                    ` in ${message.guild.name}, missing permissions.`, `SafeDeleteMessage`);
             }
             else {
                 debug.error(error);
@@ -24,9 +20,9 @@ export default function safeDeleteMessage(message : Message) : Promise<Message>{
         }
         else {
             debug.error(`Unexpected error while trying to delete message from `+
-                `${message.author.username} in ${message.guild.name}.`, error);
+                `${message.author.username} in ${message.guild.name}.`, `SafeDeleteMessage`);
+            debug.error(error)
         }
-        return error;// we don't want to reject here because we're already handling everything here
     })
 
 }

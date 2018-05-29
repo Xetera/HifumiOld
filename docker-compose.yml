@@ -1,0 +1,26 @@
+version: '3'
+services:
+  bot:
+    build: .
+    volumes:
+    - .:/src
+    working_dir: /src
+    links:
+    - redis
+    environment:
+      - ENV=DEVELOPMENT
+      - DATABASE_URL=postgres://postgres:@host.docker.internal:5432/discord
+      - REDISCLOUD_URL=redis://host.docker.internal:6379
+    depends_on:
+      - "postgres"
+      - "redis"
+    tty: true
+  redis:
+    image: redis
+  postgres:
+    image: postgres:10.3
+    restart: always
+    environment:
+      - POSTGRES_DB=discord
+      - POSTGRES_USER=hifumi
+      - POSTGRES_PASSWORD=eagle_jump

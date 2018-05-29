@@ -1,8 +1,5 @@
 import {Message, Permissions, PermissionString, RichEmbed, Role} from "discord.js";
 import missingPermissionsEmbed from "../../embeds/permissions/missingPermissionsEmbed";
-import createMuteRoleEmbed from "../../embeds/commands/configEmbed/createMuteRoleEmbed";
-import {updateWelcomeChannel} from "../../database/queries/guildQueries";
-import {channelOverrideDeniesRolePermission} from "../../utility/Util";
 import {APIErrors} from "../../interfaces/Errors";
 
 export default function createMuteRole(message: Message): Promise<Role> {
@@ -16,7 +13,7 @@ export default function createMuteRole(message: Message): Promise<Role> {
         name: 'muted',
         color: '#7c6666',
         hoist: false,
-        position: message.guild.roles.array().length - 1,
+        position: message.guild.roles.size - 1,
         permissions: ["READ_MESSAGE_HISTORY", "READ_MESSAGES"],
         // just to mess with them lol
         mentionable: true

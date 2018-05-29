@@ -1,0 +1,5 @@
+- Hotfix to allow users to unset their channel settings
+
+$removewelcome
+$removelogs
+$removewarnings

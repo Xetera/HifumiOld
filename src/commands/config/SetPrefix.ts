@@ -1,30 +1,19 @@
 import * as Discord from 'discord.js'
-import {IGuild, isIGuild} from "../../database/TableTypes";
 import {Database} from "../../database/Database";
-import * as dbg from "debug";
-import {adminOnlyCommand} from "../../interfaces/Replies";
-import onlyOwner from "../../handlers/permissions/decorators/onlyAdmin";
 import missingAdminEmbed from "../../embeds/permissions/missingAdminEmbed";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
+import gb from "../../misc/Globals";
+import {Guild} from "../../database/models/guild";
+import {debug} from "../../utility/Logging";
 
-export const debug = {
-    error  : dbg('Bot:setPrefix:Error')
-};
-
-
-export default function setPrefix(message: Discord.Message, prefix: string, database: Database){
-    if (prefix === undefined)
-        return message.channel.send('No prefix was entered.');
-    else if (prefix.length > 1)
+export default function setPrefix(message: Discord.Message, input: [string]){
+    const prefix = input.shift()!;
+    if (prefix.length > 1)
         return handleFailedCommand(message.channel, `Only single character prefixes are supported right now.`);
-    else if (!message.member.hasPermission('ADMINISTRATOR'))
-        return message.channel.send(missingAdminEmbed());
 
-    database.setPrefix(message.guild, prefix).then((res:IGuild|Error|-1 )=> {
-        if (isIGuild(res))
+    gb.instance.database.setPrefix(message.guild.id, prefix).then((res:Partial<Guild>)=> {
             message.channel.send('Prefix changed to ' + res.prefix);
-        else {
-            debug.error('Error while setting prefix.', res);
-        }
-    });
+    }).catch((err:Error)=> {
+        debug.error(err, `setPrefix`);
+    })
 }

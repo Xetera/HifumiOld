@@ -139,7 +139,7 @@ export function checkMuteCoverage(message: Message): 'all' | 'partial' | 'none' 
 }
 
 
-export function muteCoverage(message: Message){
+export async function muteCoverage(message: Message){
     const chnls: Collection<string, GuildChannel> = message.guild.channels;
 
     // @ts-ignore| we're specifically filtering out the text channels
@@ -179,7 +179,7 @@ export function muteCoverage(message: Message){
     console.log(total.missing.map(channel => channel.name));
 
     let embed;
-    const prefix = gb.instance.database.getPrefix(message.guild.id);
+    const prefix = await gb.instance.database.getPrefix(message.guild.id);
     if (!total.missing.length) {
         embed = noMissingMuteOverwritesEmbed(muteRole.role.name);
     }

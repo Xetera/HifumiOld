@@ -1,10 +1,24 @@
 import {Guild, RichEmbed} from "discord.js";
+import gb from "../../misc/Globals";
+import {warningEmbedColor} from "../../utility/Settings";
+import ReactionManager from "../../handlers/internal/reactions/reactionManager";
 
-export default function inviteWarningDMEmbed(guild: Guild): RichEmbed{
+export default async function inviteWarningDMEmbed(guild: Guild): Promise<RichEmbed> {
     // for now we don't need this to be a variable amount but maybe
     // later some guilds may want to ban on different amount of invites
-    return new RichEmbed()
-        .setTitle(`⚠ Warning ⚠`)
-        .setDescription(`You've sent 4 invites in ${guild.name}, the next one will get you banned, you've been warned.`)
-        .setTimestamp()
+    // Done ^
+
+    const current = await  gb.instance.database.getInviteWarnThreshold(guild.id);
+    const max = await gb.instance.database.getInviteBanThreshold(guild.id)
+    const embed = new RichEmbed()
+        .setTitle(`Invite Warning`)
+        .setColor(warningEmbedColor)
+        .setThumbnail(guild.iconURL)
+        .setDescription(`You've sent ${current} invites in **${guild.name}** where advertising is __not__ allowed, you will get banned at ${max} invites. This is your one and only warning.`)
+        .setTimestamp();
+
+    if (await ReactionManager.canSendReactions(guild.id)){
+        embed.setImage(ReactionManager.getInstance().stare);
+    }
+    return embed;
 }

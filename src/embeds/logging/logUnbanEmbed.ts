@@ -1,7 +1,7 @@
 import {GuildMember, RichEmbed, User} from "discord.js";
 import {Offense} from "../../moderation/interfaces";
 
-export default function logUnbanEmbed(user: User, unbanningStaff: User, banningStaff: User, reason: string): RichEmbed{
+export default function logUnbanEmbed(user: User, unbanningStaff: User, banningStaff: User | 'unknown', reason: string): RichEmbed{
     return new RichEmbed()
         .setTitle(`User Unbanned 😇`)
         .setThumbnail(user.avatarURL)

@@ -1,0 +1,41 @@
+import gb from "../misc/Globals";
+import safeMessageUser from "../handlers/safe/SafeMessageUser";
+import {Offense} from "./interfaces";
+import safeDeleteMessage from "../handlers/safe/SafeDeleteMessage";
+import {debug} from "../events/onMessage";
+import banForInviteSpam from "../actions/punishments/BanForInviteSpam";
+import {GuildMember, Message} from "discord.js";
+import {LogManager} from "../handlers/logging/logManager";
+import inviteWarningDMEmbed from "../embeds/moderation/inviteWarningDM";
+
+export default function deleteInvite(message: Message, editedMessage: boolean = false): Promise<number> {
+    const sender = message.author.username;
+    const trackList = gb.instance.trackList;
+    return safeDeleteMessage(message).then(()=> {
+        debug.info(`Deleted invite link from ${sender}`);
+        return gb.instance.database.incrementInviteStrike(message.member)
+    }).then(async(strikeCount : number) => {
+        debug.silly(`${message.member.displayName} has ` + strikeCount + " strikes on record", `InviteListener`);
+
+        if (trackList.isNewMember(message.member)
+            && await gb.instance.database.getTrackNewMembers(message.guild.id)
+            && strikeCount > 2){
+
+            debug.info(`Advertiser ${message.author.username} was a tracked member, attempting to ban...`, `InviteListener`);
+            trackList.punishNewMember(message.member, Offense.InviteLink);
+        }
+        else if (strikeCount >= await gb.instance.database.getInviteBanThreshold(message.guild.id)){
+            await banForInviteSpam(message.member);
+        }
+        else if (strikeCount === await gb.instance.database.getInviteWarnThreshold(message.guild.id)){
+            safeMessageUser(message.member, await inviteWarningDMEmbed(message.guild));
+        }
+        if (!editedMessage){
+            LogManager.logIllegalInvite(message);
+        }
+        return strikeCount;
+    }).catch(err => {
+        debug.error(`Error while incrementing invite strikes for ${message.author.username}` + err, `InviteListener`);
+        return gb.instance.database.getInviteStrikes(message.guild.id, message.member.id);
+    })
+}

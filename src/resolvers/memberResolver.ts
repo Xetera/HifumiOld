@@ -6,7 +6,7 @@ import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import {userResolvedEmbed} from "../embeds/resolvers/userResolvedEmbed";
 import resolveNumberedUncertainty from "./resolveNumberedUncertainty";
 import resolveBooleanUncertainty from "./resolveBooleanUncertainty";
-import {UserUtils} from "../utility/Util";
+import {sanitizeUserInput, UserUtils} from "../utility/Util";
 import {AllChannelTypes} from "../decorators/expects";
 
 export async function resolveMember(arg: string, message: Message, options: {fail?: boolean, strict?: boolean, global?: boolean}/*global: any = false, fail: boolean = true*/): Promise<GuildMember | undefined> {
@@ -16,6 +16,8 @@ export async function resolveMember(arg: string, message: Message, options: {fai
 
     if (options.strict === undefined)
         options.strict = true;
+
+    console.log(options.strict)
 
     const numberArg: number = Number(arg);
     const userId = Number.isInteger(numberArg);
@@ -41,7 +43,7 @@ export async function resolveMember(arg: string, message: Message, options: {fai
     // finding a single user with the given nickname
     if (!resolvedNick.length && options.fail){
         return void await handleFailedCommand(
-            message.channel, `I couldn't find the user **${arg}** anywhere, sorry.`
+            message.channel, `I couldn't find the user **${sanitizeUserInput(arg)}** anywhere, sorry.`
         );
     }
     if ((resolvedNick.length === 1) || !options.strict){
