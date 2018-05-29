@@ -9,6 +9,8 @@ import {
     Permissions, Role
 } from "discord.js";
 import {debug} from "../events/onMessage";
+import {discordInviteRegex} from "../listeners/Regex";
+import gb from "../misc/Globals";
 
 
 /**
@@ -32,6 +34,28 @@ export function random(min : number | any[] = 0, range ?: number) : number | any
 
 export function capitalize(word: string){
     return word.replace(/^./, word => word[0].toUpperCase() + word.slice(1));
+}
+
+export function normalizeString(input: string, titleCase?: boolean){
+    const words = input.replace(/_/, ' ');
+    const wordArray = words.split(' ');
+    const formatted = wordArray.map((w: string, index: number)=> {
+        let firstLetter = w.substring(0, 1);
+        if (index === 0 || titleCase) {
+            firstLetter = firstLetter.toUpperCase();
+        }
+        const rest = w.substring(1).toLowerCase();
+        return firstLetter + rest;
+    });
+    return formatted.join(' ');
+}
+
+export function HtmltoMarkdown(input: string){
+    return input
+        .replace(/<\/?i>/g, '_')
+        .replace(/<\/?b>/g, '**')
+        .replace(/<br>/g, '')
+        .replace(/&bull;/g, '->')
 }
 
 export function randBool() : boolean{
@@ -160,3 +184,47 @@ export function getOnOff(input: string): boolean | undefined {
     else
         return undefined;
 }
+
+export namespace BotUtils {
+    export function getGuilds(){
+        return gb.instance.bot.guilds;
+    }
+    export function getGuildCount(){
+        return BotUtils.getGuilds().size;
+    }
+
+}
+
+export namespace UserUtils {
+    export function lazyMatchesNickOrUsername(input: string, user: GuildMember){
+        const flexInput = input.toLowerCase();
+        return (user.nickname && user.nickname.toLowerCase().includes(flexInput)) || user.user.username.toLowerCase().includes(flexInput);
+    }
+    export function matchesNickOrUsername(input: string, user: GuildMember) {
+        const flexInput = input.toLowerCase();
+        return (user.nickname && user.nickname.toLowerCase() === flexInput) || user.user.username.toLowerCase() === flexInput;
+    }
+}
+
+export namespace InviteUtils {
+    export async function isGuildInvite(message: Message, link: string): Promise<boolean>{
+        return message.guild.fetchInvites().then((r: Collection<string, Invite>) => {
+            return Boolean(r.find(i => {
+                const url = i.url.split('/');
+                const inviteCode = url[url.length - 1];
+                return inviteCode === link;
+            }));
+        });
+    }
+}
+
+
+export function arrayFromValues(obj: {[id: string]: any}){
+    return Object.keys(obj).map(k => obj[k]);
+}
+
+export function safeGetArgs(input: any[] | undefined, defaultValue: any){
+    return Array.isArray(input) ? input.shift() : defaultValue;
+}
+
+export const emptySpace: string = '\u200b';

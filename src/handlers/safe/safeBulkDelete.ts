@@ -10,21 +10,23 @@ import {
 import moment = require("moment");
 import {debug} from "../../utility/Logging";
 
-export default function safeBulkDelete(channel: Channel, member: GuildMember){
+export default function safeBulkDelete(channel: Channel, member:  Message[] | Collection<string, Message>): Promise<number> {
     if (!(channel instanceof TextChannel)){
-        return;
+        return Promise.reject('Target channel is not a text channel');
     }
     const dateLimit: Date = moment(new Date()).subtract('14', 'd').toDate();
     return channel.fetchMessages({limit: getBulkDeleteCount()}).then((messages : Collection<Snowflake, Message>) => {
         const userMessages = messages.filter(
             // we want to avoid fetching messages that are created over 14 days ago
-            message => message.author.id === member.id && message.createdAt >  dateLimit
+            message => message.createdAt >  dateLimit
         );
-        return void channel.bulkDelete(userMessages);
+        return channel.bulkDelete(userMessages);
+    }).then(col => {
+      return col.size;
     }).catch((error: Error)=> {
         if (error instanceof DiscordAPIError){
-            debug.error(`A Discord error occurred while trying to bulk delete messages by ${member.user.username}\n` + error.stack, 'SafeBulkDelet');
+            debug.error(`A Discord error occurred while trying to bulk delete messages\n` + error.stack, 'SafeBulkDelet');
         }
-        Promise.reject(error);
+        return Promise.reject(error);
     });
 }

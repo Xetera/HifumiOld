@@ -1,0 +1,3 @@
+- added $daily and $balance
+- fixed a bug where channel type declarations would get ignored on @expects decorators
+- slightly more accurate fields for $anime (still shitty results overall though)

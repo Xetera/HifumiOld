@@ -25,7 +25,20 @@ import {
     saveMember, setIgnored
 } from "./queries/userQueries";
 import gb from "../misc/Globals";
-import {incrementCleverbotGuildCall, inserCleverbotGuild} from "./queries/cleverbotQueries";
+import {Environments} from "../events/systemStartup";
+import {debug} from "../utility/Logging";
+import {User} from "./models/user";
+import {Guild, LoggingChannelType} from "./models/guild";
+import {GuildMember, Message, Guild as DiscordGuild, GuildAuditLogsFetchOptions} from "discord.js";
+import {Macro} from "./models/macro";
+import {Note} from "./models/note";
+import 'reflect-metadata';
+import * as fs from 'fs'
+import {Infraction} from "./models/infraction";
+import moment = require("moment");
+import {MutedUser} from "./models/mutedUser";
+import {Suggestion} from "./models/suggestion";
+const rootConfig: IORMConfig = require('../../ormconfig.json');
 
 
 
@@ -53,14 +66,86 @@ function getDatabaseType(url : DatabaseConfig){
     return isDeployementLogin(url) ? 'heroku' : 'localhost';
 }
 
-export class Database {
-    // variable login based on environment
-    readonly initOptions = {
-        // global event notification;
-        error: ((error: any, e :any) => {
-            if (e.cn) {
-                debug.error('CN:\n'+ e.cn, "Database");
-                debug.error('EVENT:\n'+ error.message || error, "Database");
+                    synchronize: this.env === Environments.Development,
+                    dropSchema:  this.env === Environments.Development,
+
+                    // DUDE I'M 100% SERIOUSLY RN I'LL GET SUPER MAD OK
+                cli: {
+                    migrationsDir: 'migrations'
+                },
+                cache: {
+                    type: 'redis',
+                    duration: Infinity,
+                    options: {
+                        // setting via gb.ENV creates problems with docker
+                        url: process.env.REDISCLOUD_URL ? process.env.REDISCLOUD_URL  : 'redis://localhost:6379'
+                    }
+                }
+            }).catch(err => {
+                debug.error(err, `Database`);
+                return Promise.reject(err);
+            });
+
+        }).catch(err => {
+            debug.error(err, `Database`);
+            return Promise.reject(err);
+        });
+    }
+
+    /**
+     * Sets up the ormconfig.json file in the root folder.
+     * We need this hack because of migrations which can only be set up
+     * using these settings or environment variables which don't support URL types
+     * @param {string} url
+     * @returns {Promise<void>}
+     */
+    private ormConfig(url: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            rootConfig.url = url;
+            rootConfig.database = this.env === Environments.Development ? 'discord_test' : 'discord_production'
+            fs.writeFile('ormconfig.json', JSON.stringify(rootConfig, null, '\t'), (err) => {
+                if (err)
+                    return reject(err);
+                return resolve();
+            });
+        });
+    }
+
+    /**
+     * Syncs the database with currently
+     * @returns {Promise<void>}
+     */
+    public async sync(): Promise<void> {
+        debug.silly(`Crosschecking database`, `Database`);
+        const guilds = gb.instance.bot.guilds.array();
+        for (let i in guilds) {
+            const guild = guilds[i];
+            // setting each server
+            this.welcomeMessages[guilds[i].id] = [];
+
+            await this.addGuild(guild);
+
+            const g = await guild.fetchMembers();
+            await this.addMembers(g.members.array());
+        }
+        debug.silly(`Crosschecked db`,`Database`);
+        return Promise.resolve();
+    }
+
+    public invalidateCache(table: string): Promise<void>{
+        // always caching so we're force validating queryResultCache
+
+        return this.conn.queryResultCache!.remove([table]);
+    }
+
+    public getUsers(guildId: string): Promise<User[]> {
+        return this.conn.manager.find(User, {where: {guild_id: guildId}, cache: true});
+    }
+
+    public getUser(guildId: string, userId: string): Promise<User>  {
+        return this.conn.manager.find(User, {where: {guild_id: guildId, id: userId}, cache: true}).then((r: User[]) => {
+            if (r.length > 1) {
+                debug.error(`Multiple instances of user ${userId} exists in the db.`, `Database`);
             }
         })
     };
@@ -231,12 +316,76 @@ export class Database {
                 return this.db.one(insertMember, [id, username, guild_id]);
         });
 
-        // checking if we already cached a user
-        if (!guild.users.find(prop => prop.id === member.id)) {
-            guild.users.push({
-                id: id,
-                guild_id: guild_id,
-                ignoring: false
+    public isUserIgnored(member: GuildMember): Promise<boolean> {
+        return this.getUser(member.guild.id, member.id).then((r: User) => {
+            if (!r){
+                // sometimes users aren't saved
+                this.addMember(member);
+                return false;
+            }
+            return r.ignoring;
+        }).catch(err => {
+            debug.error(`User ${member.user.username} in guild ${member.guild.id} isn't saved in the Database`, `Database`);
+            return Promise.reject(err);
+        });
+    }
+
+    public getIgnoredUsers(guildId: string): Promise<User[]>{
+        return this.getUsers(guildId).then((r: User[]) => {
+            return r.filter(user => user.ignoring);
+        });
+    }
+    public setCommandHints(guildId: string, state: boolean): Promise<Partial<Guild>> {
+        return this.invalidateCache('guilds').then(() => {
+            return this.conn.manager.save(Guild, {id: guildId, hints: state});
+        });
+    }
+
+    public getCommandHints(guildId: string){
+        return this.getGuild(guildId).then((r: Guild) => {
+            return r.hints;
+        }).catch(err => {
+            return Promise.reject(err);
+        });
+    }
+
+    public getReactions(guildId: string){
+        return this.getGuild(guildId).then((r: Guild) => {
+            return r.reactions;
+        }).catch(err => {
+            return Promise.reject(err);
+        })
+    }
+
+    public incrementInviteStrike(member: GuildMember){
+        const memberIdentity = {
+            id: member.id,
+            guild_id: member.guild.id
+        };
+
+        return this.conn.manager.increment(User, memberIdentity, 'invite_strikes', 1)
+            .catch(err => Promise.reject(err))
+            .then(() => {
+                return this.conn.manager.findOne(User, memberIdentity)
+            }).then((r: User|undefined) => {
+                if (!r){
+                    return Promise.reject(`Invite strike of user with ID ${member.id} could not be incremented, user not found.`);
+                }
+                return Promise.resolve(r.invite_strikes);
+            }).catch(err =>  Promise.reject(err));
+    }
+
+    public getInviteStrikes(guildId: string, userId: string){
+        return this.getUser(guildId, userId).then((r: User) => {
+            return r.invite_strikes;
+        })
+    }
+
+    public setReactions(guildId: string, state: boolean){
+        return this.invalidateCache('guilds').then(() => {
+            return this.conn.manager.save(Guild, {
+                id: guildId,
+                reactions: state
             });
 
         }

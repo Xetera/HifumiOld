@@ -52,30 +52,30 @@ describe('Handling commands', () => {
         // we don't want to modify our code to take in a string as well as message so
         // it's a lot easier to just cast it to a message
         //const [command, args] = CommandHandler.parseInput(<Discord.Message> {content: "!command args args args"});
-        //expect(command).to.equal("command");
-        //expect(args.join(' ')).to.equal('args args args')
+        //expects(command).to.equal("command");
+        //expects(args.join(' ')).to.equal('args args args')
     });
 });
 
 describe('Alexa', function() {
     it('Error on setting clevertype emotion incorrectly', () => {
-        expect(() => instances.alexa.setEmotion(101)).to.throw(RangeError);
+        expects(() => instances.alexa.setEmotion(101)).to.throw(RangeError);
     });
     it('Error on setting clevertype regard incorrectly', () => {
-        expect(() => instances.alexa.setRegard(101)).to.throw(RangeError);
+        expects(() => instances.alexa.setRegard(101)).to.throw(RangeError);
     });
     it('Error on setting clevertype engagement incorrectly', () => {
-        expect(() => instances.alexa.setEngagement(101)).to.throw(RangeError);
+        expects(() => instances.alexa.setEngagement(101)).to.throw(RangeError);
     });
     this.timeout(20000);
     it('Getting cleverbot response', function(done : MochaDone) {
         instances.alexa.say('hello').then((reply: any)=> {
-            expect(reply).to.be.a('string');
+            expects(reply).to.be.a('string');
             done();
         })
     }).timeout(20000);
 
     it('Clevertype correctly recording calls', () => {
-        expect(instances.alexa.cleverbot.callAmount).to.equal(1);
+        expects(instances.alexa.cleverbot.callAmount).to.equal(1);
     });
 });

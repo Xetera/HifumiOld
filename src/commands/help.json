@@ -169,6 +169,321 @@
       "example": "invitefilter off",
       "arguments": "1",
       "permissions": "ADMIN"
+    },
+    {
+      "name": "settings hints",
+      "type": "Settings",
+      "info": "Determines whether I respond to invalid commands with a hint or not.",
+      "usage": "settings hints { 'on' | 'off' }",
+      "hidden": true,
+      "example": "settings hints on",
+      "arguments": "1",
+      "permissions": "ADMIN"
+    },
+    {
+      "name": "settings strikelimit",
+      "type": "Settings",
+      "info": "Sets the limit of maximum strikes a user can have before getting banned **{{prefix}}help strike** for more info on infractions.",
+      "usage": "settings strikelimit { number }",
+      "hidden": true,
+      "example": "settings strikelimit 8",
+      "arguments": "1",
+      "permissions": "ADMIN"
+    },
+    {
+      "name": "settings reactions",
+      "type": "Settings",
+      "info": "Toggles the reaction thumbnails I put on some of replies.",
+      "usage": "settings reactions { 'on' | 'off' }",
+      "hidden": true,
+      "example": "settings reactions on",
+      "arguments": "1",
+      "permissions": "ADMIN"
+    },
+
+    {
+      "name": "settings tracking",
+      "type": "Settings",
+      "info": "Toggles my tracking mode for new members. When enabled, people who have joined in the past 5 minutes will get banned after 2 server invites rather than waiting for the invite limit and get banned instead of getting muted once I detect them spamming.",
+      "usage": "settings tracking { 'on' | 'off' }",
+      "hidden": true,
+      "example": "settings tracking on",
+      "arguments": "1",
+      "permissions": "ADMIN"
+    },
+    {
+      "name": "settings invites",
+      "type": "Settings",
+      "info": "Changes my settings for removing invites.\n**on** - invites are allowed, I don't check messages for them\n**off** - All invites by non-mods get removed, logged and added to the user's history.",
+      "usage": "settings invites { 'on' | 'off' }",
+      "hidden": true,
+      "example": "settings invites on",
+      "arguments": "1",
+      "permissions": "ADMIN"
+    },
+    {
+      "name": "settings invitewarn",
+      "type": "Settings",
+      "info": "Number of discord invites required to DM a user about getting banned for advertising.",
+      "usage": "settings invitewarn { number }",
+      "hidden": true,
+      "example": "settings invitewarn 1",
+      "arguments": "1",
+      "permissions": "ADMIN"
+    },
+    {
+      "name": "settings inviteban",
+      "type": "Settings",
+      "info": "Number of discord invites required to ban a user for advertising.",
+      "usage": "settings inviteban { number }",
+      "hidden": true,
+      "example": "settings inviteban 3",
+      "arguments": "1",
+      "permissions": "ADMIN"
+    },
+    {
+      "name": "note",
+      "type": "Moderation",
+      "info": "Adds a note to a user. All user information including notes can be looked up by mods.",
+      "usage": "note { @Member | userID } { message }",
+      "example": "note @Xetera keeps sending pepe memes, ban them next time.",
+      "arguments": "2",
+      "permissions": "MOD"
+    },
+    {
+      "name": "deletenote",
+      "type": "Moderation",
+      "info": "Deletes a user note by ID.",
+      "usage": "deletenote { note ID }",
+      "example": "deletenote 420",
+      "arguments": "1",
+      "permissions": "MOD"
+    },
+    {
+      "name": "history",
+      "type": "Moderation",
+      "info": "Fetches the history of a user including things like infractions, notes, join date and watchlist status.",
+      "usage": "history { name | nick | ID | @Mention }",
+      "example": "history Xetera",
+      "arguments": "1",
+      "permissions": "MOD"
+    },
+    {
+      "name": "addmacro",
+      "type": "Utility",
+      "info": "Adds a new macro. Macros are special commands that you can add to make me respond with a specific message or picture URL.",
+      "usage": "addmacro { macro name } { message }",
+      "example": "addmacro rolepls Be patient, you'll have to be active first to get a role",
+      "arguments": "2",
+      "permissions": "MOD"
+    },
+    {
+      "name": "macros",
+      "type": "Utility",
+      "info": "Lists all the macros I have saved on this server.",
+      "usage": "macros",
+      "example": "macros",
+      "arguments": "0"
+    },
+    {
+      "name": "deletemacro",
+      "type": "Utility",
+      "info": "Deletes a saved macro from the server.",
+      "usage": "deletemacro { macro name }",
+      "example": "deletemacro",
+      "arguments": "1",
+      "permissions": "MOD"
+    },
+    {
+      "name": "randomquote",
+      "type": "Fun",
+      "info": "Sends a random quote by someone.",
+      "usage": "randomquote",
+      "example": "randomquote",
+      "arguments": "0"
+    },
+    {
+      "name": "reactions",
+      "type": "Settings",
+      "info": "Toggles the gif/image reactions I add to some of my replies",
+      "usage": "reactions { 'on' | 'off' }",
+      "example": "reactions off",
+      "arguments": "1",
+      "permissions": "ADMIN"
+    },
+    {
+      "name": "warn",
+      "type": "Moderation",
+      "info": "Sends a warning to a member in DMs, alias for a 0 weight strike.",
+      "usage": "warn { member } { reason }",
+      "example": "warn @Xetera Posting nsfw pics is not allowed.",
+      "arguments": "2",
+      "permissions": "MOD"
+    },
+    {
+      "name": "strike",
+      "type": "Moderation",
+      "info": "Infracts a user with a variable weight, this sends them a DM and adds the infraction to their record. The user is banned if the total of their non-expired strikes go over the strike limit of the server.",
+      "usage": "strike { member } { weight } { reason }",
+      "example": "strike Xetera 2 This is your last warning before getting banned.",
+      "arguments": "3",
+      "permissions": "MOD"
+    },
+    {
+      "name": "snipe",
+      "type": "Moderation",
+      "info": "Removes all messages by the user in the current channel going back X messages",
+      "usage": "snipe { member } { message search amount? (50)}",
+      "example": "snipe Xetera 50",
+      "arguments": "1-2",
+      "permissions": "MOD"
+    },
+    {
+      "name": "setgreeting",
+      "type": "Settings",
+      "info": "Changes my random greeting message to a custom one.\n__Placeholders__ (these get replaced in the message when users join):\n\n**{greeting}** - random old greeting message\n**{mention}** - mentions the user\n**{username}** - user's username\n**{id}** - user id\n**{discrim}** - the users discriminator\n**{status}** - the status of the user (online/offline)\n __Fields__\n**%title%** - changes the title\n**%description%** - changes the description\n**%footer%** - changes the footer.",
+      "usage": "setgreeting { message }",
+      "example": "setgreeting\n%title% Hey {mention}, welcome to the team!\n%description% Check out #rules first {mention}!\n%footer% Your ID: {id}",
+      "arguments": "1",
+      "permissions": "ADMIN"
+    },
+    {
+      "name": "embed",
+      "type": "Embeds",
+      "info": "Creates a new embed using a template, possible fields include\n**%title%**\n**%description%**\n**%field1(2, 3, 4 etc)%**\n**%value1(2, 3, 4 etc)%**\n**%thumbnail%**\n**%image%**\n**%footer%**\n**%color%** (name or hex).",
+      "usage": "embed { template }",
+      "example": "embed\n%title% Rules\n%description% Here are the rules!\n%field1% No spamming\n%value1% Thanks\n%color% red\n%footer% boi",
+      "arguments": "1"
+    },
+    {
+      "name": "sendembed",
+      "type": "Embeds",
+      "info": "Sends an embed you've previously created",
+      "usage": "sendembed",
+      "example": "sendembed",
+      "arguments": "0"
+    },
+    {
+      "name": "editembed",
+      "type": "Embeds",
+      "info": "Edits an embed you've previously created. This just modifies the existing instead of creating a new one.",
+      "usage": "editembed",
+      "example": "editembed",
+      "arguments": "0"
+    },
+    {
+      "name": "ihateyou",
+      "type": "Info",
+      "info": "Breaks my heart.",
+      "usage": "ihateyou",
+      "example": "ihateyou",
+      "arguments": "0"
+    },
+    {
+      "name": "doggo",
+      "type": "Fun",
+      "info": "Sends a random pupperino.",
+      "usage": "doggo",
+      "example": "doggo",
+      "arguments": "0"
+    },
+    {
+      "name": "suggest",
+      "type": "Suggestions",
+      "info": "Make a suggestion to the server, this gets sent to the moderators first to be reviewed before getting posted publicly.",
+      "usage": "suggest { message }",
+      "example": "suggest add a #cute-animals channel",
+      "arguments": "1"
+    },
+    {
+      "name": "suggestions",
+      "type": "Suggestions",
+      "info": "Searches through the queue of unread suggestions, approved suggestions get posted to a public channel to be voted on by everyone.\n\n__Reactions__\n**Prev** goes to the previous suggestion\n**Next** Goes to the next suggestion\n**Approve** Approves the suggestion and posts it publicly\n**Deny** Discards the suggestion\n**Quit** Quits the menu",
+      "usage": "suggestions",
+      "example": "suggestions",
+      "arguments": "0",
+      "permissions": "MOD"
+    },
+    {
+      "name": "accept",
+      "type": "Suggestions",
+      "info": "Accepts a public suggestion, changing its status in the suggestions channel. The member that made the suggestion also gets notified with a DM",
+      "usage": "accept { suggestion ID } { reason }",
+      "example": "accept 88 fixed typo in the rules",
+      "arguments": "2",
+      "permissions": "MOD"
+    },
+    {
+      "name": "reject",
+      "type": "Suggestions",
+      "info": "Rejects a public suggestion, changing its status in the suggestions channel. The member that made the suggestion also gets notified with a DM",
+      "usage": "reject { suggestion ID } { reason }",
+      "example": "reject 44 we're never adding a nsfw channel",
+      "arguments": "2",
+      "Permissions": "MOD"
+    },
+    {
+      "name": "ignoredusers",
+      "type": "Info",
+      "info": "Gets a list of everyone I'm ignoring.",
+      "usage": "ignoredusers",
+      "example": "ignoredusers",
+      "arguments": "0",
+      "permissions": "MOD"
+    },
+    {
+      "name": "invite",
+      "type": "Info",
+      "info": "Sends a link to invite me to your server and to join my support server.",
+      "usage": "invite",
+      "example": "invite",
+      "arguments": "0"
+    },
+    {
+      "name": "log",
+      "type": "Settings",
+      "info": "Changes the channels where I keep my logs at or turns them off completely.\n\n__Categories__\n**everything** - changes all logging settings\n**warnings** - sets all warning channels\n**logs** - sets all non-warning, log channels\n**channels** - channel creation and deletion\n**joins** - when members join the server\n**leaves** - when members leave the server\n**mutes** - on assigning the muted role to someone\n**invites** - on deleting invites to other servers\n**bans** - when someone is banned or unbanned (pulls the ban reason from audit logs)\n**unbans** - when a user is unbanned\n**suggestions** - when someone submits a new suggestion via **{{prefix}}suggest**\n**pings** - when someone mentions `@`everyone or `@`here\n**commands** - when someone uses a stealth command",
+      "usage": "log { category } { #Channel | 'off' }",
+      "example": "log bans #bot-warnings",
+      "arguments": "2",
+      "permissions": "MOD"
+    },
+    {
+      "name": "anime",
+      "type": "Fun",
+      "info": "Sends a bunch of info about an anime",
+      "usage": "anime { anime name }",
+      "example": "anime New Game!",
+      "arguments": "1"
+    },
+    {
+      "name": "setsuggestions",
+      "type": "Settings",
+      "info": "Changes the channel for suggestions"
+    },
+    {
+      "name": "daily",
+      "type": "Economy",
+      "info": "Checks to see if it's time to be paid by the Bank of Hifumi.",
+      "usage": "daily",
+      "example": "daily",
+      "arguments": "0"
+    },
+    {
+      "name": "balance",
+      "type": "Economy",
+      "info": "Peek at your own or someone else's balance.",
+      "usage": "balance { user }",
+      "example": "balance Xetera",
+      "arguments": "0-1"
+    },
+    {
+      "name": "test",
+      "type": "Economy",
+      "info": "Peek at your own or someone else's balance.",
+      "usage": "balance { user }",
+      "example": "balance Xetera",
+      "arguments": "0-1"
     }
   ]
 }

@@ -1,1 +1,0 @@
-set DEBUG=Bot:* & npm start node src/index.js

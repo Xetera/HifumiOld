@@ -1,0 +1,25 @@
+{
+	"type": "postgres",
+	"url": "postgres://localhost/discord",
+	"synchronize": true,
+	"logging": true,
+	"dropSchema": true,
+	"entities": [
+		"src/database/models/**/*.js"
+	],
+	"migrations": [
+		"src/database/migrations/**/*.js"
+	],
+	"subscribers": [
+		"src/database/subscribers/**/*.js"
+	],
+	"cli": {
+		"entitiesDir": "src/database/models",
+		"migrationsDir": "src/database/migrations",
+		"subscribersDir": "src/database/subscribers"
+	},
+	"cache": {
+		"duration": "0"
+	},
+	"database": "discord_test"
+}

@@ -88,7 +88,7 @@ export class MessageQueue {
         // breaking down all the unique channels
         const channels : Set<Discord.Channel> = new Set(messages.map(message => message.channel));
 
-        channels.forEach(function(channel : Channel){
+        channels.forEach((channel : Channel) => {
             safeBulkDelete(channel, member);
         });
     }
