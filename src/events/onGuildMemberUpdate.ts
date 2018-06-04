@@ -6,6 +6,7 @@ import gb from "../misc/Globals";
  *
  */
 export default async function onGuildMemberUpdate(oldMember : GuildMember, newMember : GuildMember){
+    /*
     if (!newMember.guild.available || !await gb.instance.database.getGuildEnabled(oldMember.guild.id)){
         return;
     }
@@ -21,5 +22,5 @@ export default async function onGuildMemberUpdate(oldMember : GuildMember, newMe
     // here we know that the user was prematurely muted
     if (!member)
         return;
-
+    */
 }

@@ -3,6 +3,8 @@ import {Collection, GuildMember, Message} from "discord.js";
 import {randomRuntimeError} from "../../interfaces/Replies";
 import {debug} from '../../utility/Logging'
 import {safeGetArgs} from "../../utility/Util";
+import safeSendMessage from "../../handlers/safe/SafeSendMessage";
+import moment = require("moment");
 /*
 * Removes a user's past messages in a certain channel
 * */
@@ -12,16 +14,19 @@ export default async function snipe(message: Message, input: [GuildMember, (numb
     const channel = message.channel;
     if (channel instanceof Discord.TextChannel){
         channel.fetchMessages({limit: limit}).then((messages: Collection<Discord.Snowflake, Message>) => {
+            console.log(messages.map(m => m.content));
             const userMessages = messages.filter((value) => {
-                return value.author.id === target.id;
+                return value.author.id === target.id && value.deletable
+                    && moment(value.createdAt).add(14, 'd').diff(new Date()) > 0;
             });
+            console.log(userMessages.map(m => m.content));
             return channel.bulkDelete(userMessages);
-        }).then((r: Collection<string, Message>) => {
+        }).then(async(r: Collection<string, Message>) => {
             debug.info(
                 `Deleted ${r.size} messages from ${target.user.username} ` +
                 `in [${target.guild.name}:${channel.name}].`
             );
-            message.channel.send(`Deleted ${r.size} messages from ${target.user.username}`)
+            safeSendMessage( message.channel, `Deleted ${r.size} messages from ${target.user.username}`, 15);
         }).catch(err => {
             debug.error("Error sniping messages:\n", err);
             channel.send(randomRuntimeError());

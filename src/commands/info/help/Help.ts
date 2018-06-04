@@ -13,7 +13,6 @@ const help = require('../../help.json');
 
 export async function getHelp(message : Message, input: [string] | undefined) {
     const choice = Array.isArray(input) ? input.join(' ') : undefined;
-    console.log(choice);
     const prefix: string = await gb.instance.database.getPrefix(message.guild.id);
     if (!choice){
         const prefix : string = await gb.instance.database.getPrefix(message.guild.id);

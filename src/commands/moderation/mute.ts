@@ -36,6 +36,9 @@ export default async function muteUser(message: Message, input: [GuildMember, nu
             message.channel, `I currently can't mute people for longer than 1 day.`
         );
     }
+    else if (!message.guild.roles.find('name', 'muted')){
+        return handleFailedCommand(message.channel, `There's no mute role in the server called 'muted'`);
+    }
 
     // message.channel.send returns (Message|Message[]), typeguards guarantee Message here
     const placeholder = <Message> await message.channel.send(`Working on it...`);

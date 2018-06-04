@@ -51,7 +51,7 @@ import argParse from "../../parsers/argParse";
 import {setName} from "../../commands/self/ChangeName";
 import setPfp from "../../commands/self/ChangePicture";
 import reactions from "../../commands/config/reactions";
-import ignoredUsers from "../../commands/moderation/ignoredUsers";
+import ignored from "../../commands/moderation/ignoredUsers";
 import warn from "../../commands/moderation/warn";
 import {LogManager} from "../logging/logManager";
 import deleteStrike from "../../commands/moderation/deleteStrike";
@@ -371,7 +371,7 @@ export default class CommandHandler implements indexSignature {
     /* Mod Commands */
 
     @mod
-    @expects(ArgType.Member)
+    @expects([ArgType.Member, ArgType.Channel])
     private ignore(params : CommandParameters){
         ignore(params.message, <[GuildMember]> params.input);
     }
@@ -471,8 +471,8 @@ export default class CommandHandler implements indexSignature {
 
     @mod
     @expects(ArgType.None)
-    private ignoredUsers(params: CommandParameters){
-        ignoredUsers(params.message);
+    private ignored(params: CommandParameters){
+        ignored(params.message);
     }
 
     @mod
@@ -532,9 +532,9 @@ export default class CommandHandler implements indexSignature {
         uptime(params.message);
     }
 
-    @expects(ArgType.String, {optional: true})
+    @expects(ArgType.None)
     private source(params: CommandParameters){
-        source(params.message, <[string] | undefined> params.input);
+        source(params.message);
     }
 
     @throttle(3)

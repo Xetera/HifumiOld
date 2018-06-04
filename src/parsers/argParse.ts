@@ -117,8 +117,6 @@ export default async function argParse(params: CommandParameters){
             switch(decorator.type){
                 case ArgType.Member:
                     const strict = options ? options.strict : false;
-                    console.log("options");
-                    console.log(options);
                     const member = await _resolveMember(params, input, true, strict);
                     if (!member)
                     // responses for resolveMember are already handled

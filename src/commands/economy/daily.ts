@@ -14,9 +14,17 @@ export default async function daily(message: Message){
         if (ready === 'fresh'){
             dailyAmount = 10 * dailyAmount;
         }
-        const streak = await database.getStreak(message.guild.id, message.author.id);
-        const updateAmount = EconomyHandler.calculateStreak(streak + 1, dailyAmount);
-        const updateResult = await database.triggerDaily(message.guild.id, message.author.id, updateAmount, streak + 1);
+        const isOnStreak = await database.isOnStreak(message.guild.id, message.member.id);
+        let streak;
+        if (!isOnStreak){
+            await database.resetStreak(message.guild.id, message.member.id);
+            streak = 1;
+        }
+        else {
+            streak = await database.getStreak(message.guild.id, message.author.id);
+        }
+        const updateAmount = EconomyHandler.calculateStreak(streak + 1 , dailyAmount);
+        const updateResult = await database.triggerDaily(message.guild.id, message.author.id, updateAmount,  streak + 1);
         const newCopper = updateResult.raw[0].copper;
         const formatted: ICurrency = EconomyHandler.formatMoney(newCopper, false);
         safeSendMessage(message.channel, dailyEmbed(message.guild, updateAmount, formatted, streak + 1, ready === 'fresh'));

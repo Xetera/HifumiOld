@@ -47,9 +47,9 @@ function middleWare(msg: Discord.Message, ignored: boolean){
 
 export default async function onMessage(message: Discord.Message){
     // we don't want to look at bot messages at all
-    console.log(message.content);
-    console.log(message.cleanContent);
-    if (message.author.bot || !message.guild.available){
+    if (message.author.bot
+        || !message.guild.available
+        || (message.guild && await gb.instance.database.getChannelIgnored(message.guild.id, message.channel.id))){
         return;
     }
     else if (!gb.instance || !gb.instance.database.ready) {

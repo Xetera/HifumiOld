@@ -38,6 +38,8 @@ export async function channelResolver(arg: string, message: Message, options: {c
             message.channel, `This command requires a channel mention.`
         )
     }
+
+    // probably not a channel name if there is a member mentioned
     else if (options.onlyMention){
         return;
     }

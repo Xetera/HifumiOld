@@ -1,29 +1,38 @@
 import * as Discord from "discord.js";
 import {GuildMember} from "discord.js";
-import {capitalize, random} from "../../utility/Util";
+import {capitalize, random, StringUtils} from "../../utility/Util";
 import {welcomeMessages} from "../../interfaces/Replies";
 import parseEmbedPlaceholders from "../../parsers/parseEmbedPlaceholders";
-export default function guildMemberAddEmbed(member: GuildMember, message?: string, title?: string, footer?: string){
-    if (message){
+import isUrl = StringUtils.isUrl;
+
+export default function guildMemberAddEmbed(member: GuildMember, message?: string, title?: string, footer?: string, color?: string, thumbnail?: string) {
+    const embed = new Discord.RichEmbed().setTimestamp();
+
+    if (message) {
         message = parseEmbedPlaceholders(member, message);
-    } else {
-        message = random(welcomeMessages(member));
+        embed.setDescription(message)
     }
 
-    const embed = new Discord.RichEmbed()
-        .setThumbnail(member.user.displayAvatarURL)
-        .setTitle(`${member.user.username} has joined ${member.guild.name}!`)
-        .setDescription(message)
-        .setColor("GREEN")
-        .setTimestamp();
-
-    if (title){
+    if (title) {
         title = parseEmbedPlaceholders(member, title);
         embed.setTitle(title);
     }
-    if (footer){
+
+    if (!thumbnail) {
+        embed.setThumbnail(member.user.avatarURL);
+    }
+    else if (thumbnail && isUrl(thumbnail)) {
+        embed.setThumbnail(thumbnail)
+    }
+
+    if (footer) {
         footer = parseEmbedPlaceholders(member, footer);
         embed.setFooter(footer);
+    }
+
+    if (color) {
+        color.replace('#', '');
+        embed.setColor(color.toUpperCase());
     }
     return embed;
 }

@@ -3,6 +3,8 @@ import {randomRuntimeError} from "../../interfaces/Replies";
 import {Database} from "../../database/Database";
 import gb from "../../misc/Globals";
 import {safeGetArgs} from "../../utility/Util";
+import moment = require("moment");
+import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 
 export default async function cleanse(channel : Channel, input: [number] | undefined ) {
     const limit = safeGetArgs(input, 50);
@@ -14,10 +16,15 @@ export default async function cleanse(channel : Channel, input: [number] | undef
         const messages : Collection<Snowflake, Message> = await channel.fetchMessages({limit: limit});
 
         const botMessages = messages.filter(function(message){
-            return message.author.bot || message.content.startsWith(prefix);
+            return (message.author.bot || message.content.startsWith(prefix)) &&
+            message.deletable && moment(message.createdAt).add(14, 'd').diff(new Date()) > 0;
         });
 
-        channel.bulkDelete(botMessages).catch(err => {
+        channel.bulkDelete(botMessages)
+            .then((res: Collection<string, Message>) => {
+                safeSendMessage(channel, `Deleted ${res.size - 1} bot related messages.`, 15);
+            })
+            .catch(err => {
             channel.send(randomRuntimeError());
             console.log("Error bulk deleting:\n", err);
         });

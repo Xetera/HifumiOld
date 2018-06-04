@@ -17,7 +17,6 @@ export async function resolveMember(arg: string, message: Message, options: {fai
     if (options.strict === undefined)
         options.strict = true;
 
-    console.log(options.strict)
 
     const numberArg: number = Number(arg);
     const userId = Number.isInteger(numberArg);
@@ -31,6 +30,10 @@ export async function resolveMember(arg: string, message: Message, options: {fai
     }
     else if (message.mentions.members.array().length){
         return message.mentions.members.first();
+    }
+
+    if (message.mentions.channels.size){
+        return;
     }
 
     const resolvedNick: GuildMember[] = message.guild.members.array().reduce((arr: GuildMember[], m: GuildMember) => {

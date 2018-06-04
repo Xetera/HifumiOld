@@ -131,8 +131,8 @@
     {
       "name": "ignore",
       "type": "Moderation",
-      "info": "Ignores or un-ignores all conversation and commands from a user.",
-      "usage": "ignore { member }",
+      "info": "Ignores or un-ignores all conversation and commands from a user or a channel.",
+      "usage": "ignore { member | #Channel }",
       "example": "ignore Xetera",
       "arguments": "1",
       "permissions": "MOD"
@@ -181,9 +181,9 @@
       "name": "source",
       "type": "Info",
       "info": "Sends my source code on github.",
-      "usage": "source { command name? }",
-      "example": "source setprefix",
-      "arguments": "0-1"
+      "usage": "source",
+      "example": "source",
+      "arguments": "0"
     },
     {
       "name": "mute",
@@ -475,11 +475,11 @@
       "Permissions": "MOD"
     },
     {
-      "name": "ignoredusers",
+      "name": "ignored",
       "type": "Info",
-      "info": "Gets a list of everyone I'm ignoring.",
-      "usage": "ignoredusers",
-      "example": "ignoredusers",
+      "info": "Gets a list of all the people and the channels I'm ignoring.",
+      "usage": "ignored",
+      "example": "ignored",
       "arguments": "0",
       "permissions": "MOD"
     },
@@ -523,14 +523,6 @@
     },
     {
       "name": "balance",
-      "type": "Economy",
-      "info": "Peek at your own or someone else's balance.",
-      "usage": "balance { user }",
-      "example": "balance Xetera",
-      "arguments": "0-1"
-    },
-    {
-      "name": "test",
       "type": "Economy",
       "info": "Peek at your own or someone else's balance.",
       "usage": "balance { user }",

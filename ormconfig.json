@@ -1,6 +1,6 @@
 {
 	"type": "postgres",
-	"url": "postgres:///discord_test",
+	"url": "postgresql:///discord_test",
 	"synchronize": true,
 	"logging": true,
 	"dropSchema": true,

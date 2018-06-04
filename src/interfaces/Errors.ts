@@ -12,7 +12,8 @@ export const APIErrors = {
     "MISSING_PERMISSIONS": "Missing Permissions",
     "CANNOT_MESSAGE_USER": "Cannot Message User",
     "CANNOT_SEND_EMPTY_MESSAGE": "Cannot send an empty message",
-    "MESSAGE_TOO_LONG": "Invalid Form Body\ncontent: Must be 2000 or fewer in length."
+    "MESSAGE_TOO_LONG": "Invalid Form Body\ncontent: Must be 2000 or fewer in length.",
+    "INVALID_THUMBNAIL": "Invalid Form Body\nembed.thumbnail.url: Not a well formed URL."
 };
 
 export const PSQLErrors = {

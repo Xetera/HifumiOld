@@ -1,0 +1,7 @@
+- $setgreeting is now more customizable, much like an embed
+- $ignore now takes in a channel as well as a user
+- fixed streaks
+- $nuke properly deletes itself
+- sending valid color hex in form of #ffffff or 0xffffff replies automatically with the color name
+- $source no longer takes in an optional command
+- $nuke, $cleanse and $snipe no longer try deleting messages older than 14 days

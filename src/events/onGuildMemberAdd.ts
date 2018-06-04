@@ -24,12 +24,13 @@ export default async function onGuildMemberAdd(member : Discord.GuildMember): Pr
     const database = gb.instance.database;
     await database.addMember(member);
     await gb.instance.trackList.add(member);
+
     // we will change this later to fetch from a Database instead of using a preset name
     const [welcomeChannelId, customMessage] = await Promise.all([
         database.getWelcomeChannel(member.guild.id),
         database.getWelcomeMessage(member.guild.id)
     ]);
-
+    
     if (welcomeChannelId) {
         const welcomeChannel: Channel | undefined = member.guild.channels.get(welcomeChannelId);
         if (!welcomeChannel) {
@@ -47,22 +48,33 @@ export default async function onGuildMemberAdd(member : Discord.GuildMember): Pr
 function sendEmbed(channel: TextChannel, member: GuildMember, welcomeMessage?: string){
     let defaultChannelEmbed;
     if (welcomeMessage){
-        const fields: TemplatedMessage | string = templateParser(['title', 'description', 'footer'], welcomeMessage);
+        const fields: TemplatedMessage | string = templateParser(
+            ['title', 'description', 'footer', 'thumbnail', 'color'], welcomeMessage);
 
         let description;
         let title;
         let footer;
+        let thumbnail;
+        let color;
         if (typeof fields !== 'string'){
             if (fields._default || fields['description']){
                 description = fields._default.concat(fields['description']);
             }
             title = fields['title'];
             footer = fields['footer'];
-            defaultChannelEmbed = guildMemberAddEmbed(member, description, title, footer);
+            thumbnail = fields['thumbnail'];
+            color = fields['color'];
+            defaultChannelEmbed = guildMemberAddEmbed(member, description, title, footer, color, thumbnail);
         }
     }
     else {
-        defaultChannelEmbed = guildMemberAddEmbed(member);
+        defaultChannelEmbed = guildMemberAddEmbed(member,
+            random(welcomeMessages(member)),
+            `${member.user.username} has joined ${member.guild.name}!`,
+            undefined,
+            'GREEN',
+            member.user.avatarURL
+        );
     }
 
     channel.send(defaultChannelEmbed).then((welcomeMessage: Message | Message[])=> {
