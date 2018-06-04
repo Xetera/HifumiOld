@@ -5,7 +5,7 @@ import {debug} from '../../utility/Logging'
 import safeDeleteMessage from "./SafeDeleteMessage";
 
 export default function safeSendMessage
-(channel : Discord.Channel, message: string | number  | RichEmbed | MessageOptions, deleteAfter?: number): Promise<Message|Message[]|void> {
+(channel : Discord.Channel, message: string | number  | RichEmbed | MessageOptions, deleteAfter?: number){
     let out : string|RichEmbed|MessageOptions;
     if (typeof message === 'number'){
         out = message.toString().trim();
@@ -24,10 +24,10 @@ export default function safeSendMessage
         return channel.send(out).then((message: Message | Message[]) => {
             if (message instanceof Message && deleteAfter){
                 safeDeleteMessage(message,deleteAfter * 1000);
-                return Promise.resolve(message);
+                return message
             }
-            return Promise.resolve(message);
-        }).catch((err: any )=> {
+            return message;
+        }).catch((err: any)=> {
             if (err instanceof DiscordAPIError){
                 if (err.message === APIErrors.MISSING_PERMISSIONS){
                     debug.error(`Could not send message to ${channel.name} in ${channel.guild.name}, missing permissions`
@@ -43,7 +43,10 @@ export default function safeSendMessage
                 else if (err.message === APIErrors.CANNOT_SEND_EMPTY_MESSAGE){
                     debug.error(`Tried to send an empty message to ${channel.name}\n` + err.stack, 'safeSendMessage');
                 }
-
+                else if (err.message === APIErrors.INVALID_THUMBNAIL){
+                    debug.error('Invalid thumbnail for embed', 'safeSendMessage');
+                    //return Promise.reject(APIErrors.INVALID_THUMBNAIL)
+                }
                 debug.error(`Unexpected Discord API error while sending message to channel ${channel.name}\n` + err.stack,
                     'safeSendMessage');
             }

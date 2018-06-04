@@ -16,14 +16,13 @@ import {Guild, LoggingChannelType} from "./models/guild";
 import {GuildMember, Message, Guild as DiscordGuild, GuildAuditLogsFetchOptions} from "discord.js";
 import {Macro} from "./models/macro";
 import {Note} from "./models/note";
-import {arrayFromValues} from "../utility/Util";
 import 'reflect-metadata';
 import * as fs from 'fs'
 import {Infraction} from "./models/infraction";
 import moment = require("moment");
-import {MutedUserSubscriber} from "./subscribers/mutedUser.subscriber";
 import {MutedUser} from "./models/mutedUser";
 import {Suggestion} from "./models/suggestion";
+import {IgnoredChannel} from "./models/ignoredChannel";
 const rootConfig: IORMConfig = require('../../ormconfig.json');
 
 interface IWelcomeMessage {
@@ -111,9 +110,10 @@ export class Database {
     private ormConfig(url: string): Promise<void> {
         return new Promise((resolve, reject) => {
             rootConfig.url = url;
+            rootConfig.database = this.env === Environments.Development ? 'discord_test' : 'discord';
             fs.writeFile('ormconfig.json', JSON.stringify(rootConfig, null, '\t'), (err) => {
                 if (err)
-                    return reject();
+                    return reject(err);
                 return resolve();
             });
         });
@@ -200,6 +200,7 @@ export class Database {
     }
 
     public setPrefix(guildId: string, prefix: string) {
+        debug.silly('Setting prefix');
         if (prefix.length > 1) {
             return Promise.reject(`Prefix for ${guildId} must be a single character`);
         }
@@ -896,6 +897,56 @@ export class Database {
             return true;
         }
         return moment(lastUsed).add(23, 'h').diff(new Date())
+    }
+
+    public async isOnStreak(guildId: string, userId: string){
+        const d = await this.getUser(guildId, userId);
+        const lastUsed = d.last_daily;
+        if (!lastUsed)
+            return 'fresh';
+        const limit = moment(lastUsed).add(48, 'h').toDate();
+        return new Date() > limit;
+    }
+
+    public async resetStreak(guildId: string, userId: string){
+        await this.conn.manager.createQueryBuilder()
+            .update(User)
+            .set({streak: 0})
+            .where(`id = :id AND guild_id = :guild_id`, {id: userId, guild_id: guildId})
+            .execute();
+    }
+
+    public async getChannelIgnored(guildId: string, channelId: string){
+        return this.conn.manager.findOne(IgnoredChannel, {where: {guild_id: guildId, channel_id: channelId}, cache: true});
+    }
+
+    public async getIgnoredChannels(guildId: string){
+        return this.conn.manager.find(IgnoredChannel, {where: {guild_id: guildId}, cache: true});
+    }
+
+    public async setChannelIgnored(guildId: string, channelId: string, ignorer: string, status: boolean){
+        return this.invalidateCache('ignored_channels').then(() => {
+            if (status){
+                return this.conn.createQueryBuilder()
+                    .insert()
+                    .into(IgnoredChannel)
+                    .values({
+                        channel_id: channelId,
+                        guild_id: guildId,
+                        ignore_date: new Date(),
+                        ignored_by: ignorer
+                    })
+                    .onConflict(`("channel_id", "guild_id") DO NOTHING`)
+                    .execute();
+
+            }
+            return this.conn.createQueryBuilder()
+                .delete()
+                .from(IgnoredChannel)
+                .where("channel_id = :channel_id AND guild_id = :guild_id",
+                    {channel_id: channelId, guild_id: guildId})
+                .execute();
+        });
     }
 }
 

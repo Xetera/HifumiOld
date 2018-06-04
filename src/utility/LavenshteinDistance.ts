@@ -3,8 +3,7 @@ import {Command, Help} from "../commands/info/help/help.interface";
 const help: Help = require('../commands/help.json');
 
 // No idea how this works, copy pasted from somewhere, god bless
-function getEditDistance(a: string, b: string): number
-{
+function getEditDistance(a: string, b: string): number {
     const an = a ? a.length : 0;
     const bn = b ? b.length : 0;
     if (an === 0)

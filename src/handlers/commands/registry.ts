@@ -1,4 +1,4 @@
-import {ArgOptions, ArgType} from "../../decorators/expect";
+import {ArgOptions, ArgType} from "../../decorators/expects";
 import {Channel, TextChannel, VoiceChannel} from "discord.js";
 import * as Discord from 'discord.js'
 

@@ -41,7 +41,7 @@ export default function systemsEval(params: CommandParameters, input: [string]){
     response = response ? response.toString() : 'undefined';
     response = isCodeBlock ? codeBlock(response) : response;
     if (!isDMResponse)
-        safeSendMessage(message.channel, response).catch(err => {
+        safeSendMessage(message.channel, response).catch((err: any) => {
             if (!(err instanceof DiscordAPIError)){
                 return void safeSendMessage(message.channel, err);
             }

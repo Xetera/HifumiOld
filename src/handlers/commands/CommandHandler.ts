@@ -25,7 +25,7 @@ import setLogsChannel from "../../commands/config/setLogsChannel";
 import ignore from "../../commands/self/Ignore";
 import botInfo from "../../commands/info/botInfo";
 import {debug} from "../../utility/Logging";
-import {Channel, GuildMember, Message, TextChannel} from "discord.js";
+import {Channel, GuildMember, Message, Permissions, TextChannel} from "discord.js";
 import createMuteRole from "../../commands/config/createMuteRole";
 import muteUser from "../../commands/moderation/mute";
 import commandNotFoundEmbed from "../../embeds/commands/commandNotFoundEmbed";
@@ -43,6 +43,41 @@ import randomQuote from "../../commands/fun/randomQuote";
 import setChatChannel from "../../commands/config/setChatChannel";
 import {Macro} from "../../database/models/macro";
 import strike from "../../commands/moderation/strike";
+import {throttle} from '../../decorators/throttleCommand'
+import snipe from "../../commands/moderation/Snipe";
+import {ArgOptions, ArgType, expects} from "../../decorators/expects";
+import { REGISTRY} from "./registry";
+import argParse from "../../parsers/argParse";
+import {setName} from "../../commands/self/ChangeName";
+import setPfp from "../../commands/self/ChangePicture";
+import reactions from "../../commands/config/reactions";
+import ignored from "../../commands/moderation/ignoredUsers";
+import warn from "../../commands/moderation/warn";
+import {LogManager} from "../logging/logManager";
+import deleteStrike from "../../commands/moderation/deleteStrike";
+import setGreeting from "../../commands/config/setGreeting";
+import safeDeleteMessage from "../safe/SafeDeleteMessage";
+import listGuilds from "../../commands/debug/listGuilds";
+import EmbedBuilder from "../internal/embedBuilder";
+import iHateYou from "../../commands/info/iHateYou";
+import doggo from "../../commands/fun/doggo";
+import suggest from "../../commands/suggestions/suggest";
+import setSuggestionsChannel from "../../commands/config/setSuggestionsChannel";
+import getSuggestions from "../../commands/suggestions/getSuggestions";
+import approveSuggestion from "../../commands/suggestions/approveSuggestion";
+import {Command} from "../../commands/info/help/help.interface";
+import respondToSuggestion, {SuggestionResponse} from "../../commands/suggestions/respondToSuggestion";
+import denySuggestion from "../../commands/suggestions/denySuggestion";
+import removeWelcome from "../../commands/config/settings/removeWelcome";
+import removeLogs from "../../commands/config/settings/removeLogs";
+import removeWarnings from "../../commands/config/settings/removeWarnings";
+import invite from "../../commands/self/invite";
+import log from "../../commands/config/settings/log";
+import ping from "../../commands/info/ping";
+import Anime from "../../API/anime";
+import daily from "../../commands/economy/daily";
+import balance from "../../commands/economy/balance";
+import {requires} from "../../decorators/requires";
 
 import {throttle} from '../../decorators/throttleCommand'
 import snipe from "../../commands/moderation/Snipe";
@@ -243,25 +278,25 @@ export default class CommandHandler implements indexSignature {
 
     /* Owner Commands */
     @botOwner
-    @expect(ArgType.Message)
+    @expects(ArgType.Message)
     private setName(params: CommandParameters){
         setName(params.message, <[string]> params.input);
     }
 
     @botOwner
-    @expect(ArgType.String)
+    @expects(ArgType.String)
     private setpfp(params: CommandParameters){
         setPfp(params.message, <[string]> params.input);
     }
 
     @botOwner
-    @expect(ArgType.Message)
+    @expects(ArgType.Message)
     private eval(params: CommandParameters){
         systemsEval(params, <[string]> params.input)
     }
 
     @botOwner
-    @expect(ArgType.None)
+    @expects(ArgType.None)
     private guilds(params: CommandParameters){
         listGuilds(params.message);
     }
@@ -270,19 +305,19 @@ export default class CommandHandler implements indexSignature {
 
     @admin
     @throttle(30)
-    @expect(ArgType.String, {maxLength: 1})
+    @expects(ArgType.String, {maxLength: 1})
     private setPrefix(params: CommandParameters){
         setPrefix(params.message, <[string]> params.input);
     }
 
     @admin
-    @expect(ArgType.Message, {raw: true})
+    @expects(ArgType.Message, {raw: true})
     private setGreeting(params: CommandParameters){
         setGreeting(params.message, <[string[]]> params.input);
     }
 
     @admin
-    @expect(ArgType.Boolean)
+    @expects(ArgType.Boolean)
     private reactions(params: CommandParameters){
         reactions(params.message, <[boolean]> params.input);
     }
@@ -293,83 +328,78 @@ export default class CommandHandler implements indexSignature {
     }
 
     @admin
-    @expect(ArgType.Boolean)
+    @requires('MANAGE_MESSAGES')
+    @expects(ArgType.Boolean)
     private inviteFilter(params: CommandParameters){
         setInvites(params.message, <[boolean]> params.input);
     }
 
     @admin
-    @expect(ArgType.Number)
+    @expects(ArgType.Number)
     private deleteStrike(params: CommandParameters){
         deleteStrike(params.message, <[number]> params.input);
     }
 
     @admin
-    @expect(ArgType.None)
+    @expects(ArgType.None)
     private setWelcome(params : CommandParameters){
         setWelcome(params.message);
     }
 
     @admin
-    @expect(ArgType.None)
+    @expects(ArgType.None)
     private removeWelcome(params : CommandParameters){
         removeWelcome(params.message);
     }
 
     @admin
     @throttle(10)
-    @expect(ArgType.None)
+    @expects(ArgType.None)
     private setLogs(params : CommandParameters){
         setLogsChannel(params.message);
     }
 
     @admin
-    @expect(ArgType.None)
+    @expects(ArgType.None)
     private removeLogs(params : CommandParameters){
         removeLogs(params.message);
     }
 
     @admin
-    @expect(ArgType.None)
+    @expects(ArgType.None)
     private setWarnings(params: CommandParameters){
         setWarningsChannel(params.message);
     }
 
     @admin
-    @expect(ArgType.None)
+    @expects(ArgType.None)
     private removeWarnings(params : CommandParameters){
         removeWarnings(params.message);
     }
 
     @admin
-    @expect(ArgType.None)
+    @expects(ArgType.None)
     private setChat(params: CommandParameters){
         setChatChannel(params.message);
     }
 
-    // @admin
-    // @expect(ArgType.String)
-    // private setMute(params: CommandParameters){
-    //     //setMuteRole()
-    // }
-
     @admin
-    @expect(ArgType.String, {maxLength: 15})
-    @expect([ArgType.Boolean, ArgType.Channel])
+    @expects(ArgType.String, {maxLength: 15})
+    @expects([ArgType.Boolean, ArgType.Channel])
     private log(params: CommandParameters){
         log(params.message, <[string, (TextChannel | string)]> params.input)
     }
 
     @admin
-    @expect(ArgType.String, {maxLength: 15})
-    @expect([ArgType.Boolean, ArgType.Channel])
+    @expects(ArgType.String, {maxLength: 15})
+    @expects([ArgType.Boolean, ArgType.Channel])
     private logs(params: CommandParameters){
         log(params.message, <[string, (TextChannel | string)]> params.input)
     }
 
     @mod
-    @expect(ArgType.String, {optional: true})
-    @expect(ArgType.String, {optional: true})
+    @expects(ArgType.String, {optional: true})
+    @expects(ArgType.String, {optional: true})
     private settings(params : CommandParameters){
         settings(params.message, <[string, string]> params.input);
     }
@@ -377,241 +407,246 @@ export default class CommandHandler implements indexSignature {
     /* Mod Commands */
 
     @mod
-    @expect(ArgType.Member)
+    @expects([ArgType.Member, ArgType.Channel])
     private ignore(params : CommandParameters){
         ignore(params.message, <[GuildMember]> params.input);
     }
 
     @mod
-    @expect(ArgType.Number, {maxRange: 500, optional: true})
+    @requires('MANAGE_MESSAGES')
+    @expects(ArgType.Number, {maxRange: 500, optional: true})
     private nuke(params: CommandParameters){
         nuke(params.message, <[number] | undefined > params.input);
     }
 
     @mod
     @throttle(15)
-    @expect(ArgType.Number, {maxRange: 500, optional: true})
+    @requires('MANAGE_MESSAGES')
+    @expects(ArgType.Number, {maxRange: 500, optional: true})
     private cleanse(params: CommandParameters){
         cleanse(params.message.channel, <[number] | undefined> params.input)
     }
 
     @mod
-    @expect(ArgType.Member)
-    @expect(ArgType.Number, {maxRange: 60 * 24})
-    @expect(ArgType.Message)
+    @requires('MANAGE_ROLES')
+    @expects(ArgType.Member, {strict: true})
+    @expects(ArgType.Number, {maxRange: 60 * 24})
+    @expects(ArgType.Message)
     private mute(params: CommandParameters){
         muteUser(params.message, <[GuildMember, number, string]> params.input);
     }
 
     @mod
     @throttle(10)
-    @expect(ArgType.String, {maxLength: 2})
-    @expect(ArgType.Message)
+    @expects(ArgType.String, {maxLength: 2})
+    @expects(ArgType.Message)
     private addMacro(params: CommandParameters){
         addMacro(params.message, <[string, string]> params.input);
     }
 
     @mod
-    @expect(ArgType.String)
+    @expects(ArgType.String)
     private deleteMacro(params: CommandParameters){
         deleteMacro(params.message, <[string]> params.input);
     }
 
     @mod
-    @expect(ArgType.Channel, {channelType: 'text'})
-    @expect(ArgType.Message)
+    @expects(ArgType.Channel, {channelType: 'text'})
+    @expects(ArgType.Message)
     private echo(params : CommandParameters){
         echo(params.message, <[TextChannel, string]> params.input)
     }
 
     @mod
-    @expect(ArgType.Boolean)
+    @expects(ArgType.Boolean)
     private hints(params: CommandParameters){
         setHints(params.message, <[boolean]> params.input);
     }
 
     @mod
-    @expect(ArgType.Member)
-    @expect(ArgType.Message)
+    @expects(ArgType.Member)
+    @expects(ArgType.Message)
     private note(params: CommandParameters){
         setNote(params.message, <[GuildMember, string]> params.input);
     }
 
     @mod
-    @expect(ArgType.Number)
+    @expects(ArgType.Number)
     private deleteNote(params: CommandParameters){
         deleteNote(params.message, <[number]> params.input);
     }
 
     @mod
-    @expect(ArgType.Member)
+    @expects(ArgType.Member, {strict: false})
     private history(params: CommandParameters){
         getHistory(params.message, <[GuildMember]> params.input);
     }
 
     @mod
-    @expect(ArgType.Member)
-    @expect(ArgType.Number)
-    @expect(ArgType.Message, {minWords: 2})
+    @expects(ArgType.Member)
+    @expects(ArgType.Number)
+    @expects(ArgType.Message, {minWords: 2})
     private strike(params: CommandParameters){
         strike(params.message, <[GuildMember, number, string]> params.input);
     }
 
     @mod
-    @expect(ArgType.Member)
-    @expect(ArgType.Message, {minWords: 2})
+    @expects(ArgType.Member)
+    @expects(ArgType.Message, {minWords: 2})
     private warn(params: CommandParameters){
         warn(params.message, <[GuildMember, string]> params.input)
     }
 
     @mod
-    @expect(ArgType.Member)
-    @expect(ArgType.Number, {optional: true, minRange: 5, maxRange: 500})
+    @requires('MANAGE_MESSAGES')
+    @expects(ArgType.Member)
+    @expects(ArgType.Number, {optional: true, minRange: 5, maxRange: 500})
     private snipe(params: CommandParameters){
         snipe(params.message, <[GuildMember, number]> params.input);
     }
 
     @mod
-    @expect(ArgType.None)
-    private ignoredUsers(params: CommandParameters){
-        ignoredUsers(params.message);
+    @expects(ArgType.None)
+    private ignored(params: CommandParameters){
+        ignored(params.message);
     }
 
     @mod
-    @expect(ArgType.None)
+    @requires('MANAGE_MESSAGES')
+    @expects(ArgType.None)
     private suggestions(params: CommandParameters){
         getSuggestions(params.message);
     }
 
     @mod
-    @expect(ArgType.Number)
-    @expect(ArgType.Message)
+    @expects(ArgType.Number)
+    @expects(ArgType.Message)
     private accept(params: CommandParameters){
         respondToSuggestion(params.message, <[string, string]> params.input, SuggestionResponse.ACCEPTED);
     }
 
     @mod
-    @expect(ArgType.Number)
-    @expect(ArgType.Message)
+    @expects(ArgType.Number)
+    @expects(ArgType.Message)
     private reject(params: CommandParameters){
         respondToSuggestion(params.message, <[string, string]> params.input, SuggestionResponse.REJECTED);
     }
 
     /* Public Commands */
-    @expect(ArgType.Message)
+    @expects(ArgType.Message)
     private embed(params: CommandParameters){
         EmbedBuilder.getInstance().embed(params.message, <[string]> params.input)
     }
 
-    @expect(ArgType.Message)
+    @expects(ArgType.Message)
     private editEmbed(params: CommandParameters){
         EmbedBuilder.getInstance().editEmbed(params.message);
     }
 
-    @expect(ArgType.None)
+    @expects(ArgType.None)
     private sendEmbed(params: CommandParameters){
         EmbedBuilder.getInstance().sendEmbed(params.message);
     }
 
-    @expect(ArgType.Message, {optional: true})
+    @expects(ArgType.Message, {optional: true})
     private help(params: CommandParameters){
         getHelp(params.message, <[string] | undefined > params.input)
     }
 
-    @expect(ArgType.None)
+    @expects(ArgType.None)
     private passives(params: CommandParameters){
         passives(params.message);
     }
 
-    @expect(ArgType.Member)
+    @expects(ArgType.Member)
     private pfp(params : CommandParameters){
         pfp(params.message, <[GuildMember]> params.input);
     }
 
-    @expect(ArgType.None)
+    @expects(ArgType.None)
     private uptime(params : CommandParameters){
         uptime(params.message);
     }
 
-    @expect(ArgType.String, {optional: true})
+    @expects(ArgType.None)
     private source(params: CommandParameters){
-        source(params.message, <[string] | undefined> params.input);
+        source(params.message);
     }
 
     @throttle(3)
-    @expect(ArgType.None)
+    @expects(ArgType.None)
     private ch(params: CommandParameters){
         ch(params.message);
     }
 
-    @expect(ArgType.None)
+    @expects(ArgType.None)
     private serverInfo(params: CommandParameters){
         serverInfo(params.message);
     }
 
-    @expect(ArgType.None)
+    @expects(ArgType.None)
     private botInfo(params: CommandParameters){
         botInfo(params.message);
     }
 
-    @expect(ArgType.None)
+    @expects(ArgType.None)
     private macros(params: CommandParameters){
         listMacros(params.message)
     }
 
-    @expect(ArgType.None)
+    @expects(ArgType.None)
     private bump(params : CommandParameters){
         bump(params.message);
     }
 
-    @expect(ArgType.None)
+    @expects(ArgType.None)
     private randomQuote(params: CommandParameters){
         randomQuote(params.message);
     }
 
-    @expect(ArgType.None)
+    @expects(ArgType.None)
     private doggo(params: CommandParameters){
         doggo(params.message);
     }
 
-    @expect(ArgType.None)
+    @expects(ArgType.None)
     private iHateYou(params: CommandParameters){
         iHateYou(params.message);
     }
 
     @throttle(10)
-    @expect(ArgType.Message)
+    @expects(ArgType.Message)
     private suggest(params: CommandParameters){
         suggest(params.message, <[string]> params.input);
     }
 
-    @expect(ArgType.None)
+    @expects(ArgType.None)
     private setSuggestions(params: CommandParameters){
         setSuggestionsChannel(params.message);
     }
 
-    @expect(ArgType.None)
+    @expects(ArgType.None)
     private invite(params: CommandParameters){
         invite(params.message);
     }
 
-    @expect(ArgType.None)
+    @expects(ArgType.None)
     private ping(params: CommandParameters){
         ping(params.message);
     }
 
     @throttle(3)
-    @expect(ArgType.Message)
+    @expects(ArgType.Message)
     private anime(params: CommandParameters){
         Anime.getInstance().getAnime(params.message, <[string]> params.input);
     }
 
-    @expect(ArgType.None)
+    @expects(ArgType.None)
     private daily(params: CommandParameters){
         daily(params.message);
     }
 
-    @expect(ArgType.Member, {optional: true})
+    @expects(ArgType.Member, {optional: true})
     private balance(params: CommandParameters){
         balance(params.message, <[(GuildMember | undefined)]> params.input);
     }

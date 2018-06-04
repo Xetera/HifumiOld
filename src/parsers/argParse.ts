@@ -1,5 +1,5 @@
 import {CommandParameters} from "../handlers/commands/CommandHandler";
-import {ArgOptions, ArgType} from "../decorators/expect";
+import {ArgOptions, ArgType} from "../decorators/expects";
 import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import {resolveMember} from "../resolvers/memberResolver";
 import {handleInvalidParameters} from "../handlers/commands/invalidCommandHandler";
@@ -73,7 +73,9 @@ export default async function argParse(params: CommandParameters){
 
                 switch(decorator.type[i]){
                     case ArgType.Member:
-                        const member = await _resolveMember(params, input, false);
+                        const strict = options ? options.strict : false;
+
+                        const member = await _resolveMember(params, input, false, strict);
                         buffer.push(member);
                         break;
                     case ArgType.Number:
@@ -114,7 +116,8 @@ export default async function argParse(params: CommandParameters){
             // SINGLE VARIABLE
             switch(decorator.type){
                 case ArgType.Member:
-                    const member = await _resolveMember(params, input);
+                    const strict = options ? options.strict : false;
+                    const member = await _resolveMember(params, input, true, strict);
                     if (!member)
                     // responses for resolveMember are already handled
                     // in the implementation of the function
@@ -157,8 +160,8 @@ export default async function argParse(params: CommandParameters){
     return true;
 }
 
-async function _resolveMember(params: any, input: any, fail: boolean = true): Promise<GuildMember | undefined>{
-    return await resolveMember(input!, params.message, false, fail);
+async function _resolveMember(params: any, input: any, fail: boolean = true, strict: boolean = true): Promise<GuildMember | undefined>{
+    return await resolveMember(input!, params.message, {fail: fail, strict: strict, global: false});
 }
 
 async function _resolveNumber(params: any, input: any, decorator: any, fail: boolean = true): Promise<number | void>{
@@ -216,6 +219,6 @@ async function _resolveBoolean(params: any, input: any, fail: boolean = true): P
 }
 
 async function _resolveChannel(params: any, input: any, options: any, fail: boolean = true){
-    const searchOpts = !options ? 'BOTH' : !options.channelType ? 'BOTH' : options.channelType ;
-    return await channelResolver(input, params.message, searchOpts, true, fail);
+    const searchOpts = !options ? 'BOTH' : !options.channelType ? 'BOTH' : options.channelType;
+    return await channelResolver(input, params.message, {channelType: searchOpts, fail: true, onlyMention: true});
 }

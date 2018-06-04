@@ -1,6 +1,6 @@
 {
 	"type": "postgres",
-	"url": "postgres://localhost/discord",
+	"url": "postgresql:///discord_test",
 	"synchronize": true,
 	"logging": true,
 	"dropSchema": true,
@@ -20,5 +20,6 @@
 	},
 	"cache": {
 		"duration": "0"
-	}
+	},
+	"database": "discord_test"
 }

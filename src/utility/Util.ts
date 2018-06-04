@@ -9,7 +9,7 @@ import {
     Permissions, Role
 } from "discord.js";
 import {debug} from "../events/onMessage";
-import {discordInviteRegex} from "../listeners/Regex";
+import {discordInviteRegex, emojiRegex, urlRegex} from "../listeners/Regex";
 
 
 /**
@@ -214,6 +214,14 @@ export namespace InviteUtils {
     }
 }
 
+export namespace StringUtils {
+    export function isUrl(input: string){
+        return urlRegex.test(input)
+    }
+    export function isEmoji(input: string){
+        return emojiRegex.test(input);
+    }
+}
 
 export function arrayFromValues(obj: {[id: string]: any}){
     return Object.keys(obj).map(k => obj[k]);
@@ -224,3 +232,7 @@ export function safeGetArgs(input: any[] | undefined, defaultValue: any){
 }
 
 export const emptySpace: string = '\u200b';
+
+export function stringify(...items: string[]){
+    return items.map(i => i != null ? i : '').join(' ')
+}

@@ -71,7 +71,7 @@ export function getTokens(env: Environments) {
 
 export function getDatabaseConnection(env: Environments) : string {
     if (env === Environments.Development && !process.env.DATABASE_URL){
-        return 'postgres://localhost/discord';
+        return 'postgresql:///discord_test';
     }
     else if (env === Environments.Development && process.env.DATABASE_URL)
         return process.env.DATABASE_URL;

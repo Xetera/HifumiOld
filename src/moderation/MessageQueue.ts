@@ -82,14 +82,11 @@ export class MessageQueue {
 
     private removeUserMessages(messages: CachedMessage[]): void {
         // guaranteed that all messages are by the same author so we can just take the first index
-        const member : Discord.GuildMember = messages[0].member;
-        const memberName :string = messages[0].member.nickname || messages[0].author.username;
-        const guild : Discord.Guild = messages[0].guild;
         // breaking down all the unique channels
         const channels : Set<Discord.Channel> = new Set(messages.map(message => message.channel));
 
         channels.forEach(function(channel : Channel){
-            safeBulkDelete(channel, member);
+            safeBulkDelete(channel, messages);
         });
     }
 
@@ -98,17 +95,18 @@ export class MessageQueue {
         if (!guild){
             return void debug.error(`Cannot bulk delete messages, no guild associated with ${member} in the queue`, 'MessageQueue');
         }
-        let message;
+        let messages = [];
         for (let i=guild.length -1 ; i > 0; i--){
-            if (guild[i].id === member.id){
-                message = guild[i];
+            if (guild[i].member.id === member.id){
+                messages.push(guild[i]);
             }
         }
-        if (!message){
+
+        if (!messages.length){
             return void debug.error(`Could not find a message from the user ${member} in the queue`, 'MessageQueue');
         }
 
-        safeBulkDelete(message.channel, member);
+        safeBulkDelete(messages[0].channel, messages);
     }
 
     public checkLockdown(guild : Discord.Guild): boolean {

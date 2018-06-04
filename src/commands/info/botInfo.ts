@@ -13,7 +13,7 @@ export default function botInfo(message : Discord.Message) : void {
             .setTitle('Hifumi')
             .setColor('#ffd275')
             .addField(`Owner`, `Xetera#9596`, true)
-            .addField(`Version`, `1.6.0`, true)
+            .addField(`Version`, `1.7.0`, true)
             .addField(`Lines of Code`, 9152, true)
             .addField(`Language`, `Typescript`, true)
             .addField(`Database`, `Postgres`, true)

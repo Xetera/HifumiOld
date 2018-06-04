@@ -23,7 +23,7 @@ Everything about the implementation of commands are declared in decorators.
     will likely be replaced for the token bucket method that the
     cleverbot module uses in the future
 
-`@expect` declares the expected arguments and saves it to the registry.
+`@expects` declares the expected arguments and saves it to the registry.
 Commands that are called through `commandHandler._run` get their
 decorators checked for the required parameters in `argParse.ts` and "throw" errors
 before each function implementation is even entered.

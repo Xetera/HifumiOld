@@ -20,8 +20,10 @@ export default function getAnimeEmbed(input: getAnimeQueryResponse){
         description += `... [Read More](${input.siteUrl})`;
     }
     const image = input.coverImage.large || input.coverImage.medium;
-    const characters = input.characters && input.characters.nodes.length
-        ? input.characters.nodes.splice(0, 3).map(c => `${c.name.first ? c.name.first + ' ' : ''}${c.name.last} ${c.name.first === 'Hifumi' && c.name.last === 'Takimoto' ? '<- __HEY THAT\'S ME!__' : ''}`).join('\n')
+    const characters =
+        input.characters && input.characters.nodes.length
+        ? input.characters.nodes.splice(0, 5).map(c =>
+            `${c.name.first ? c.name.first + ' ' : ''}${c.name.last ? c.name.last : ''} ${c.name.first === 'Hifumi' && c.name.last === 'Takimoto' ? '<- __HEY THAT\'S ME!__' : ''}`).join('\n')
         : 'Unknown characters';
     const embed = new RichEmbed()
         .setTitle(`Anime: ${title}`)

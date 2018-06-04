@@ -64,6 +64,5 @@ export default class EconomyHandler {
     }
 
     public daily(){
-
     }
 }

@@ -9,7 +9,7 @@ const help: Help = require('../../commands/help.json');
 
 export default async function addMacro(message: Message, input: [string, string]) {
     const [macroName, macroContent] = input;
-    if (macroContent.length > 200) {
+    if (macroContent.length > 2000) {
         return void handleFailedCommand(
             message.channel, `${gb.emojis.get('alexa_boi')} How do you expect me to remember all that? Try something shorter.`
         );
@@ -25,8 +25,9 @@ export default async function addMacro(message: Message, input: [string, string]
             `Mentions are not allowed in macros, do you know how annoying it is to get pinged by bots? (⁎˃ᆺ˂)`
         )
     }
+    try {
+        const count = await gb.instance.database.getMacroCount(message.guild.id);
 
-    gb.instance.database.getMacroCount(message.guild.id).then(async (count: number) => {
         if (count >= 50 && !await gb.instance.database.getPremium(message.guild.id)) {
             return void handleFailedCommand(
                 message.channel, "Whoa, you already have 50 macros saved, time to delete some"
@@ -35,22 +36,18 @@ export default async function addMacro(message: Message, input: [string, string]
 
         const found: Macro | undefined = await gb.instance.database.getMacro(message.guild.id, macroName);
         if (found) {
-            (handleFailedCommand(
+            return void handleFailedCommand(
                 message.channel, `A macro with the name **${macroName}** already exists in this server.`
-                )
             );
-            return Promise.reject(new Error('Duplicate macro'));
         }
 
-        return gb.instance.database.addMacro(message, macroName, macroContent)
-    }).then(async(macro: Partial<Macro>|undefined) => {
+        const macro: Partial<Macro>|undefined = await gb.instance.database.addMacro(message, macroName, macroContent)
+
         const prefix = await gb.instance.database.getPrefix(message.guild.id);
         if (macro)
             message.channel.send(`From now on I'll respond to **${prefix}${macro.macro_name}** with:\n${macro.macro_content}`);
-    }).catch((err: Error) => {
-        if (err.message === 'Duplicate macro'){
-            return debug.silly(`Duplicate macro ${macroName} entered in ${message.guild.name}`, 'addMacro');
-        }
+    }
+    catch (err){
         return debug.error(err, 'addMacro')
-    })
+    }
 }
