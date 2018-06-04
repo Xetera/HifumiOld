@@ -43,40 +43,8 @@ import randomQuote from "../../commands/fun/randomQuote";
 import setChatChannel from "../../commands/config/setChatChannel";
 import {Macro} from "../../database/models/macro";
 import strike from "../../commands/moderation/strike";
-import {throttle} from '../../decorators/throttleCommand'
-import snipe from "../../commands/moderation/Snipe";
-import {ArgOptions, ArgType, expects} from "../../decorators/expects";
-import { REGISTRY} from "./registry";
-import argParse from "../../parsers/argParse";
-import {setName} from "../../commands/self/ChangeName";
-import setPfp from "../../commands/self/ChangePicture";
-import reactions from "../../commands/config/reactions";
 import ignored from "../../commands/moderation/ignoredUsers";
-import warn from "../../commands/moderation/warn";
-import {LogManager} from "../logging/logManager";
-import deleteStrike from "../../commands/moderation/deleteStrike";
-import setGreeting from "../../commands/config/setGreeting";
-import safeDeleteMessage from "../safe/SafeDeleteMessage";
-import listGuilds from "../../commands/debug/listGuilds";
-import EmbedBuilder from "../internal/embedBuilder";
-import iHateYou from "../../commands/info/iHateYou";
-import doggo from "../../commands/fun/doggo";
-import suggest from "../../commands/suggestions/suggest";
-import setSuggestionsChannel from "../../commands/config/setSuggestionsChannel";
-import getSuggestions from "../../commands/suggestions/getSuggestions";
-import approveSuggestion from "../../commands/suggestions/approveSuggestion";
-import {Command} from "../../commands/info/help/help.interface";
-import respondToSuggestion, {SuggestionResponse} from "../../commands/suggestions/respondToSuggestion";
-import denySuggestion from "../../commands/suggestions/denySuggestion";
-import removeWelcome from "../../commands/config/settings/removeWelcome";
-import removeLogs from "../../commands/config/settings/removeLogs";
-import removeWarnings from "../../commands/config/settings/removeWarnings";
-import invite from "../../commands/self/invite";
-import log from "../../commands/config/settings/log";
-import ping from "../../commands/info/ping";
-import Anime from "../../API/anime";
-import daily from "../../commands/economy/daily";
-import balance from "../../commands/economy/balance";
+
 import {requires} from "../../decorators/requires";
 
 import {throttle} from '../../decorators/throttleCommand'
@@ -84,7 +52,6 @@ import snipe from "../../commands/moderation/Snipe";
 import {ArgOptions, ArgType, expect} from "../../decorators/expect";
 import { REGISTRY} from "./registry";
 import argParse from "../../parsers/argParse";
-import {setName} from "../../commands/self/ChangeName";
 import setPfp from "../../commands/self/ChangePicture";
 import reactions from "../../commands/config/reactions";
 import ignoredUsers from "../../commands/moderation/ignoredUsers";
@@ -114,6 +81,8 @@ import Anime from "../../API/anime";
 import EconomyHandler from "../economy/economyHandler";
 import daily from "../../commands/economy/daily";
 import balance from "../../commands/economy/balance";
+import {expects} from "../../decorators/expects";
+import {setName} from "../../commands/self/ChangeName";
 
 export interface CommandParameters extends Instance {
     message: Discord.Message;

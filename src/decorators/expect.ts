@@ -28,6 +28,7 @@ export interface ArgOptions {
         channelType?: AllChannelTypes;
         minWords?: number;
         raw?: boolean;
+        strict?: boolean;
     }
 }
 
