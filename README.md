@@ -3,14 +3,17 @@
 </a>
 <hr>
 
+<table style="width:100%">
+  <tr>
+    <td><strong>Prefix:</strong> $</td>
+      <td><strong>Language:</strong> Typescript</td>
+      <td><strong>Library:</strong> Discord.js</td>
+      <td><a href="https://www.hifumi.io">Hifumi's Website</a></td>
+      <td><a href="https://discordapp.com/oauth2/authorize?client_id=372615866652557312&scope=bot&permissions=268463300">Invite Me!</a>       </td> 
+      <td><a href="https://discord.gg/RM6KUrf">Join the Support Server</a></td>
+  </tr>
+</table>
 
-Moderation based discord bot written in Typescript using [Discord.js](https://github.com/discordjs/discord.js)
-
-Currently hosted on [heroku](https://www.heroku.com/)
-
-[Invite Me](https://discordapp.com/oauth2/authorize?client_id=372615866652557312&permissions=0&scope=bot) - Prefix: $
-
-[Support Server](https://discordapp.com/oauth2/authorize?client_id=372615866652557312&scope=bot&permissions=268463300)
 
 ## Features:
 
@@ -38,7 +41,7 @@ Currently hosted on [heroku](https://www.heroku.com/)
 * Customization: ⚙ Change Hifumi to fit your server
     * `$setgreeting` - Customize the message you want Hifumi to greet new members with
     * `$log` - Change logging settings by assigning a channel for a specific category of logs or turning it off entirely
-        * Logging options: **joins**, **leaves**, **mutes**, **bans**, **unbans**, **channel management**, **suggestions**, **commands**, **invites**, **ping spam**, 
+        * Logging options: **joins**, **leaves**, **mutes**, **bans**, **unbans**, **channel management**, **suggestions**, **commands**, **invites**, **ping spam** 
     * `$settings` - Changes bot settings
         * `$settings prefix` - Changes the prefix I reply to
         * `$settings hints` - Hifumi tries to guess what you meant when you enter incorrect commands
@@ -49,11 +52,9 @@ Currently hosted on [heroku](https://www.heroku.com/)
         * `$settings inviteban` - Threshold for banning members for sending invites
         * `$settings strikelimit` - Max number of strikes a user can have before getting banned (3 by default)
         
-* Fun: 🎉
+* Fun: 🎉 Time to relax
     * `$anime` - Sends details about a specific anime and the date the next ep comes out on (if still airing)
     * `$doggo` - Sends a cute 🐶 and its breed
     * `$randomquote` - A quote... that is random
     * `$ch` - Random cyanide and happiness comic
-    
-* Some setting commands are left out
 #### Inspired by [HotBot](https://github.com/AberrantFox/hotbot) in [The Programmer's Hangout](https://discord.gg/programming)
