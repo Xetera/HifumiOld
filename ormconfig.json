@@ -21,5 +21,5 @@
 	"cache": {
 		"duration": "0"
 	},
-	"database": "discord_test"
+	"database": "discord"
 }
