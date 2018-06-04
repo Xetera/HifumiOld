@@ -110,7 +110,6 @@ export class Database {
     private ormConfig(url: string): Promise<void> {
         return new Promise((resolve, reject) => {
             rootConfig.url = url;
-            rootConfig.database = this.env === Environments.Development ? 'discord_test' : 'discord';
             fs.writeFile('ormconfig.json', JSON.stringify(rootConfig, null, '\t'), (err) => {
                 if (err)
                     return reject(err);
