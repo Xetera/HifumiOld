@@ -20,6 +20,5 @@
 	},
 	"cache": {
 		"duration": "0"
-	},
-	"database": "discord"
+	}
 }
