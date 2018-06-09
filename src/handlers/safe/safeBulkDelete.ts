@@ -10,23 +10,26 @@ import {
 import moment = require("moment");
 import {debug} from "../../utility/Logging";
 
-export default function safeBulkDelete(channel: Channel, member:  Message[] | Collection<string, Message>): Promise<number> {
+export default async function safeBulkDelete(channel: Channel, messages?:  Message[]): Promise<number> {
     if (!(channel instanceof TextChannel)){
         return Promise.reject('Target channel is not a text channel');
     }
-    const dateLimit: Date = moment(new Date()).subtract('14', 'd').toDate();
-    return channel.fetchMessages({limit: getBulkDeleteCount()}).then((messages : Collection<Snowflake, Message>) => {
-        const userMessages = messages.filter(
-            // we want to avoid fetching messages that are created over 14 days ago
-            message => message.createdAt >  dateLimit
-        );
-        return channel.bulkDelete(userMessages);
-    }).then(col => {
-      return col.size;
-    }).catch((error: Error)=> {
+    try {
+        if (messages && messages.length){
+            const deletedMessages = await channel.bulkDelete(messages, true);
+            debug.info(`Bulk deleted ${deletedMessages.size} messages from chanel '${channel.name}' in guild ${channel.guild.name}`, `SafeBulkDelete`);
+            return deletedMessages.size
+        }
+        const fetched : Collection<Snowflake, Message> = await channel.fetchMessages({limit: getBulkDeleteCount()});
+        const deletedMessages = await channel.bulkDelete(fetched, true);
+        debug.info(`Bulk deleted the last ${deletedMessages.size} messages from channel '${channel.name}' in guild ${channel.guild.name}`, `SafeBulkDelete`);
+        return deletedMessages.size;
+    }
+
+    catch(error){
         if (error instanceof DiscordAPIError){
-            debug.error(`A Discord error occurred while trying to bulk delete messages\n` + error.stack, 'SafeBulkDelet');
+            debug.error(`A Discord error occurred while trying to bulk delete messages\n` + error.stack, 'SafeBulkDelete');
         }
         return Promise.reject(error);
-    });
+    }
 }

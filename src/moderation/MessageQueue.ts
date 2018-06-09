@@ -60,7 +60,7 @@ export class MessageQueue {
     }
 
     //gets called every message
-    private checkForSpam(member : Discord.GuildMember): void {
+    private async checkForSpam(member : Discord.GuildMember) {
         const spamMessages : CachedMessage[] | void = this.getRecentUserMessages(member);
         if (!spamMessages) return;
 
@@ -70,7 +70,7 @@ export class MessageQueue {
         if (isUserSpamming){
             // checking if the user is new before punishing
             const watchlist = gb.instance.trackList;
-            if (watchlist.isNewMember(member)){
+            if (watchlist.isNewMember(member) && await gb.instance.database.getTrackNewMembers(member.guild.id)){
                 return watchlist.punishNewMember(member, Offense.Spam);
             }
 
@@ -81,13 +81,11 @@ export class MessageQueue {
     }
 
     private removeUserMessages(messages: CachedMessage[]): void {
-        // guaranteed that all messages are by the same author so we can just take the first index
-        // breaking down all the unique channels
-        const channels : Set<Discord.Channel> = new Set(messages.map(message => message.channel));
-
-        channels.forEach(function(channel : Channel){
-            safeBulkDelete(channel, messages);
-        });
+        if (!messages.length){
+            return debug.error(`Tried to remove messages by a person who has no messages in the MessageQueue`, `MessageQueue`)
+        }
+        const channel = messages[messages.length - 1].channel;
+        safeBulkDelete(channel, messages.filter(message => message.channel.id === channel.id));
     }
 
     public removeUsersRecentMessages(member: GuildMember){
@@ -125,7 +123,8 @@ export class MessageQueue {
             return;
         }
         return messages.filter(message => {
-            return message.author.id === member.user.id && message.guild.id === member.guild.id && message.sent > tolerance;
+            return message.author.id === member.user.id &&
+                message.guild.id === member.guild.id && message.sent > tolerance;
         }
         );
     }
