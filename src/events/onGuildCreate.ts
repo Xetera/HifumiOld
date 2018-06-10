@@ -3,14 +3,19 @@ import {Database} from "../database/Database";
 import * as dbg from "debug";
 import {default as gb, Instance} from "../misc/Globals";
 import {TextChannel} from "discord.js";
-import onGuildCreateEmbed from "../embeds/events/onGuildCreateEmbed";
 import {debug} from "../utility/Logging";
 
 
-export default async function onGuildCreate(guild : Discord.Guild){
+export default async function onGuildCreate(guild : Discord.Guild) {
     const database = gb.instance.database;
-
-    if (!database.ready || !await gb.instance.database.getGuildEnabled(guild.id) || !guild.available){
+    /**
+     * we don't want to check if it's ready because once we're in a guild
+     * we need to be adding it to the database regardless. Even if it's
+     * an outage it's fine because we're just upserting anyways
+     */
+    if (!database.ready
+        || !gb.instance
+        || !await gb.instance.database.getGuildEnabled(guild.id) || !guild.available) {
         return;
     }
 
@@ -20,10 +25,4 @@ export default async function onGuildCreate(guild : Discord.Guild){
     gb.instance.muteQueue.insertNewGuild(guild);
     gb.instance.trackList.insertNewGuild(guild);
     debug.info(`I was added to the server: ${guild.name} with ${guild.memberCount} members.`);
-    const targetChannel = guild.systemChannel;
-    let embed = onGuildCreateEmbed();
-
-    if (targetChannel && targetChannel instanceof TextChannel){
-        targetChannel.send(embed);
-    }
 }
