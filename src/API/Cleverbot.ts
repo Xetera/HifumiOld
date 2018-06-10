@@ -7,7 +7,7 @@ import moment = require("moment");
 import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import TokenBucket from "../moderation/TokenBucket";
 import safeSendMessage from "../handlers/safe/SafeSendMessage";
-import {formattedTimeString, StringUtils} from "../utility/Util";
+import {formattedTimeString, randRange, sanitizeUserInput, StringUtils} from "../utility/Util";
 import prefixReminderEmbed from "../embeds/misc/prefixReminderEmbed";
 
 interface Ignores {
@@ -51,8 +51,8 @@ export class Cleverbot {
             return;
         }
 
-        let cleverbotCall = message.content.match(this.identifier);
-        if (message.isMentioned(bot.user) && !message.content.replace(MessageMentions.USERS_PATTERN, '')){
+        let cleverbotCall = message.isMentioned(bot.user);
+        if (cleverbotCall && !message.content.replace(MessageMentions.USERS_PATTERN, '')){
             return void safeSendMessage(message.channel, prefixReminderEmbed(await gb.instance.database.getPrefix(message.guild.id)), 30000);
         }
 
@@ -75,8 +75,16 @@ export class Cleverbot {
                 return;
             }
 
-            debug.info(`[${message.member.guild}]::${message.channel.name}::<${message.author.username}> cleverbot call`, "Cleverbot");
             message.react('👀');
+            if (this.isUserRepeating(message)){
+                // to make it feel like it's still cleverbot
+                setTimeout(() => {
+                    return void safeSendMessage(message.channel, sanitizeUserInput(message.content));
+                }, randRange(1500, 3000));
+                return;
+            }
+
+            debug.info(`[${message.member.guild}]::${message.channel.name}::<${message.author.username}> cleverbot call`, "Cleverbot");
 
             this.say(message, message.content, message.member.id).then(async(resp : string) => {
                 // sometimes randomly the messages are empty for no reason
@@ -85,6 +93,36 @@ export class Cleverbot {
 
         }
     }
+
+    public isUserRepeating(message: Message): boolean {
+        let userHistory;
+        try {
+            const user = this.cleverbot.users.find(user => user.id === message.member.id);
+            console.log(user);
+            if (!user){
+                return false;
+            }
+            userHistory = user.history;
+        }
+        catch (err){
+            console.log(err);
+            return false;
+        }
+        const last = userHistory[userHistory.length - 1];
+        const beforeLast = userHistory[userHistory.length - 2];
+        console.log(beforeLast, last);
+
+        if (!last || !beforeLast){
+            return false;
+        }
+
+        return (
+            last.input === this.replaceKeyword(message.content) &&
+            beforeLast.input === this.replaceKeyword(message.content)
+        );
+    }
+
+
 
     public say(message: Message, phrase: string, id: string, replaceKeyword: boolean = true) : Promise<string>{
         let parsedArg :string;
@@ -133,6 +171,7 @@ export class Cleverbot {
                 this.users[id].warnings += 1;
             }
 
+            // Mutes every 3rd violation, mute time increases per 3rd mute
             if (this.users[id].warnings % 3 === 0){
                 const user = this.users[id];
                 this.users[id].ignores.ignoring = true;
@@ -142,7 +181,7 @@ export class Cleverbot {
             }
 
             else {
-                debug.info(`Warned a user in ${message.guild.name} about rate limiting`, `Cleverbot`)
+                debug.info(`Warned a user in ${message.guild.name} about rate limiting`, `Cleverbot`);
                 handleFailedCommand(
                     message.channel, `You are rate limited, please stop spamming me.`, `Warning #${this.users[id].warnings}/3`                );
             }
