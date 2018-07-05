@@ -1,7 +1,5 @@
-
 import {
-    createInstance, getDatabaseConnection, getEnvironmentSettings, getTokens,
-    setupProcess
+    createInstance, getDatabaseConnection, getEnvironmentSettings, getTokens, setupProcess
 } from "./events/systemStartup";
 import gb from './misc/Globals';
 import 'reflect-metadata';
@@ -10,7 +8,6 @@ import onMessage from './events/onMessage'
 import onGuildMemberAdd from "./events/onGuildMemberAdd";
 import onGuildMemberRemove from "./events/onGuildMemberRemove";
 import onGuildCreate from "./events/onGuildCreate";
-import * as Discord from 'discord.js'
 import updatePresence from "./actions/UpdatePresence";
 import onMessageUpdate from "./events/onMessageUpdate";
 import onGuildMemberUpdate from "./events/onGuildMemberUpdate";
@@ -19,9 +16,9 @@ import {LogManager} from "./handlers/logging/logManager";
 import onChannelCreate from "./events/onChannelCreate";
 import onChannelDelete from "./events/onChannelDelete";
 import {Client} from "discord.js";
-import uncaughtException from "./handlers/process/uncaughtException";
 import websocketErrorHandler from "./handlers/process/websocketErrorHandler";
 import websocketWarningHandler from "./handlers/process/websocketWarningHandler";
+import {debug} from "./utility/Logging";
 
 setupProcess();
 gb.ENV  = getEnvironmentSettings();
@@ -33,6 +30,7 @@ main();
 
 async function main(){
     const bot = new Client();
+    debug.info('Logging in...', 'Startup');
     bot.login(BOT_TOKEN);
 
     bot.on('ready', async() =>{
@@ -44,64 +42,36 @@ async function main(){
         }, 1000 * 60 * 10);
     });
 
-
 // === === === === MESSAGE === === === === === //
-    bot.on('message', (message : Discord.Message) => {
-        onMessage(message);
-    });
+    bot.on('message', onMessage);
 
-    bot.on('messageUpdate', (oldMessage: Discord.Message, newMessage: Discord.Message) => {
-        onMessageUpdate(oldMessage, newMessage);
-    });
+    bot.on('messageUpdate', onMessageUpdate);
 
-    bot.on('messageDelete', (oldMessage: Discord.Message, newMessage: Discord.Message) => {
-        // (oldMessage, newMessage);
-    });
-
+    bot.on('messageDelete', () => {});
 
 // === === === === GUILD MEMBER === === === === === //
-    bot.on('guildMemberAdd', (member : Discord.GuildMember) => {
-        onGuildMemberAdd(member);
-    });
+    bot.on('guildMemberAdd', onGuildMemberAdd);
 
+    bot.on('guildMemberRemove', onGuildMemberRemove);
 
-    bot.on('guildMemberRemove', (member : Discord.GuildMember) => {
-        onGuildMemberRemove(member);
-    });
-
-    bot.on('guildMemberUpdate', (oldMember: Discord.GuildMember, newMember: Discord.GuildMember) => {
-        onGuildMemberUpdate(oldMember, newMember);
-    });
-
+    bot.on('guildMemberUpdate', onGuildMemberUpdate);
 
 // === === === === GUILD === === === === === //
-    bot.on('guildUpdate', (oldMember: Discord.Guild, newMember: Discord.Guild) => {
-        onGuildUpdate(oldMember, newMember);
-    });
+    bot.on('guildUpdate', onGuildUpdate);
 
-    bot.on('guildCreate', (guild : Discord.Guild) => {
-        onGuildCreate(guild);
-    });
+    bot.on('guildCreate', onGuildCreate);
 
-    bot.on('guildBanAdd', (guild:Discord.Guild, member: Discord.User) => {
-        LogManager.logBan(guild, member);
-    });
+    bot.on('guildBanAdd', LogManager.logBan);
 
-    bot.on('guildBanRemove', (guild:Discord.Guild, member: Discord.User) => {
-        LogManager.logUnban(guild, member);
-    });
+    bot.on('guildBanRemove', LogManager.logUnban);
 
 // === === === === CHANNEL === === === === === //
-    bot.on('channelCreate', (channel :Discord.Channel) => {
-        onChannelCreate(channel)
-    });
+    bot.on('channelCreate', onChannelCreate);
 
-    bot.on('channelDelete', (channel :Discord.Channel) => {
-        onChannelDelete(channel);
-    });
+    bot.on('channelDelete',onChannelDelete);
 
 // === === === === EXCEPTIONS === === === === === //
-    bot.on('error', (err) => websocketErrorHandler(err));
+    bot.on('error', websocketErrorHandler);
 
-    bot.on('warn', (warning) => websocketWarningHandler(warning));
+    bot.on('warn', websocketWarningHandler);
 }
