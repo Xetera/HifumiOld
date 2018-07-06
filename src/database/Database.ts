@@ -23,6 +23,7 @@ import moment = require("moment");
 import {MutedUser} from "./models/mutedUser";
 import {Suggestion} from "./models/suggestion";
 import {IgnoredChannel} from "./models/ignoredChannel";
+import {parseMacro} from "../parsers/parseMacro";
 const rootConfig: IORMConfig = require('../../ormconfig.json');
 
 interface IWelcomeMessage {
@@ -54,9 +55,13 @@ export class Database {
             return this.sync();
         }).then(() => {
             this.ready = true;
+        }).catch(err => {
+            debug.error(`Could not connect to the database properly ...exiting application`);
+            debug.error(err);
+            process.exit(1);
         });
-
     }
+
 
     /**
      * Connects to postgres, returns connection on successful connections
@@ -74,8 +79,8 @@ export class Database {
                     // DO NOT TURN THESE ON FOR PRODUCTION
                     // I'M SERIOUS DON'T DO IT
 
-                    synchronize: this.env === Environments.Development,
-                    dropSchema:  this.env === Environments.Development,
+                    //synchronize: this.env === Environments.Development,
+                    //dropSchema:  this.env === Environments.Development,
 
                     // DUDE I'M 100% SERIOUSLY RN I'LL GET SUPER MAD OK
                 cli: {
@@ -271,14 +276,18 @@ export class Database {
         })
     }
 
-    public addMacro(message: Message, macroName: string, macroContent: string): Promise<Partial<Macro>> {
+    public addMacro(message: Message, macroName: string, macroContent?: string, macroLinks?: string[]): Promise<Partial<Macro>> {
+        if (!macroContent && !macroLinks){
+            return Promise.reject('Macro to be saved missing both content and links')
+        }
         return this.invalidateCache('macros').then(() => {
             return this.conn.manager.save(Macro, {
                 creator_id: message.author.id,
                 date_created: new Date(),
                 guild_id: message.guild.id,
                 macro_name: macroName,
-                macro_content: macroContent
+                macro_content: macroContent,
+                macro_links: macroLinks
             });
         }).catch(err => {
             return Promise.reject(err);
@@ -368,7 +377,7 @@ export class Database {
         });
     }
 
-    public setLogsChannel(guildId: string, channelId: string): Promise<Partial<Guild>> {
+    public setLogsChannel(guildId: string, channelId: string | undefined): Promise<Partial<Guild>> {
         return this.getGuild(guildId).then((r: Guild) => {
             if (!r.warnings_channel) {
                 return void this.setWarningsChannel(guildId, channelId);
@@ -392,7 +401,7 @@ export class Database {
     }
 
 
-    public setWarningsChannel(guildId: string, channelId: string): Promise<Partial<Guild>> {
+    public setWarningsChannel(guildId: string, channelId: string | undefined): Promise<Partial<Guild>> {
         return this.invalidateCache('guilds').then(() => {
             return this.conn.manager.save(Guild, {id: guildId, warnings_channel: channelId});
         }).catch(err => {
@@ -409,7 +418,7 @@ export class Database {
             .execute();
     }
 
-    public setChatChannel(guildId: string, channelId:string): Promise<Partial<Guild>> {
+    public setChatChannel(guildId: string, channelId:string | undefined): Promise<Partial<Guild>> {
         return this.invalidateCache('guildss').then(() => {
             return this.conn.manager.save(Guild, {id: guildId, chat_channel: channelId});
         }).catch(err => {
@@ -753,7 +762,7 @@ export class Database {
         return this.changeSuggestionStatus(id, 'REJECTED', reason);
     }
 
-    public setSuggestionsChannel(guildId: string, channelId: string){
+    public setSuggestionsChannel(guildId: string, channelId: string | undefined){
         return this.invalidateCache('guilds').then(() => {
             return this.conn.manager.save(Guild, {id: guildId, suggestions_channel: channelId});
         })
@@ -856,65 +865,6 @@ export class Database {
             .execute();
     }
 
-    public async triggerDaily(guildId: string, userId: string, amount: number, streak: number){
-        await this.invalidateCache('users');
-        const copper = await this.getCopper(guildId, userId);
-        return this.conn.createQueryBuilder()
-            .update(User)
-            .set({last_daily: new Date(), copper: copper + amount, streak: streak})
-            .where(`id = :id AND guild_id = :guild_id`, {guild_id: guildId, id: userId})
-            .returning('copper')
-            .execute();
-    }
-
-    public async getCopper(guildId: string, userId: string){
-        const u = await this.getUser(guildId, userId);
-        return u.copper;
-    }
-
-    public async getStreak(guildId: string, userId: string){
-        const u = await this.getUser(guildId, userId);
-        return u.streak;
-    }
-
-    /**
-     *
-     * @param {string} guildId
-     * @param {string} userId
-     * @returns {Promise<"fresh" | true | number>}
-     * Returns 'fresh' for new users doing daily for the first time
-     * Returns true if daily is usable
-     * or the time delta if it's not
-     */
-    public async isDailyUsable(guildId: string, userId: string): Promise<'fresh' | true | number> {
-        const d = await this.getUser(guildId, userId);
-        const lastUsed = d.last_daily;
-        if (!lastUsed)
-            return 'fresh';
-        const limit = moment(new Date()).subtract(23, 'h').toDate();
-        if (lastUsed < limit){
-            return true;
-        }
-        return moment(lastUsed).add(23, 'h').diff(new Date())
-    }
-
-    public async isOnStreak(guildId: string, userId: string){
-        const d = await this.getUser(guildId, userId);
-        const lastUsed = d.last_daily;
-        if (!lastUsed)
-            return 'fresh';
-        const limit = moment(lastUsed).add(48, 'h').toDate();
-        return new Date() > limit;
-    }
-
-    public async resetStreak(guildId: string, userId: string){
-        await this.conn.manager.createQueryBuilder()
-            .update(User)
-            .set({streak: 0})
-            .where(`id = :id AND guild_id = :guild_id`, {id: userId, guild_id: guildId})
-            .execute();
-    }
-
     public async getChannelIgnored(guildId: string, channelId: string){
         return this.conn.manager.findOne(IgnoredChannel, {where: {guild_id: guildId, channel_id: channelId}, cache: true});
     }
@@ -946,6 +896,10 @@ export class Database {
                     {channel_id: channelId, guild_id: guildId})
                 .execute();
         });
+    }
+    public async getSpamfilter(){
+        //return this
+
     }
 }
 
