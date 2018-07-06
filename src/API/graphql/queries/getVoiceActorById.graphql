@@ -1,0 +1,12 @@
+query ($id: Int) {
+    Staff(id: $id){
+        language
+        description
+        name {
+            first
+            last
+            native
+        }
+        siteUrl
+    }
+}
