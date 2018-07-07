@@ -14,12 +14,10 @@ export default async function snipe(message: Message, input: [GuildMember, (numb
     const channel = message.channel;
     if (channel instanceof Discord.TextChannel){
         channel.fetchMessages({limit: limit}).then((messages: Collection<Discord.Snowflake, Message>) => {
-            console.log(messages.map(m => m.content));
             const userMessages = messages.filter((value) => {
                 return value.author.id === target.id && value.deletable
                     && moment(value.createdAt).add(14, 'd').diff(new Date()) > 0;
             });
-            console.log(userMessages.map(m => m.content));
             return channel.bulkDelete(userMessages);
         }).then(async(r: Collection<string, Message>) => {
             debug.info(

@@ -23,7 +23,6 @@ import moment = require("moment");
 import {MutedUser} from "./models/mutedUser";
 import {Suggestion} from "./models/suggestion";
 import {IgnoredChannel} from "./models/ignoredChannel";
-import {parseMacro} from "../parsers/parseMacro";
 const rootConfig: IORMConfig = require('../../ormconfig.json');
 
 interface IWelcomeMessage {

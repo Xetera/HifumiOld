@@ -78,11 +78,9 @@ import invite from "../../commands/self/invite";
 import log from "../../commands/config/settings/log";
 import ping from "../../commands/info/ping";
 import Anime from "../../API/anime";
-import EconomyHandler from "../economy/economyHandler";
-import daily from "../../commands/economy/daily";
-import balance from "../../commands/economy/balance";
 import {expects} from "../../decorators/expects";
 import {setName} from "../../commands/self/ChangeName";
+import {getAnime} from "../../commands/fun/getAnime";
 
 export interface CommandParameters extends Instance {
     message: Discord.Message;
@@ -607,19 +605,8 @@ export default class CommandHandler implements indexSignature {
     @throttle(3)
     @expects(ArgType.Message)
     private anime(params: CommandParameters){
-        Anime.getInstance().getAnime(params.message, <[string]> params.input);
+        getAnime(params.message, <[string]> params.input)
     }
-
-    @expects(ArgType.None)
-    private daily(params: CommandParameters){
-        daily(params.message);
-    }
-
-    @expects(ArgType.Member, {optional: true})
-    private balance(params: CommandParameters){
-        balance(params.message, <[(GuildMember | undefined)]> params.input);
-    }
-
     // @expect(ArgType.Message)
     // private character(params: CommandParameters){
     //     Anime.getInstance().getCharacter(params.message, <[string]> params.input);

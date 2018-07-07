@@ -236,3 +236,12 @@ export const emptySpace: string = '\u200b';
 export function stringify(...items: string[]){
     return items.map(i => i != null ? i : '').join(' ')
 }
+export function randRange(min: number, max?: number) {
+    if (!max){
+        max = min;
+        min = 0;
+    }
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+}

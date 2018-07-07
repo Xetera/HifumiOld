@@ -1,5 +1,4 @@
 import {Message, RichEmbed} from 'discord.js'
-import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../decorators/expects";
 import Anime from "../../API/anime";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
@@ -7,7 +6,6 @@ import {randomRuntimeError, runtimeErrorResponses} from "../../interfaces/Replie
 import {debug} from "../../utility/Logging";
 import gb from "../../misc/Globals";
 import {random} from "../../utility/Util";
-import {DoggoEndpoint} from "../endpoints/doggoEndpoint";
 
 const placeholders = [
     'Searching...',
@@ -19,7 +17,7 @@ const placeholders = [
     'Going through my anime contacts...'
 ];
 
-async function run(message: Message, input: [string]): Promise<any> {
+export async function getAnime(message: Message, input: [string]): Promise<any> {
     const [anime] = input;
     const placeholder = <Message> await safeSendMessage(
         message.channel,
@@ -32,15 +30,3 @@ async function run(message: Message, input: [string]): Promise<any> {
         placeholder.edit(randomRuntimeError());
     })
 }
-
-export const command: Command = new Command(
-    {
-        names: ['anime'],
-        info: 'Gets information about an anime',
-        usage: '{{prefix}}anime {anime name}',
-        examples: ['{{prefix}}anime New Game!'],
-        category: 'Fun',
-        expects: [{type: ArgType.Message}],
-        run: run
-    }
-);

@@ -5,5 +5,4 @@ export default function prefixReminderEmbed(prefix: string){
         .setTitle(`Hi!`)
         .setColor('BLUE')
         .setDescription(`**My prefix here is: **${prefix}\n**${prefix}help** for more info!`)
-        .setFooter(`Wanted to chat with me? Say my name instead`);
 }

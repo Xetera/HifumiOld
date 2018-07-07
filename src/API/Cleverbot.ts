@@ -98,7 +98,6 @@ export class Cleverbot {
         let userHistory;
         try {
             const user = this.cleverbot.users.find(user => user.id === message.member.id);
-            console.log(user);
             if (!user){
                 return false;
             }
@@ -110,7 +109,6 @@ export class Cleverbot {
         }
         const last = userHistory[userHistory.length - 1];
         const beforeLast = userHistory[userHistory.length - 2];
-        console.log(beforeLast, last);
 
         if (!last || !beforeLast){
             return false;

@@ -1,4 +1,4 @@
-import {IAnilistDate} from "./anilist";
+import {IAnilistDate} from "./anime.interface";
 
 export default function formatAnilistDate(date: IAnilistDate){
     if (date.day && date.month && date.year){

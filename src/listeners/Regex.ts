@@ -6,3 +6,4 @@ export const telegramInviteRegex: RegExp = /(https?):\/\/t.me\/joinchat\/[A-z 0-
 export const hexRegex: RegExp = /(#|0x)([A-Fa-f0-9]{6})([!&*)(+=._\-\s]|$)/;
 export const urlRegex: RegExp = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,11}\b([-a-zA-Z0-9@:%_+.~#?&\/=]*)/;
 export const emojiRegex: RegExp = /<:\w+:\d{17,21}>/;
+export const specialCharRegex: RegExp = /[!@#$%^&*()_{}\[\]]/;

@@ -70,10 +70,8 @@ export namespace AnimeUtils {
     }
 
     export function getRelevantMALId(response: MALResponse, search: string): number | undefined {
-        console.log(response);
         if (response.categories.length){
             const animeCat = response.categories.find(c => c.type === 'anime');
-            console.log(animeCat);
             if (!animeCat || !animeCat.items.length){
                 return;
             } else if (specialCharRegex.test(search)){
@@ -83,9 +81,7 @@ export namespace AnimeUtils {
                  * on animes like New Game!! so in that case we want to search
                  * through all the responses instead of
                  */
-                console.log('contains special chars');
                 const exactMatch = animeCat.items.find(item => item.name.toLowerCase() === search.toLowerCase());
-                console.log(exactMatch);
                 if (exactMatch){
                     return exactMatch.id;
                 }
