@@ -6,7 +6,7 @@ import parseEmbedPlaceholders from "../../parsers/parseEmbedPlaceholders";
 import isUrl = StringUtils.isUrl;
 
 export default function guildMemberAddEmbed(member: GuildMember, message?: string, title?: string, footer?: string, color?: string, thumbnail?: string) {
-    const embed = new Discord.RichEmbed().setTimestamp();
+    const embed = new Discord.RichEmbed()
 
     if (message) {
         message = parseEmbedPlaceholders(member, message);
