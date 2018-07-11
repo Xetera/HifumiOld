@@ -3,7 +3,7 @@ import {Suggestion, SuggestionStatus} from "../../../database/models/suggestion"
 
 const pendingSuggestionColor = '#fff9ae';
 const rejectedSuggestionColor = '#ff2e47';
-const acceptedSuggestionColor = '#4f88ff';
+const acceptedSuggestionColor = '#74ff7f';
 
 export default function suggestionEmbed(message: Message, suggestion: Suggestion){
     let color;
