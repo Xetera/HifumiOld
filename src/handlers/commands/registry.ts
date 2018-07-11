@@ -1,6 +1,4 @@
 import {ArgOptions, ArgType} from "../../decorators/expects";
-import {Channel, TextChannel, VoiceChannel} from "discord.js";
-import * as Discord from 'discord.js'
 
 export const REGISTRY = new Map<string, Map<string, ArgOptions[]>>();
 export function register(cls: string, property: string, decorator: ArgOptions) {

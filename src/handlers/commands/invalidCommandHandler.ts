@@ -6,6 +6,7 @@ import gb from "../../misc/Globals";
 import ReactionManager from "../internal/reactions/reactionManager";
 import {highlight} from "../../utility/Markdown";
 import invalidParametersEmbed from "../../embeds/commands/invalidParametersEmbed";
+import safeSendMessage from "../safe/SafeSendMessage";
 
 export async function handleInvalidParameters(channel : Channel, commandName: string){
     const command = findCommand(commandName.toLowerCase());
@@ -18,11 +19,11 @@ export async function handleInvalidParameters(channel : Channel, commandName: st
         debug.error(`Could not find command ${commandName}`, 'handleInvalidParameters');
         return;
     }
-    else if (!command.arguments) {
+    else if (!command.argLength) {
         debug.error(`An uncallable command was referenced`, 'handleInvalidParameters');
         return;
     }
 
     const embed = await invalidParametersEmbed(prefix, command, channel);
-    channel.send(embed);
+    safeSendMessage(channel, embed);
 }
