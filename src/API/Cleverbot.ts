@@ -1,5 +1,5 @@
 import * as Discord from 'discord.js'
-import {Cleverbot as Clevertype} from 'clevertype'
+import {Cleverbot as Clevertype, Config} from 'clevertype'
 import {debug} from '../utility/Logging'
 import gb from "../misc/Globals";
 import {Channel, Message, MessageMentions, TextChannel} from "discord.js";
@@ -21,7 +21,15 @@ export class Cleverbot {
     identifier : RegExp = /hifumi/i;
     users: {[id: string]: {warnings: number, ignores: Ignores}} = {};
     constructor(apiKey : string){
-        this.cleverbot = new Clevertype(apiKey, true);
+        const configuration: Config = {
+            apiKey: apiKey,
+            mood: {
+                regard: 30,
+                emotion: 100,
+                engagement: 5
+            }
+        };
+        this.cleverbot = new Clevertype(configuration, true);
         debug.info('Cleverbot module is ready', "Cleverbot");
     }
 
