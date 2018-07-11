@@ -3,43 +3,47 @@ import {ArgOptions, ArgType} from "../decorators/expects";
 import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import {resolveMember} from "../resolvers/memberResolver";
 import {handleInvalidParameters} from "../handlers/commands/invalidCommandHandler";
-import {Channel, GuildMember, MessageMentions} from "discord.js";
+import {GuildMember} from "discord.js";
 import {getOnOff} from "../utility/Util";
 import {isBoolean} from "util";
 import {channelResolver} from "../resolvers/channelResolver";
 
 export default async function argParse(params: CommandParameters){
     // Only Expect.None is given, passing all test regardless
-    if (params.expect.length === 1 && params.expect[0].type === ArgType.None){
+    if (params.expect.length === 1 && !Array.isArray(params.expect[0]) && (<ArgOptions> params.expect[0]).type === ArgType.None){
         return true;
     }
-
     // filtering out the commands that are optional to check against the length
     const nonOptionalArgs = params.expect.reduce((arr: (ArgOptions | ArgOptions[])[], e: (ArgOptions | ArgOptions[]))=> {
         if (!Array.isArray(e) && (!e.options || !e.options.optional)){
             arr.push(e);
         }
         else if (Array.isArray(e)){
-            if (!e[0].options){
+            // kind of a weird way of doing it but it should work
+            const isOptional = e.find(op => op.options !== undefined && op.options.optional !== undefined);
+            if (!isOptional){
                 arr.push(e);
             }
         }
         return arr;
-    }, <(ArgOptions | ArgOptions[])[]>[]);
+    }, <(ArgOptions | ArgOptions[])[]> []);
 
-    if (nonOptionalArgs.length > params.args.length){
+    if (params.args.length < nonOptionalArgs.length){
         return void handleInvalidParameters(
             params.message.channel, params.name
         );
     }
+    else if (!nonOptionalArgs.length && !params.args.length){
+        return true;
+    }
     // For some reason, decorators added to the array in reverse
     // so we traverse it in reverse
-    for (let i=params.expect.length - 1; i >= 0; --i){
+    for (let i in params.expect){
         let decorator = params.expect[i];
 
         const input = params.args.shift();
-        const options = params.expect[i].options;
-        const optional = !options ? false : options.optional;
+        const options = !Array.isArray(params.expect[i]) ? (<ArgOptions> params.expect[i]).options : undefined;
+        const optional = options ? options.optional : false;
         if (!input && !optional){
             return void handleInvalidParameters(
                 params.message.channel, params.name
@@ -49,8 +53,7 @@ export default async function argParse(params: CommandParameters){
         else if (!input && optional){
             if (Number(i) <= params.args.length)
                 continue;
-            else
-                break;
+            break;
         }
 
         else if (!params.input){
@@ -61,20 +64,17 @@ export default async function argParse(params: CommandParameters){
         // yes I know this is a disgusting way to do it
         // but I don't want to add inner return statements
         // to every single one of these calls
-
-        // maybe later
-        if (Array.isArray(decorator.type)){
+        if (Array.isArray(decorator)){
             let buffer: any[] = [];
-            for (let i in decorator.type){
+            for (let i in decorator){
                 const check = buffer.filter(b => b !== undefined);
 
                 if (check.length)
                     break;
 
-                switch(decorator.type[i]){
+                switch(decorator[i].type){
                     case ArgType.Member:
                         const strict = options ? options.strict : false;
-
                         const member = await _resolveMember(params, input, false, strict);
                         buffer.push(member);
                         break;
@@ -108,7 +108,7 @@ export default async function argParse(params: CommandParameters){
                 params.input.push(...buffer);
             else {
                 return void handleFailedCommand(
-                    params.message.channel, `I was expecting **${input}** to be a ${decorator.type.join(' or ')}`
+                    params.message.channel, `I was expecting **${input}** to be a ${decorator.map(d => d.type).join(' or ')}`
                 )
             }
         }
@@ -220,5 +220,5 @@ async function _resolveBoolean(params: any, input: any, fail: boolean = true): P
 
 async function _resolveChannel(params: any, input: any, options: any, fail: boolean = true){
     const searchOpts = !options ? 'BOTH' : !options.channelType ? 'BOTH' : options.channelType;
-    return await channelResolver(input, params.message, {channelType: searchOpts, fail: true, onlyMention: true});
+    return await channelResolver(input, params.message, {channelType: searchOpts, fail: fail, onlyMention: true});
 }

@@ -250,16 +250,6 @@ export function randRange(min: number, max?: number) {
     return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
 }
 
-export function randRange(min: number, max?: number) {
-    if (!max){
-        max = min;
-        min = 0;
-    }
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
-}
-
 export function formatAndJoin(array: string[], surrounder: string = '`', spacer: string = ', '){
     return array.map(a => surrounder + a + surrounder).join(spacer);
 }

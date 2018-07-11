@@ -2,10 +2,7 @@ import {GuildMember} from "discord.js";
 import {capitalize, random} from "../utility/Util";
 import {welcomeMessages} from "../interfaces/Replies";
 
-export default function parseEmbedPlaceholders(member: GuildMember, message?: string){
-    if (!message){
-        return;
-    }
+export default function parseTemplatePlaceholders(member: GuildMember, message: string){
     return message
         .replace(/{mention}/g, `<@${member.id}>`)
         .replace(/{id}/g, member.id)
