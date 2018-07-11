@@ -1,20 +1,19 @@
 import * as Discord from "discord.js";
 import {GuildMember} from "discord.js";
 import {capitalize, random, StringUtils} from "../../utility/Util";
-import {welcomeMessages} from "../../interfaces/Replies";
-import parseEmbedPlaceholders from "../../parsers/parseEmbedPlaceholders";
+import parseTemplatePlaceholders from "../../parsers/parseTemplatePlaceholders";
 import isUrl = StringUtils.isUrl;
 
-export default function guildMemberAddEmbed(member: GuildMember, message?: string, title?: string, footer?: string, color?: string, thumbnail?: string) {
-    const embed = new Discord.RichEmbed()
+export default function guildMemberAddEmbed(member: GuildMember, message?: string, title?: string, footer?: string, color?: string, thumbnail?: string, image?: string) {
+    const embed = new Discord.RichEmbed();
 
     if (message) {
-        message = parseEmbedPlaceholders(member, message);
+        message = parseTemplatePlaceholders(member, message);
         embed.setDescription(message)
     }
 
     if (title) {
-        title = parseEmbedPlaceholders(member, title);
+        title = parseTemplatePlaceholders(member, title);
         embed.setTitle(title);
     }
 
@@ -25,8 +24,12 @@ export default function guildMemberAddEmbed(member: GuildMember, message?: strin
         embed.setThumbnail(thumbnail)
     }
 
+    if (image){
+        embed.setImage(image);
+    }
+
     if (footer) {
-        footer = parseEmbedPlaceholders(member, footer);
+        footer = parseTemplatePlaceholders(member, footer);
         embed.setFooter(footer);
     }
 

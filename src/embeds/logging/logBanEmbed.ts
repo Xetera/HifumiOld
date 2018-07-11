@@ -3,7 +3,7 @@ import {Offense} from "../../moderation/interfaces";
 
 export default function logBanEmbed(user: User, reason: string | Offense, bannedBy: User): RichEmbed{
     return new RichEmbed()
-        .setTitle(`User Banned ⛔`)
+        .setTitle(`⛔ User Banned [${user.username}#${user.discriminator}]`)
         .setThumbnail(user.avatarURL)
         .setDescription(user)
         .setColor('#ff0000')

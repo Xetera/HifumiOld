@@ -3,15 +3,15 @@ import ReactionManager from "../../handlers/internal/reactions/reactionManager";
 import {missingPermissionsEmbedColor, warningEmbedColor} from "../../utility/Settings";
 import gb from "../../misc/Globals";
 
-export default function missingAdminEmbed(guild: Guild): RichEmbed{
+export default async function missingAdminEmbed(guild: Guild): Promise<RichEmbed> {
     const embed = new RichEmbed()
         .setTitle(`Admin Command`)
         .setDescription(`I was told to only let admins use that, sorry...`)
         .setColor(missingPermissionsEmbedColor);
-    //TODO: fix the async reaction fetching of this
-    //if (await gb.instance.database.getReactions(guild.id)){
+
+    if (await gb.instance.database.getReactions(guild.id)){
         embed.setThumbnail(ReactionManager.getInstance().sorry[0])
-    //}
+    }
     return embed;
 
 }

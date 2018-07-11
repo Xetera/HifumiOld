@@ -7,14 +7,14 @@ const help: Help = require('../../commands/help.json');
 
 export default async function commandNotFoundEmbed(channel: Channel, commandName: string, pool?: string[]){
     if (!(channel instanceof TextChannel)){
-        return;
+        throw new Error('Can only send embeds to a channel');
     }
-
+    const commands = gb.instance.commandHandler._newCommands;
     if (pool){
-        pool = help.commands.map(c => c.name).concat(pool)
+        pool = commands.map(c => c.names[0]).concat(pool)
     }
     else {
-        pool = help.commands.map(c => c.name);
+        pool = commands.map(c => c.names[0]);
     }
     let suggestion: string = lavenshteinDistance(commandName, pool);
     if (commandName.length > 20){

@@ -1,6 +1,6 @@
 import {Guild, PermissionResolvable, RichEmbed} from "discord.js";
 import ReactionManager from "../../handlers/internal/reactions/reactionManager";
-import {random} from "../../utility/Util";
+import {normalizeString, random} from "../../utility/Util";
 
 export default async function missingSelfPermission(guild: Guild, permission: PermissionResolvable | PermissionResolvable[]){
     const embed = new RichEmbed()

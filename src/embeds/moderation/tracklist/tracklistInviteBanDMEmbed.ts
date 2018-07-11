@@ -8,6 +8,6 @@ export default function tracklistInviteBanDMEmbed(guild: Guild): RichEmbed{
         .setDescription(
             `You were banned in \`${guild.name}\` for posting 2 invites as a tracked member.`+
             `\n\n${advertiseOnBan()}`)
-        .setImage('https://github.com/ilocereal/Hifumi/blob/master/alexanoinvite.png?raw=true')
+        .setImage('https://github.com/ilocereal/Hifumi/raw/master/assets/banners/hifumi_new.png')
         .setTimestamp()
 }

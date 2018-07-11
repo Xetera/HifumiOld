@@ -4,8 +4,9 @@ import moment = require("moment");
 import gb from "../../../misc/Globals";
 import {emptySpace} from "../../../utility/Util";
 
-export default async function getSuggestionEmbed(message: Message, suggestions: Suggestion[], index: number, prefix: string){
+export default function getSuggestionEmbed(message: Message, suggestions: Suggestion[], index: number, prefix: string){
     const suggestion = suggestions[index];
+    console.log(suggestion);
     if (!suggestion){
         return new RichEmbed()
             .setTitle(`No suggestions`)
@@ -25,7 +26,7 @@ export default async function getSuggestionEmbed(message: Message, suggestions: 
             `**Date:** ${moment(suggestion.suggestion_date).calendar()}\n`)
         .addField(`Proposal`, suggestion.suggestion_message + emptySpace +
             `\n\nReact with the appropriate emoji below.\n` +
-            `**${await gb.instance.database.getPrefix(message.guild.id)}help suggestions** for more info`)
+            `**${prefix}help suggestions** for more info`)
 
         // these are not spaces, don't delete
         .setFooter(`[Prev]   [Next] [Approve]  [Deny]        [Quit]`)
