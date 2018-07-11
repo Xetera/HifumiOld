@@ -355,7 +355,7 @@ export class Database {
         })
     }
 
-    public setWelcomeChannel(guildId: string, channelId: string): Promise<Partial<Guild>> {
+    public setWelcomeChannel(guildId: string, channelId: string | undefined): Promise<Partial<Guild>> {
         return this.invalidateCache('guilds').then(() => {
             return this.conn.manager.save(Guild, {id: guildId, welcome_channel: channelId});
         }).catch(err => {

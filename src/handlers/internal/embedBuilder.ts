@@ -1,6 +1,6 @@
 import {TemplatedMessage} from "../../parsers/parsers.interface";
 import templateParser from "../../parsers/templateParser";
-import {ColorResolvable, Message, RichEmbed} from "discord.js";
+import {Channel, ColorResolvable, Message, RichEmbed} from "discord.js";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import safeSendMessage from "../safe/SafeSendMessage";
 import gb from "../../misc/Globals";
@@ -119,22 +119,17 @@ export default class EmbedBuilder {
             );
         }
         const embed: RichEmbed = this.buildEmbed(message, response);
-        message.channel.send(embed);
+        return embed;
         //const title = response['title'];
     }
 
-    public async sendEmbed(message: Message){
-        const prefix = await gb.instance.database.getPrefix(message.guild.id);
+    public async getEmbed(message: Message){
         const templatedMessage = this.embeds[message.member.id];
 
         if (!templatedMessage){
-            return await handleFailedCommand(
-                message.channel, `You haven't created an embed yet! use ${prefix}embed to build one!`
-            );
+            return;
         }
-
-        const embed = this.buildEmbed(message, templatedMessage);
-        safeSendMessage(message.channel, embed);
+        return this.buildEmbed(message, templatedMessage);
     }
 
     public async editEmbed(message: Message, ){

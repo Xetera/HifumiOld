@@ -22,7 +22,7 @@ export function welcomeMessages(member: GuildMember) {
         `Christmas came early, it's ${member}!`,
         `Oh hello, what's this I'm reading about you being a cool duderoni? What do you have to say for yourself ${member}?`,
         `Baby ${member} you got a kid? Cuz you look like OOO MAMA!`,
-        `I got excited for a second but turns out it's just ${member} ${gb.emojis.get('alexa_feels_bad_man')}`
+        `I got excited for a second but turns out it's just ${member} ${gb.emojis.get('hifumi_feels_bad_man')}`
     ];
 }
 
