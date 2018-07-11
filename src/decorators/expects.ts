@@ -1,11 +1,3 @@
-import commandThrottleEmbed from "../embeds/commands/commandThrottleEmbed";
-import {CommandParameters} from "../handlers/commands/CommandHandler";
-import gb from "../misc/Globals";
-import {resolveMember} from "../resolvers/memberResolver";
-import {handleInvalidParameters} from "../handlers/commands/invalidCommandHandler";
-import {capitalize} from "../utility/Util";
-import {GuildMember, Permissions, TextChannel, VoiceChannel} from "discord.js";
-import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import {register} from "../handlers/commands/registry";
 
 export enum ArgType {
