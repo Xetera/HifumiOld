@@ -34,6 +34,7 @@ import logInviteMessageEmbed from "../../embeds/logging/logInviteMessageEmbed";
 import logEditedInviteMessageEmbed from "../../embeds/logging/logEditedInviteMessageEmbed";
 import {Suggestion} from "../../database/models/suggestion";
 import logNewSuggestionEmbed from "../../embeds/logging/suggestions/logNewSuggestionEmbed";
+import {defaultCoreCipherList} from "constants";
 
 enum LogAction {
     JOIN = 'join',
@@ -175,24 +176,36 @@ export class LogManager {
         if (!guild.available || !channel)
             return;
         LogManager.waitForAuditLogs(guild, (audit: GuildAuditLogs) => {
-            const entries = LogManager.findExecutor(audit, "MEMBER_BAN_REMOVE");
-            if (!entries){
-                return LogManager.logUnban(guild, user, recursion || 0);
+            const entry = LogManager.findExecutor(audit, "MEMBER_BAN_REMOVE");
+            if (!entry){
+                return LogManager.logUnban(guild, user, recursion && recursion + 1 || 0);
             }
-            const unbanningStaff: User = entries.executor;
             const originalBan: GuildAuditLogsEntry | undefined = audit.entries.array().find(entry =>
                 entry.target === user && entry.action === 'MEMBER_BAN_ADD'
             );
+
             if (!originalBan)
                 debug.error(`Could not find the original ban reason for unbanned member in ${guild.name}`);
-            const banningStaff: User | 'unknown' = originalBan ? originalBan.executor : 'unknown';
-            LogManager.logWarning(guild, <string> channel, logUnbanEmbed(user, unbanningStaff, banningStaff, originalBan ? originalBan.reason : 'unknown'), LogAction.UNBAN);
+
+            const banningStaff = originalBan ? originalBan.executor : 'unknown';
+            const banReason    = originalBan ? originalBan.reason : 'unknown';
+
+            LogManager.logWarning(guild, <string> channel,
+                logUnbanEmbed(
+                    user, entry.executor, banningStaff, banReason, entry.reason
+                ),
+                LogAction.UNBAN
+            );
         });
     }
 
-    public static async logChannelCreate(target: Channel){
+    public static async logChannelCreate(target: Channel, recursion?: number){
         if (!(target instanceof TextChannel) && !(target instanceof VoiceChannel))
             return void debug.warning(`A new DM channel was created with a user.`, `onChannelCreate`);
+
+        if (recursion && recursion > 3){
+            return debug.warning(`Could not find a channel create log after an channel create event was fired in ${target.guild.name}`);
+        }
 
         const channel = await gb.instance.database.getGuildProperty(
             target.guild.id,
@@ -203,12 +216,23 @@ export class LogManager {
 
 
         LogManager.waitForAuditLogs(target.guild, (audit: GuildAuditLogs) => {
-            const creator = audit.entries.first().executor;
+            const entry = LogManager.findExecutor(audit, "CHANNEL_CREATE");
+
+            if (!entry){
+                return LogManager.logChannelCreate(target, recursion && recursion + 1 || 0);
+            }
+
+            const creator = entry.executor;
             LogManager.logMessage(target.guild, <string> channel, logChannelCreateEmbed(target, creator, target.name), LogAction.CHANNEL_CREATE);
         });
     }
 
-    public static async logChannelDelete(target: Channel){
+    public static async logChannelDelete(target: Channel, recursion?: number){
+
+        if (recursion && recursion > 3){
+            return debug.warning(`Could not find a channel create log after an channel create event was fired in ${(<TextChannel> target).guild.name}`);
+        }
+
         if (!(target instanceof TextChannel) && !(target instanceof VoiceChannel))
             return;
 
@@ -220,7 +244,13 @@ export class LogManager {
             return;
 
         LogManager.waitForAuditLogs(target.guild, (audit: GuildAuditLogs) => {
-            const creator = audit.entries.first().executor;
+            const entry = LogManager.findExecutor(audit, "CHANNEL_DELETE");
+
+            if (!entry){
+                return LogManager.logChannelCreate(target, recursion && recursion + 1|| 0);
+            }
+
+            const creator = entry.executor;
             LogManager.logMessage(target.guild, <string> channel,  logChannelDeleteEmbed(target, creator, target.name), LogAction.CHANNEL_DELETE);
         });
     }
