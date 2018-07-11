@@ -2,7 +2,7 @@ import {
     Channel,
     DiscordAPIError,
     Guild,
-    GuildAuditLogs,
+    GuildAuditLogs, GuildAuditLogsActions,
     GuildAuditLogsEntry,
     GuildMember,
     Message,
@@ -60,6 +60,11 @@ export class LogManager {
                     debug.error(`Could not fetch audit logs for server ${guild.name}, missing permissions`,`LogManager`)
                 });
         }, 1000);
+    }
+
+    private static findExecutor(logs: GuildAuditLogs, action: keyof GuildAuditLogsActions): GuildAuditLogsEntry | undefined {
+        const entries = logs.entries.array();
+        return entries.find(entry => entry.action === action);
     }
 
     public static async logWarning(guild: Guild, channelId: string, embed: RichEmbed|string, action: LogAction){
@@ -120,7 +125,10 @@ export class LogManager {
         LogManager.logMessage(member.guild, <string> channel, logMemberLeaveEmbed(member), LogAction.LEAVE);
     }
 
-    public static async logBan(guild:Guild, member: User, banningUser?: GuildMember){
+    public static async logBan(guild:Guild, member: User, banningUser?: GuildMember, recursion?: number){
+        if (recursion && recursion > 3){
+            return debug.warning(`Could not find a ban log after an ban event was fired in ${guild.name}`);
+        }
         const channel = await gb.instance.database.getGuildProperty(
             guild.id,
             'ban_logging_channel'
@@ -129,7 +137,12 @@ export class LogManager {
             return;
         // race condition but audit log should be winning 99% of the time
         LogManager.waitForAuditLogs(guild, (audit: GuildAuditLogs) => {
-            const entry = audit.entries.first();
+            const entry = LogManager.findExecutor(audit, 'MEMBER_BAN_ADD');
+
+            if (!entry){
+                return LogManager.logBan(guild, member, banningUser, recursion || 0);
+            }
+
             if (entry.reason && entry.reason.includes('<TRACKED>'))
                 return; // this is a tracked member ban, we don't want to log it normally
             LogManager.logWarning(guild, <string> channel, logBanEmbed(member, entry.reason, banningUser ? banningUser.user : entry.executor), LogAction.BAN)
@@ -150,7 +163,11 @@ export class LogManager {
             LogManager.logWarning(guild, <string> channel, logWatchlistInviteBanEmbed(member), LogAction.BAN);
     }
 
-    public static async logUnban(guild:Guild, user: User){
+    public static async logUnban(guild:Guild, user: User, recursion?: number){
+        if (recursion && recursion > 3){
+            return debug.warning(`Could not find an unban log after an unban event was fired in ${guild.name}`);
+        }
+
         const channel = await gb.instance.database.getGuildProperty(
             guild.id,
             'unban_logging_channel'
@@ -158,9 +175,12 @@ export class LogManager {
         if (!guild.available || !channel)
             return;
         LogManager.waitForAuditLogs(guild, (audit: GuildAuditLogs) => {
-            const auditEntries = audit.entries;
-            const unbanningStaff: User = auditEntries.first().executor;
-            const originalBan: GuildAuditLogsEntry | undefined = auditEntries.array().find(entry =>
+            const entries = LogManager.findExecutor(audit, "MEMBER_BAN_REMOVE");
+            if (!entries){
+                return LogManager.logUnban(guild, user, recursion || 0);
+            }
+            const unbanningStaff: User = entries.executor;
+            const originalBan: GuildAuditLogsEntry | undefined = audit.entries.array().find(entry =>
                 entry.target === user && entry.action === 'MEMBER_BAN_ADD'
             );
             if (!originalBan)
@@ -224,7 +244,7 @@ export class LogManager {
             'ping_logging_channel'
         );
         if (!message.guild.available ||!target)
-            return;
+            return
 
         LogManager.logWarning(message.member.guild, <string> target, logMentionSpamEmbed(
             message.member,

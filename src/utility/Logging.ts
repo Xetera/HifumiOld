@@ -1,4 +1,3 @@
-import * as dbg from 'debug'
 import * as Discord from'discord.js'
 import gb from "../misc/Globals";
 const cli = require('heroku-cli-util');
@@ -38,8 +37,6 @@ export function startupTable(guilds : GuildStats[]){
         ]
     });
 }
-
-
 
 
 // TODO: remove this and just convert everything that bot sends into embeds

@@ -17,8 +17,11 @@ import {discordInviteRegex, emojiRegex, urlRegex} from "../listeners/Regex";
  *
  * @param {number} [min=0] - Optional start range.
  * @param {number} range - Max range.
- * @returns {number} - Random choice within range
+ * @returns {number} - Rando
+ * m choice within range
  */
+export function random<T>(min: T[]): T;
+export function random(min: number, range?: number): number;
 export function random(min : number | any[] = 0, range ?: number) : number | any {
     if (typeof min === 'number' && range){
         if (!min){
@@ -82,15 +85,7 @@ export function channelOverrideDeniesRolePermission(channel: Channel, role: Role
         )
     );
 }
-export function pluralize(word : string, number: number) : string | -1 {
-    if (number > 1 || number === 0){
-        return word + 's';
-    }
-    else if (number === 1){
-        return word;
-    }
-    return -1;
-}
+export const pluralize = (word : string, number: number) : string => number != 1 ? `${word}s` : word;
 
 
 export interface ITime {
@@ -200,6 +195,8 @@ export namespace UserUtils {
         const flexInput = input.toLowerCase();
         return (user.nickname && user.nickname.toLowerCase() === flexInput) || user.user.username.toLowerCase() === flexInput;
     }
+
+
 }
 
 export namespace InviteUtils {
@@ -220,6 +217,13 @@ export namespace StringUtils {
     }
     export function isEmoji(input: string){
         return emojiRegex.test(input);
+    }
+    export function shortenString(content: string, amount: number = 300): string {
+        if (content.length < amount){
+            return content;
+        }
+        const beginning = content.substring(0, amount);
+        return `${beginning}...`;
     }
 }
 
@@ -244,4 +248,23 @@ export function randRange(min: number, max?: number) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+}
+
+export function randRange(min: number, max?: number) {
+    if (!max){
+        max = min;
+        min = 0;
+    }
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+}
+
+export function formatAndJoin(array: string[], surrounder: string = '`', spacer: string = ', '){
+    return array.map(a => surrounder + a + surrounder).join(spacer);
+}
+
+export function randomObjectValue<T>(object: {[key: string]: T }): T  {
+    const keys: string[] = Object.keys(object);
+    return object[random(keys)];
 }
