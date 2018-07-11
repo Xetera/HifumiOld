@@ -14,6 +14,7 @@ import {
 } from "../../embeds/commands/configEmbed/channelPermissionsCalculatorEmbed";
 import {debug} from "../../utility/Logging";
 import gb from "../../misc/Globals";
+import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 
 interface IRoleCoverage{
     override: Map<Role, TextChannel[]>;
@@ -192,6 +193,6 @@ export async function muteCoverage(message: Message){
         embed = missingMuteOverwritesEmbed(total.missing.map(channel => channel.name), muteRole.role.name);
     }
 
-    message.channel.send(embed);
+    safeSendMessage(message.channel, embed);
     //message.channel.send(embed)
 }

@@ -8,8 +8,20 @@ export interface Command {
     arguments: string;
     permissions?: 'MOD' | 'ADMIN' | 'OWNER'
 }
+export type HelpCategories = "Logging"
+    | "Info"
+    | "Chat"
+    | "Utility"
+    | "Moderation"
+    | "Settings"
+    | "Fun"
+    | "Embeds"
+    | "Suggestions"
+    | "Settings"
+    | "Economy"
+    | "Debug";
 
 export interface Help {
-    categories: string[];
-    commands: Command[]
+    categories: HelpCategories;
+    commands: Command[];
 }

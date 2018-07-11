@@ -1,13 +1,36 @@
 import {Message} from "discord.js";
 import gb from "../../misc/Globals";
-import {handleInvalidParameters} from "../../handlers/commands/invalidCommandHandler";
-import {User} from "../../database/models/user";
-import {Guild} from "../../database/models/guild";
+import {Command} from "../../handlers/commands/Command";
+import {ArgType} from "../../decorators/expects";
+import {UserPermissions} from "../../handlers/commands/command.interface";
+import safeSendMessage from "../../handlers/safe/SafeSendMessage";
+import successEmbed from "../../embeds/commands/successEmbed";
 import {randomRuntimeError} from "../../interfaces/Replies";
 
-export default async function setHints(message: Message, input: [boolean]){
+export async function hints(message: Message, input: [boolean]){
     const [state] = input;
-    gb.instance.database.setCommandHints(message.guild.id, state).then(() => {
-        message.channel.send(`Alright, my command hints are **${state ? 'on' : 'off'}** now.`);
-    }).catch();
+    try {
+        await gb.instance.database.setCommandHints(message.guild.id, state);
+    }
+    catch (err) {
+        return safeSendMessage(message.channel, randomRuntimeError());
+    }
+
+    safeSendMessage(
+        message.channel,
+        successEmbed(message.member, `My command hints are **${state ? 'on' : 'off'}** now.`)
+    );
 }
+
+export const command: Command = new Command(
+    {
+        names: ['hints'],
+        info: 'Toggles my settings for suggesting corrections to incorrect commands.',
+        usage: "{{prefix}}hints { 'on' | 'off' }",
+        examples: ['{{prefix}}hints off'],
+        category: 'Settings',
+        expects: [{type: ArgType.Boolean}],
+        run: hints,
+        userPermissions: UserPermissions.Moderator,
+    }
+);

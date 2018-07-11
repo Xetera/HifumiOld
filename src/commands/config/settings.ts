@@ -1,6 +1,4 @@
 import {Message} from "discord.js";
-import {Database} from "../../database/Database";
-
 import {debug} from '../../utility/Logging'
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import gb from "../../misc/Globals";
@@ -8,17 +6,19 @@ import {Guild} from "../../database/models/guild";
 import getSettingsEmbed from "../../embeds/commands/configEmbed/getConfig";
 import setPrefix from "./SetPrefix";
 import {handleInvalidParameters} from "../../handlers/commands/invalidCommandHandler";
-import setHints from "../self/hints";
+import {hints} from "../self/hints";
 import {getOnOff} from "../../utility/Util";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
-import onlyAdmin from "../../decorators/onlyAdmin";
 import missingAdminEmbed from "../../embeds/permissions/missingAdminEmbed";
-import setStrikeLimit from "../moderation/setStrikeLimit";
-import reactions from "./reactions";
-import setNewMemberTracking from "../moderation/setNewMemberTracking";
-import setInvites from "./setInvites";
-import setInviteWarn from "./setInviteWarn";
-import setInviteBan from "./setInviteBan";
+import _setStrikeLimit from "../moderation/_setStrikeLimit";
+import {reactions} from "./reactions";
+import {setMemberTracking} from "../moderation/setNewMemberTracking";
+import setInvites from "./_setInvites";
+import setInviteWarn from "./_setInviteWarn";
+import setInviteBan from "./_setInviteBan";
+import {Command} from "../../handlers/commands/Command";
+import {ArgType} from "../../decorators/expects";
+import {UserPermissions} from "../../handlers/commands/command.interface";
 
 export default async function settings(message : Message, input: [(string | undefined), (string | undefined)]) {
     const [setting, choice] = input;
@@ -38,7 +38,7 @@ export default async function settings(message : Message, input: [(string | unde
         return void safeSendMessage(message.channel, embed);
     }
     else if (!message.member.hasPermission('ADMINISTRATOR')){
-        return void safeSendMessage(message.channel, missingAdminEmbed(message.guild));
+        return void safeSendMessage(message.channel, await missingAdminEmbed(message.guild));
     }
 
     if (setting === 'prefix'){
@@ -59,7 +59,7 @@ export default async function settings(message : Message, input: [(string | unde
                 message.channel, `I was expecting **${choice}** to be 'on' or 'off'`
             );
         }
-        return void setHints(message, [bool])
+        return void hints(message, [bool])
     }
     else if (setting === 'premium'){
         return void safeSendMessage(message.channel, '😂');
@@ -78,7 +78,7 @@ export default async function settings(message : Message, input: [(string | unde
             )
         }
 
-        return void setStrikeLimit(message, [num]);
+        return void _setStrikeLimit(message, [num]);
     }
     else if (setting === 'reactions'){
         if (!choice){
@@ -107,7 +107,7 @@ export default async function settings(message : Message, input: [(string | unde
             )
         }
 
-        return void setNewMemberTracking(message, [bool]);
+        return void setMemberTracking(message, [bool]);
     }
     else if (setting === 'invites'){
         if (!choice){
@@ -139,6 +139,7 @@ export default async function settings(message : Message, input: [(string | unde
 
         return void setInviteWarn(message, [num]);
     }
+
     else if (setting === 'inviteban'){
         if (!choice){
             return void handleInvalidParameters(
@@ -160,3 +161,19 @@ export default async function settings(message : Message, input: [(string | unde
         );
     }
 }
+
+export const command: Command = new Command(
+    {
+        names: ['settings'],
+        info: 'Displays all the settings that are available in this guild',
+        usage: '{{prefix}}settings',
+        examples: ['{{prefix}}settings'],
+        category: 'Settings',
+        expects: [
+            {type: ArgType.String, options: {optional: true}},
+            {type: ArgType.String, options: {optional: true}}
+        ],
+        run: settings,
+        userPermissions: UserPermissions.Moderator,
+    }
+);

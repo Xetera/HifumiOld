@@ -1,26 +1,45 @@
-import * as Discord from 'discord.js'
-import * as dbg from "debug";
-import {getHelp} from "./help/Help";
-import {handleInvalidParameters} from "../../handlers/commands/invalidCommandHandler";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
-import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
-import {GuildMember} from "discord.js";
+import {GuildMember, RichEmbed} from "discord.js";
 import pfpEmbed from "../../embeds/commands/pfpEmbed";
+import {Message} from 'discord.js'
+import {Command} from "../../handlers/commands/Command";
+import {ArgType} from "../../decorators/expects";
 
-export const debug = {
-    silly  : dbg('Bot:PFP:Silly'),
-    info   : dbg('Bot:PFP:Info'),
-    warning: dbg('Bot:PFP:Warning'),
-    error  : dbg('Bot:PFP:Error')
-};
-export default async function pfp(message: Discord.Message, input: [GuildMember]){
-    const [user] = input;
-
+function getPfp(user: GuildMember): string | RichEmbed {
     let url = user.user.avatarURL;
 
     if (url == null){
-        return message.channel.send(`${user.user.username} does not have a profile picture.`);
+        return `${user.user.username} does not have a profile picture.`;
+    }
+    return pfpEmbed(user);
+}
+
+async function run(message: Message, input: [(GuildMember | undefined)]): Promise<any> {
+    const [user] = input;
+    let out;
+    if (!user){
+        out = getPfp(message.member);
+    }
+    else {
+        out = getPfp(user);
     }
 
-    safeSendMessage(message.channel, pfpEmbed(user));
+    safeSendMessage(message.channel, out);
 }
+
+export const command: Command = new Command(
+    {
+        names: ['avatar', 'profilepic', 'pfp'],
+        info: "Gets a users's avatar",
+        usage: '{{prefix}}avatar { user }',
+        examples: [
+            '{{prefix}}avatar @Xetera',
+            '{{prefix}}avatar Xetera',
+            '{{prefix}}avatar 140862798832861184'
+        ],
+        category: 'Info',
+        expects: [{type: ArgType.Member, options: {optional: true}}],
+        run: run
+    }
+);
+

@@ -10,7 +10,7 @@ export default async function cleanse(channel : Channel, input: [number] | undef
     const limit = safeGetArgs(input, 50);
     if (channel instanceof TextChannel){
         if (!channel.guild.members.find('id', channel.client.user.id).hasPermission("MANAGE_MESSAGES"))
-            return channel.send(`${gb.emojis.get('alexa_feels_bad_man')} I'm not allowed to delete messages...`);
+            return channel.send(`${gb.emojis.get('hifumi_feels_bad_man')} I'm not allowed to delete messages...`);
 
         const prefix = await gb.instance.database.getPrefix(channel.guild.id);
         const messages : Collection<Snowflake, Message> = await channel.fetchMessages({limit: limit});

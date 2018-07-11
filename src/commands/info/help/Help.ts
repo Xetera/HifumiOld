@@ -1,76 +1,89 @@
-import * as Discord from 'discord.js'
-import {Database} from "../../../database/Database";
-import {Command, Help} from "./help.interface";
-import {Message, RichEmbed} from "discord.js";
-import {handleInvalidParameters} from "../../../handlers/commands/invalidCommandHandler";
+import {Message, RichEmbed, TextChannel} from "discord.js";
 import commandNotFoundEmbed from "../../../embeds/commands/commandNotFoundEmbed";
-import {highlight} from "../../../utility/Markdown";
 import {capitalize, random} from "../../../utility/Util";
 import {commandEmbedColor} from "../../../utility/Settings";
 import gb from "../../../misc/Globals";
-import helpMacroEmbed from "../../../embeds/commands/helpMacroEmbed";
-const help = require('../../help.json');
-
-export async function getHelp(message : Message, input: [string] | undefined) {
-    const choice = Array.isArray(input) ? input.join(' ') : undefined;
+import helpMacroEmbed from "../../../embeds/commands/info/helpMacroEmbed";
+import {ArgType} from "../../../decorators/expects";
+import {Command} from "../../../handlers/commands/Command";
+import safeSendMessage from "../../../handlers/safe/SafeSendMessage";
+import commandHelpEmbed from "../../../embeds/commands/info/commandHelpEmbed";
+import CommandHandler from "../../../handlers/commands/CommandHandler";
+async function run(message: Message, input: [string | undefined]): Promise<any> {
+    const [choice] = input;
     const prefix: string = await gb.instance.database.getPrefix(message.guild.id);
-    if (!choice){
-        const prefix : string = await gb.instance.database.getPrefix(message.guild.id);
-        let embed = new RichEmbed();
 
-        let sortedCommands: {[type:string]: Command[]} = help.commands.reduce((obj: {[type:string]: Command[]}, command: Command) => {
-            // we don't want to send ALL the settings commands in help
-            if (command.hidden)
-                return obj;
-            if (!obj[command.type]){
-                obj[command.type] = [];
-            }
-            obj[command.type].push(command);
-            return obj;
-        }, {});
-        // this may be a little
-
-        for(let key in sortedCommands){
-            // sorting alphabetically
-            sortedCommands[key] = sortedCommands[key].sort(function(a, b){
-                if(a.name < b.name) return -1;
-                if(a.name > b.name) return 1;
-                return 0;
-            });
-
-            const command = sortedCommands[key].map((cmd: Command)=> '`' + prefix + cmd.name + '`').join(', ');
-            embed.addField('⇨ ' + sortedCommands[key][0].type + ' ⇦', command);
-        }
-        const randomCategory = sortedCommands[random(Object.keys(sortedCommands))];
-        embed.setTitle(`__Commands__`)
-            .setDescription(`I auto delete messages starting with 2 of your prefixes like so \`${prefix + prefix}${randomCategory[random(Object.keys(randomCategory))].name}\`\n`)
-            .setColor(commandEmbedColor)
-            .setFooter(`${prefix}help {command} for more info`);
-        message.channel.send(embed);
-        return;
+    if (choice){
+        return getSpecificHelp(message, choice, prefix);
     }
-    // searching specific command
-    getSpecificHelp(message, choice, prefix);
+
+    let embed = new RichEmbed();
+    const commands = gb.instance.commandHandler._newCommands;
+    let sortedCommands: {[type:string]: Command[]} = commands.reduce((obj: {[type:string]: Command[]}, command: Command) => {
+        // we don't want to send ALL the settings commands in help
+        if (command.hidden)
+            return obj;
+        if (!obj[command.category]) {
+            obj[command.category] = [];
+        }
+        obj[command.category].push(command);
+        return obj;
+    }, {});
+
+    let hasMissingCommands = false;
+
+    for(let key in sortedCommands){
+        // sorting alphabetically
+        sortedCommands[key] = sortedCommands[key].sort((a, b) => {
+            if(a.names[0] < b.names[0]) return -1;
+            if(a.names[0] > b.names[0]) return 1;
+            return 0;
+        });
+
+        const command = sortedCommands[key].map((cmd: Command) => {
+            if (!cmd.hasClientPermissions(message.guild) || CommandHandler.getMissingUserPermission(message.member, cmd)){
+                hasMissingCommands = true;
+                return `~~${prefix}${cmd.names[0]}~~`
+            }
+            return `${prefix}${cmd.names[0]}`;
+
+        }).join(', ');
+        embed.addField('⇨ ' + sortedCommands[key][0].category + ' ⇦', command);
+    }
+
+    const randomCategory = sortedCommands[random(Object.keys(sortedCommands))];
+    let description = `I auto delete messages starting with 2 of your prefixes like so **${prefix + prefix}${random(randomCategory).names[0]}**\n`
+    if (hasMissingCommands){
+        description += `~~These~~ are commands that can not be run due to missing permissions.`;
+    }
+    embed.setTitle(`__Commands__`)
+        .setDescription(description)
+        .setColor(commandEmbedColor)
+        .setFooter(`${prefix}help {command} for more info`);
+    safeSendMessage(message.channel, embed);
+    return;
 }
 
+export const command: Command = new Command(
+    {
+        names: ['help', 'h'],
+        info: 'Sends info on all my commands or a specific command.',
+        usage: '{{prefix}}help [command?]',
+        examples: ['{{prefix}}help', '{{prefix}}help setgreeting'],
+        category: 'Info',
+        expects: [{ type: ArgType.Message, options: { optional: true } }],
+        run: run
+    }
+);
+
 async function getSpecificHelp(message: Message, arg: string, prefix: string){
-    const command: Command = help.commands.find((command: Command)=> command.name === arg);
+    const command: Command | undefined = gb.instance.commandHandler._newCommands.find(cmd => cmd.names.includes(arg));
     if (!command) {
         const macro = await gb.instance.database.getMacro(message.guild.id, arg);
         if (macro){
-            return message.channel.send(helpMacroEmbed(message.guild, macro));
+            return safeSendMessage(message.channel, helpMacroEmbed(message.guild, macro));
         }
-        return message.channel.send(await commandNotFoundEmbed(message.channel, arg));
+        return safeSendMessage(message.channel, await commandNotFoundEmbed(message.channel, arg));
     }
-    const shortCommand: boolean = command.usage === command.example;
-    let embed = new RichEmbed()
-        .setTitle('__' + prefix + command.name + '__')
-        .setColor(commandEmbedColor)
-        .addField('Info', command.info.replace(/{{prefix}}/g, prefix))
-        .addField('Usage', highlight(prefix + command.usage))
-        .addField('Example', highlight(prefix + command.example))
-        .addField('Permissions', command.permissions ? command.permissions : 'Everyone', true)
-        .addField('Arguments', command.arguments, true)
-        .addField('Type', command.type, true);
-    message.channel.send(embed);
+    return safeSendMessage(message.channel, commandHelpEmbed(command, prefix, message.guild));
 }

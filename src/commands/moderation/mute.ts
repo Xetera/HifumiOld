@@ -3,14 +3,12 @@ import gb from "../../misc/Globals";
 import moment = require("moment");
 import {formattedTimeString} from "../../utility/Util";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
-import {handleInvalidParameters} from "../../handlers/commands/invalidCommandHandler";
+import {Command} from "../../handlers/commands/Command";
+import {ArgType} from "../../decorators/expects";
+import {UserPermissions} from "../../handlers/commands/command.interface";
+import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 
-/**
- * Mutes the user a certain duration
- * @param {Message} message
- * @param {any[]} input
- */
-export default async function muteUser(message: Message, input: [GuildMember, number, string]) {
+async function run(message: Message, input: [GuildMember, number, string]): Promise<any> {
     const [member, duration, reason] = input;
 
     // controlling for edge cases
@@ -41,7 +39,7 @@ export default async function muteUser(message: Message, input: [GuildMember, nu
     }
 
     // message.channel.send returns (Message|Message[]), typeguards guarantee Message here
-    const placeholder = <Message> await message.channel.send(`Working on it...`);
+    const placeholder = <Message> await safeSendMessage(message.channel, `Working on it...`);
 
     const unmuteDate = moment(new Date()).add(duration, 'm').toDate();
 
@@ -56,3 +54,17 @@ export default async function muteUser(message: Message, input: [GuildMember, nu
         return placeholder.edit(`Muted ${member.user.username} for ${formattedTimeString(duration * 60)}`);
     }).then(x => x.delete(30000));
 }
+
+export const command: Command = new Command(
+    {
+        names: ['mute'],
+        info: 'Mutes a user for a specific time period (somewhat broken right now).',
+        usage: '{{prefix}}mute { user } { minutes } { reason }',
+        examples: ['{{prefix}}mute @Xetera 60 You need to rethink your life'],
+        category: 'Moderation',
+        expects: [{type: ArgType.Member}, {type: ArgType.Number}, {type: ArgType.Message}],
+        run: run,
+        userPermissions: UserPermissions.Moderator,
+        clientPermissions: ['MANAGE_ROLES']
+    }
+);

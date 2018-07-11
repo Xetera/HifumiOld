@@ -3,6 +3,7 @@ import gb from "../../misc/Globals";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {debug} from "../../utility/Logging";
+import successEmbed from "../../embeds/commands/successEmbed";
 
 export default async function denySuggestion(message: Message, input: [string]){
     const [id] = input;

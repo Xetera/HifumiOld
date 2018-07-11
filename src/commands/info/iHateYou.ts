@@ -2,8 +2,10 @@ import {Message, RichEmbed} from "discord.js";
 import gb from "../../misc/Globals";
 import ReactionManager from "../../handlers/internal/reactions/reactionManager";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
+import {Command} from "../../handlers/commands/Command";
+import {ArgType} from "../../decorators/expects";
 
-export default async function iHateYou(message: Message) {
+async function run(message: Message): Promise<any> {
     const embed = new RichEmbed()
         .setTitle(`:(`)
         .setColor('PURPLE')
@@ -14,4 +16,17 @@ export default async function iHateYou(message: Message) {
         embed.setThumbnail(ReactionManager.getInstance().crying)
     }
     safeSendMessage(message.channel, embed);
+
 }
+
+export const command: Command = new Command(
+    {
+        names: ['yousuck'],
+        info: 'Breaks my heart...',
+        usage: '{{prefix}}yousuck',
+        examples: ['{{prefix}}yousuck'],
+        category: 'Info',
+        expects: [{type: ArgType.None}],
+        run: run,
+    }
+);

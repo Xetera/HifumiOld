@@ -3,11 +3,14 @@ import {Message, MessageCollector, MessageReaction, ReactionCollector, User} fro
 import {Suggestion} from "../../database/models/suggestion";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import getSuggestionEmbed from "../../embeds/commands/suggestions/getSuggestionEmbed";
-import approveSuggestion from "./approveSuggestion";
-import denySuggestion from "./denySuggestion";
+import approveSuggestion from "./_approveSuggestion";
+import denySuggestion from "./_denySuggestion";
 import {debug} from "../../utility/Logging";
+import {Command} from "../../handlers/commands/Command";
+import {ArgType} from "../../decorators/expects";
+import {UserPermissions} from "../../handlers/commands/command.interface";
 
-export default async function getSuggestions(message: Message){
+async function run(message: Message): Promise<any> {
     let index = 0;
     let errored = false;
     let end = false;
@@ -17,40 +20,34 @@ export default async function getSuggestions(message: Message){
     const embed = await getSuggestionEmbed(message, suggestions, index, prefix);
     const suggestionMenu = <Message> await safeSendMessage(message.channel, embed);
 
-    if (embed.title === `No suggestions`){
+    if (embed.title === `No suggestions`) {
         return;
     }
 
     const collector = new ReactionCollector(suggestionMenu, (reaction: MessageReaction, user: User) => {
         const emoji = reaction.emoji.name;
-        return(emoji === '⬅' || emoji === '➡'
-            || emoji === '✅'|| emoji === '❌'
+        return (emoji === '⬅' || emoji === '➡'
+            || emoji === '✅' || emoji === '❌'
             || emoji === '🚪')
             && user.id === message.author.id;
     }, {time: 120000});
 
-    collector.on('collect', async(msg: Message, collector) => {
+    collector.on('collect', async (msg: Message, collector) => {
         const emoji = collector.collected.last().emoji.name;
 
-        if (emoji === '➡'){
-            if (index + 1 < suggestions.length){
+        if (emoji === '➡') {
+            if (index + 1 < suggestions.length) {
                 index++;
             }
-            else {
-                index = 0;
-            }
             suggestionMenu.edit(getSuggestionEmbed(message, suggestions, index, prefix))
         }
-        else if (emoji === '⬅'){
-            if (index - 1 >= 0){
+        else if (emoji === '⬅') {
+            if (index - 1 >= 0) {
                 index--;
             }
-            else {
-                index = suggestions.length - 1;
-            }
             suggestionMenu.edit(getSuggestionEmbed(message, suggestions, index, prefix))
         }
-        else if (emoji === '✅'){
+        else if (emoji === '✅') {
             approveSuggestion(message, [suggestions[index].suggestion_id])
                 .catch(() => {
                     errored = true;
@@ -58,48 +55,45 @@ export default async function getSuggestions(message: Message){
                 });
             suggestions.splice(index, 1);
 
-            if (suggestions[index]){
+            if (suggestions[index]) {
                 suggestionMenu.edit(getSuggestionEmbed(message, suggestions, index, prefix));
             }
-            else if (!suggestions.length){
+            else if (!suggestions.length) {
                 suggestionMenu.edit(getSuggestionEmbed(message, suggestions, index, prefix));
                 suggestionMenu.clearReactions();
                 collector.stop();
                 end = true;
             }
-            else if (suggestions[index - 1]){
+            else if (suggestions[index - 1]) {
                 index--;
                 suggestionMenu.edit(getSuggestionEmbed(message, suggestions, index, prefix));
             }
-            else {
-
-            }
         }
-        else if (emoji === '❌'){
+        else if (emoji === '❌') {
             denySuggestion(message, [suggestions[index].suggestion_id])
                 .catch(() => {
                     suggestionMenu.delete()
                 });
             suggestions.splice(index, 1);
 
-            if (suggestions[index]){
+            if (suggestions[index]) {
                 // we don't want to increase the index here
                 // since the elements in the array slide
                 // back when spliced
                 suggestionMenu.edit(getSuggestionEmbed(message, suggestions, index, prefix));
             }
-            else if (!suggestions.length){
+            else if (!suggestions.length) {
                 suggestionMenu.edit(getSuggestionEmbed(message, suggestions, index, prefix));
                 collector.stop();
                 end = true;
             }
-            else if (suggestions[index - 1]){
+            else if (suggestions[index - 1]) {
                 index--;
                 suggestionMenu.edit(getSuggestionEmbed(message, suggestions, index, prefix));
             }
         }
 
-        else if (emoji === '🚪'){
+        else if (emoji === '🚪') {
             return void collector.stop();
         }
         try {
@@ -109,14 +103,14 @@ export default async function getSuggestions(message: Message){
             await reaction.remove(user);
         }
         catch (e) {
-            if (e.message === 'Unknown Message'){
+            if (e.message === 'Unknown Message') {
                 return;
             }
             debug.error(e, `getSuggestions`);
         }
     });
 
-    collector.on('end' , () => suggestionMenu.delete());
+    collector.on('end', () => suggestionMenu.delete());
 
     if (end)
         return;
@@ -131,10 +125,23 @@ export default async function getSuggestions(message: Message){
         await suggestionMenu.react(`🚪`);
     }
     catch (e) {
-        if (e.message === 'Unknown Message'){
+        if (e.message === 'Unknown Message') {
             return;
         }
         debug.error(e, `getSuggestions`);
     }
-
 }
+
+export const command: Command = new Command(
+    {
+        names: ['suggestions'],
+        info: 'Get all the suggestions that are awaiting approval',
+        usage: '{{prefix}}suggestions',
+        examples: ['{{prefix}}suggestions'],
+        category: 'Utility',
+        expects: [{type: ArgType.None}],
+        run: run,
+        clientPermissions: ['MANAGE_MESSAGES'],
+        userPermissions: UserPermissions.Moderator,
+    }
+);

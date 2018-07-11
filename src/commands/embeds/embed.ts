@@ -4,8 +4,8 @@ import {ArgType} from "../../decorators/expects";
 import EmbedBuilder from "../../handlers/internal/embedBuilder";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 
-async function run(message: Message): Promise<any> {
-    const embed: RichEmbed | void = await EmbedBuilder.getInstance().editEmbed(message);
+async function run(message: Message, input: [string]): Promise<any> {
+    const embed: RichEmbed | void = await EmbedBuilder.getInstance().embed(message, input);
     if (embed){
         safeSendMessage(message.channel, embed);
     }
@@ -13,11 +13,16 @@ async function run(message: Message): Promise<any> {
 
 export const command: Command = new Command(
     {
-        names: ['editembed', 'ee'],
-        info: 'Edits your current embed, only replacing given portions',
-        usage: '{{prefix}}editembed { template }',
+        names: ['embed'],
+        info: 'Sends an embed to the channel',
+        usage: '{{prefix}}embed { template }',
         examples: [
-            '{{prefix}}editembed' +
+            '{{prefix}}embed\n' +
+            '%title% Rules\n' +
+            '%description% Here are the rules!\n' +
+            '%field1% No spamming\n' +
+            '%value1% Thanks\n' +
+            '%color% red\n' +
             '%footer% boi'
         ],
         category: 'Embeds',
@@ -25,4 +30,3 @@ export const command: Command = new Command(
         run: run,
     }
 );
-

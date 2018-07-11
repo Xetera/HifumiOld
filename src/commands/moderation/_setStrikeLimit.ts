@@ -4,7 +4,7 @@ import gb from "../../misc/Globals";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import resolveBooleanUncertainty from "../../resolvers/resolveBooleanUncertainty";
 
-export default async function setStrikeLimit(message: Message, input: [number]){
+export default async function _setStrikeLimit(message: Message, input: [number]){
     const [limit] = input;
     if (limit > 20){
         return void handleFailedCommand(

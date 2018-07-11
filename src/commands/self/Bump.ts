@@ -1,7 +1,9 @@
-import * as Discord from 'discord.js'
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
+import {Message} from 'discord.js'
+import {Command} from "../../handlers/commands/Command";
+import {ArgType} from "../../decorators/expects";
 
-export default function bump(message: Discord.Message){
+async function run(message: Message): Promise<any> {
     const members = message.guild.members;
     const bots = [];
     if (members.get('222853335877812224')){
@@ -18,3 +20,15 @@ export default function bump(message: Discord.Message){
         safeSendMessage(message.channel,'Could not find DLM or ServerHound in the server.', 60);
     }
 }
+
+export const command: Command = new Command(
+    {
+        names: ['bump'],
+        info: 'Bumps the server if ServerHound or DLM are on the server.',
+        usage: '{{prefix}}bump',
+        examples: ['{{prefix}}bump'],
+        category: 'Utility',
+        expects: [{type: ArgType.None}],
+        run: run
+    }
+);

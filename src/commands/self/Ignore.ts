@@ -1,15 +1,13 @@
-import * as Discord from 'discord.js'
-import {Database} from "../../database/Database";
 import {Channel, GuildMember, TextChannel} from "discord.js";
-import {underline} from "../../utility/Markdown";
 import gb from "../../misc/Globals";
-import {User} from "../../database/models/user";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
-import {handleInvalidParameters} from "../../handlers/commands/invalidCommandHandler";
-import {resolveMember} from "../../resolvers/memberResolver";
-import {UpdateResult} from "typeorm";
+import {Message} from 'discord.js'
+import {Command} from "../../handlers/commands/Command";
+import {ArgType} from "../../decorators/expects";
+import {UserPermissions} from "../../handlers/commands/command.interface";
+import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 
-export default async function ignore(message: Discord.Message, input: [GuildMember | Channel]) {
+async function run(message: Message, input: [GuildMember | Channel]): Promise<any> {
     const [target] = input;
     if (target instanceof GuildMember) {
         if (target.id === gb.ownerID) {
@@ -42,9 +40,9 @@ export default async function ignore(message: Discord.Message, input: [GuildMemb
         }
 
         if (!status)
-            message.channel.send(`Ignoring everything from ${target.user.username}.`);
+            safeSendMessage(message.channel, `Ignoring everything from ${target.user.username}.`);
         else
-            message.channel.send(`Unignored ${target.user.username}`);
+           safeSendMessage(message.channel, `Unignored ${target.user.username}`);
 
     }
     else if (target instanceof TextChannel) {
@@ -61,14 +59,27 @@ export default async function ignore(message: Discord.Message, input: [GuildMemb
         }
 
         if (!status)
-            message.channel.send(`Ignoring commands and chats from ${target}.`);
+            safeSendMessage(message.channel,`Ignoring commands and chats from ${target}.`);
         else
-            message.channel.send(`Unignored commands and chats from ${target}`);
+            safeSendMessage(message.channel, `Unignored commands and chats from ${target}`);
 
     }
     else {
         return handleFailedCommand(message.channel, `I can't ignore that.`)
     }
-
-
 }
+
+export const command: Command = new Command(
+    {
+        names: ['ignore'],
+        info: 'Ignores commands from a channel or a specific user.',
+        usage: '{{prefix}}ignore { channel | user }',
+        examples: ['{{prefix}}ignore #general', "{{prefix}}ignore @Xetera"],
+        category: 'Settings',
+        expects: [
+            [{type: ArgType.Member}, {type: ArgType.Channel}]
+        ],
+        run: run,
+        userPermissions: UserPermissions.Moderator,
+    }
+);

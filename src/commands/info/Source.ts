@@ -1,8 +1,20 @@
-import {Message} from "discord.js";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
-import {safeGetArgs} from "../../utility/Util";
-const sources = require('./Sources.json');
+import {Message} from 'discord.js'
+import {Command} from "../../handlers/commands/Command";
+import {ArgType} from "../../decorators/expects";
 
-export default function source(message: Message){
-    return message.channel.send('https://github.com/ilocereal/Hifumi');
+async function run(message: Message): Promise<any> {
+    safeSendMessage(message.channel, 'https://github.com/ilocereal/Hifumi');
 }
+
+export const command: Command = new Command(
+    {
+        names: ['source'],
+        info: 'Sends my source code from github.',
+        usage: '{{prefix}}source',
+        examples: ['{{prefix}}source'],
+        category: 'Info',
+        expects: [{type: ArgType.None}],
+        run: run,
+    }
+);

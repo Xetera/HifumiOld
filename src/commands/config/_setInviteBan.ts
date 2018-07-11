@@ -3,7 +3,6 @@ import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {randomRuntimeError} from "../../interfaces/Replies";
 import gb from "../../misc/Globals";
-import warn from "../moderation/warn";
 
 export default async function setInviteBan(message: Message, input: [number]){
     const [limit] = input;
@@ -30,3 +29,4 @@ export default async function setInviteBan(message: Message, input: [number]){
 
     safeSendMessage(message.channel, `Limit for banning on invites is now ${limit}`);
 }
+

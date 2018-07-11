@@ -1,4 +1,3 @@
-import {Database} from "../../database/Database";
 import {Channel, Message, TextChannel} from "discord.js";
 import {runtimeErrorResponses} from "../../interfaces/Replies";
 import {random} from "../../utility/Util";
@@ -7,27 +6,60 @@ import setConfigChannelEmbed from "../../embeds/commands/configEmbed/setConfigCh
 import gb from "../../misc/Globals";
 import {Guild} from "../../database/models/guild";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
-import setConfigChannelFailEmbed from "../../embeds/commands/configEmbed/setConfigChannelFailEmbed";
+import {Command} from "../../handlers/commands/Command";
+import {ArgType} from "../../decorators/expects";
+import {UserPermissions} from "../../handlers/commands/command.interface";
+import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
+import successEmbed from "../../embeds/commands/successEmbed";
 
-export default function setWelcome(message : Message){
-    const channel = message.channel;
-    const guildId = message.guild.id;
-    if (channel instanceof TextChannel){
-        gb.instance.database.setWelcomeChannel(guildId, channel.id).then((r: Partial<Guild>) => {
-            const targetChannel = message.client.channels.get(r.welcome_channel!);
-            if (!targetChannel){
-                debug.error(`Could not find channel ${r.welcome_channel} in ${message.guild}`, 'SetWarnings');
-                return void message.channel.send(
-                    setConfigChannelFailEmbed(message.channel, 'warnings')
-                );
-            }
-            message.channel.send(
-                setConfigChannelEmbed(targetChannel, 'welcome')
+function setWelcomeChannel(message: Message, channel: Channel) {
+    gb.instance.database.setWelcomeChannel(message.guild.id, channel.id).then((r: Partial<Guild>) => {
+        safeSendMessage(message.channel,
+            setConfigChannelEmbed(channel, 'welcome')
+        );
+
+    }).catch(err => {
+        debug.error(`Error while trying to set welcome channel\n` + err, 'setWelcomeChannel');
+        return safeSendMessage(channel, random(runtimeErrorResponses));
+    })
+}
+
+async function run(message: Message, input: [(TextChannel | boolean | undefined)]): Promise<any> {
+    const [channel] = input;
+    if (channel instanceof TextChannel) {
+        setWelcomeChannel(message, channel);
+    }
+    else if (channel === false) {
+        try {
+            await gb.instance.database.setWelcomeChannel(message.guild.id, undefined)
+        } catch (err) {
+            return handleFailedCommand(message.channel,
+                `Something went wrong, I couldn't clear your welcome channel!`
             );
-
-        }).catch(err => {
-            debug.error(`Error while trying to set welcome channel\n` + err, 'setWelcomeChannel');
-            return safeSendMessage(channel, random(runtimeErrorResponses));
-        })
+        }
+        const embed = successEmbed(message.member, `No longer sending welcome messages`);
+        safeSendMessage(message.channel, embed);
+    } else {
+        setWelcomeChannel(message, message.channel);
     }
 }
+
+export const command: Command = new Command(
+    {
+        names: ['welcomechannel', 'wchannel'],
+        info: 'Changes the channel where welcome messages are sent.',
+        usage: "{{prefix}}welcomechannel { #channel | 'off' }",
+        examples: ['{{prefix}}welcomechannel #general', "{{prefix}}welcomechannel off"],
+        category: 'Settings',
+        expects:
+            [
+                [{type: ArgType.Channel, options: {channelType: 'text', optional: true}}, {
+                    type: ArgType.Boolean,
+                    options: {optional: true}
+                }]
+            ],
+        run: run,
+        userPermissions: UserPermissions.Moderator,
+    }
+);
+

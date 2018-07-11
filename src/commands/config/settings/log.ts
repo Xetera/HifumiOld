@@ -4,7 +4,8 @@ import gb from "../../../misc/Globals";
 import {LoggingChannelType} from "../../../database/models/guild";
 import safeSendMessage from "../../../handlers/safe/SafeSendMessage";
 
-export default function logs(message: Message, input: [string, (TextChannel | string | boolean)]){
+
+export default function logs(message: Message, input: [string, (TextChannel | boolean)]){
     const [setting, choice] = input;
 
     let destination: string | null;
@@ -16,7 +17,7 @@ export default function logs(message: Message, input: [string, (TextChannel | st
         }
         destination = choice.id;
     }
-    else if (choice === false || choice === 'off'){
+    else if (choice === false){
         destination = null;
     }
     else {
@@ -100,3 +101,29 @@ export default function logs(message: Message, input: [string, (TextChannel | st
     })
 
 }
+
+import {Command} from "../../../handlers/commands/Command";
+import {ArgType} from "../../../decorators/expects";
+import {UserPermissions} from "../../../handlers/commands/command.interface";
+
+
+export const command: Command = new Command(
+    {
+        names: ['log'],
+        info: 'Changes my logging settings',
+        usage: "{{prefix}}log { setting } { channel | 'off' }",
+        examples: [
+            '{{prefix}}log bans #bans',
+            '{{prefix}}log warnings #warnings',
+            '{{prefix}}log everything #logs',
+            '{{prefix}}log unbans off'
+        ],
+        category: 'Settings',
+        expects: [
+            {type: ArgType.String},
+            [{type: ArgType.Boolean}, {type: ArgType.Channel}]
+        ],
+        run: logs,
+        userPermissions: UserPermissions.Moderator,
+    }
+);

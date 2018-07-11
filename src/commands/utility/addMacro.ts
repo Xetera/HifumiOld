@@ -1,17 +1,24 @@
 import {Message} from "discord.js";
-import {handleInvalidParameters} from "../../handlers/commands/invalidCommandHandler";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import gb from "../../misc/Globals";
 import {Help} from "../info/help/help.interface";
 import {debug} from "../../utility/Logging";
 import {Macro} from "../../database/models/macro";
+import {buildMacro, parseMacro} from "../../parsers/parseMacro";
+import {urlRegex} from "../../listeners/Regex";
 const help: Help = require('../../commands/help.json');
+import {Command} from "../../handlers/commands/Command";
+import {ArgType} from "../../decorators/expects";
+import {UserPermissions} from "../../handlers/commands/command.interface";
+import safeSendMessage from "../../handlers/safe/SafeSendMessage";
+import successEmbed from "../../embeds/commands/successEmbed";
 
-export default async function addMacro(message: Message, input: [string, string]) {
+async function run(message: Message, input: [string, string]): Promise<any> {
     const [macroName, macroContent] = input;
-    if (macroContent.length > 2000) {
+    // Urls shouldn't be counting as messages
+    if (macroContent.replace(urlRegex, '').length > 2000) {
         return void handleFailedCommand(
-            message.channel, `${gb.emojis.get('alexa_boi')} How do you expect me to remember all that? Try something shorter.`
+            message.channel, `${gb.emojis.get('hifumi_boi')} How do you expect me to remember all that? Try something shorter.`
         );
     }
     else if (help.commands.map(command => command.name).includes(macroName)) {
@@ -25,6 +32,7 @@ export default async function addMacro(message: Message, input: [string, string]
             `Mentions are not allowed in macros, do you know how annoying it is to get pinged by bots? (⁎˃ᆺ˂)`
         )
     }
+
     try {
         const count = await gb.instance.database.getMacroCount(message.guild.id);
 
@@ -41,13 +49,32 @@ export default async function addMacro(message: Message, input: [string, string]
             );
         }
 
-        const macro: Partial<Macro>|undefined = await gb.instance.database.addMacro(message, macroName, macroContent)
-
+        const [content, links] = await parseMacro(macroContent);
+        if (!content && !links){
+            return;
+        }
         const prefix = await gb.instance.database.getPrefix(message.guild.id);
-        if (macro)
-            message.channel.send(`From now on I'll respond to **${prefix}${macro.macro_name}** with:\n${macro.macro_content}`);
+
+        const macro: Partial<Macro>|undefined = await gb.instance.database.addMacro(message, macroName, content, links);
+        if (macro){
+            return safeSendMessage(message.channel, successEmbed(message.member, `Macro **${prefix}${macroName}** saved.`));
+        }
+        safeSendMessage(message.channel, `Uh, I couldn't save that macro for some reason...`);
     }
     catch (err){
         return debug.error(err, 'addMacro')
     }
 }
+
+export const command: Command = new Command(
+    {
+        names: ['addmacro', 'am'],
+        info: 'Creates a new macro. Macros are custom commands that you can save specific replies to.',
+        usage: '{{prefix}}addmacro { macro name } { response }',
+        examples: ["{{prefix}}addmacro rolepls Don't beg for a role, mods give them based on activity."],
+        category: 'Utility',
+        expects: [{type: ArgType.String}, {type: ArgType.Message}],
+        run: run,
+        userPermissions: UserPermissions.Moderator,
+    }
+);

@@ -2,11 +2,11 @@ import {Message, TextChannel} from "discord.js";
 import gb from "../../misc/Globals";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import suggestionEmbed from "../../embeds/commands/suggestions/suggestionEmbed";
-import {Suggestion, SuggestionStatus} from "../../database/models/suggestion";
 import resolveBooleanUncertainty from "../../resolvers/resolveBooleanUncertainty";
 import areYouSureEmbed from "../../embeds/commands/areYouSureEmbed";
 import suggestionAcceptedDMEmbed from "../../embeds/commands/suggestions/suggestionAcceptedDMEmbed";
 import suggestionRejectionEmbed from "../../embeds/commands/suggestions/suggestionRejectedDMEmbed";
+import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 
 export enum SuggestionResponse {
     PENDING,
@@ -15,10 +15,10 @@ export enum SuggestionResponse {
     AWAITING_APPROVAL
 }
 
-export default async function respondToSuggestion(message: Message, input: [string, string], response: SuggestionResponse){
+export async function _respondToSuggestion(message: Message, input: [number, string], response: SuggestionResponse): Promise<any> {
     const [id, reason] = input;
 
-    const suggestion = await gb.instance.database.getSuggestion(message.guild.id, id);
+    const suggestion = await gb.instance.database.getSuggestion(message.guild.id, id.toString());
     if (!suggestion){
         return await handleFailedCommand(
             message.channel, `I can't respond to that suggestion because it doesn't exist.`
@@ -49,15 +49,15 @@ export default async function respondToSuggestion(message: Message, input: [stri
 
     if (response === SuggestionResponse.ACCEPTED){
         let response = `Accepted suggestion #${suggestion.suggestion_id}`;
-        const updateResult = await gb.instance.database.acceptSuggestion(id, reason);
+        const updateResult = await gb.instance.database.acceptSuggestion(id.toString(), reason);
         const acceptedSuggestion = updateResult.raw[0];
         const acceptionEmbed = suggestionEmbed(message, acceptedSuggestion);
         if (user){
             user.send(suggestionAcceptedDMEmbed(acceptedSuggestion));
-            message.channel.send(response);
+            safeSendMessage(message.channel, response);
         }
         else {
-            message.channel.send(response + `\nBut I did not inform the original sender, they might have left.`);
+            safeSendMessage(message.channel, response + `\nBut I did not inform the original sender, they might have left.`);
         }
 
         oldMessage.edit(acceptionEmbed);
@@ -65,16 +65,18 @@ export default async function respondToSuggestion(message: Message, input: [stri
     }
     else if (response === SuggestionResponse.REJECTED){
         let response = `Rejected suggestion #${suggestion.suggestion_id}`;
-        const updateResult = await gb.instance.database.rejectSuggestion(id, reason);
+        const updateResult = await gb.instance.database.rejectSuggestion(id.toString(), reason);
         const rejectedSuggestion = updateResult.raw[0];
         const rejectionEmbed = suggestionEmbed(message, rejectedSuggestion);
         if (user){
             user.send(suggestionRejectionEmbed(rejectedSuggestion));
-            message.channel.send(response);
+            safeSendMessage(message.channel, response);
         }
         else {
-            message.channel.send(response + `\nBut I could not inform the original sender, they might have left.`);
+            safeSendMessage(message.channel, response + `\nBut I could not inform the original sender, they might have left.`);
         }
         oldMessage.edit(rejectionEmbed);
     }
 }
+
+

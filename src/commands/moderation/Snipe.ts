@@ -5,12 +5,12 @@ import {debug} from '../../utility/Logging'
 import {safeGetArgs} from "../../utility/Util";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import moment = require("moment");
-/*
-* Removes a user's past messages in a certain channel
-* */
-export default async function snipe(message: Message, input: [GuildMember, (number | undefined)]){
-    const target = <GuildMember> input.shift()!;
-    const limit = safeGetArgs(input, 50);
+import {Command} from "../../handlers/commands/Command";
+import {ArgType} from "../../decorators/expects";
+import {UserPermissions} from "../../handlers/commands/command.interface";
+
+async function run(message: Message, input: [GuildMember, (number | undefined)]): Promise<any> {
+    const [target, limit] = input;
     const channel = message.channel;
     if (channel instanceof Discord.TextChannel){
         channel.fetchMessages({limit: limit}).then((messages: Collection<Discord.Snowflake, Message>) => {
@@ -31,3 +31,17 @@ export default async function snipe(message: Message, input: [GuildMember, (numb
         })
     }
 }
+
+export const command: Command = new Command(
+    {
+        names: ['snipe'],
+        info: 'Removes past messages from a specific user in the current channel.',
+        usage: '{{prefix}}snipe { user }',
+        examples: ['{{prefix}}snipe @Xetera'],
+        category: 'Moderation',
+        expects: [{type: ArgType.Member}, {type: ArgType.Number, options: {optional: true}}],
+        run: run,
+        userPermissions: UserPermissions.Moderator,
+        clientPermissions: ['MANAGE_MESSAGES']
+    }
+);

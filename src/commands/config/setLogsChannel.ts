@@ -1,37 +1,63 @@
-import {Database} from "../../database/Database";
 import {Channel, Message, TextChannel} from "discord.js";
 import {runtimeErrorResponses} from "../../interfaces/Replies";
 import {random} from "../../utility/Util";
 import {debug} from '../../utility/Logging'
-import hasMessagingPermissions from "../../handlers/permissions/missingPermissionsHandler";
 import setConfigChannelEmbed from "../../embeds/commands/configEmbed/setConfigChannelEmbed";
 import {Guild} from "../../database/models/guild";
 import gb from "../../misc/Globals";
 import setConfigChannelFailEmbed from "../../embeds/commands/configEmbed/setConfigChannelFailEmbed";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
+import {Command} from "../../handlers/commands/Command";
+import {ArgType} from "../../decorators/expects";
+import {UserPermissions} from "../../handlers/commands/command.interface";
 
-export default function setLogsChannel(message: Message){
-    const channel = message.channel;
-    const guildId = message.guild.id;
-
-    if (!(channel instanceof TextChannel)) {
-        return;
-    }
-
-    gb.instance.database.setLogsChannel(guildId, channel.id).then((r: Partial<Guild>) => {
+async function setLogsChannel(message: Message, channel?: TextChannel){
+    try{
+        const r: Partial<Guild> = await gb.instance.database.setLogsChannel(
+            message.guild.id , channel && channel.id || undefined
+        );
         const targetChannel = message.client.channels.get(r.logs_channel!);
         if (!targetChannel){
             debug.error(`Could not find channel ${r.logs_channel} in ${message.guild}`, 'SetWarnings');
-            return void message.channel.send(
+            return void safeSendMessage(message.channel,
                 setConfigChannelFailEmbed(message.channel, 'logs')
             );
         }
-        message.channel.send(
+        safeSendMessage(message.channel,
             setConfigChannelEmbed(targetChannel, 'logs')
         );
-    }).catch(err => {
-        debug.error(`Error while trying to set logs channel\n` + err, 'setWelcomeChannel');
-        return safeSendMessage(channel, random(runtimeErrorResponses));
-    })
 
+    }
+    catch(err) {
+        debug.error(`Error while trying to set logs channel\n` + err, 'setWelcomeChannel');
+        return safeSendMessage(message.channel, random(runtimeErrorResponses));
+    }
 }
+async function run(message: Message, input: [(TextChannel | boolean | undefined)]): Promise<any> {
+    const [channel] = input;
+    if (channel instanceof  TextChannel) {
+        await gb.instance.database.setLogsChannel(message.guild.id, undefined);
+        setLogsChannel(message, channel);
+        return;
+    } else if (channel === false) {
+        await gb.instance.database.setLogsChannel(message.guild.id, undefined);
+        setLogsChannel(message, undefined);
+        return;
+    }
+    setLogsChannel(message, <TextChannel> message.channel);
+}
+
+
+export const command: Command = new Command(
+    {
+        names: ['logchannel'],
+        info: "Changes the channel I keep logs in",
+        usage: "{{prefix}}logchannel { #channel | 'off' } ",
+        examples: ['{{prefix}}logchannel #logs', "{{prefix}}logchannel off"],
+        category: 'Settings',
+        expects:
+            [{type: ArgType.Channel, options: {channelType: 'text', optional: true}}, {type: ArgType.Boolean}],
+        run: run,
+        userPermissions: UserPermissions.Moderator,
+    }
+);
