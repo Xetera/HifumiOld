@@ -18,11 +18,11 @@ export default function onReady(bot: Client): Promise<string> {
     let startupGuild = [];
 
     for (let guild of guilds) {
-        gb.allMembers += guild.members.array().length;
+        gb.allMembers += guild.members.size;
         startupGuild.push({
             name: guild.name,
-            members: guild.members.array().length,
-            channels: guild.channels.array().length
+            members: guild.members.size,
+            channels: guild.channels.size
         });
     }
 

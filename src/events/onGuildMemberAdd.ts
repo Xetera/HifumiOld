@@ -30,7 +30,7 @@ export default async function onGuildMemberAdd(member : Discord.GuildMember): Pr
         database.getWelcomeChannel(member.guild.id),
         database.getWelcomeMessage(member.guild.id)
     ]);
-    
+
     if (welcomeChannelId) {
         const welcomeChannel: Channel | undefined = member.guild.channels.get(welcomeChannelId);
         if (!welcomeChannel) {
@@ -81,7 +81,7 @@ function sendEmbed(channel: TextChannel, member: GuildMember, welcomeMessage?: s
         if (Array.isArray(welcomeMessage)) {
             return;
         }
-        const kanna_wave = member.client.emojis.find('name', 'alexa_kanna_wave');
+        const kanna_wave = member.client.emojis.find('name', 'hifumi_kanna_wave');
 
         if (kanna_wave !== undefined)
             welcomeMessage.react(kanna_wave);

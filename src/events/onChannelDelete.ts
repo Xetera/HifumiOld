@@ -7,7 +7,9 @@ export default async function onChannelDelete(channel: Channel){
         return;
     }
 
-    if (!gb.instance.database.ready ||!await gb.instance.database.getGuildEnabled(channel.guild.id)){
+    if (!channel.guild.available
+        || !gb.instance.database.ready
+        ||!await gb.instance.database.getGuildEnabled(channel.guild.id)){
         return;
     }
 

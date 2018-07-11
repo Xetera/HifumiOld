@@ -1,18 +1,13 @@
 import * as Discord from'discord.js'
 import * as dbg from 'debug'
-import {Cleverbot} from '../API/Cleverbot'
-import {MessageQueue} from "../moderation/MessageQueue";
 import inviteListener from '../listeners/InviteListener'
 import * as moment from "moment";
-import {Database} from "../database/Database";
 import {MessageType} from "../interfaces/identifiers";
-import commandHandler from "../handlers/commands/CommandHandler";
 import {default as gb, Instance} from "../misc/Globals";
-import {getHelp} from "../commands/info/help/Help";
 import DMCommandHandler from "../handlers/commands/DMCommandHandler";
 import pingListener from "../listeners/pingListener";
 import memeListener from "../listeners/memeListener";
-import {MessageMentions} from "discord.js";
+import axios from 'axios'
 import hexListener from "../listeners/hexListener";
 
 export const debug = {
@@ -40,6 +35,7 @@ function middleWare(msg: Discord.Message, ignored: boolean){
     pingListener(message, database);
     inviteListener(message);
     if (!ignored) {
+
         memeListener(message);
         hexListener(message);
     }
@@ -48,12 +44,13 @@ function middleWare(msg: Discord.Message, ignored: boolean){
 export default async function onMessage(message: Discord.Message){
     // we don't want to look at bot messages at all
     if (message.author.bot
+        || !gb.instance
+        || !gb.instance.database.ready
         || !message.guild.available
         || (message.guild && await gb.instance.database.getChannelIgnored(message.guild.id, message.channel.id))){
         return;
     }
     else if (!gb.instance || !gb.instance.database.ready) {
-        //message.channel.send(`😰 give me some time to get set up first.`);
         return void debug.info(`Got message from ${message.guild.name} but the DB hasn't finished caching.`);
     }
 

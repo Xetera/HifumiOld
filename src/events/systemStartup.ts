@@ -7,7 +7,6 @@ import CommandHandler, {CommandParameters} from "../handlers/commands/CommandHan
 import Tracklist from "../moderation/Tracklist";
 import {Cleverbot} from "../API/Cleverbot";
 import {MuteQueue} from "../moderation/MuteQueue";
-import {LogManager} from "../handlers/logging/logManager";
 import {default as catchUncaughtExceptions} from '../handlers/process/uncaughtException'
 import {catchSigterm} from '../handlers/process/sigterm'
 import {default as catchUnhandledRejections} from '../handlers/process/unhandledRejection'
@@ -48,6 +47,7 @@ export function getEnvironmentSettings() : Environments{
 }
 
 export function getTokens(env: Environments) {
+    debug.info('Getting Tokens', 'Startup');
     let BOT_TOKEN : string;
     let CLEVERBOT_TOKEN : string;
 
@@ -71,6 +71,7 @@ export function getTokens(env: Environments) {
 
 export function getDatabaseConnection(env: Environments) : string {
     if (env === Environments.Development && !process.env.DATABASE_URL){
+        debug.info("No database url ENV found, setting it to 'discord_test'", 'Startup');
         return 'postgresql:///discord_test';
     }
     else if (env === Environments.Development && process.env.DATABASE_URL)
@@ -84,8 +85,8 @@ export async function createInstance(bot: Client, BOT_TOKEN: string, CLEVERBOT_T
     // it gets the job done
     // TODO: Smarter Xetera to past Xetera, use singletons or
     // TODO: dependency injections <- this is probably less stupid
-    let alexa = new Cleverbot(CLEVERBOT_TOKEN);
-    let database = new Database(DATABASE_CONFIG);
+    let alexa     = new Cleverbot(CLEVERBOT_TOKEN);
+    let database  = new Database(DATABASE_CONFIG);
     let muteQueue = new MuteQueue();
     let tracklist = new Tracklist();
     // probably not a good place to have this side effect but whatever
@@ -101,7 +102,7 @@ export async function createInstance(bot: Client, BOT_TOKEN: string, CLEVERBOT_T
         trackList: tracklist,
         heroku: new Heroku({token: process.env.HEROKU_API_TOKEN}),
         // this is to be able to eval through the context of all the instances
-        eval: (params: CommandParameters, message: Message, x: any) => {
+        eval: (message: Message, x: any) => {
             try {
                 return eval(x);
             }
