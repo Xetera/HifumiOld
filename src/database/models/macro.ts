@@ -30,8 +30,11 @@ export class Macro {
     @PrimaryColumn()
     macro_name: string;
 
-    @Column()
+    @Column({nullable: true})
     macro_content: string;
+
+    @Column('varchar', {array: true, nullable: true})
+    macro_links: string[];
 
     @Column()
     date_created: Date;
