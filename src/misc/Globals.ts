@@ -28,7 +28,7 @@ export interface Instance {
     commandHandler:CommandHandler,
     trackList: Tracklist,
     heroku: any
-    eval(params: CommandParameters, message: Message, x : any): any
+    eval(message: Message, x : any): any
 }
 
 let gb : Globals = <Globals>{};
