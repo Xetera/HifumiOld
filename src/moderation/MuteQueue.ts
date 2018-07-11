@@ -254,33 +254,33 @@ export class MuteQueue {
         mutedGuildMember.timeout = timeoutId;
     }
 
-    public clearRaiders(message: Discord.Message) {
-        const guild = message.guild;
-        const raidGuild: MutedMember[] | undefined= this.queue.get(guild.id);
-        if (!raidGuild)
-            return debug.error(`No guild found for ${message.guild.name}`, 'muteQueue');
-        const youTried = gb.emojis.get('alexa_you_tried');
-        const raiderCount = raidGuild.length;
-
-        if (!raidGuild)
-            return debug.error(`Tried clearing raiders in an non - existent guild ${guild.name}.`);
-
-        for (let i = raidGuild.length; i > 0; --i){
-            const raider = raidGuild[i];
-            if (raider.member.hasPermission('ADMINISTRATOR')){
-                debug.warning(`Tried to autoban an admin for raiding in ${guild.name}`);
-                continue;
-                // TODO: Post a warning in the warning channel for this later
-            }
-            safeBanUser(raider.member,
-                `Mass banned by ${message.author.username}`,
-                `You were mass banned by a mod for raiding ${youTried}\n${advertiseOnBan}`);
-            raidGuild.splice(i, 1);
-
-            // we also need to remove them from the Database when we implement that
-        }
-        message.channel.send(`Banned ${raiderCount - raidGuild.length} muted raiders. ${youTried}`)
-    }
+    // public clearRaiders(message: Discord.Message) {
+    //     const guild = message.guild;
+    //     const raidGuild: MutedMember[] | undefined= this.queue.get(guild.id);
+    //     if (!raidGuild)
+    //         return debug.error(`No guild found for ${message.guild.name}`, 'muteQueue');
+    //     const youTried = gb.emojis.get('hifumi_you_tried');
+    //     const raiderCount = raidGuild.length;
+    //
+    //     if (!raidGuild)
+    //         return debug.error(`Tried clearing raiders in an non - existent guild ${guild.name}.`);
+    //
+    //     for (let i = raidGuild.length; i > 0; --i){
+    //         const raider = raidGuild[i];
+    //         if (raider.member.hasPermission('ADMINISTRATOR')){
+    //             debug.warning(`Tried to autoban an admin for raiding in ${guild.name}`);
+    //             continue;
+    //             // TODO: Post a warning in the warning channel for this later
+    //         }
+    //         safeBanUser(raider.member,
+    //             `Mass banned by ${message.author.username}`,
+    //             `You were mass banned by a mod for raiding ${youTried}\n${advertiseOnBan}`);
+    //         raidGuild.splice(i, 1);
+    //
+    //         // we also need to remove them from the Database when we implement that
+    //     }
+    //     message.channel.send(`Banned ${raiderCount - raidGuild.length} muted raiders. ${youTried}`)
+    // }
 
     public crossCheckMutes(){
 
