@@ -145,3 +145,34 @@ interface MALCategory {
 export interface MALResponse {
     categories: MALCategory[];
 }
+
+
+interface WhatAnimeDocs{
+    from: number;
+    to: number;
+    anilist_id: number;
+    at: number;
+    episode: number | 'OVA/OAD' | 'Special' | '';
+    similarity: number;
+    mal_id?: number;
+    is_adult: boolean;
+    title_native?: string;
+    title_chinese?: string;
+    title_english?: string;
+    title_romaji?: string;
+    synonyms: string[];
+    synonyms_chinese: string[];
+    filename: string;
+    tokenThumb: string;
+}
+
+export interface WhatAnimeSearchResponse {
+    RawDocsCount: number;
+    RawDocsSearchTime: number;
+    ReRankSearchTime: number;
+    CacheHit: boolean;
+    trial: number;
+    quota: number;
+    expire: number;
+    docs: WhatAnimeDocs[];
+}
