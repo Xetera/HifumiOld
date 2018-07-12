@@ -18,7 +18,7 @@ export default function guildMemberAddEmbed(member: GuildMember, message?: strin
     }
 
     if (!thumbnail) {
-        embed.setThumbnail(member.user.avatarURL);
+        embed.setThumbnail(member.user.displayAvatarURL);
     }
     else if (thumbnail && isUrl(thumbnail)) {
         embed.setThumbnail(thumbnail)
