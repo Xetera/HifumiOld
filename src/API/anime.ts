@@ -165,8 +165,14 @@ export default class Anime {
     public async reverseSearch(picture: string, isGif: boolean): Promise<[(RichEmbed | string), (Attachment | undefined)]> {
         let base64: string;
         if (StringUtils.isUrl(picture)) {
+            let buffer;
+            try {
+                buffer = await fetchUrlAsBase64(picture, isGif);
+            } catch (err){
+                console.log(err);
+                return [err, undefined]
+            }
 
-            let buffer = await fetchUrlAsBase64(picture, isGif);
             if (!buffer) {
                 return ["Not a valid image", undefined];
             }
@@ -183,19 +189,23 @@ export default class Anime {
                 {headers: {'Content-Type': 'application/x-www-form-urlencoded', 'charset': 'UTF-8'}});
 
         } catch (e) {
-            if (e.status === 413){
+            if (e.response.status === 413){
                 return [
-                    "That is a _pretty_ gigantic image. There's a 1MB upload limit, choose something smaller.",
+                    "That is a _pretty_ gigantic image. There's a 1MB upload limit for this, choose something smaller. " +
+                    "I will be able to compress and resize images automatically in future updates.",
                     undefined
                 ]
             }
-            return [`Something went wrong [Status Code (${e.status})]`, undefined]
+            else if (e.response.status === 504){
+                return [
+                    "Couldn't receive a valid response from the server, it's most likely overloaded.",
+                undefined]
+            }
+            return [`Huh? That's not supposed to happen!\n**Message: **${e.message || e.response.data}\n**Status Code:** ${e.response.status}`, undefined]
         }
 
         const data = response.data;
 
-        if (response.status === 413){
-        }
         if (typeof data === 'string'){
             return [data, undefined];
         }
@@ -203,15 +213,17 @@ export default class Anime {
 
         const result = data.docs[0];
 
-        if (result.similarity < 0.85){
-            return ['Could not find an accurate result', undefined];
+        console.log(data);
+        if (!result){
+            return ["Could not receive a response from the server, either whatanime.ga API is down or " +
+            "there's a problem somewhere else.", undefined]
         }
 
         const [buffer, anilistResponse] = await Promise.all([
             this.getReverseSearchGif(result.anilist_id, result.filename, result.at, result.tokenthumb),
             this.getAnimeByAnilistId(result.anilist_id.toString())
         ]);
-        const parsed = AnimeUtils.parseAnilistResponse(anilistResponse);
+        const parsed = AnimeUtils.parseAnilistResponse(anilistResponse, result.episode);
         const embed = whatAnimeEmbed(parsed, result.episode, result.similarity, buffer);
         const mediaTitle = normalizeString(result.title_english + '_Episode_' + result.episode + '.mp4');
         return [embed, new Attachment(buffer, mediaTitle)];

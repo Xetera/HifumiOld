@@ -20,7 +20,7 @@ async function run(message: Message, input: [(boolean | undefined)]): Promise<an
 export const command: Command = new Command(
     {
         names: ['spamfilter'],
-        info: 'Toggles my settings for checking spam',
+        info: 'Toggles my settings for checking for and deleting spam',
         usage: "{{prefix}}spamfilter { 'on' | 'off'? }",
         examples: ['{{prefix}}spamfilter', '{{prefix}}spamfilter'],
         category: 'Settings',

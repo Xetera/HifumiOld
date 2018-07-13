@@ -1,11 +1,12 @@
 import {IAnilistDate} from "./anime.interface";
 import {getUrlExtension, StringUtils} from "../utility/Util";
-import axios, {AxiosResponse} from 'axios'
+import axios, {AxiosError, AxiosResponse} from 'axios'
 //@ts-ignore
 import * as gif from 'gif-frames'
 import sta = require('stream-to-array')
 import * as gm from 'gm'
 import * as util from "util";
+import {debug} from "../utility/Logging";
 
 export default function formatAnilistDate(date: IAnilistDate) {
     if (date.day && date.month && date.year) {
@@ -40,7 +41,28 @@ export async function fetchUrlAsBase64(url: string, isGif: boolean): Promise<str
     if (!StringUtils.isUrl(url)) {
         return;
     }
-    const response: AxiosResponse<string> = await axios.get(url, {responseType: 'arraybuffer'});
+    let response: AxiosResponse<string>;
+    try {
+        response = await axios.get(url, {responseType: 'arraybuffer', maxRedirects: 0});
+    } catch (err){
+        err = <AxiosError> err;
+        // we're redirected from shit websites like tenor.co but
+        // we just snatch up the buffer anyways
+        if (err.response.status === 301 || err.response.status === 302){
+            debug.error('Sometyhjing1')
+            return Promise.reject(
+                "The website "+ url +" is trying to redirect me, please follow the redirect and post the " +
+                "link to the actual image file. This generally happens with dedicated image hosting websites like " +
+                "giphy or tenor."
+            );
+        }
+        else {
+            debug.error('something 12')
+            debug.error("Error getting file from request", "APIUtils|FetchUrlAsBase64");
+            debug.error(err);
+            return Promise.reject(err.message);
+        }
+    }
     let out: Buffer | string;
     if (isGif && getUrlExtension(url) === 'gif') {
         out = await fetchFirstGifFrame(response.data);
