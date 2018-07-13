@@ -40,7 +40,7 @@ export default class InfractionHandler {
             `**Expired**: ${i.expiration_date <= new Date() ? 'Yes' : '__No__'}  ` +
             `**Weight**: ${i.infraction_weight}\n` +
             `**Date**: ${moment(i.infraction_date).calendar()}\n` +
-            `${i.infraction_reason}`;
+            `${i.infraction_reason}\n`;
     }
     /**
      * Checks requirements for striking members, returns max strike weight of the members guild

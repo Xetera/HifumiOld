@@ -43,7 +43,7 @@ export default async function historyEmbed(member: GuildMember | User, notes: No
     /* Notes */
     let notesValue:string[] = [`**${notes.length}** notes on record\n`];
     for (let i in notes){
-        notesValue.push(`**ID**: __**${notes[i].note_id}**__ **Staff**: __**${notes[i].staff_name}**__\n**Date**: ${moment(notes[i].note_date).calendar()}\n${notes[i].note_content}`)
+        notesValue.push(`**ID**: __**${notes[i].note_id}**__ **Staff**: __**${notes[i].staff_name}**__\n**Date**: ${moment(notes[i].note_date).calendar()}\n${notes[i].note_content}\n`)
     }
     const notesTotal = notes.length !== 0 ? notesValue.join('\n') : 'Nothing noted so far.';
 
