@@ -84,6 +84,12 @@ export interface IAnilistCharacter {
     }
 }
 
+export interface streamingEpisode {
+    title?: string;
+    thumbnail?: string;
+    url?: string;
+    site?: string;
+}
 export interface getAnimeQueryResponse {
     title: {
         english?: string;
@@ -118,6 +124,22 @@ export interface getAnimeQueryResponse {
     characters: {
         nodes: IAnilistCharacter[];
     }
+    streamingEpisodes?: streamingEpisode[];
+}
+
+export interface ParsedAnimeResponse {
+    title:  string;
+    genres: string[];
+    isAdult: boolean;
+    siteUrl: string;
+    description: string;
+    episodes: number;
+    duration: string;
+    averageScore?: number;
+    popularity?: number;
+    watchTime: string;
+    thumbnail: string;
+    episodeLink?: string;
 }
 
 export interface MALMedia {
@@ -147,7 +169,7 @@ export interface MALResponse {
 }
 
 
-interface WhatAnimeDocs{
+export interface WhatAnimeDocs{
     from: number;
     to: number;
     anilist_id: number;
@@ -163,7 +185,7 @@ interface WhatAnimeDocs{
     synonyms: string[];
     synonyms_chinese: string[];
     filename: string;
-    tokenThumb: string;
+    tokenthumb: string;
 }
 
 export interface WhatAnimeSearchResponse {
