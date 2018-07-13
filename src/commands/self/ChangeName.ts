@@ -29,6 +29,7 @@ export const command: Command = new Command(
         expects: [{type: ArgType.Message}],
         run: run,
         userPermissions: UserPermissions.BotOwner,
+        hidden: true,
         ownerOnly: true
     }
 );
