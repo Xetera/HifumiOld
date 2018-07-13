@@ -34,7 +34,7 @@ async function run(message: Message, input: [GuildMember, (string | undefined)])
         );
     }
     try {
-        await member.kick(reason);
+        await member.kick(reason || `Kicked by ${message.author.username}`);
     }
     catch (err){
         return handleFailedCommand(message.channel,

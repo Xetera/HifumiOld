@@ -34,7 +34,7 @@ async function run(message: Message, input: [GuildMember, (string | undefined)])
         );
     }
 
-    await target.ban({reason: reason, days: 7});
+    await target.ban({reason: reason || `User softbanned by ${message.author.username}`, days: 7});
     const embed = successEmbed(message.member, `Softbanned ${target.user.username}#${target.user.discriminator}`);
 
     await safeSendMessage(message.channel, embed);
@@ -63,7 +63,7 @@ export const command: Command = new Command(
             "{{prefix}}softban 140862798832861184 posting nsfw"
         ],
         category: 'Moderation',
-        expects: [{type: ArgType.Member}, {type: ArgType.Message, options: {optional: true}}],
+        expects: [{type: ArgType.Member, options: {strict: true}}, {type: ArgType.Message, options: {optional: true}}],
         run: run,
         userPermissions: UserPermissions.Moderator,
         clientPermissions: ['BAN_MEMBERS']
