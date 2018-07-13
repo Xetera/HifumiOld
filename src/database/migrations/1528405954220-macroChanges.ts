@@ -20,6 +20,12 @@ export class macroChanges1528405954220 implements MigrationInterface {
             isNullable: true
         }));
 
+        await queryRunner.addColumn('guilds', new TableColumn({
+            name: 'spam_filter',
+            type: 'boolean',
+            isNullable: false,
+            default: false
+        }));
         // updating old macro content
         const macros = <Macro[]> await queryRunner.query('SELECT macro_name, guild_id, macro_content, macro_links FROM macros');
         for (let macro of macros){
