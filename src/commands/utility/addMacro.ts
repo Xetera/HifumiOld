@@ -62,7 +62,8 @@ async function run(message: Message, input: [string, string]): Promise<any> {
         safeSendMessage(message.channel, `Uh, I couldn't save that macro for some reason...`);
     }
     catch (err){
-        return debug.error(err, 'addMacro')
+        debug.error(err, 'addMacro');
+        return safeSendMessage(message.channel, `Something went wrong while trying to save that macro.`);
     }
 }
 

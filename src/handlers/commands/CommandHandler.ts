@@ -173,11 +173,22 @@ export default class CommandHandler implements indexSignature {
         if (macros.length){
             targetMacro = macros.find(macro => macro.macro_name === inputData.command);
             if (targetMacro) {
-                message.channel.startTyping();
                 gb.instance.database.incrementMacroCalls(message.guild.id, message.author.id);
                 const content = await buildMacro(targetMacro);
+                const isPureMessage = typeof content[0] !== 'object' && (!content[1] || typeof content[1] !== 'object');
+                if (isPureMessage){
+                    try {
+                        return message.channel.send(content);
+                    } catch (err){
+                        return handleFailedCommand(message.channel,
+                            `There was a problem sending that macro, this an error`
+                        )
+                    }
+                }
+                console.log(content)
+                await message.channel.startTyping();
                 message.channel.send(...content).catch(console.log);
-                return void message.channel.stopTyping();
+                return await message.channel.stopTyping();
             }
         }
 
