@@ -6,7 +6,7 @@ import {
     GuildMember, Invite,
     Message, PermissionOverwrites,
     PermissionResolvable,
-    Permissions, Role
+    Permissions, Role, TextChannel
 } from "discord.js";
 import {debug} from "../events/onMessage";
 import {discordInviteRegex, emojiRegex, urlRegex} from "../listeners/Regex";
@@ -39,7 +39,7 @@ export function capitalize(word: string){
 }
 
 export function normalizeString(input: string, titleCase?: boolean){
-    const words = input.replace(/_/, '');
+    const words = input.replace(/_/, ' ');
     const wordArray = words.split(' ');
     const formatted = wordArray.map((w: string, index: number)=> {
         let firstLetter = w.substring(0, 1);
@@ -257,4 +257,17 @@ export function formatAndJoin(array: string[], surrounder: string = '`', spacer:
 export function randomObjectValue<T>(object: {[key: string]: T }): T  {
     const keys: string[] = Object.keys(object);
     return object[random(keys)];
+}
+
+export async function getPastMessagesReverse(channel: TextChannel, amount: number){
+    const messages = await channel.fetchMessages({limit: amount});
+    return messages.array().reverse();
+}
+
+export function getUrlExtension(url: string){
+    const sections = url.split('.');
+    if (!sections.length){
+        return;
+    }
+    return sections.pop()
 }
