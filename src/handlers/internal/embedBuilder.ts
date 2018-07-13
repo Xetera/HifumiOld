@@ -156,9 +156,7 @@ export default class EmbedBuilder {
                 existing[i] = response[i];
             }
         }
-        const embed = this.buildEmbed(message, existing);
-        safeSendMessage(message.channel, embed);
-        return embed;
+        return this.buildEmbed(message, existing);
     }
 
     public checkEmbedBounds(fields: TemplatedMessage) {
@@ -166,7 +164,6 @@ export default class EmbedBuilder {
         if (fields['title'].length > 256){
             return `The title field cannot be more than 256 characters long.`;
         }
-
     }
 
 }

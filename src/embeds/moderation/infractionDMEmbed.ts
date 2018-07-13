@@ -6,7 +6,9 @@ export default function infractionDMEmbed(guild: Guild, weight: number, reason: 
         .setTitle(`Moderator Warning!`)
         // TODO: add personalized warning messages
         .setDescription(
-            `You've been warned by a moderator in **${guild.name}**`)
+            `You've been warned by a moderator in **${guild.name}** with weight **${weight}**\n` +
+            `In **${guild.name}**, you are given a maximum of ${strikeCap} strikes before you are banned.\n` +
+            `Make sure to go over the server's rules`)
         .setColor(warningEmbedColor)
         .addField(`__Weight__`, weight, true)
         .addField(`__Current Strikes__`, `${currentStrikes}/${strikeCap}`, true)
