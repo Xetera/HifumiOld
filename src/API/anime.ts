@@ -162,12 +162,13 @@ export default class Anime {
         }
     }
 
-    public async reverseSearch(picture: string): Promise<[RichEmbed, Attachment] | undefined> {
+    public async reverseSearch(picture: string, isGif: boolean): Promise<[(RichEmbed | string), (Attachment | undefined)]> {
         let base64: string;
         if (StringUtils.isUrl(picture)) {
-            let buffer = await fetchUrlAsBase64(picture);
+
+            let buffer = await fetchUrlAsBase64(picture, isGif);
             if (!buffer) {
-                return;
+                return ["Not a valid image", undefined];
             }
             base64 = buffer;
         } else {
@@ -175,18 +176,43 @@ export default class Anime {
             base64 = picture;
         }
 
-        const response: AxiosResponse<WhatAnimeSearchResponse> = await axios.post(`https://whatanime.ga/api/search?token=${this.whatanimeKey}`,
-            `image=${base64}`,
-            {headers: {'Content-Type': 'application/x-www-form-urlencoded', 'charset': 'UTF-8'}});
+        let response: AxiosResponse<WhatAnimeSearchResponse | string>;
+        try {
+            response = await axios.post(`https://whatanime.ga/api/search?token=${this.whatanimeKey}`,
+                `image=${base64}`,
+                {headers: {'Content-Type': 'application/x-www-form-urlencoded', 'charset': 'UTF-8'}});
+
+        } catch (e) {
+            if (e.status === 413){
+                return [
+                    "That is a _pretty_ gigantic image. There's a 1MB upload limit, choose something smaller.",
+                    undefined
+                ]
+            }
+            return [`Something went wrong [Status Code (${e.status})]`, undefined]
+        }
+
         const data = response.data;
+
+        if (response.status === 413){
+        }
+        if (typeof data === 'string'){
+            return [data, undefined];
+        }
+
+
         const result = data.docs[0];
+
+        if (result.similarity < 0.85){
+            return ['Could not find an accurate result', undefined];
+        }
 
         const [buffer, anilistResponse] = await Promise.all([
             this.getReverseSearchGif(result.anilist_id, result.filename, result.at, result.tokenthumb),
             this.getAnimeByAnilistId(result.anilist_id.toString())
         ]);
         const parsed = AnimeUtils.parseAnilistResponse(anilistResponse);
-        const embed = whatAnimeEmbed(parsed, result.episode, buffer);
+        const embed = whatAnimeEmbed(parsed, result.episode, result.similarity, buffer);
         const mediaTitle = normalizeString(result.title_english + '_Episode_' + result.episode + '.mp4');
         return [embed, new Attachment(buffer, mediaTitle)];
     }

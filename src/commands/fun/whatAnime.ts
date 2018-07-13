@@ -1,24 +1,33 @@
-import {Message} from 'discord.js'
+import {Message, TextChannel} from 'discord.js'
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../decorators/expects";
-import gb from "../../misc/Globals";
 import Anime from "../../API/anime";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
-import {random, StringUtils} from "../../utility/Util";
+import {getPastMessagesReverse, getUrlExtension, random, StringUtils} from "../../utility/Util";
 import {urlRegex} from "../../listeners/Regex";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
-import {animePlaceholders} from "./getAnime";
-import safeDeleteMessage from "../../handlers/safe/SafeDeleteMessage";
+import whatAnimePlaceholder from "../../embeds/commands/fun/anime/whatAnimePlaceholder";
+import isUrl = StringUtils.isUrl;
+import {AnimeUtils} from "../../utility/animeUtils";
+import isPicture = AnimeUtils.isPicture;
+
+
 
 async function run(message: Message, input: [string]): Promise<any> {
     let [url] = input;
     if (url === 'last'){
-        const messages = await message.channel.fetchMessages({limit: 10});
-        const messageArray = messages.array().reverse();
+        const messageArray = await getPastMessagesReverse(<TextChannel> message.channel, 10);
         for (const sent of messageArray){
+            const attachmentMatch = sent.attachments.array();
+            const attachmentFile = attachmentMatch.find(item => urlRegex.test(item.url));
+            const fileMatch = attachmentFile && attachmentFile.url.match(urlRegex);
             let match = sent.content.match(urlRegex);
-            if (match){
+
+            if (match && isPicture(match[0], true)){
                 url = match[0];
+            }
+            else if (fileMatch && isPicture(fileMatch[0], true)){
+                url = fileMatch[0]
             }
         }
         if (url === 'last'){
@@ -26,14 +35,42 @@ async function run(message: Message, input: [string]): Promise<any> {
                 `Couldn't find a link or attachment in the last 10 messages in this channel.`);
         }
     }
-    const placeholder = <Message> await safeSendMessage(message.channel, random(animePlaceholders) + '\n_This might take a few seconds_');
-    const out = await Anime.getInstance().reverseSearch(url);
-    if (!out){
-        return placeholder.edit("Whoops, couldn't find that anime");
+    else if (url === 'last embed'){
+        const messageArray = await getPastMessagesReverse(<TextChannel> message.channel, 10);
+        for (const sent of messageArray){
+            if (!sent.embeds.length){
+                continue;
+            }
+            for (const embed of sent.embeds){
+                if (embed && embed.image && embed.image.url && isPicture(embed.image.url, true)){
+                    url = embed.image.url;
+                }
+            }
+        }
+        if (url === 'last embed'){
+            return handleFailedCommand(message.channel, `Could not find a matching embed in the last 10 messages`);
+        }
     }
-    // can't spread here.. for some weird reason
+    else if (!isUrl(url)){
+        return handleFailedCommand(message.channel,
+            `Expected **${url}** to be a URL, 'last' or 'last embed'`
+        );
+    }
+
+    const isGif = getUrlExtension(url) === 'gif';
+    const placeholder = <Message> await safeSendMessage(message.channel, whatAnimePlaceholder(message.member, url, isGif));
+    const out = await Anime.getInstance().reverseSearch(url, isGif);
+
+    if (typeof out[0] === 'string'){
+        placeholder.delete();
+        return handleFailedCommand(message.channel, <string> out[0]);
+    }
+
     await placeholder.edit(out[0]);
-    await message.channel.send(out[1]);
+
+    if (out[1]){
+        await message.channel.send(out[1]);
+    }
 }
 
 export const command: Command = new Command(
@@ -48,7 +85,7 @@ export const command: Command = new Command(
             '{{prefix}}whatanime last'
         ],
         category: 'Fun',
-        expects: [{type: ArgType.String}],
+        expects: [{type: ArgType.Message}],
         run: run,
     }
 );

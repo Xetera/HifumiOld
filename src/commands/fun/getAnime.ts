@@ -6,8 +6,9 @@ import {randomRuntimeError, runtimeErrorResponses} from "../../interfaces/Replie
 import {debug} from "../../utility/Logging";
 import gb from "../../misc/Globals";
 import {random} from "../../utility/Util";
+import {Command} from "../../handlers/commands/Command";
 
-const placeholders = [
+export const animePlaceholders = [
     'Searching...',
     'Contacting the anime gods...',
     'Looking through my stash...',
@@ -17,11 +18,11 @@ const placeholders = [
     'Going through my anime contacts...'
 ];
 
-export async function getAnime(message: Message, input: [string]): Promise<any> {
+async function run(message: Message, input: [string]): Promise<any> {
     const [anime] = input;
     const placeholder = <Message> await safeSendMessage(
         message.channel,
-        `${gb.emojis.get('hifumi_kanna_inspect')} ${random(placeholders)}`
+        `${gb.emojis.get('hifumi_kanna_inspect')} ${random(animePlaceholders)}`
     );
     Anime.getInstance().getAnime(message, anime).then((embed: RichEmbed) => {
         placeholder.edit(embed);
@@ -30,3 +31,15 @@ export async function getAnime(message: Message, input: [string]): Promise<any> 
         placeholder.edit(randomRuntimeError());
     })
 }
+
+export const command: Command = new Command(
+    {
+        names: ['anime',],
+        info: 'Displays detailed information about an anime.',
+        usage: '{{prefix}}anime { anime name }',
+        examples: ['{{prefix}}anime New Game!', '{{prefix}}anime Zero no Tsukaima'],
+        category: 'Fun',
+        expects: [{type: ArgType.Message}],
+        run: run
+    }
+);

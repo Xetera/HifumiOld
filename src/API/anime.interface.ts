@@ -129,7 +129,7 @@ export interface getAnimeQueryResponse {
 
 export interface ParsedAnimeResponse {
     title:  string;
-    genres: string[];
+    genres: string;
     isAdult: boolean;
     siteUrl: string;
     description: string;
