@@ -16,23 +16,22 @@ export async function strike(message: Message, input: [GuildMember, number, stri
             message.channel, {file: 'assets/misc/counterspell.png'}
         );
     }
-
     else if (target.id === gb.ownerID) {
         return handleFailedCommand(
             message.channel, `${weight ? 'strike' : 'warn'} senpai? But I don't want him to spank me again...`
         );
     }
 
-    const banned = InfractionHandler.getInstance().addInfraction(message, message.member, target, reason, weight);
+    const banned = await InfractionHandler.getInstance().addInfraction(message, message.member, target, reason, weight);
 
     let output: string;
 
     if (banned) {
         output = `Banned ${target.user.username}.`;
     } else {
-        output = `Infracted ${target.user.username} for that.`;
+        output = `Infracted ${target.user.username} with weight **${weight}**.`;
     }
-    
+
     const embed = successEmbed(message.member, output);
     return safeSendMessage(message.channel, embed);
 }
@@ -44,14 +43,21 @@ async function run(message: Message, input: [GuildMember, number, string]): Prom
 export const command: Command = new Command(
     {
         names: ['strike'],
-        info: 'Warns or strikes a user, incrementing their strike count ',
-        usage: '',
-        examples: ["{{prefix}}strike @Xetera 1 Don't "],
+        info:
+        'Warns or strikes a user, adding to their current strike count.\n' +
+        "The target user notified DM'd **anonymously**, without exposing the striking moderator." +
+        "If current strike count reaches or goes over the maximum limit (3 by default) and I have ban permissions, " +
+        "the user is banned after a confirmation message.",
+        usage: '{{prefix}}strike { user } { weight } { reason }',
+        examples: [
+            "{{prefix}}strike @Xetera 1 Don't be rude to other people.",
+            "{{prefix}}strike 140862798832861184 3 You suck, you're banned."
+        ],
         category: 'Moderation',
         expects: [
             {type: ArgType.Member},
             [{type: ArgType.Number}, {type: ArgType.Message}],
-            {type: ArgType.Message, options: {optional: true}}
+            {type: ArgType.Message}
         ],
         run: run,
         userPermissions: UserPermissions.Moderator

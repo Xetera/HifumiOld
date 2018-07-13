@@ -6,15 +6,18 @@ import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../decorators/expects";
 import {UserPermissions} from "../../handlers/commands/command.interface";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
+import successEmbed from "../../embeds/commands/successEmbed";
 
 async function run(message: Message, input: [GuildMember, string]): Promise<any> {
     const [member, note] = input;
-    gb.instance.database.addNote(message.guild, message.member, member, note).then(res => {
-        safeSendMessage(message.channel, `Alright, I added that note`);
-    }).catch(err => {
-        debug.error(err);
-        handleFailedCommand(message.channel, `I couldn't add that note!`);
-    })
+    try {
+        await gb.instance.database.addNote(message.guild, message.member, member, note);
+    } catch (e) {
+        debug.error(e);
+        return handleFailedCommand(message.channel, `I couldn't add that note!`);
+    }
+    const embed = successEmbed(message.member, `Alright, I added that note`);
+    return safeSendMessage(message.channel, embed);
 }
 
 export const command: Command = new Command(
