@@ -8,7 +8,6 @@ import {
     ManyToOne,
     JoinColumn
 } from "typeorm";
-import {User} from "./user";
 import 'reflect-metadata';
 import {Guild} from "./guild";
 
@@ -21,7 +20,7 @@ export class Note {
     target_id: string;
 
     @Column()
-    @ManyToOne(type => Guild, guild => guild.id, {
+    @ManyToOne(() => Guild, guild => guild.id, {
         nullable: false
     })
     @JoinColumn({name: 'guild_id', referencedColumnName: 'id'})

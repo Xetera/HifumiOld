@@ -69,6 +69,10 @@ export class MessageQueue {
 
         if (isUserSpamming){
             // checking if the user is new before punishing
+            const spamFilter = await gb.instance.database.getSpamFilter(member.guild.id);
+            if (!spamFilter){
+                return;
+            }
             const watchlist = gb.instance.trackList;
             if (watchlist.isNewMember(member) && await gb.instance.database.getTrackNewMembers(member.guild.id)){
                 return watchlist.punishNewMember(member, Offense.Spam);

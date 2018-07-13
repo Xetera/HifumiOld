@@ -32,6 +32,9 @@ export class Guild {
     @Column({default: true})
     allows_invites: boolean;
 
+    @Column({default: false})
+    spam_filter: boolean;
+
     @Column({nullable: true})
     welcome_message: string;
 

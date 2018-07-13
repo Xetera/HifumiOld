@@ -141,8 +141,6 @@ export default class InfractionHandler {
                 return Promise.resolve(true);
             }
 
-            // We are already checking for isBan && !target.bannable before we enter the promise
-            staff.send(`Infracted user <@${target.id}> with weight **${weight}** and reason:\n${reason}`);
             target.send(infractionDMEmbed(
                 staff.guild,
                 weight,

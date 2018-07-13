@@ -77,9 +77,11 @@ export const command: Command = new Command(
     {
         names: ['whatanime', 'searchanime'],
         info:
-        'Searches an image to try to find its name. Use "last" to search the last image sent in the channel.\n' +
+        'Searches an image to try to find its name.\n' +
+        'Use "last" to search the last image/attachment sent in the channel.\n' +
+        'Use "last embed" to search for an embed containing an image.' +
         'Full screenshots will give the best results' ,
-        usage: "{{prefix}}whatanime { url | 'last' }",
+        usage: "{{prefix}}whatanime { url | 'last' | 'last embed' }",
         examples: [
             '{{prefix}}whatanime https://cdn.hifumi.io/xetera/0XvWlGkkX.jpg',
             '{{prefix}}whatanime last'

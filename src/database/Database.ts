@@ -78,7 +78,7 @@ export class Database {
                     // DO NOT TURN THESE ON FOR PRODUCTION
                     // I'M SERIOUS DON'T DO IT
 
-                    //synchronize: this.env === Environments.Development,
+                    synchronize: this.env === Environments.Development,
                     //dropSchema:  this.env === Environments.Development,
 
                     // DUDE I'M 100% SERIOUSLY RN I'LL GET SUPER MAD OK
@@ -896,9 +896,19 @@ export class Database {
                 .execute();
         });
     }
-    public async getSpamfilter(){
-        //return this
+    public async getSpamFilter(guildId: string){
+        return this.getGuild(guildId).then(r => {
+            return r.spam_filter;
+        });
+    }
 
+    public async setSpamFilter(guildId: string, state: boolean){
+        return this.conn.createQueryBuilder()
+            .update(Guild)
+            .set({spam_filter: state})
+            .where(`id = :id`, {id: guildId})
+            .returning('*')
+            .execute();
     }
 }
 
