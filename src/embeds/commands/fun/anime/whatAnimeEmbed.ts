@@ -13,7 +13,7 @@ export default function whatAnimeEmbed(data: ParsedAnimeResponse, episode: numbe
         sceneEpisode += ` [Watch it here!](${data.episodeLink})`;
     }
 
-    return new RichEmbed()
+    const embed = new RichEmbed()
         .setTitle(`Anime: ${data.title}`)
         .setDescription(
             `${sceneEpisode}\n` +
@@ -23,5 +23,13 @@ export default function whatAnimeEmbed(data: ParsedAnimeResponse, episode: numbe
         )
         .setColor(`#f57d7d`)
         .addField(`Description`, data.description ? data.description : 'No description found')
-        .setThumbnail(data.thumbnail)
+        .setThumbnail(data.thumbnail);
+    if (similarity < 0.85){
+        embed.setFooter(
+            `This result has less than 85% accuracy, it's probably wrong.`
+        )
+    }
+
+    return embed;
 }
+
