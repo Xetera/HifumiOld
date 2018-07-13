@@ -38,7 +38,7 @@ export const command: Command = new Command(
             '{{prefix}}avatar 140862798832861184'
         ],
         category: 'Info',
-        expects: [{type: ArgType.Member, options: {optional: true}}],
+        expects: [{type: ArgType.Member, options: {optional: true, strict: false}}],
         run: run
     }
 );
