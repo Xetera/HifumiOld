@@ -1,21 +1,19 @@
 **Completely revamped how commands are structured**
 Permissions are now checked before command validity which means Hifumi won't bait you into thinking you have permissions to use commands you typed wrong. Also added aliases.
 
-**$character, $clapify, $cat, $flip, $kick, $ban, $softban commands added**
+**$whatanime, $character, $clapify, $cat, $flip, $kick, $ban, $softban and $spamfilter commands added**
+
+**Removed all economy commands**
 
 **No longer responding to the word "hifumi" to chat and listening for @Hifumi instead.**
 This is largely because it gets very annoying to have any sort of conversation about her without her constantly replying. Also because the chat feature will eventually be replaced with a command that generates messages that sound like specific users (or the actual character of Hifumi) and also that chat is expensive to pay for.
 
-**'$anime' now gives WAY better results**
+**$anime now gives WAY better results**
 The anime command now uses MAL's API along with AniList's to give much better results for searches. You won't be be getting **Attack on Titan** for searching **K-On** anymore
 
 **No more links in macros!**
 Links to images in macros will automatically be sent as an attachment and removed from the message now
 
-**Removed all the economy stuff**
-I don't know why this was even here to begin with.. sorry
-
 **Bugfixes:**
     - **$suggestions** now slides suggestions properly again
     - Logs won't blindly take the first audit log it sees
-    -
