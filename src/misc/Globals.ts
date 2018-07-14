@@ -17,6 +17,7 @@ interface Globals {
     allMembers: number;
     emojis: Map<emojiName, Discord.Emoji>;
     instance: Instance;
+    sleeping: boolean;
 }
 
 export interface Instance {
@@ -31,5 +32,7 @@ export interface Instance {
     eval(message: Message, x : any): any
 }
 
-let gb : Globals = <Globals>{};
+let gb : Globals = <Globals>{
+    sleeping: false
+};
 export default gb;

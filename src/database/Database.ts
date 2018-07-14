@@ -57,7 +57,8 @@ export class Database {
         }).catch(err => {
             debug.error(`Could not connect to the database properly ...exiting application`);
             debug.error(err);
-            process.exit(1);
+            gb.sleeping = true;
+            gb.instance.bot.user.setActivity('Sleeping...');
         });
     }
 

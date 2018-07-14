@@ -8,6 +8,7 @@ export default async function onChannelCreate(channel: Channel){
     }
 
     if (!channel.guild.available
+        || gb.sleeping
         || !gb.instance.database.ready
         ||!await gb.instance.database.getGuildEnabled(channel.guild.id)){
         return;

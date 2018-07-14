@@ -44,6 +44,7 @@ function middleWare(msg: Discord.Message, ignored: boolean){
 export default async function onMessage(message: Discord.Message){
     // we don't want to look at bot messages at all
     if (message.author.bot
+        || gb.sleeping
         || !gb.instance
         || !gb.instance.database.ready
         || message.guild && !message.guild.available

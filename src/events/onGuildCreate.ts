@@ -14,6 +14,7 @@ export default async function onGuildCreate(guild : Discord.Guild) {
      * an outage it's fine because we're just upserting anyways
      */
     if (!database.ready
+        || gb.sleeping
         || !gb.instance
         || !await gb.instance.database.getGuildEnabled(guild.id) || !guild.available) {
         return;

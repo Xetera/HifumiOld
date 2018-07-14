@@ -11,6 +11,7 @@ export default async function onGuildMemberRemove(member : Discord.GuildMember) 
     // we will change this later to fetch from a Database instead of using a preset name
 
     if (!member.guild.available
+        || gb.sleeping
         || !gb.instance.database.ready
         || !await gb.instance.database.getGuildEnabled(member.guild.id)){
         return;
