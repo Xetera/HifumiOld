@@ -5,6 +5,7 @@ import gb from "../../misc/Globals";
 import {safeGetArgs} from "../../utility/Util";
 import moment = require("moment");
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
+import {debug} from "../../utility/Logging";
 
 export default async function cleanse(channel : Channel, input: [number] | undefined ) {
     const limit = safeGetArgs(input, 50);
@@ -26,7 +27,7 @@ export default async function cleanse(channel : Channel, input: [number] | undef
             })
             .catch(err => {
             channel.send(randomRuntimeError());
-            console.log("Error bulk deleting:\n", err);
+            debug.error("Error bulk deleting:\n", err);
         });
     }
 }

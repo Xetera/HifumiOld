@@ -225,6 +225,17 @@ export namespace StringUtils {
         const beginning = content.substring(0, amount);
         return `${beginning}...`;
     }
+    export function shortenByNewlines(input: string, maxLength: number){
+        const sections = input.split('\n');
+        return sections.reduce((aggregate: string[], line:string) => {
+            const currentCount = aggregate.reduce((a, b) => a + b.length, 0);
+
+            if (currentCount + line.length < maxLength){
+                aggregate.push(line);
+            }
+            return aggregate;
+        }, <string[]> []).join('\n') + '...';
+    }
 }
 
 export function arrayFromValues(obj: {[id: string]: any}){

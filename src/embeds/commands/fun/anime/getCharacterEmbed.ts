@@ -1,6 +1,6 @@
 import {RichEmbed} from "discord.js";
 import {ICharacter, IVoiceActor} from "../../../../API/anime.interface";
-import {normalizeString} from "../../../../utility/Util";
+import {emptySpace, normalizeString, StringUtils} from "../../../../utility/Util";
 import {AnimeUtils} from "../../../../utility/animeUtils";
 
 export default function getCharacterEmbed(character: ICharacter, VA?: IVoiceActor){
@@ -33,12 +33,12 @@ export default function getCharacterEmbed(character: ICharacter, VA?: IVoiceActo
                 `${edge.node.title.userPreferred ? AnimeUtils.getHyperlink(normalizeString(edge.node.title.userPreferred), edge.node.siteUrl): 'Unknown Title'} ` +
                 `${edge.node.averageScore ? `${edge.node.averageScore}/100` : 'Unknown Score'}`
         );
-        embed.addField(`Appears in`, apparances.join('\n'));
+        embed.addField(`Appears in`, apparances.join('\n') + emptySpace);
     }
     if (VA){
         embed.addField(`Voice Actor`,
             `**Name: **${AnimeUtils.formatName(VA.name)} ${VA.siteUrl? `-> [More Info](${VA.siteUrl})` : ''}\n`+
-            `${VA.description ? `**Description:**\n${VA.description}` : ''}`
+            `${VA.description ? `**Description:**\n${StringUtils.shortenByNewlines(VA.description, 200)}` : ''}`
         );
     }
 
