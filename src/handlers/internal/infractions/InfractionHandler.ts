@@ -118,7 +118,7 @@ export default class InfractionHandler {
                 let response = await resolveBooleanUncertainty(message,
                     `Striking this member will put them at ${weight + currentWeight}/${infractionLimit} total strikes, getting them banned.`, 30);
                 if (!response)
-                    return Promise.reject(`User denied boolean confirmation`);
+                    return Promise.reject(`EVENT_CANCELLED`);
                 isBan = true;
             }
 
@@ -149,18 +149,16 @@ export default class InfractionHandler {
                 strikeLimit
             ));
             return Promise.resolve(false);
-        }).catch(async(err: string | Error) => {
+        }).catch(async(err) => {
             if (err === 'EVENT_CANCELLED'){
                 return Promise.reject(`EVENT_CANCELLED`);
             }
             else if (typeof err !== 'string' && isInfractionRequestRejection(err)){
-                await handleFailedCommand(message.channel, err.responseMessage);
-                return Promise.reject(`Errored on infraction`);
+                return Promise.reject(`EVENT_CANCELLED`);
             }
             debug.error(err, `InfractionHandler`);
             await handleFailedCommand(message.channel, random(runtimeErrorResponses));
-            return Promise.reject(`Errored on infraction`);
-
+            return Promise.reject(new Error(err));
         });
     }
 }
