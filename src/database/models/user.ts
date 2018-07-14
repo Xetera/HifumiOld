@@ -46,12 +46,4 @@ export class User {
     @Column({default: 0})
     macros_used: number;
 
-    @Column({default: 0})
-    copper: number;
-
-    @Column({nullable: true})
-    last_daily: Date;
-
-    @Column({default: 0})
-    streak: number;
 }
