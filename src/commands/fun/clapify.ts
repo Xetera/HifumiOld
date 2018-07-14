@@ -2,9 +2,11 @@ import {Message} from 'discord.js'
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../decorators/expects";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
+import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
+import {debug} from "../../utility/Logging";
 
 async function run(message: Message, input: [string]): Promise<any> {
-    
+
     const [content] = input;
     const words = content.split(' ');
     const edited = words.reduce((coll: string[], item: string, index: number) => {
@@ -15,7 +17,14 @@ async function run(message: Message, input: [string]): Promise<any> {
         return coll;
     }, []);
     const out = edited.join(' ');
-    safeSendMessage(message.channel, out);
+    try {
+        message.channel.send(out, {disableEveryone: true});
+    } catch (e) {
+        debug.error(e, `Clapify`);
+        handleFailedCommand(message.channel,
+             `Couldn't send that message`
+        );
+    }
 }
 
 export const command: Command = new Command(

@@ -24,7 +24,7 @@ async function run(message: Message): Promise<any> {
 
 export const command: Command = new Command(
     {
-        names: ['kitty', 'cat'],
+        names: ['cat', 'kitty'],
         info: 'Sends a cute cat.',
         usage: '{{prefix}}cat',
         examples: ['{{prefix}}cat'],
