@@ -71,7 +71,7 @@ export default class Anime {
     }
 
 
-    public async getAnime(message: Message, anime: string): Promise<RichEmbed> {
+    public async getAnime(message: Message, anime: string): Promise<RichEmbed | string> {
         /**
          * Why do you do it like this you ask? As much as I love AniList it has a god
          * awful search system.
@@ -82,13 +82,21 @@ export default class Anime {
         if (!MALId) {
             return await animeNotFoundEmbed(message.guild.id, 'anime')
         }
-        const response: AxiosResponse<{ data: { Media: getAnimeQueryResponse } }> = await this.anilist.post(`/`,
-            JSON.stringify({
-                query: await Anime.getQuery('getAnimeByMalId'),
-                variables: {
-                    id: MALId
-                }
-            }));
+        let response: AxiosResponse<{ data: { Media: getAnimeQueryResponse } }> ;
+        try{
+            response = await this.anilist.post(`/`,
+                JSON.stringify({
+                    query: await Anime.getQuery('getAnimeByMalId'),
+                    variables: {
+                        id: MALId
+                    }
+                }));
+        } catch (err){
+            if (err.response.status === 404){
+                return await animeNotFoundEmbed(message.guild.id, 'anime');
+            }
+            return `Something went wrong while looking up this anime.`
+        }
 
         const data = response.data.data.Media;
         if (data.isAdult && message.channel instanceof TextChannel && !message.channel.nsfw) {
@@ -109,7 +117,6 @@ export default class Anime {
     }
 
     public async getCharacter(message: Message, character: string) {
-        console.log(character);
         try {
             const response: AxiosResponse<{ data: { Character: ICharacter } }> = await this.anilist.post(`/`,
                 JSON.stringify({
@@ -213,7 +220,6 @@ export default class Anime {
 
         const result = data.docs[0];
 
-        console.log(data);
         if (!result){
             return ["Could not receive a response from the server, either whatanime.ga API is down or " +
             "there's a problem somewhere else.", undefined]

@@ -24,9 +24,9 @@ async function run(message: Message, input: [string]): Promise<any> {
         message.channel,
         `${gb.emojis.get('hifumi_kanna_inspect')} ${random(animePlaceholders)}`
     );
-    Anime.getInstance().getAnime(message, anime).then((embed: RichEmbed) => {
+    Anime.getInstance().getAnime(message, anime).then((embed: string | RichEmbed) => {
         placeholder.edit(embed);
-    }).catch(err =>{
+    }).catch((err: Error)=>{
         debug.error(err, `Anime`);
         placeholder.edit(randomRuntimeError());
     })

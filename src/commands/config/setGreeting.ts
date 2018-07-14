@@ -72,7 +72,6 @@ async function run(message: Message, input: [string]): Promise<any> {
         gb.instance.database.setWelcomeMessage(message.guild.id, final).then(() => {
         }).catch((err: any) => {
             console.log('STACK ERROR');
-            console.log(err.stack);
             debug.error(err, `setWelcomeMessage`);
         })
     })

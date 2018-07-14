@@ -40,7 +40,6 @@ export async function parseMacro(content: string): Promise<[(string | undefined)
         if (isMedia(image)) {
 
             const url = image.request.res.responseUrl;
-            console.log(image.request.res)
             arr.push(url);
             content = content.replace(url, '');
         }

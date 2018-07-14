@@ -176,7 +176,6 @@ export async function muteCoverage(message: Message){
             muteRole.count = 1;
         }
     });
-    console.log(total.missing.map(channel => channel.name));
 
     let embed;
     const prefix = await gb.instance.database.getPrefix(message.guild.id);

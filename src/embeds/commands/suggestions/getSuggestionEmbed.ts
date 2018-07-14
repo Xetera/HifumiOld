@@ -6,7 +6,6 @@ import {emptySpace} from "../../../utility/Util";
 
 export default function getSuggestionEmbed(message: Message, suggestions: Suggestion[], index: number, prefix: string){
     const suggestion = suggestions[index];
-    console.log(suggestion);
     if (!suggestion){
         return new RichEmbed()
             .setTitle(`No suggestions`)

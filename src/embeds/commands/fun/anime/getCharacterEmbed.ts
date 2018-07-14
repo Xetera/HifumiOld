@@ -33,7 +33,7 @@ export default function getCharacterEmbed(character: ICharacter, VA?: IVoiceActo
                 `${edge.node.title.userPreferred ? AnimeUtils.getHyperlink(normalizeString(edge.node.title.userPreferred), edge.node.siteUrl): 'Unknown Title'} ` +
                 `${edge.node.averageScore ? `${edge.node.averageScore}/100` : 'Unknown Score'}`
         );
-        embed.addField(`Appears in`, apparances.join('\n') + emptySpace);
+        embed.addField(`Appears in`, apparances.join('\n'));
     }
     if (VA){
         embed.addField(`Voice Actor`,
