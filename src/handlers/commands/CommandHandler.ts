@@ -185,9 +185,8 @@ export default class CommandHandler implements indexSignature {
                         )
                     }
                 }
-                console.log(content)
                 await message.channel.startTyping();
-                message.channel.send(...content).catch(console.log);
+                message.channel.send(...content).catch(debug.error);
                 return await message.channel.stopTyping();
             }
         }
