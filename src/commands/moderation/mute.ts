@@ -7,6 +7,7 @@ import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../decorators/expects";
 import {UserPermissions} from "../../handlers/commands/command.interface";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
+import successEmbed from "../../embeds/commands/successEmbed";
 
 async function run(message: Message, input: [GuildMember, number, string]): Promise<any> {
     const [member, duration, reason] = input;
@@ -51,18 +52,20 @@ async function run(message: Message, input: [GuildMember, number, string]): Prom
         duration * 60 /* duration is in seconds */
     ).then(res => {
         // editing the "Please wait" message we sent earlier on completion
-        return placeholder.edit(`Muted ${member.user.username} for ${formattedTimeString(duration * 60)}`);
+        return placeholder.edit(successEmbed(message.member, `Muted ${member.user.username} for ${formattedTimeString(duration * 60)}`));
     }).then(x => x.delete(30000));
 }
 
 export const command: Command = new Command(
     {
         names: ['mute'],
-        info: 'Mutes a user for a specific time period (somewhat broken right now).',
+        info: 'Mutes a user for a specific time period.\n' +
+        'Somewhat broken right now as it requires you to have a role called "muted" with all the correct overrides\n' +
+        'This will be fixed in later patches.',
         usage: '{{prefix}}mute { user } { minutes } { reason }',
         examples: ['{{prefix}}mute @Xetera 60 You need to rethink your life'],
         category: 'Moderation',
-        expects: [{type: ArgType.Member}, {type: ArgType.Number}, {type: ArgType.Message}],
+        expects: [{type: ArgType.Member, options: {strict: true}}, {type: ArgType.Number}, {type: ArgType.Message}],
         run: run,
         userPermissions: UserPermissions.Moderator,
         clientPermissions: ['MANAGE_ROLES']

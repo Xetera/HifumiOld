@@ -22,7 +22,15 @@ export async function strike(message: Message, input: [GuildMember, number, stri
         );
     }
 
-    const banned = await InfractionHandler.getInstance().addInfraction(message, message.member, target, reason, weight);
+    let banned;
+    try {
+        banned = await InfractionHandler.getInstance().addInfraction(message, message.member, target, reason, weight);
+    } catch (err) {
+        console.log(err);
+        if (err === `EVENT_CANCELLED`){
+            return;
+        }
+    }
 
     let output: string;
 
@@ -48,14 +56,14 @@ export const command: Command = new Command(
         "The target user notified DM'd **anonymously**, without exposing the striking moderator." +
         "If current strike count reaches or goes over the maximum limit (3 by default) and I have ban permissions, " +
         "the user is banned after a confirmation message.",
-        usage: '{{prefix}}strike { user } { weight } { reason }',
+        usage: '{{prefix}}strike { member } { weight } { reason }',
         examples: [
             "{{prefix}}strike @Xetera 1 Don't be rude to other people.",
             "{{prefix}}strike 140862798832861184 3 You suck, you're banned."
         ],
         category: 'Moderation',
         expects: [
-            {type: ArgType.Member},
+            {type: ArgType.Member, options: {strict: true}},
             [{type: ArgType.Number}, {type: ArgType.Message}],
             {type: ArgType.Message}
         ],
