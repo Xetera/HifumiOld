@@ -61,7 +61,7 @@ export async function _respondToSuggestion(message: Message, input: [number, str
         }
 
         oldMessage.delete();
-        safeSendMessage(message.channel, acceptionEmbed);
+        safeSendMessage(channel, acceptionEmbed);
     }
     else if (response === SuggestionResponse.REJECTED){
         let response = `Rejected suggestion #${suggestion.suggestion_id}`;
@@ -75,7 +75,8 @@ export async function _respondToSuggestion(message: Message, input: [number, str
         else {
             safeSendMessage(message.channel, response + `\nBut I could not inform the original sender, they might have left.`);
         }
-        oldMessage.edit(rejectionEmbed);
+        oldMessage.delete();
+        safeSendMessage(channel, rejectionEmbed);
     }
 }
 
