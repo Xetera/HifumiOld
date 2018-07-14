@@ -12,7 +12,7 @@ import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import missingAdminEmbed from "../../embeds/permissions/missingAdminEmbed";
 import _setStrikeLimit from "../moderation/_setStrikeLimit";
 import {reactions} from "./reactions";
-import {setMemberTracking} from "../moderation/setNewMemberTracking";
+import {setMemberTracking} from "./tracking";
 import setInvites from "./_setInvites";
 import setInviteWarn from "./_setInviteWarn";
 import setInviteBan from "./_setInviteBan";

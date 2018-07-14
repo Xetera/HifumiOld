@@ -124,7 +124,6 @@ export function checkMuteCoverage(message: Message): 'all' | 'partial' | 'none' 
     const total = input.total;
     const tally = input.tally;
     const channels = <TextChannel[]> message.guild.channels.array().filter(channel => channel.type === 'text');
-    console.log(total.missing.map(c => c.name) );
     if (!total.missing.length) {
         return 'all';
     }

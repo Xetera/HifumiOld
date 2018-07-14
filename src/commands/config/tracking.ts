@@ -5,9 +5,20 @@ import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../decorators/expects";
 import {UserPermissions} from "../../handlers/commands/command.interface";
 
-export async function setMemberTracking(message: Message, input: [boolean]){
+export async function setMemberTracking(message: Message, input: [(boolean | undefined)]){
     const [choice] = input;
-    const r = await gb.instance.database.setTrackNewMembers(message.guild.id, choice);
+    // could also be false, can't check with !
+    if (choice === undefined){
+        const status = await gb.instance.database.getTrackNewMembers(message.guild.id);
+        if (status){
+            safeSendMessage(message.channel, `My tracking setting is currently on.`);
+        } else {
+            safeSendMessage(message.channel, `Currently not tracking new members.`);
+        }
+        return;
+    }
+
+    await gb.instance.database.setTrackNewMembers(message.guild.id, choice);
     if (!choice)
         safeSendMessage(message.channel, `No longer tracking new members in this server.`);
     else
@@ -29,7 +40,7 @@ export const command: Command = new Command(
         usage: "{{prefix}}tracking { 'on' | 'off' }",
         examples: ['{{prefix}}tracking on'],
         category: 'Settings',
-        expects: [{type: ArgType.Boolean}],
+        expects: [{type: ArgType.Boolean, options: {optional: true}}],
         run: run,
         userPermissions: UserPermissions.Moderator,
         clientPermissions: ['BAN_MEMBERS']
