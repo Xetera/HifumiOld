@@ -58,3 +58,5 @@
     * `$randomquote` - A quote... that is random
     * `$ch` - Random cyanide and happiness comic
 #### Inspired by [HotBot](https://github.com/AberrantFox/hotbot) in [The Programmer's Hangout](https://discord.gg/programming)
+
+#### This repo is not really meant to be self-hosted, there's quite a significant chunk of code that's either hardcoded or made to be very convenient for Hifumi in specific. You're probably going to have a hard time trying to fork it anytime in the near future.
