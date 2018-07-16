@@ -6,7 +6,6 @@ import admin from "../../decorators/onlyAdmin";
 import {Cleverbot} from "../../API/Cleverbot";
 import {MuteQueue} from "../../moderation/MuteQueue";
 import {MessageQueue} from "../../moderation/MessageQueue";
-import botOwner from "../../decorators/onlyOwner";
 import mod from "../../decorators/onlyMod";
 import cleanse from "../../commands/utility/Cleanse";
 import settings from "../../commands/config/settings";
@@ -38,8 +37,6 @@ import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import {debug} from "../../utility/Logging";
 import {GuildMember, Message, PermissionResolvable, TextChannel} from "discord.js";
 
-
-
 export interface CommandParameters extends Instance {
     message: Discord.Message;
     bot: Discord.Client;
@@ -63,15 +60,13 @@ interface UserInputData {
     args: string[];
 }
 
-
 function isMessage(message : any) : message is Discord.Message {
     return <Discord.Message> message.content !== undefined;
 }
 
 export default class CommandHandler implements indexSignature {
     [method:string]: any;
-    commands : string[];
-    _newCommands: Command[] = [];
+    commands: Command[] = [];
     restarting: boolean = false;
     constructor(){
         this.glob();
@@ -85,7 +80,7 @@ export default class CommandHandler implements indexSignature {
             for (let fileName of matches){
                 const file = require(fileName);
                 if (file.command){
-                    this._newCommands.push(<Command> file.command);
+                    this.commands.push(<Command> file.command);
                 }
             }
         }));
@@ -149,11 +144,11 @@ export default class CommandHandler implements indexSignature {
         params.message = message;
         params.input = [];
 
-        for (let i in this._newCommands) {
-            const match = this._newCommands[i].names.find(name => name.toLowerCase()  ===inputData.command.toLowerCase());
+        for (let i in this.commands) {
+            const match = this.commands[i].names.find(name => name.toLowerCase()  ===inputData.command.toLowerCase());
             if (!match)
                 continue;
-            const execution = this._newCommands[i];
+            const execution = this.commands[i];
 
             try {
                 this._run(message, execution, params);
@@ -274,10 +269,13 @@ export default class CommandHandler implements indexSignature {
     public static getMissingUserPermission(executor: GuildMember, command: Command): UserPermissions | false {
         // !command.userPermissions also catches UserPermissions === 0
         // by default since it's an enum
+        if (executor.id === gb.ownerID){
+            return false;
+        }
         if (!command.userPermissions && command.userPermissions !== ''){
             return false;
         }
-        if (command.userPermissions === UserPermissions.Administrator && !executor.hasPermission('ADMINISTRATOR')){
+        else if (command.userPermissions === UserPermissions.Administrator && !executor.hasPermission('ADMINISTRATOR')){
             return UserPermissions.Administrator;
         }
         else if (command.userPermissions === UserPermissions.Moderator && !executor.hasPermission('BAN_MEMBERS')){
@@ -292,7 +290,7 @@ export default class CommandHandler implements indexSignature {
     }
 
     public findCommand(targetName: string, excludeOwner: boolean = false){
-        for (let command of this._newCommands){
+        for (let command of this.commands){
             // Could be shorter, but this is easier to read
             if (excludeOwner && command.userPermissions === UserPermissions.BotOwner){
                 continue;
