@@ -7,10 +7,14 @@ import banForInviteSpam from "../actions/punishments/BanForInviteSpam";
 import {GuildMember, Message} from "discord.js";
 import {LogManager} from "../handlers/logging/logManager";
 import inviteWarningDMEmbed from "../embeds/moderation/inviteWarningDM";
+import {APIErrors} from "../interfaces/Errors";
 
 export default function deleteInvite(message: Message, editedMessage: boolean = false): Promise<number> {
     const sender = message.author.username;
     const trackList = gb.instance.trackList;
+    if (!message.guild.me.hasPermission('MANAGE_MESSAGES')){
+       return Promise.reject(new Error(APIErrors.MISSING_PERMISSIONS));
+    }
     return safeDeleteMessage(message).then(()=> {
         debug.info(`Deleted invite link from ${sender}`);
         return gb.instance.database.incrementInviteStrike(message.member)
