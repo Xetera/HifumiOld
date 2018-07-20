@@ -63,10 +63,6 @@ export class LogManager {
         }, 1000);
     }
 
-    private static canLog(channel: TextChannel): boolean{
-        return channel.permissionsFor(channel.guild.me).has(['SEND_MESSAGES', 'READ_MESSAGES']);
-    }
-
     private static findExecutor(logs: GuildAuditLogs, action: keyof GuildAuditLogsActions): GuildAuditLogsEntry | undefined {
         const entries = logs.entries.array();
         return entries.find(entry => entry.action === action);
@@ -74,12 +70,9 @@ export class LogManager {
 
     public static async logWarning(guild: Guild, channelId: string, embed: RichEmbed|string, action: LogAction){
         const warningsChannel = guild.channels.get(channelId);
-        if (!warningsChannel) {
+        if (!warningsChannel){
             // User probably deleted the channel and didn't update their log setting
             return void debug.error(`Could not resolve a warnings channel saved in the database`, `LogManager`);
-        }
-        else if (!LogManager.canLog( < TextChannel > warningsChannel)){
-           return;
         }
         if (warningsChannel instanceof TextChannel){
             warningsChannel.send(embed);
@@ -94,9 +87,6 @@ export class LogManager {
         if (!logsChannel){
             // User probably deleted the channel and didn't update their log setting
             return void debug.error(`Could not resolve a channel saved in the database`, `LogManager`);
-        }
-        else if (!LogManager.canLog( < TextChannel > logsChannel)){
-            return;
         }
         if (logsChannel instanceof TextChannel){
             safeSendMessage(logsChannel, embed);
