@@ -18,7 +18,7 @@ async function run(message: Message, input: [string | undefined]): Promise<any> 
     }
 
     let embed = new RichEmbed();
-    const commands = gb.instance.commandHandler._newCommands;
+    const commands = gb.instance.commandHandler.commands;
     let sortedCommands: {[type:string]: Command[]} = commands.reduce((obj: {[type:string]: Command[]}, command: Command) => {
         // we don't want to send ALL the settings commands in help
         if (command.hidden)
@@ -77,7 +77,7 @@ export const command: Command = new Command(
 );
 
 async function getSpecificHelp(message: Message, arg: string, prefix: string){
-    const command: Command | undefined = gb.instance.commandHandler._newCommands.find(cmd => cmd.names.includes(arg));
+    const command: Command | undefined = gb.instance.commandHandler.commands.find(cmd => cmd.names.includes(arg));
     if (!command) {
         const macro = await gb.instance.database.getMacro(message.guild.id, arg);
         if (macro){
