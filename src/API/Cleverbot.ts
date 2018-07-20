@@ -25,8 +25,8 @@ export class Cleverbot {
             apiKey: apiKey,
             mood: {
                 regard: 30,
-                emotion: 100,
-                engagement: 5
+                emotion: 70,
+                engagement: 20
             }
         };
         this.cleverbot = new Clevertype(configuration, true);
@@ -69,16 +69,15 @@ export class Cleverbot {
         if (message.channel.id === chatChannelId || cleverbotCall || message.isMentioned(bot.user)) {
 
             if (!gb.instance.database.ready) {
-                message.channel.send(`😰 give me some time to get set up first.`);
+                safeSendMessage(message.channel, `😰 give me some time to get set up first.`);
                 return void debug.info(`Got message from ${message.guild.name} but the DB hasn't finished caching.`);
             }
 
             // don't respond to messages not meant for me
-            if (message.mentions.users.array().length !== 0 && !message.isMentioned(bot.user))
+            if (message.mentions.users.size !== 0 && !message.isMentioned(bot.user))
                 return;
             else if (message.content.startsWith('-') || message.content.startsWith(await gb.instance.database.getPrefix(message.guild.id)))
                 return;
-
             else if (this.isRateLimited(message.member.id, message)){
                 return;
             }
@@ -112,7 +111,7 @@ export class Cleverbot {
             userHistory = user.history;
         }
         catch (err){
-            console.log(err);
+            debug.error(err);
             return false;
         }
         const last = userHistory[userHistory.length - 1];
