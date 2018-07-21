@@ -41,6 +41,7 @@
     "request": "^2.85.0",
     "stream-to": "^2.0.0",
     "stream-to-array": "^2.3.0",
+    "tslint": "^5.11.0",
     "typeorm": "^0.2.3",
     "typescript": "^2.8.3",
     "ytdl-core": "^0.19.0"

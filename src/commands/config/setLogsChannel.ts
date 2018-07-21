@@ -10,12 +10,16 @@ import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../decorators/expects";
 import {UserPermissions} from "../../handlers/commands/command.interface";
+import successEmbed from "../../embeds/commands/successEmbed";
 
 async function setLogsChannel(message: Message, channel?: TextChannel){
     try{
         const r: Partial<Guild> = await gb.instance.database.setLogsChannel(
             message.guild.id , channel && channel.id || undefined
         );
+        if (!channel){
+            return safeSendMessage(message.channel, successEmbed(message.member, `Removed logging channel`));
+        }
         const targetChannel = message.client.channels.get(r.logs_channel!);
         if (!targetChannel){
             debug.error(`Could not find channel ${r.logs_channel} in ${message.guild}`, 'SetWarnings');
@@ -40,7 +44,7 @@ async function run(message: Message, input: [(TextChannel | boolean | undefined)
         setLogsChannel(message, channel);
         return;
     } else if (channel === false) {
-        await gb.instance.database.setLogsChannel(message.guild.id, undefined);
+        await gb.instance.database.removeLogsChannel(message.guild.id);
         setLogsChannel(message, undefined);
         return;
     }
@@ -56,7 +60,7 @@ export const command: Command = new Command(
         examples: ['{{prefix}}logchannel #logs', "{{prefix}}logchannel off"],
         category: 'Settings',
         expects:
-            [{type: ArgType.Channel, options: {channelType: 'text', optional: true}}, {type: ArgType.Boolean}],
+            [[{type: ArgType.Channel, options: {channelType: 'text', optional: true}}, {type: ArgType.Boolean}]],
         run: run,
         userPermissions: UserPermissions.Moderator,
     }

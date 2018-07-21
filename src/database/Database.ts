@@ -426,6 +426,19 @@ export class Database {
         })
     }
 
+    public removeChatChannel(guildId: string){
+        return this.invalidateCache('guilds').then(() => {
+            return this.conn.manager.createQueryBuilder()
+                .update(Guild)
+                .set({chat_channel: null})
+                .where(`id = :id`, {id: guildId})
+                .returning('*')
+                .execute();
+        }).catch(err => {
+            return Promise.reject(err);
+        });
+    }
+
     public getWelcomeChannel(guildId: string): Promise<string> {
         return this.getGuild(guildId).then((r: Guild) => {
             return r.welcome_channel;

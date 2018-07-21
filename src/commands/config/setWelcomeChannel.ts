@@ -31,7 +31,7 @@ async function run(message: Message, input: [(TextChannel | boolean | undefined)
     }
     else if (channel === false) {
         try {
-            await gb.instance.database.setWelcomeChannel(message.guild.id, undefined)
+            await gb.instance.database.removeWelcomeChannel(message.guild.id);
         } catch (err) {
             return handleFailedCommand(message.channel,
                 `Something went wrong, I couldn't clear your welcome channel!`
@@ -53,10 +53,8 @@ export const command: Command = new Command(
         category: 'Settings',
         expects:
             [
-                [{type: ArgType.Channel, options: {channelType: 'text', optional: true}}, {
-                    type: ArgType.Boolean,
-                    options: {optional: true}
-                }]
+                [{type: ArgType.Channel, options: {channelType: 'text', optional: true}},
+                    {type: ArgType.Boolean,options: {optional: true}}]
             ],
         run: run,
         userPermissions: UserPermissions.Moderator,

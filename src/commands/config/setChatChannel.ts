@@ -8,15 +8,18 @@ import {debug} from "../../utility/Logging";
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../decorators/expects";
 import {UserPermissions} from "../../handlers/commands/command.interface";
-function setChatChannel(message: Message, channel: TextChannel){
+import successEmbed from "../../embeds/commands/successEmbed";
+import guildMemberAddEmbed from "../../embeds/events/onGuildMemberAddEmbed";
+
+async function setChatChannel(message: Message, channel: TextChannel) {
     try {
-        message.channel.send(
+        await gb.instance.database.setChatChannel(message.guild.id, channel.id);
+        await message.channel.send(
             setConfigChannelEmbed(channel, 'chat')
         );
         if (message.channel instanceof TextChannel
-            && message.channel.topic !== '') {
-
-            message.channel.setTopic(`Talk to Hifumi without having to mention her name. @mention or put a - before your messages to talk to other people without having her respond`);
+            && message.channel.topic !== '' && message.guild.me.hasPermission('MANAGE_CHANNELS')) {
+            await message.channel.setTopic(`Talk to Hifumi without having to mention her name. @mention or put a - before your messages to talk to other people without having her respond`);
         }
     }
     catch (err) {
@@ -24,19 +27,21 @@ function setChatChannel(message: Message, channel: TextChannel){
         return safeSendMessage(channel, random(runtimeErrorResponses));
     }
 }
+
 async function run(message: Message, input: [(TextChannel | boolean | undefined)]) {
     const [target] = input;
     if (target instanceof TextChannel) {
-       setChatChannel(message, target);
+        setChatChannel(message, target);
     }
-    else if (target === false){
-      try {
-          gb.instance.database.setChatChannel(message.guild.id, undefined);
-      }
-      catch (err) {
-          debug.error(`Error while trying to delete chat channel\n` + err, 'setWelcomeChannel');
-          return safeSendMessage(message.channel, random(runtimeErrorResponses));
-      }
+    else if (target === false) {
+        try {
+            await gb.instance.database.removeChatChannel(message.guild.id);
+            return safeSendMessage(message.channel, successEmbed(message.member, `Removed your chat channel.`));
+        }
+        catch (err) {
+            debug.error(`Error while trying to delete chat channel\n` + err, 'setWelcomeChannel');
+            return safeSendMessage(message.channel, random(runtimeErrorResponses));
+        }
     }
     else {
         setChatChannel(message, <TextChannel> message.channel);
@@ -50,8 +55,8 @@ export const command: Command = new Command(
         usage: "{{prefix}}chatchannel { #channel | 'off' ?}",
         examples:
             [
-            '{{prefix}}chatchannel',
-            '{{prefix}}chatchannel #chat-with-hifumi'],
+                '{{prefix}}chatchannel',
+                '{{prefix}}chatchannel #chat-with-hifumi'],
         category: 'Settings',
         expects: [
             [{type: ArgType.Channel, options: {channelType: 'text', optional: true}}, {type: ArgType.Boolean}]
