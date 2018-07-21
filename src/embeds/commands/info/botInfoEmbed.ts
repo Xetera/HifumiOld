@@ -2,7 +2,7 @@ import {Message, RichEmbed} from "discord.js";
 import gb from "../../../misc/Globals";
 
 export default function botInfoEmbed(message: Message){
-    const commandCount = gb.instance.commandHandler._newCommands.length;
+    const commandCount = gb.instance.commandHandler.commands.length;
     const serverCount = message.client.guilds.size;
     const userCount = message.client.users.size;
     return new RichEmbed()

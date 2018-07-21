@@ -3,18 +3,19 @@ import lavenshteinDistance from "../../utility/LavenshteinDistance";
 import {Help} from "../../commands/info/help/help.interface";
 import ReactionManager from "../../handlers/internal/reactions/reactionManager";
 import gb from "../../misc/Globals";
+import {Command} from "../../handlers/commands/Command";
 const help: Help = require('../../commands/help.json');
 
 export default async function commandNotFoundEmbed(channel: Channel, commandName: string, pool?: string[]){
     if (!(channel instanceof TextChannel)){
         throw new Error('Can only send embeds to a channel');
     }
-    const commands = gb.instance.commandHandler._newCommands;
+    const commands = gb.instance.commandHandler.commands;
     if (pool){
-        pool = commands.map(c => c.names[0]).concat(pool)
+        pool = commands.map((c:Command)=> c.names[0]).concat(pool)
     }
     else {
-        pool = commands.map(c => c.names[0]);
+        pool = commands.map((c: Command) => c.names[0]);
     }
     let suggestion: string = lavenshteinDistance(commandName, pool);
     if (commandName.length > 20){
