@@ -1,29 +1,15 @@
 import * as Discord from "discord.js";
 import {Database} from "../../database/Database";
-import setPrefix from "../../commands/config/SetPrefix";
 import gb, {Instance} from "../../misc/Globals";
-import admin from "../../decorators/onlyAdmin";
 import {Cleverbot} from "../../API/Cleverbot";
 import {MuteQueue} from "../../moderation/MuteQueue";
 import {MessageQueue} from "../../moderation/MessageQueue";
-import mod from "../../decorators/onlyMod";
-import cleanse from "../../commands/utility/Cleanse";
-import settings from "../../commands/config/settings";
 import commandNotFoundEmbed from "../../embeds/commands/commandNotFoundEmbed";
-import setInvites from "../../commands/config/_setInvites";
-import randomQuote from "../../commands/fun/randomQuote";
 import {Macro} from "../../database/models/macro";
-import {requires} from "../../decorators/requires";
-import {throttle} from '../../decorators/throttleCommand'
 import {ArgOptions, ArgType} from "../../decorators/expects";
 import argParse from "../../parsers/argParse";
 import {LogManager} from "../logging/logManager";
 import safeDeleteMessage from "../safe/SafeDeleteMessage";
-import EmbedBuilder from "../internal/embedBuilder";
-import removeWelcome from "../../commands/config/settings/removeWelcome";
-import removeLogs from "../../commands/config/settings/removeLogs";
-import removeWarnings from "../../commands/config/settings/removeWarnings";
-import {expects} from "../../decorators/expects";
 import {buildMacro} from "../../parsers/parseMacro";
 import {Command} from "./Command";
 import glob = require('glob')
@@ -218,6 +204,7 @@ export default class CommandHandler implements indexSignature {
             }
 
             const missingP = CommandHandler.getMissingUserPermission(message.member, command);
+            console.log(missingP);
 
             if (missingP === UserPermissions.Administrator && !message.member.hasPermission('ADMINISTRATOR')){
                 return safeSendMessage(message.channel, await missingAdminEmbed(message.guild));
@@ -272,7 +259,7 @@ export default class CommandHandler implements indexSignature {
         if (executor.id === gb.ownerID){
             return false;
         }
-        if (!command.userPermissions && command.userPermissions !== ''){
+        else if (!command.userPermissions && command.userPermissions !== ''){
             return false;
         }
         else if (command.userPermissions === UserPermissions.Administrator && !executor.hasPermission('ADMINISTRATOR')){
@@ -300,77 +287,4 @@ export default class CommandHandler implements indexSignature {
             }
         }
     }
-
-    /* Admin Commands */
-
-    @admin
-    @throttle(30)
-    @expects(ArgType.String, {maxLength: 1})
-    private setPrefix(params: CommandParameters){
-        setPrefix(params.message, <[string]> params.input);
-    }
-
-    @admin
-    @requires('MANAGE_MESSAGES')
-    @expects(ArgType.Boolean)
-    private inviteFilter(params: CommandParameters){
-        setInvites(params.message, <[boolean]> params.input);
-    }
-
-    @admin
-    @expects(ArgType.None)
-    private removeWelcome(params : CommandParameters){
-        removeWelcome(params.message);
-    }
-
-    @admin
-    @expects(ArgType.None)
-    private removeLogs(params : CommandParameters){
-        removeLogs(params.message);
-    }
-
-    @admin
-    @expects(ArgType.None)
-    private removeWarnings(params : CommandParameters){
-        removeWarnings(params.message);
-    }
-
-    @mod
-    @expects(ArgType.String, {optional: true})
-    @expects(ArgType.String, {optional: true})
-    private settings(params : CommandParameters){
-        settings(params.message, <[string, string]> params.input);
-    }
-
-    /* Mod Commands */
-
-    @mod
-    @throttle(15)
-    @requires('MANAGE_MESSAGES')
-    @expects(ArgType.Number, {maxRange: 500, optional: true})
-    private cleanse(params: CommandParameters){
-        cleanse(params.message.channel, <[number] | undefined> params.input)
-    }
-
-    /* Public Commands */
-    @expects(ArgType.Message)
-    private embed(params: CommandParameters){
-        EmbedBuilder.getInstance().embed(params.message, <[string]> params.input)
-    }
-
-    @expects(ArgType.Message)
-    private editEmbed(params: CommandParameters){
-        EmbedBuilder.getInstance().editEmbed(params.message);
-    }
-
-    @expects(ArgType.None)
-    private sendEmbed(params: CommandParameters){
-        EmbedBuilder.getInstance().getEmbed(params.message);
-    }
-
-    @expects(ArgType.None)
-    private randomQuote(params: CommandParameters){
-        randomQuote(params.message);
-    }
-
 }
