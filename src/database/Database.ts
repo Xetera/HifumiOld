@@ -616,6 +616,19 @@ export class Database {
             .execute();
     }
 
+    public deleteAllInfractions(guildId: string, target_id: string){
+        return this.invalidateCache('infractions').then(() => {
+            return this.conn.manager
+                .createQueryBuilder()
+                .delete()
+                .from(Infraction)
+                .where("guild_id = :guild AND target_id = :target",
+                    {guild: guildId, target: target_id})
+                .returning('*')
+                .execute();
+        });
+    }
+
     public getTrackNewMembers(guildId: string){
         return this.getGuild(guildId).then((r: Guild) => {
             return r.tracking_new_members;
