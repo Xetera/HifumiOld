@@ -10,8 +10,8 @@ export default function safeSendMessage
     if (typeof message === 'number'){
         out = message.toString().trim();
     }
-    else if (message instanceof RichEmbed){
-        out = message;
+    else if (typeof message === 'string') {
+        out = message.replace(channel.client.token, '[TOKEN REDACTED]');
     }
     else {
         out = message;

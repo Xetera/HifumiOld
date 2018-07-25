@@ -419,7 +419,7 @@ export class Database {
     }
 
     public setChatChannel(guildId: string, channelId:string | undefined): Promise<Partial<Guild>> {
-        return this.invalidateCache('guildss').then(() => {
+        return this.invalidateCache('guilds').then(() => {
             return this.conn.manager.save(Guild, {id: guildId, chat_channel: channelId});
         }).catch(err => {
             return Promise.reject(err);
