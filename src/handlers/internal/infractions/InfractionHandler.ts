@@ -111,14 +111,14 @@ export default class InfractionHandler {
             if (weight + currentWeight >= infractionLimit){
 
                 if (!target.bannable){
-                    safeSendMessage(message.channel, `Striking this member would result in them getting banned but I can't ban that member.`);
-                    return Promise.reject(`Target ${target.user.username} in guild ${target.guild.name} not bannable by infraction.`);
+                    debug.info(`Target ${target.user.username} in guild ${target.guild.name} not bannable by infraction.`);
+                    throw new Error(`TARGET_NOT_BANNABLE`);
                 }
 
-                let response = await resolveBooleanUncertainty(message,
+                const response = await resolveBooleanUncertainty(message,
                     `Striking this member will put them at ${weight + currentWeight}/${infractionLimit} total strikes, getting them banned.`, 30);
                 if (!response)
-                    return Promise.reject(`EVENT_CANCELLED`);
+                    throw new Error(`EVENT_CANCELLED`);
                 isBan = true;
             }
 
@@ -136,9 +136,9 @@ export default class InfractionHandler {
 
                 await safeBanUser(target, banReason).catch((err) => {
                     debug.error(err, 'InfractionHandler');
-                    return Promise.reject(err);
+                    throw new Error(err);
                 });
-                return Promise.resolve(true);
+                return true;
             }
 
             target.send(infractionDMEmbed(
@@ -148,17 +148,7 @@ export default class InfractionHandler {
                 currentWeight + weight,
                 strikeLimit
             ));
-            return Promise.resolve(false);
-        }).catch(async(err) => {
-            if (err === 'EVENT_CANCELLED'){
-                return Promise.reject(`EVENT_CANCELLED`);
-            }
-            else if (typeof err !== 'string' && isInfractionRequestRejection(err)){
-                return Promise.reject(`EVENT_CANCELLED`);
-            }
-            debug.error(err, `InfractionHandler`);
-            await handleFailedCommand(message.channel, random(runtimeErrorResponses));
-            return Promise.reject(new Error(err));
+            return false;
         });
     }
 }
