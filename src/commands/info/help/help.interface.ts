@@ -18,7 +18,6 @@ export type HelpCategories = "Logging"
     | "Embeds"
     | "Suggestions"
     | "Settings"
-    | "Economy"
     | "Debug";
 
 export interface Help {
