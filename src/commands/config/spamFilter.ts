@@ -8,13 +8,13 @@ import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 async function run(message: Message, input: [(boolean | undefined)]): Promise<any> {
     const [state] = input;
 
-    if (!state){
+    if (state === undefined){
         const state = await gb.instance.database.getSpamFilter(message.guild.id);
         return safeSendMessage(message.channel, `**Spam Filter:** ${state ? 'on' : 'off'}`);
     }
 
     const _ = await gb.instance.database.setSpamFilter(message.guild.id, state);
-    return safeSendMessage(message.channel, `My spam filter is now ${!state ? 'on' : 'off'}`);
+    return safeSendMessage(message.channel, `My spam filter is now ${state ? 'on' : 'off'}`);
 }
 
 export const command: Command = new Command(

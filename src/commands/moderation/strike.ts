@@ -7,6 +7,7 @@ import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../decorators/expects";
 import {UserPermissions} from "../../handlers/commands/command.interface";
 import successEmbed from "../../embeds/commands/successEmbed";
+import {randomRuntimeError} from "../../interfaces/Replies";
 
 export async function strike(message: Message, input: [GuildMember, number, string]) {
     const [target, weight, reason] = input;
@@ -26,10 +27,13 @@ export async function strike(message: Message, input: [GuildMember, number, stri
     try {
         banned = await InfractionHandler.getInstance().addInfraction(message, message.member, target, reason, weight);
     } catch (err) {
-        console.log(err);
-        if (err === `EVENT_CANCELLED`){
+        if (err.message === `TARGET_NOT_BANNABLE`){
+            return handleFailedCommand(message.channel, `Striking this member would result in them getting banned but I can't ban that member.`);
+        } else if (err.message === `EVENT_CANCELLED`){
             return;
         }
+        return handleFailedCommand(message.channel, randomRuntimeError());
+
     }
 
     let output: string;

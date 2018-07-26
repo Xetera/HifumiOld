@@ -419,7 +419,7 @@ export class Database {
     }
 
     public setChatChannel(guildId: string, channelId:string | undefined): Promise<Partial<Guild>> {
-        return this.invalidateCache('guildss').then(() => {
+        return this.invalidateCache('guilds').then(() => {
             return this.conn.manager.save(Guild, {id: guildId, chat_channel: channelId});
         }).catch(err => {
             return Promise.reject(err);
@@ -614,6 +614,19 @@ export class Database {
             .from(Infraction)
             .where('infraction_id = :infraction_id AND guild_id = :guild_id', {infraction_id: id, guild_id: guildId})
             .execute();
+    }
+
+    public deleteAllInfractions(guildId: string, target_id: string){
+        return this.invalidateCache('infractions').then(() => {
+            return this.conn.manager
+                .createQueryBuilder()
+                .delete()
+                .from(Infraction)
+                .where("guild_id = :guild AND target_id = :target",
+                    {guild: guildId, target: target_id})
+                .returning('*')
+                .execute();
+        });
     }
 
     public getTrackNewMembers(guildId: string){
