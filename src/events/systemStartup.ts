@@ -89,13 +89,11 @@ export async function createInstance(bot: Client, BOT_TOKEN: string, CLEVERBOT_T
     let tracklist = new Tracklist();
     // probably not a good place to have this side effect but whatever
     let messageQueue = new MessageQueue(muteQueue, database, tracklist);
-    let commandHandler = new CommandHandler();
     return {
         bot: bot,
         muteQueue: muteQueue,
         database: database,
         messageQueue: messageQueue,
-        commandHandler:commandHandler,
         trackList: tracklist,
         heroku: new Heroku({token: process.env.HEROKU_API_TOKEN}),
         // this is to be able to eval through the context of all the instances

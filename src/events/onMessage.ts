@@ -10,6 +10,7 @@ import memeListener from "../listeners/memeListener";
 import hexListener from "../listeners/hexListener";
 import {ICleverbot} from "../interfaces/injectables/cleverbot.interface";
 import {Container} from "typescript-ioc";
+import {ICommandHandler} from "../interfaces/injectables/commandHandler.interface";
 
 export const debug = {
     silly: dbg('Bot:onMessage:Silly'),
@@ -27,7 +28,7 @@ function middleWare(msg: Discord.Message, ignored: boolean){
     const message = <Message> msg;
     message.sent = moment(new Date()).toDate();
     messageQueue.add(message);
-    const hifumi = Container.get(ICleverbot);
+    const hifumi: ICleverbot = Container.get(ICleverbot);
 
     hifumi.checkMessage(message, bot);
     pingListener(message, database);
@@ -78,6 +79,7 @@ export default async function onMessage(message: Discord.Message){
 
     // right now this only supports 1 char length prefix but we can change that later
     if (guildEnabled && !userIgnored){
-        return gb.instance.commandHandler.handler(message);
+        const commandHandler: ICommandHandler = Container.get(ICommandHandler);
+        return commandHandler.handler(message);
     }
 }

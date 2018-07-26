@@ -1,8 +1,10 @@
 import {Message, RichEmbed} from "discord.js";
-import gb from "../../../misc/Globals";
+import {Container} from "typescript-ioc";
+import {ICommandHandler} from "../../../interfaces/injectables/commandHandler.interface";
 
 export default function botInfoEmbed(message: Message){
-    const commandCount = gb.instance.commandHandler.commands.length;
+    const commandHandler: ICommandHandler = Container.get(ICommandHandler);
+    const commandCount = commandHandler.commands.length;
     const serverCount = message.client.guilds.size;
     const userCount = message.client.users.size;
     return new RichEmbed()

@@ -3,12 +3,15 @@ import lavenshteinDistance from "../../utility/LavenshteinDistance";
 import ReactionManager from "../../handlers/internal/reactions/reactionManager";
 import gb from "../../misc/Globals";
 import {Command} from "../../handlers/commands/Command";
+import {ICommandHandler} from "../../interfaces/injectables/commandHandler.interface";
+import {Container} from "typescript-ioc";
 
 export default async function commandNotFoundEmbed(channel: Channel, commandName: string, pool?: string[]){
     if (!(channel instanceof TextChannel)){
         throw new Error('Can only send embeds to a channel');
     }
-    const commands = gb.instance.commandHandler.commands;
+    const commandHandler: ICommandHandler = Container.get(ICommandHandler);
+    const commands = commandHandler.commands;
     if (pool){
         pool = commands.map((c:Command)=> c.names[0]).concat(pool)
     }

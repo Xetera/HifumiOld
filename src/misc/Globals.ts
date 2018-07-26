@@ -3,7 +3,6 @@ import {MuteQueue} from "../moderation/MuteQueue";
 import {MessageQueue} from "../moderation/MessageQueue";
 import {Database} from "../database/Database";
 import {Environments} from "../events/systemStartup";
-import CommandHandler  from "../handlers/commands/CommandHandler";
 import {Message} from "discord.js";
 import Tracklist from "../moderation/Tracklist";
 
@@ -23,7 +22,6 @@ export interface Instance {
     muteQueue: MuteQueue,
     messageQueue: MessageQueue,
     database : Database,
-    commandHandler:CommandHandler,
     trackList: Tracklist,
     heroku: any
     eval(message: Message, x : any): any

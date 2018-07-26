@@ -27,6 +27,7 @@ export interface UserInputData {
 }
 
 export abstract class ICommandHandler {
+    commands: Command[];
     restarting: boolean;
     abstract glob(): void;
     abstract async parseInput(message: Message): Promise<UserInputData | undefined>;
