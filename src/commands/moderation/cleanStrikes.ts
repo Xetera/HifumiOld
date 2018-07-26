@@ -26,7 +26,7 @@ export const command: Command = new Command(
     {
         names: ['cleanstrikes'],
         info: "Cleans all strikes from a user's history.",
-        usage: '{{prefix}}cleanstrikes',
+        usage: '{{prefix}}cleanstrikes { member }',
         examples: ['{{prefix}}cleanstrikes @Xetera'],
         category: 'Moderation',
         expects: [{type: ArgType.Member}],
