@@ -1,5 +1,4 @@
 import * as Discord from 'discord.js'
-import {Cleverbot} from "../API/Cleverbot";
 import {MuteQueue} from "../moderation/MuteQueue";
 import {MessageQueue} from "../moderation/MessageQueue";
 import {Database} from "../database/Database";
@@ -21,7 +20,6 @@ interface Globals {
 
 export interface Instance {
     bot: Discord.Client,
-    alexa: Cleverbot,
     muteQueue: MuteQueue,
     messageQueue: MessageQueue,
     database : Database,

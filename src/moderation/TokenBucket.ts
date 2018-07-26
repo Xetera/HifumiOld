@@ -1,6 +1,5 @@
 import moment = require("moment");
 import {BucketCommand, ITokenBucket, Ticket} from "../interfaces/injectables/tokenBucket.interface";
-
 import 'reflect-metadata'
 import {injectable} from "inversify";
 

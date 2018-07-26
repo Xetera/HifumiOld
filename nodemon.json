@@ -6,5 +6,5 @@
   "ignore": [
     "src/**/*.spec.ts"
   ],
-  "exec": "tsc & node src/index.js"
+  "exec": "tsc & node --stack-trace-limit=1000 src/index.js "
 }

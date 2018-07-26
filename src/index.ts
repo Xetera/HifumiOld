@@ -19,6 +19,7 @@ import {Client} from "discord.js";
 import websocketErrorHandler from "./handlers/process/websocketErrorHandler";
 import websocketWarningHandler from "./handlers/process/websocketWarningHandler";
 import {debug} from "./utility/Logging";
+import './misc/inversify.config'
 
 setupProcess();
 gb.ENV  = getEnvironmentSettings();

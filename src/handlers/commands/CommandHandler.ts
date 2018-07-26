@@ -1,7 +1,6 @@
 import * as Discord from "discord.js";
 import {Database} from "../../database/Database";
 import gb, {Instance} from "../../misc/Globals";
-import {Cleverbot} from "../../API/Cleverbot";
 import {MuteQueue} from "../../moderation/MuteQueue";
 import {MessageQueue} from "../../moderation/MessageQueue";
 import commandNotFoundEmbed from "../../embeds/commands/commandNotFoundEmbed";
@@ -22,11 +21,12 @@ import missingSelfPermission from "../../embeds/permissions/missingSelfPermissio
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import {debug} from "../../utility/Logging";
 import {GuildMember, Message, PermissionResolvable, TextChannel} from "discord.js";
+import {ICleverbot} from "../../interfaces/injectables/cleverbot.interface";
 
 export interface CommandParameters extends Instance {
     message: Discord.Message;
     bot: Discord.Client;
-    alexa: Cleverbot;
+    alexa: ICleverbot;
     muteQueue: MuteQueue;
     messageQueue: MessageQueue;
     database : Database;

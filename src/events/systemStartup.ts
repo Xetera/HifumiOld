@@ -5,7 +5,6 @@ import {debug} from '../utility/Logging'
 import {MessageQueue} from "../moderation/MessageQueue";
 import CommandHandler  from "../handlers/commands/CommandHandler";
 import Tracklist from "../moderation/Tracklist";
-import {Cleverbot} from "../API/Cleverbot";
 import {MuteQueue} from "../moderation/MuteQueue";
 import {default as catchUncaughtExceptions} from '../handlers/process/uncaughtException'
 import {catchSigterm} from '../handlers/process/sigterm'
@@ -85,7 +84,6 @@ export async function createInstance(bot: Client, BOT_TOKEN: string, CLEVERBOT_T
     // it gets the job done
     // TODO: Smarter Xetera to past Xetera, use singletons or
     // TODO: dependency injections <- this is probably less stupid
-    let alexa     = new Cleverbot(CLEVERBOT_TOKEN);
     let database  = new Database(DATABASE_CONFIG);
     let muteQueue = new MuteQueue();
     let tracklist = new Tracklist();
@@ -94,7 +92,6 @@ export async function createInstance(bot: Client, BOT_TOKEN: string, CLEVERBOT_T
     let commandHandler = new CommandHandler();
     return {
         bot: bot,
-        alexa: alexa,
         muteQueue: muteQueue,
         database: database,
         messageQueue: messageQueue,

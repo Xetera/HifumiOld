@@ -8,6 +8,9 @@ import DMCommandHandler from "../handlers/commands/DMCommandHandler";
 import pingListener from "../listeners/pingListener";
 import memeListener from "../listeners/memeListener";
 import hexListener from "../listeners/hexListener";
+import {container} from "../misc/inversify.config";
+import {ICleverbot} from "../interfaces/injectables/cleverbot.interface";
+import {Types} from "../interfaces/injectables/types.interface";
 
 export const debug = {
     silly: dbg('Bot:onMessage:Silly'),
@@ -21,10 +24,12 @@ interface Message extends Discord.Message {
 }
 
 function middleWare(msg: Discord.Message, ignored: boolean){
-    const {messageQueue, alexa, bot, database} = gb.instance;
+    const {messageQueue, bot, database} = gb.instance;
     const message = <Message> msg;
     message.sent = moment(new Date()).toDate();
     messageQueue.add(message);
+    const alexa = container.get<ICleverbot>(Types.Cleverbot);
+
     alexa.checkMessage(message, bot);
     pingListener(message, database);
     inviteListener(message);
