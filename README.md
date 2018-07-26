@@ -64,7 +64,7 @@
     * `$ch` - Random cyanide and happiness comic
     
 ## Program Structure and Architecture
-#### Technologies
+
 <div align="center">
     <img height="64" src="https://rynop.files.wordpress.com/2016/09/ts.png?w=816" title="Typescript">
     <img height="64" src="https://dashboard.snapcraft.io/site_media/appmedia/2016/11/postgresql-icon-256x256.jpg.png" title="Postgres">
@@ -106,7 +106,9 @@ For now, migrations are created manually for production are handled by TypeORM's
 #### Backups
 For database backups, python scripts are used to dump the current production db into Amazon S3 bucket.
 
-This script are set on a cron job of regular intervals and an X amount of backups are rotated inside the bucket, deleting the oldest version on every backup once X is reached to preserve limited bucket space.
+This script is set on a cron job of regular intervals, and an X amount of backups are rotated inside the bucket, deleting the oldest version on every backup once X is reached to preserve limited bucket space.
+
+A backup-restoration script is available to restore the latest backup if necessary.
 
 ### Inversion of Control
 All objects that are required in the global scope or inside other classes are handled by [typescript-ioc](https://github.com/thiagobustamante/typescript-ioc) to avoid the usage of global singletons.
