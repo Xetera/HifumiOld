@@ -1,8 +1,6 @@
 import {
     createConnection,
-    ConnectionOptions,
     Connection,
-    getConnection,
     DeleteResult,
     InsertResult,
     UpdateResult
@@ -13,7 +11,7 @@ import {Environments} from "../events/systemStartup";
 import {debug} from "../utility/Logging";
 import {User} from "./models/user";
 import {Guild, LoggingChannelType} from "./models/guild";
-import {GuildMember, Message, Guild as DiscordGuild, GuildAuditLogsFetchOptions} from "discord.js";
+import {GuildMember, Message, Guild as DiscordGuild} from "discord.js";
 import {Macro} from "./models/macro";
 import {Note} from "./models/note";
 import 'reflect-metadata';

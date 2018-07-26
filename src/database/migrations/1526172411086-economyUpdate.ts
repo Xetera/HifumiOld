@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner, Table, TableColumn} from "typeorm";
+import {MigrationInterface, QueryRunner, TableColumn} from "typeorm";
 
 export class economyUpdate1526172411086 implements MigrationInterface {
 

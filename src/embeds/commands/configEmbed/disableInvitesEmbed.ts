@@ -1,6 +1,5 @@
 import {Guild, RichEmbed} from "discord.js";
 import ReactionManager from "../../../handlers/internal/reactions/reactionManager";
-import {random} from "../../../utility/Util";
 
 export default async function disableInvitesEmbed(guild: Guild){
     const rm = ReactionManager.getInstance();

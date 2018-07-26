@@ -1,4 +1,4 @@
-import {Channel, GuildMember, RichEmbed, TextChannel, User} from "discord.js";
+import {Channel, RichEmbed, User} from "discord.js";
 
 declare type channelType = 'dm' | 'group' | 'text' | 'voice' | 'category';
 export function resolveType(type: channelType): string{

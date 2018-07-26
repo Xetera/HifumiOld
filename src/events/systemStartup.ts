@@ -1,9 +1,9 @@
 import {Database} from "../database/Database";
-import gb, {Instance} from "../misc/Globals";
-import {Client, Guild, Message} from "discord.js";
+import {Instance} from "../misc/Globals";
+import {Client, Message} from "discord.js";
 import {debug} from '../utility/Logging'
 import {MessageQueue} from "../moderation/MessageQueue";
-import CommandHandler, {CommandParameters} from "../handlers/commands/CommandHandler";
+import CommandHandler  from "../handlers/commands/CommandHandler";
 import Tracklist from "../moderation/Tracklist";
 import {Cleverbot} from "../API/Cleverbot";
 import {MuteQueue} from "../moderation/MuteQueue";

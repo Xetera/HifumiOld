@@ -1,6 +1,6 @@
-import {Message, RichEmbed, TextChannel} from "discord.js";
+import {Message, RichEmbed} from "discord.js";
 import commandNotFoundEmbed from "../../../embeds/commands/commandNotFoundEmbed";
-import {capitalize, random} from "../../../utility/Util";
+import { random} from "../../../utility/Util";
 import {commandEmbedColor} from "../../../utility/Settings";
 import gb from "../../../misc/Globals";
 import helpMacroEmbed from "../../../embeds/commands/info/helpMacroEmbed";

@@ -1,4 +1,4 @@
-import {Channel, GuildMember, RichEmbed, TextChannel, User} from "discord.js";
+import {Channel, RichEmbed,User} from "discord.js";
 import {resolveType} from "./logChannelCreateEmbed";
 
 

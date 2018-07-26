@@ -1,6 +1,5 @@
 import safeBanUser from "../../../handlers/safe/SafeBanUser";
 import {GuildMember} from "discord.js";
-import watchlistSpamBanDMEmbed from "../../../embeds/moderation/tracklist/tracklistSpamBanDMEmbed";
 import {LogManager} from "../../../handlers/logging/logManager";
 import {Offense} from "../../../moderation/interfaces";
 import watchlistInviteBanDMEmbed from "../../../embeds/moderation/tracklist/tracklistInviteBanDMEmbed";

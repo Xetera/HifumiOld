@@ -1,7 +1,6 @@
 import {getMuteTime} from "../../utility/Settings";
 import {DiscordAPIError, GuildMember, Role} from "discord.js";
-import {debug, log} from "../../utility/Logging";
-import gb from "../../misc/Globals";
+import {debug} from "../../utility/Logging";
 import {LogManager} from "../../handlers/logging/logManager";
 import muteDMEmbed from "../../embeds/moderation/muteDMEmbed";
 import {Offense} from "../../moderation/interfaces";

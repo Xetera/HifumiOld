@@ -1,7 +1,7 @@
 import {Collection, Message, RichEmbed} from "discord.js";
 import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import {debug} from "../utility/Logging";
-import {getOnOff, getYesNo} from "../utility/Util";
+import { getYesNo} from "../utility/Util";
 import safeSendMessage from "../handlers/safe/SafeSendMessage";
 import areYouSureEmbed from "../embeds/commands/areYouSureEmbed";
 

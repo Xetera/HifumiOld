@@ -1,7 +1,3 @@
-interface DiscordError extends Error {
-    MissingPermissionsError: any
-}
-
 // for some reason checking for errors doesn't actually work with d.js
 export const APIErrors = {
     "UNKNOWN_ACCOUNT": "Unknown Account",

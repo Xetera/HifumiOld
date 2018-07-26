@@ -1,9 +1,7 @@
 import {Command} from "../../handlers/commands/Command";
-import {HelpCategories} from "./help/help.interface";
 import {ArgType} from "../../decorators/expects";
 import {Message} from "discord.js";
 import whatsNewEmbed from "../../embeds/commands/info/whatsNewEmbed";
-import * as fs from 'fs'
 import {parsePatchNotes} from "../../parsers/parsePatchNotes";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 

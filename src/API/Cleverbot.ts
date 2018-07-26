@@ -2,24 +2,27 @@ import * as Discord from 'discord.js'
 import {Cleverbot as Clevertype, Config} from 'clevertype'
 import {debug} from '../utility/Logging'
 import gb from "../misc/Globals";
-import {Channel, Message, MessageMentions, TextChannel} from "discord.js";
+import { Message, MessageMentions, TextChannel} from "discord.js";
 import moment = require("moment");
 import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
-import TokenBucket from "../moderation/TokenBucket";
 import safeSendMessage from "../handlers/safe/SafeSendMessage";
 import {formattedTimeString, randRange, sanitizeUserInput, StringUtils} from "../utility/Util";
 import prefixReminderEmbed from "../embeds/misc/prefixReminderEmbed";
+import TokenBucket from "../moderation/TokenBucket";
+import {inject, injectable} from "inversify";
+import {Types} from "../interfaces/injectables/types.interface";
 
 interface Ignores {
     ignoreUntil: Date | undefined;
     ignoring: boolean;
 }
 
-
+@injectable()
 export class Cleverbot {
     cleverbot : Clevertype;
     identifier : RegExp = /hifumi/i;
     users: {[id: string]: {warnings: number, ignores: Ignores}} = {};
+    @inject(Types.Cleverbot) tokenBucket: TokenBucket;
     constructor(apiKey : string){
         const configuration: Config = {
             apiKey: apiKey,
@@ -38,6 +41,7 @@ export class Cleverbot {
     }
 
     public setEmotion(mood : number){
+
         this.cleverbot.setEmotion(mood);
     }
 
@@ -160,7 +164,7 @@ export class Cleverbot {
             }
         }
 
-        const limited = TokenBucket.getInstance().isCleverbotRateLimited(id);
+        const limited = this.tokenBucket.isCleverbotRateLimited(id);
         if (limited){
             const user = this.users[id];
             if (!user){

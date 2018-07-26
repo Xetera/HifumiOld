@@ -1,4 +1,4 @@
-import {GuildMember, Message, User} from 'discord.js'
+import {GuildMember, Message} from 'discord.js'
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../decorators/expects";
 import {UserPermissions} from "../../handlers/commands/command.interface";

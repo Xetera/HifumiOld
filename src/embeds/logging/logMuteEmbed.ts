@@ -1,6 +1,6 @@
-import {GuildMember, RichEmbed, TextChannel} from "discord.js";
+import {GuildMember, RichEmbed} from "discord.js";
 import {getMuteTime} from "../../utility/Settings";
-import {formattedTimeString, formatTime} from "../../utility/Util";
+import {formattedTimeString} from "../../utility/Util";
 import {Offense} from "../../moderation/interfaces";
 
 export default function logMutedEmbed(member: GuildMember, mutedBy: GuildMember, reason: string | Offense, duration: number): RichEmbed {

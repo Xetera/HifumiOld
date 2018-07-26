@@ -1,13 +1,11 @@
 import * as Discord from'discord.js'
 import {debug, startupTable} from '../utility/Logging'
-import {default as gb, emojiName, Instance} from "../misc/Globals";
+import {default as gb, emojiName} from "../misc/Globals";
 import {Environments} from "./systemStartup";
-import {Client, Emoji, Message} from "discord.js";
+import {Client, Emoji} from "discord.js";
 import updatePresence from "../actions/UpdatePresence";
 
 
-const cli = require('heroku-cli-util');
-const Heroku = require('heroku-client');
 
 // returning owner id at the end
 export default function onReady(bot: Client): Promise<string> {

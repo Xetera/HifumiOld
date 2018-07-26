@@ -2,7 +2,6 @@ import * as Discord from 'discord.js'
 import {Collection, GuildMember, Message} from "discord.js";
 import {randomRuntimeError} from "../../interfaces/Replies";
 import {debug} from '../../utility/Logging'
-import {safeGetArgs} from "../../utility/Util";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import moment = require("moment");
 import {Command} from "../../handlers/commands/Command";

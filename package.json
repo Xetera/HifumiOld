@@ -38,7 +38,6 @@
     "redis": "^2.8.0",
     "reflect-metadata": "^0.1.12",
     "request": "^2.85.0",
-    "stream-to": "^2.0.0",
     "stream-to-array": "^2.3.0",
     "tslint": "^5.11.0",
     "typeorm": "^0.2.3",

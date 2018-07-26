@@ -4,7 +4,6 @@ import axios, {AxiosError, AxiosResponse} from 'axios'
 //@ts-ignore
 import * as gif from 'gif-frames'
 import sta = require('stream-to-array')
-import * as gm from 'gm'
 import * as util from "util";
 import {debug} from "../utility/Logging";
 

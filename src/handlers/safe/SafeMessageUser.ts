@@ -1,5 +1,4 @@
-import {DiscordAPIError, DMChannel, GuildMember, Message, RichEmbed, User} from "discord.js";
-import * as dbg from 'debug'
+import {DiscordAPIError, DMChannel, GuildMember, RichEmbed} from "discord.js";
 import {APIErrors} from "../../interfaces/Errors";
 import {debug} from "../../utility/Logging";
 

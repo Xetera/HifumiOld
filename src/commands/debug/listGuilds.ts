@@ -1,7 +1,6 @@
 import {Message} from "discord.js";
 import {codeBlock} from "../../utility/Markdown";
 import gb from "../../misc/Globals";
-import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../decorators/expects";
 import {UserPermissions} from "../../handlers/commands/command.interface";

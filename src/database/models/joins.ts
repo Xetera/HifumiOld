@@ -2,11 +2,9 @@ import {
     Entity,
     PrimaryGeneratedColumn,
     Column,
-    ManyToMany,
     PrimaryColumn,
     ManyToOne,
     JoinColumn,
-    OneToOne, JoinTable, Index
 } from "typeorm";
 import {Guild} from "./guild";
 import 'reflect-metadata';

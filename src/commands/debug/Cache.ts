@@ -1,9 +1,3 @@
-import {DiscordAPIError, Message, User} from "discord.js";
-import {Database} from "../../database/Database";
-import safeSendMessage from "../../handlers/safe/SafeSendMessage";
-import {codeBlock} from "../../utility/Markdown";
-import {debug} from "../../utility/Logging";
-import {APIErrors} from "../../interfaces/Errors";
 /*
 export default function getCache(message: Message, database : Database){
     const cache = database.guilds.get(message.guild.id);

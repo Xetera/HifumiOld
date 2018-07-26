@@ -24,7 +24,7 @@ async function createMuteRole(guild: Guild, name: string = 'muted-by-hifumi'): P
 }
 
 async function run(message: Message, input: [(string | undefined)]): Promise<any> {
-    const [name] = input;
+    //const [name] = input;
     let existingRole = await gb.instance.database.getMuteRole(message.guild.id);
     if (!existingRole) {
         const prompt: string = `I could not find a mute role, would you like me to set one up automatically ` +

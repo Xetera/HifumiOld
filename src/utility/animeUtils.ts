@@ -1,4 +1,4 @@
-import {getAnimeQueryResponse, MALMedia, MALResponse, ParsedAnimeResponse} from "../API/anime.interface";
+import {getAnimeQueryResponse, MALResponse, ParsedAnimeResponse} from "../API/anime.interface";
 import {specialCharRegex} from "../listeners/Regex";
 import {formattedTimeString, HtmltoMarkdown} from "./Util";
 

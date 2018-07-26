@@ -1,7 +1,7 @@
 import axios, {AxiosInstance, AxiosResponse} from "axios";
 import {getAnimeQueryResponse, ICharacter, IVoiceActor, MALResponse, WhatAnimeSearchResponse} from "./anime.interface";
 import {promisify} from "util";
-import {Attachment, Message, MessageOptions, RichEmbed, TextChannel} from "discord.js";
+import {Attachment, Message, RichEmbed, TextChannel} from "discord.js";
 import getAnimeEmbed from "../embeds/commands/fun/anime/getAnimeEmbed";
 import animeNotFoundEmbed from "../embeds/commands/fun/anime/animeNotFoundEmbed";
 import nsfwAnimeWarningEmbed from "../embeds/commands/fun/anime/nsfwAnimeWarningEmbed";
@@ -14,7 +14,6 @@ import {AnimeUtils} from "../utility/animeUtils";
 import {normalizeString, StringUtils} from "../utility/Util";
 import {fetchUrlAsBase64} from "./utils";
 import whatAnimeEmbed from "../embeds/commands/fun/anime/whatAnimeEmbed";
-import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 
 const fs = require('fs');
 const readFile = promisify(fs.readFile);
@@ -23,18 +22,12 @@ export default class Anime {
     private readonly endpoint = 'https://graphql.anilist.co/';
     private readonly MALEndpoint = 'https://myanimelist.net/search/prefix.json?type=all&keyword=';
     private static _instance: Anime;
-    private readonly clientId: string;
-    private readonly clientSecret: string;
     private anilist: AxiosInstance;
-    private whatanime: AxiosInstance;
-    private tokenExpiration: number;
     private readonly whatanimeKey: string;
 
     private constructor() {
         if (gb.ENV === Environments.Development) {
             const settings = require('../../config0.json');
-            this.clientId = settings.anilist.client_id;
-            this.clientSecret = settings.anilist.client_secret;
             this.whatanimeKey = settings.whatanime.API_KEY;
         } else {
             const client_id = process.env['ANILIST_CLIENT_ID'];
@@ -43,8 +36,6 @@ export default class Anime {
             if (!client_id || !client_secret || !what_anime_key) {
                 throw new Error("Required Anime environment variables were not set in production")
             }
-            this.clientId = client_id;
-            this.clientSecret = client_secret;
             this.whatanimeKey = what_anime_key;
         }
         this.anilist = axios.create({
@@ -53,9 +44,6 @@ export default class Anime {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             }
-        });
-        this.whatanime = axios.create({
-            baseURL: 'https://whatanime.ga/api/'
         });
     }
 

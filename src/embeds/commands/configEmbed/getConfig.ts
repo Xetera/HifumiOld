@@ -1,6 +1,5 @@
 import {Guild as DiscordGuild, RichEmbed} from "discord.js";
 import {Guild as DBGuild} from "../../../database/models/guild";
-import set = Reflect.set;
 
 
 export default function getSettingsEmbed(guild: DiscordGuild, settings: DBGuild) {

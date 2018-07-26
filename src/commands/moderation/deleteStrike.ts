@@ -36,10 +36,10 @@ async function run(message: Message, input: [number]): Promise<any> {
     }).then((r: Infraction) => {
         return Promise.all([gb.instance.database.deleteInfractionById(id, message.guild.id), r]);
     }).then((r: [DeleteResult, Infraction]) => {
-        const [_, infraction] = r;
+        const [, infraction] = r;
         return Promise.all([safeSendMessage(message.channel, `Strike #${id} has vanished.`), infraction]);
     }).then((r: [Message | Message[] | void, Infraction]) => {
-        const [_, infraction] = r;
+        const [, infraction] = r;
         const user = message.guild.members.get(infraction.target_id);
         if (user){
             safeMessageUser(user, deleteStrikeDMEmbed(message, infraction))

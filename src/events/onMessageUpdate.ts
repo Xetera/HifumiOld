@@ -1,10 +1,7 @@
 import * as Discord from 'discord.js'
 import {discordInviteRegex} from "../listeners/Regex";
-import safeDeleteMessage from "../handlers/safe/SafeDeleteMessage";
 import {debug} from '../utility/Logging'
-import {Message} from "discord.js";
 import {LogManager} from "../handlers/logging/logManager";
-import logEditedInviteMessageEmbed from "../embeds/logging/logEditedInviteMessageEmbed";
 import deleteInvite from "../moderation/InviteRemover";
 import {default as gb} from "../misc/Globals";
 

@@ -1,5 +1,5 @@
 import {Message, RichEmbed} from "discord.js";
-import {Suggestion, SuggestionStatus} from "../../../database/models/suggestion";
+import {Suggestion} from "../../../database/models/suggestion";
 
 const pendingSuggestionColor = '#fff9ae';
 const rejectedSuggestionColor = '#ff2e47';

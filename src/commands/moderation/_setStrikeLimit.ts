@@ -21,6 +21,6 @@ export default async function _setStrikeLimit(message: Message, input: [number])
     if (!ok)
         return;
 
-    const r = await gb.instance.database.setInfractionLimit(message.guild.id, limit);
+    await gb.instance.database.setInfractionLimit(message.guild.id, limit);
     safeSendMessage(message.channel, `Members in this server will now have to get up to **${limit}** infractions before getting banned.`);
 }

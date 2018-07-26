@@ -1,6 +1,6 @@
 import * as Discord from "discord.js";
 import {GuildMember} from "discord.js";
-import {capitalize, random, StringUtils} from "../../utility/Util";
+import {StringUtils} from "../../utility/Util";
 import parseTemplatePlaceholders from "../../parsers/parseTemplatePlaceholders";
 import isUrl = StringUtils.isUrl;
 

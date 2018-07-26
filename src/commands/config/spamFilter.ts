@@ -13,7 +13,7 @@ async function run(message: Message, input: [(boolean | undefined)]): Promise<an
         return safeSendMessage(message.channel, `**Spam Filter:** ${state ? 'on' : 'off'}`);
     }
 
-    const _ = await gb.instance.database.setSpamFilter(message.guild.id, state);
+    await gb.instance.database.setSpamFilter(message.guild.id, state);
     return safeSendMessage(message.channel, `My spam filter is now ${state ? 'on' : 'off'}`);
 }
 

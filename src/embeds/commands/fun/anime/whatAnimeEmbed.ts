@@ -1,11 +1,7 @@
-import {Attachment, RichEmbed, RichEmbedOptions} from "discord.js";
+import { RichEmbed} from "discord.js";
 import {
-    getAnimeQueryResponse,
     ParsedAnimeResponse,
-    WhatAnimeDocs,
-    WhatAnimeSearchResponse
 } from "../../../../API/anime.interface";
-import {Stream} from "stream";
 
 export default function whatAnimeEmbed(data: ParsedAnimeResponse, episode: number | string, similarity: number,  image: Buffer){
     let sceneEpisode = `**Scene Found on Episode:** ${episode}/${data.episodes}`;

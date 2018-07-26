@@ -1,4 +1,4 @@
-import {formattedTimeString, formatTime} from "../../utility/Util";
+import {formattedTimeString} from "../../utility/Util";
 import uptimeEmbed from "../../embeds/commands/uptimeEmbed";
 import {Message} from 'discord.js'
 import {Command} from "../../handlers/commands/Command";

@@ -1,6 +1,5 @@
-import {Channel, Collection, DiscordAPIError, Message, Snowflake, TextChannel} from "discord.js";
+import {Channel, Collection, Message, Snowflake, TextChannel} from "discord.js";
 import {randomRuntimeError} from "../../interfaces/Replies";
-import {Database} from "../../database/Database";
 import gb from "../../misc/Globals";
 import {safeGetArgs} from "../../utility/Util";
 import moment = require("moment");

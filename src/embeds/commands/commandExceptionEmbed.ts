@@ -2,7 +2,6 @@
 import gb from "../../misc/Globals";
 import {random} from "../../utility/Util";
 import ReactionManager from "../../handlers/internal/reactions/reactionManager";
-import {warningEmbedColor} from "../../utility/Settings";
 
 export async function handleFailedCommand(channel: Channel, message: string, footer?: string){
     // we don't want @everyone pings going off because of this

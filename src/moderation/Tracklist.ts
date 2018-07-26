@@ -1,7 +1,7 @@
 import * as Discord from 'discord.js'
-import {getMemberTrackDate, getMemberTrackDuration, securityLevel, SecurityLevels} from "../utility/Settings";
-import {default as gb, Instance} from "../misc/Globals";
-import {Guild, GuildMember, Message, TextBasedChannel} from "discord.js";
+import { getMemberTrackDuration, securityLevel, SecurityLevels} from "../utility/Settings";
+import {default as gb} from "../misc/Globals";
+import {Guild, GuildMember, Message} from "discord.js";
 import {Offense} from "./interfaces";
 import banTrackedUserForInvite from "../actions/punishments/tracklist/BanTrackedUserForInvite";
 import banTrackedUserForSpam from "../actions/punishments/tracklist/banTrackedUserForSpam";
@@ -15,9 +15,6 @@ interface TrackedMember extends GuildMember {
     banned: boolean;
 }
 
-function isTrackedMember(member: any): member is TrackedMember {
-    return 'join_date' in member;
-}
 
 
 export default class Tracklist {

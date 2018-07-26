@@ -1,7 +1,6 @@
-import {DiscordAPIError, Guild, GuildMember, Permissions} from "discord.js";
+import { GuildMember} from "discord.js";
 import safeBanUser from "../../handlers/safe/SafeBanUser";
 import inviteSpamBanEmbed from "../../embeds/moderation/inviteSpamBanDMEmbed";
-import {LogManager} from "../../handlers/logging/logManager";
 
 
 export default async function banForInviteSpam(member : GuildMember){

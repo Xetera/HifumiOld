@@ -1,8 +1,5 @@
-import * as Discord from 'discord.js'
-import {Presence, RichEmbed} from "discord.js";
 import {Message} from 'discord.js'
 import {Command} from "../../handlers/commands/Command";
-import gb from "../../misc/Globals";
 import {ArgType} from "../../decorators/expects";
 import botInfoEmbed from "../../embeds/commands/info/botInfoEmbed";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";

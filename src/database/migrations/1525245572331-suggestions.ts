@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner, Table, TableColumn, TableForeignKey} from "typeorm";
+import {MigrationInterface, QueryRunner, TableColumn, TableForeignKey} from "typeorm";
 
 export class suggestions1525245572331 implements MigrationInterface {
 

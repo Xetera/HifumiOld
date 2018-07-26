@@ -1,4 +1,4 @@
-import {Channel, GuildMember, RichEmbed, Role, TextChannel, VoiceChannel} from "discord.js";
+import {RichEmbed, Role} from "discord.js";
 import ReactionManager from "../../handlers/internal/reactions/reactionManager";
 
 export default async function conflictOnRoleResolveEmbed(channels: Role[], identifier: string){

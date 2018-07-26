@@ -1,17 +1,11 @@
 import moment = require("moment");
+import {BucketCommand, ITokenBucket, Ticket} from "../interfaces/injectables/tokenBucket.interface";
 
-interface Ticket {
-    tokens: number;
-    lastRequest: Date | undefined;
-}
+import 'reflect-metadata'
+import {injectable} from "inversify";
 
-interface BucketCommand {
-    tokenRefillRate: number;
-    tokenCap: number;
-    cost: number;
-}
-
-export default class TokenBucket {
+@injectable()
+export default class TokenBucket implements ITokenBucket {
     cleverbotBucket: BucketCommand = {
         tokenRefillRate: 95,
         tokenCap: 400,
@@ -20,25 +14,15 @@ export default class TokenBucket {
     registry: {[command: string]: BucketCommand} = {};
     cleverbot: {[user: string]: Ticket} = {};
     commands: {[user: string]: Ticket} = {};
-    public static _instance: TokenBucket;
     // tokens increase every 0.2 seconds
-    private constructor(){}
-
-    public static getInstance(){
-        if (!TokenBucket._instance){
-            TokenBucket._instance = new this();
-        }
-        return TokenBucket._instance;
-    }
-
-    private _createTicket(){
+    private static _createTicket(){
         return <Ticket> {
             tokens: 500,
             lastRequest: new Date()
         }
     }
 
-    private _calculateCleverbotRateLimit(user: string){
+    private _calculateCleverbotRateLimit(user: string): boolean {
         const command = this.cleverbotBucket;
         const target = this.cleverbot[user];
         const diff = moment(new Date()).diff(target.lastRequest);
@@ -63,10 +47,6 @@ export default class TokenBucket {
         return false;
     }
 
-    private _calculateCleverbotRefill(){
-
-    }
-
     public registerCommand(commandName: string, tokenFlow: number, err: (msg: string) => any){
         if (this.registry[commandName]){
             return err(`Command already exists`);
@@ -81,7 +61,7 @@ export default class TokenBucket {
     public isCleverbotRateLimited(user: string){
         const target = this.cleverbot[user];
         if (!target){
-            this.cleverbot[user] = this._createTicket();
+            this.cleverbot[user] = TokenBucket._createTicket();
             return this._calculateCleverbotRateLimit(user);
         }
         return this._calculateCleverbotRateLimit(user)

@@ -3,11 +3,10 @@ import * as dbg from 'debug'
 import inviteListener from '../listeners/InviteListener'
 import * as moment from "moment";
 import {MessageType} from "../interfaces/identifiers";
-import {default as gb, Instance} from "../misc/Globals";
+import {default as gb} from "../misc/Globals";
 import DMCommandHandler from "../handlers/commands/DMCommandHandler";
 import pingListener from "../listeners/pingListener";
 import memeListener from "../listeners/memeListener";
-import axios from 'axios'
 import hexListener from "../listeners/hexListener";
 
 export const debug = {
@@ -22,12 +21,7 @@ interface Message extends Discord.Message {
 }
 
 function middleWare(msg: Discord.Message, ignored: boolean){
-    const messageQueue = gb.instance.messageQueue;
-    const alexa = gb.instance.alexa;
-    const watchlist = gb.instance.trackList;
-    const bot = gb.instance.bot;
-    const database = gb.instance.database;
-    //casting
+    const {messageQueue, alexa, bot, database} = gb.instance;
     const message = <Message> msg;
     message.sent = moment(new Date()).toDate();
     messageQueue.add(message);

@@ -1,6 +1,5 @@
 import {GuildMember, Message} from "discord.js";
 import {strike} from "./strike";
-import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../decorators/expects";
 import {UserPermissions} from "../../handlers/commands/command.interface";

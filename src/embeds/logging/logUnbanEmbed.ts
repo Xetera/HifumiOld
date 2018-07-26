@@ -1,5 +1,4 @@
-import {GuildMember, RichEmbed, User} from "discord.js";
-import {Offense} from "../../moderation/interfaces";
+import { RichEmbed, User} from "discord.js";
 
 export default function logUnbanEmbed(user: User, unbanningStaff: User, banningStaff: User | 'unknown',
                                       banReason: string | 'unknown', unbanReason: string): RichEmbed{

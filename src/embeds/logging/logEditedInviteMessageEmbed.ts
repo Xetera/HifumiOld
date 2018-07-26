@@ -1,5 +1,4 @@
-import {GuildMember, Message, RichEmbed} from "discord.js";
-import {warningEmbedColor} from "../../utility/Settings";
+import { Message, RichEmbed} from "discord.js";
 import gb from "../../misc/Globals";
 import moment = require("moment");
 

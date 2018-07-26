@@ -4,8 +4,6 @@ import {debug} from '../events/onMessage'
 import {securityLevel, SecurityLevels} from "../utility/Settings";
 import gb from "../misc/Globals";
 import deleteInvite from "../moderation/InviteRemover";
-import {InviteUtils} from "../utility/Util";
-import isGuildInvite = InviteUtils.isGuildInvite;
 
 export default async function inviteListener(message: Message){
     const sentInvites: RegExpMatchArray | null = message.content.match(discordInviteRegex);

@@ -2,7 +2,7 @@ import {Message, RichEmbed} from 'discord.js'
 import {ArgType} from "../../decorators/expects";
 import Anime from "../../API/anime";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
-import {randomRuntimeError, runtimeErrorResponses} from "../../interfaces/Replies";
+import {randomRuntimeError} from "../../interfaces/Replies";
 import {debug} from "../../utility/Logging";
 import gb from "../../misc/Globals";
 import {random} from "../../utility/Util";

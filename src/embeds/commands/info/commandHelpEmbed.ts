@@ -1,7 +1,7 @@
 import {Guild, RichEmbed} from "discord.js";
 import {Command} from "../../../handlers/commands/Command";
 import {commandEmbedColor} from "../../../utility/Settings";
-import {formatAndJoin, formattedTimeString, normalizeString} from "../../../utility/Util";
+import {formatAndJoin, normalizeString} from "../../../utility/Util";
 
 export default function commandHelpEmbed(command: Command, prefix: string, guild: Guild){
     const [name, ...aliases] = command.names;

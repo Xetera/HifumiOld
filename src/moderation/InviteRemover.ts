@@ -4,7 +4,7 @@ import {Offense} from "./interfaces";
 import safeDeleteMessage from "../handlers/safe/SafeDeleteMessage";
 import {debug} from "../events/onMessage";
 import banForInviteSpam from "../actions/punishments/BanForInviteSpam";
-import {GuildMember, Message} from "discord.js";
+import { Message} from "discord.js";
 import {LogManager} from "../handlers/logging/logManager";
 import inviteWarningDMEmbed from "../embeds/moderation/inviteWarningDM";
 import {APIErrors} from "../interfaces/Errors";

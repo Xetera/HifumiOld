@@ -1,14 +1,10 @@
 import {
     Entity,
-    PrimaryGeneratedColumn,
     Column,
     PrimaryColumn,
-    OneToMany,
-    JoinTable,
     ManyToOne,
     JoinColumn
 } from "typeorm";
-import {User} from "./user";
 import 'reflect-metadata';
 import {Guild} from "./guild";
 

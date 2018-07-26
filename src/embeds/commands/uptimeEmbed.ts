@@ -1,8 +1,6 @@
 
 import {RichEmbed} from "discord.js";
 import {commandEmbedColor} from "../../utility/Settings";
-import gb from "../../misc/Globals";
-import {Environments} from "../../events/systemStartup";
 
 /**
  *

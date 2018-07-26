@@ -1,7 +1,6 @@
 import {Suggestion} from "../../../database/models/suggestion";
 import {Message, RichEmbed} from "discord.js";
 import moment = require("moment");
-import gb from "../../../misc/Globals";
 import {emptySpace} from "../../../utility/Util";
 
 export default function getSuggestionEmbed(message: Message, suggestions: Suggestion[], index: number, prefix: string){
