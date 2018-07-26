@@ -1,6 +1,6 @@
 import {Channel, Message, RichEmbed} from 'discord.js'
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
+import {ArgType} from "../../interfaces/arg.interface";
 import EmbedBuilder from "../../handlers/internal/embedBuilder";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";

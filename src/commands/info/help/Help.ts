@@ -4,11 +4,11 @@ import { random} from "../../../utility/Util";
 import {commandEmbedColor} from "../../../utility/Settings";
 import gb from "../../../misc/Globals";
 import helpMacroEmbed from "../../../embeds/commands/info/helpMacroEmbed";
-import {ArgType} from "../../../decorators/expects";
 import {Command} from "../../../handlers/commands/Command";
 import safeSendMessage from "../../../handlers/safe/SafeSendMessage";
 import commandHelpEmbed from "../../../embeds/commands/info/commandHelpEmbed";
 import CommandHandler from "../../../handlers/commands/CommandHandler";
+import {ArgType} from "../../../interfaces/arg.interface";
 async function run(message: Message, input: [string | undefined]): Promise<any> {
     const [choice] = input;
     const prefix: string = await gb.instance.database.getPrefix(message.guild.id);

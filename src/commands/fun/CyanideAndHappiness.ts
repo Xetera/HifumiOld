@@ -7,7 +7,7 @@ import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {randomRuntimeError} from "../../interfaces/Replies";
 import {Command} from "../../handlers/commands/Command";
 import {debug} from "../../utility/Logging";
-import {ArgType} from "../../decorators/expects";
+import {ArgType} from "../../interfaces/arg.interface";
 
 
 async function run(message: Message) {

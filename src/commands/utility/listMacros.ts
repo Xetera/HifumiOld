@@ -4,7 +4,7 @@ import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import listMacrosEmbed from "../../embeds/commands/listMacrosEmbed";
 import {Macro} from "../../database/models/macro";
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
+import {ArgType} from "../../interfaces/arg.interface";
 
 async function run(message: Message): Promise<any> {
     let macros: Macro[] = await gb.instance.database.getMacros(message.guild.id);

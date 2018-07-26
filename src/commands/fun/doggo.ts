@@ -6,7 +6,7 @@ import doggoEmbed from "../../embeds/commands/fun/doggoEmbed";
 import {random} from "../../utility/Util";
 import {debug} from "../../utility/Logging";
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
+import {ArgType} from "../../interfaces/arg.interface";
 
 function handleDogFail(placeholder: Message){
     placeholder.edit(`Oh no I couldn't get a pupper... maybe they're all sleeping.`);

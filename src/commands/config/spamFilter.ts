@@ -1,9 +1,9 @@
 import {Message} from 'discord.js'
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
 import gb from "../../misc/Globals";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
+import {ArgType} from "../../interfaces/arg.interface";
 
 async function run(message: Message, input: [(boolean | undefined)]): Promise<any> {
     const [state] = input;

@@ -1,6 +1,6 @@
 import {Message} from 'discord.js'
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
+import {ArgType} from "../../interfaces/arg.interface";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import axios from 'axios'
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";

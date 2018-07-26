@@ -1,7 +1,7 @@
 import {GuildMember, Message} from 'discord.js'
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {ArgType} from "../../interfaces/arg.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
 import {PermissionUtils} from "../../utility/permissionUtils";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import successEmbed from "../../embeds/commands/successEmbed";

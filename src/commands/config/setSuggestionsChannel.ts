@@ -5,8 +5,8 @@ import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {debug} from "../../utility/Logging";
 import setConfigChannelFailEmbed from "../../embeds/commands/configEmbed/setConfigChannelFailEmbed";
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {ArgType} from "../../interfaces/arg.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
 
 async function setSuggestionsChannel(message: Message, channel: string | undefined){
     try{

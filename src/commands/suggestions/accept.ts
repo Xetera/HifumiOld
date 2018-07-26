@@ -1,7 +1,7 @@
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
+import {ArgType} from "../../interfaces/arg.interface";
 import {SuggestionResponse, _respondToSuggestion} from "./_respondToSuggestion";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
 import {Message} from "discord.js";
 
 

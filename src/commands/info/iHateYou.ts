@@ -3,7 +3,7 @@ import gb from "../../misc/Globals";
 import ReactionManager from "../../handlers/internal/reactions/reactionManager";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
+import {ArgType} from "../../interfaces/arg.interface";
 
 async function run(message: Message): Promise<any> {
     const embed = new RichEmbed()

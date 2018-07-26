@@ -7,8 +7,8 @@ import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import safeMessageUser from "../../handlers/safe/SafeMessageUser";
 import deleteStrikeDMEmbed from "../../embeds/moderation/deleteStrikeDMEmbed";
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {ArgType} from "../../interfaces/arg.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
 
 
 enum EStrikeRejections {

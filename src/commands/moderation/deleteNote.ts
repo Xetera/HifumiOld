@@ -6,8 +6,8 @@ import {DeleteResult} from "typeorm"
 import {Command} from "../../handlers/commands/Command";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import successEmbed from "../../embeds/commands/successEmbed";
-import {ArgType} from "../../decorators/expects";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {ArgType} from "../../interfaces/arg.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
 
 async function run(message: Message, args: [number]): Promise<any> {
     const [noteId] = args;

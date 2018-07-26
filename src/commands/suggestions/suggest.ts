@@ -5,7 +5,7 @@ import approveSuggestion from "./_approveSuggestion";
 import {Suggestion} from "../../database/models/suggestion";
 import {LogManager} from "../../handlers/logging/logManager";
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
+import {ArgType} from "../../interfaces/arg.interface";
 
 async function run(message: Message, input: [string]): Promise<any> {
     const [suggestion] = input;

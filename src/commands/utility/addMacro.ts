@@ -8,8 +8,8 @@ import { parseMacro} from "../../parsers/parseMacro";
 import {urlRegex} from "../../listeners/Regex";
 const help: Help = require('../../commands/help.json');
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {ArgType} from "../../interfaces/arg.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import successEmbed from "../../embeds/commands/successEmbed";
 

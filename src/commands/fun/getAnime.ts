@@ -1,5 +1,5 @@
 import {Message, RichEmbed} from 'discord.js'
-import {ArgType} from "../../decorators/expects";
+import {ArgType} from "../../interfaces/arg.interface";
 import Anime from "../../API/anime";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {randomRuntimeError} from "../../interfaces/Replies";

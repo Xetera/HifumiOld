@@ -7,8 +7,8 @@ import {
 } from "discord.js";
 import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import conflictOnChannelResolveEmbed from "../embeds/resolvers/conflictOnChannelResolveEmbed";
-import {AllChannelTypes} from "../decorators/expects";
 import resolveNumberedUncertainty from "./resolveNumberedUncertainty";
+import {AllChannelTypes} from "../interfaces/arg.interface";
 
 export async function channelResolver(arg: string, message: Message, options: {channelType: AllChannelTypes, onlyMention?: boolean, fail?: boolean, strict?: boolean}/*channelType: AllChannelTypes, onlyMention: boolean = false, fail: boolean = true*/): Promise<Channel | undefined> {
     // Can't set default values for objects

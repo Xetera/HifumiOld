@@ -7,8 +7,8 @@ import guildMemberAddEmbed from "../../embeds/events/onGuildMemberAddEmbed";
 import templateParser from "../../parsers/templateParser";
 import {TemplatedMessage} from "../../parsers/parsers.interface";
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {ArgType} from "../../interfaces/arg.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
 import parseTemplatePlaceholders from "../../parsers/parseTemplatePlaceholders";
 
 async function run(message: Message, input: [string]): Promise<any> {

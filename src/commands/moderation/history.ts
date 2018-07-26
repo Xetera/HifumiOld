@@ -7,8 +7,8 @@ import {Infraction} from "../../database/models/infraction";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {Database} from "../../database/Database";
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {ArgType} from "../../interfaces/arg.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
 
 async function run(message: Message, input: [GuildMember]): Promise<any> {
     const [target] = input;

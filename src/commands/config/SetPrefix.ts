@@ -4,9 +4,9 @@ import {Guild} from "../../database/models/guild";
 import {debug} from "../../utility/Logging";
 import {Message} from 'discord.js'
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
+import {ArgType} from "../../interfaces/arg.interface";
 
 export default async function setPrefix(message: Message, input: [string]){
     const [prefix] = input;

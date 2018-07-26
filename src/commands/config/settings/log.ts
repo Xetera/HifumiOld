@@ -3,7 +3,9 @@ import {handleFailedCommand} from "../../../embeds/commands/commandExceptionEmbe
 import gb from "../../../misc/Globals";
 import {LoggingChannelType} from "../../../database/models/guild";
 import safeSendMessage from "../../../handlers/safe/SafeSendMessage";
-
+import {Command} from "../../../handlers/commands/Command";
+import {UserPermissions} from "../../../interfaces/command.interface";
+import {ArgType} from "../../../interfaces/arg.interface";
 
 export default function logs(message: Message, input: [string, (TextChannel | boolean)]){
     const [setting, choice] = input;
@@ -101,10 +103,6 @@ export default function logs(message: Message, input: [string, (TextChannel | bo
     })
 
 }
-
-import {Command} from "../../../handlers/commands/Command";
-import {ArgType} from "../../../decorators/expects";
-import {UserPermissions} from "../../../handlers/commands/command.interface";
 
 
 export const command: Command = new Command(

@@ -1,12 +1,12 @@
 import {Guild, Message, Role} from "discord.js";
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
 import gb from "../../misc/Globals";
 import resolveBooleanUncertainty from "../../resolvers/resolveBooleanUncertainty";
 import {APIErrors} from "../../interfaces/Errors";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import {debug} from "../../utility/Logging";
+import {ArgType} from "../../interfaces/arg.interface";
 
 async function createMuteRole(guild: Guild, name: string = 'muted-by-hifumi'): Promise<Role> {
     const role = await guild.createRole({

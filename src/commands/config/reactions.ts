@@ -3,8 +3,8 @@ import gb from "../../misc/Globals";
 import {Guild} from "../../database/models/guild";
 import setReactionsEmbed from "../../embeds/commands/configEmbed/setReactionsEmbed";
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {ArgType} from "../../interfaces/arg.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 
 export async function reactions(message: Message, input: [boolean]){

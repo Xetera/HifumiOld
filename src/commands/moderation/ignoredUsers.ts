@@ -5,8 +5,8 @@ import ignoredEmbed from "../../embeds/moderation/ignoredUsersEmbed";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {IgnoredChannel} from "../../database/models/ignoredChannel";
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {ArgType} from "../../interfaces/arg.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
 
 async function run(message: Message): Promise<any> {
     Promise.all([

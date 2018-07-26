@@ -2,7 +2,7 @@ import {Message} from "discord.js";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import inviteEmbed from "../../embeds/commands/inviteEmbed";
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
+import {ArgType} from "../../interfaces/arg.interface";
 
 async function run(message: Message): Promise<any> {
     safeSendMessage(message.channel, inviteEmbed());

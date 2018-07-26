@@ -3,8 +3,8 @@ import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import gb from "../../misc/Globals";
 import {debug} from "../../utility/Logging";
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {ArgType} from "../../interfaces/arg.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import successEmbed from "../../embeds/commands/successEmbed";
 

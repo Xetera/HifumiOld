@@ -7,8 +7,8 @@ import approveSuggestion from "./_approveSuggestion";
 import denySuggestion from "./_denySuggestion";
 import {debug} from "../../utility/Logging";
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {ArgType} from "../../interfaces/arg.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
 
 async function run(message: Message): Promise<any> {
     let index = 0;

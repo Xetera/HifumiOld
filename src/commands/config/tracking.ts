@@ -2,8 +2,8 @@ import {Message} from "discord.js";
 import gb from "../../misc/Globals";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
+import {ArgType} from "../../interfaces/arg.interface";
 
 export async function setMemberTracking(message: Message, input: [(boolean | undefined)]){
     const [choice] = input;

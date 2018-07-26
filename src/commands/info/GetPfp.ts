@@ -3,7 +3,7 @@ import {GuildMember, RichEmbed} from "discord.js";
 import pfpEmbed from "../../embeds/commands/pfpEmbed";
 import {Message} from 'discord.js'
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
+import {ArgType} from "../../interfaces/arg.interface";
 
 function getPfp(user: GuildMember): string | RichEmbed {
     let url = user.user.avatarURL;

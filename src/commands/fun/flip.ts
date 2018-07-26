@@ -1,6 +1,6 @@
 import {Message} from 'discord.js'
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
+import {ArgType} from "../../interfaces/arg.interface";
 import {random} from "../../utility/Util";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 

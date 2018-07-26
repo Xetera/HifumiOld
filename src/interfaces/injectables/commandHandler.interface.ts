@@ -5,7 +5,7 @@ import {ICleverbot} from "./cleverbot.interface";
 import {MuteQueue} from "../../moderation/MuteQueue";
 import {MessageQueue} from "../../moderation/MessageQueue";
 import {Database} from "../../database/Database";
-import {ArgOptions} from "../../decorators/expects";
+import {ArgOptions} from "../arg.interface";
 
 export interface CommandParameters extends Instance {
     message:Message;

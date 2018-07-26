@@ -8,8 +8,8 @@ import gb from "../../misc/Globals";
 import setConfigChannelFailEmbed from "../../embeds/commands/configEmbed/setConfigChannelFailEmbed";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {ArgType} from "../../interfaces/arg.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
 import successEmbed from "../../embeds/commands/successEmbed";
 
 async function setLogsChannel(message: Message, channel?: TextChannel){

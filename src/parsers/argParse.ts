@@ -1,5 +1,3 @@
-import {CommandParameters} from "../handlers/commands/CommandHandler";
-import {ArgOptions, ArgType} from "../decorators/expects";
 import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import {resolveMember} from "../resolvers/memberResolver";
 import {handleInvalidParameters} from "../handlers/commands/invalidCommandHandler";
@@ -7,6 +5,8 @@ import {GuildMember} from "discord.js";
 import {getOnOff} from "../utility/Util";
 import {isBoolean} from "util";
 import {channelResolver} from "../resolvers/channelResolver";
+import {CommandParameters} from "../interfaces/injectables/commandHandler.interface";
+import {ArgOptions, ArgType} from "../interfaces/arg.interface";
 
 export default async function argParse(params: CommandParameters){
     // Only Expect.None is given, passing all test regardless

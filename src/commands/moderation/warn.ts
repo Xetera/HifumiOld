@@ -1,8 +1,8 @@
 import {GuildMember, Message} from "discord.js";
 import {strike} from "./strike";
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {ArgType} from "../../interfaces/arg.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
 
 async function run(message: Message, input: [GuildMember, string]): Promise<any> {
     const [member, reason] = input;

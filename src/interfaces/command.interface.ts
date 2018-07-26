@@ -1,6 +1,6 @@
 import {Message, PermissionResolvable} from "discord.js";
-import {HelpCategories} from "../../commands/info/help/help.interface";
-import {ArgOptions} from "../../decorators/expects";
+import {HelpCategories} from "../commands/info/help/help.interface";
+import {ArgOptions} from "./arg.interface";
 
 export interface ICommand {
     /**

@@ -1,4 +1,4 @@
-import {register} from "../handlers/commands/registry";
+export type AllChannelTypes = 'text' | 'voice' | 'BOTH';
 
 export enum ArgType {
     String = 'string',

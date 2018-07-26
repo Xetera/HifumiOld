@@ -1,9 +1,9 @@
 import {GuildMember, Message} from 'discord.js'
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
+import {ArgType} from "../../interfaces/arg.interface";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import {PermissionUtils} from "../../utility/permissionUtils";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
 import successEmbed from "../../embeds/commands/successEmbed";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 

@@ -5,8 +5,8 @@ import {codeBlock} from "../../utility/Markdown";
 import safeMessageUser from "../../handlers/safe/SafeMessageUser";
 import {debug} from "../../utility/Logging";
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
+import {ArgType} from "../../interfaces/arg.interface";
 
 export default async function run(message: Message, input: [string]){
     let [req] = input;

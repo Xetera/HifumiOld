@@ -1,18 +1,14 @@
 import * as Discord from "discord.js";
-import {Database} from "../../database/Database";
-import gb, {Instance} from "../../misc/Globals";
-import {MuteQueue} from "../../moderation/MuteQueue";
-import {MessageQueue} from "../../moderation/MessageQueue";
+import gb from "../../misc/Globals";
 import commandNotFoundEmbed from "../../embeds/commands/commandNotFoundEmbed";
 import {Macro} from "../../database/models/macro";
-import {ArgOptions} from "../../decorators/expects";
 import argParse from "../../parsers/argParse";
 import {LogManager} from "../logging/logManager";
 import safeDeleteMessage from "../safe/SafeDeleteMessage";
 import {buildMacro} from "../../parsers/parseMacro";
 import {Command} from "./Command";
 import glob = require('glob')
-import {UserPermissions} from "./command.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
 import safeSendMessage from "../safe/SafeSendMessage";
 import missingAdminEmbed from "../../embeds/permissions/missingAdminEmbed";
 import missingModEmbed from "../../embeds/permissions/missingModEmbed";
@@ -21,40 +17,19 @@ import missingSelfPermission from "../../embeds/permissions/missingSelfPermissio
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import {debug} from "../../utility/Logging";
 import {GuildMember, Message, PermissionResolvable, TextChannel} from "discord.js";
-import {ICleverbot} from "../../interfaces/injectables/cleverbot.interface";
-
-export interface CommandParameters extends Instance {
-    message: Discord.Message;
-    bot: Discord.Client;
-    alexa: ICleverbot;
-    muteQueue: MuteQueue;
-    messageQueue: MessageQueue;
-    database : Database;
-    args: string[];
-    input: any[];
-    expect: (ArgOptions | ArgOptions[])[];
-    name: string;
-}
-
-interface indexSignature {
-    [method:string]: (CommandParameters);
-}
-
-interface UserInputData {
-    stealth: boolean;
-    command: string;
-    args: string[];
-}
+import {Singleton} from "typescript-ioc";
+import {CommandParameters, ICommandHandler, UserInputData} from "../../interfaces/injectables/commandHandler.interface";
 
 function isMessage(message : any) : message is Discord.Message {
     return <Discord.Message> message.content !== undefined;
 }
 
-export default class CommandHandler implements indexSignature {
-    [method:string]: any;
+@Singleton
+export default class CommandHandler extends ICommandHandler {
     commands: Command[] = [];
     restarting: boolean = false;
     constructor(){
+        super();
         this.glob();
     }
 
@@ -72,7 +47,7 @@ export default class CommandHandler implements indexSignature {
         }));
     }
 
-    public static async parseInput(message : Discord.Message): Promise<UserInputData | undefined> {
+    public async parseInput(message : Discord.Message): Promise<UserInputData | undefined> {
         let args : string[] = [];
         const prefix = await gb.instance.database.getPrefix(message.guild.id);
         // removing excess whitespace between words that can't be removed with .trim()
@@ -113,7 +88,7 @@ export default class CommandHandler implements indexSignature {
     public async handler(message : Message) {
         if (this.restarting)
             return;
-        const inputData: UserInputData | undefined = await CommandHandler.parseInput(message);
+        const inputData: UserInputData | undefined = await this.parseInput(message);
         if (inputData === undefined)
             return;
         else if (inputData.stealth){

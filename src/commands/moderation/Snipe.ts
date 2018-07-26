@@ -5,8 +5,8 @@ import {debug} from '../../utility/Logging'
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import moment = require("moment");
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {ArgType} from "../../interfaces/arg.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
 
 async function run(message: Message, input: [GuildMember, (number | undefined)]): Promise<any> {
     const [target, limit] = input;

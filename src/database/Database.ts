@@ -14,7 +14,6 @@ import {Guild, LoggingChannelType} from "./models/guild";
 import {GuildMember, Message, Guild as DiscordGuild} from "discord.js";
 import {Macro} from "./models/macro";
 import {Note} from "./models/note";
-import 'reflect-metadata';
 import * as fs from 'fs'
 import {Infraction} from "./models/infraction";
 import moment = require("moment");

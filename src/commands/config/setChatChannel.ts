@@ -6,8 +6,8 @@ import {random} from "../../utility/Util";
 import {runtimeErrorResponses} from "../../interfaces/Replies";
 import {debug} from "../../utility/Logging";
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {ArgType} from "../../interfaces/arg.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
 import successEmbed from "../../embeds/commands/successEmbed";
 
 async function setChatChannel(message: Message, channel: TextChannel) {

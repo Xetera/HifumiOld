@@ -2,8 +2,8 @@ import * as Discord from 'discord.js'
 import {debug} from '../../utility/Logging'
 import {Message} from 'discord.js'
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {ArgType} from "../../interfaces/arg.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 
 async function run(message: Message, input: [string]): Promise<any> {

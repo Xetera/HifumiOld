@@ -2,7 +2,7 @@ import {formattedTimeString} from "../../utility/Util";
 import uptimeEmbed from "../../embeds/commands/uptimeEmbed";
 import {Message} from 'discord.js'
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
+import {ArgType} from "../../interfaces/arg.interface";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 
 async function run(message: Message): Promise<any> {

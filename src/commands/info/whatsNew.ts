@@ -1,5 +1,5 @@
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
+import {ArgType} from "../../interfaces/arg.interface";
 import {Message} from "discord.js";
 import whatsNewEmbed from "../../embeds/commands/info/whatsNewEmbed";
 import {parsePatchNotes} from "../../parsers/parsePatchNotes";

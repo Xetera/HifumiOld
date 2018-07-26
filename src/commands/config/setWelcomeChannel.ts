@@ -7,10 +7,10 @@ import gb from "../../misc/Globals";
 import {Guild} from "../../database/models/guild";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import successEmbed from "../../embeds/commands/successEmbed";
+import {ArgType} from "../../interfaces/arg.interface";
 
 function setWelcomeChannel(message: Message, channel: Channel) {
     gb.instance.database.setWelcomeChannel(message.guild.id, channel.id).then((r: Partial<Guild>) => {

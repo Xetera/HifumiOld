@@ -17,8 +17,8 @@ import setInvites from "./_setInvites";
 import setInviteWarn from "./_setInviteWarn";
 import setInviteBan from "./_setInviteBan";
 import {Command} from "../../handlers/commands/Command";
-import {ArgType} from "../../decorators/expects";
-import {UserPermissions} from "../../handlers/commands/command.interface";
+import {UserPermissions} from "../../interfaces/command.interface";
+import {ArgType} from "../../interfaces/arg.interface";
 
 export default async function settings(message : Message, input: [(string | undefined), (string | undefined)]) {
     const [setting, choice] = input;
