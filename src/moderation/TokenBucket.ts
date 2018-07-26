@@ -1,10 +1,9 @@
 import moment = require("moment");
 import {BucketCommand, ITokenBucket, Ticket} from "../interfaces/injectables/tokenBucket.interface";
-import 'reflect-metadata'
-import {injectable} from "inversify";
+import {Singleton} from "typescript-ioc";
 
-@injectable()
-export default class TokenBucket implements ITokenBucket {
+@Singleton
+export default class TokenBucket extends ITokenBucket {
     cleverbotBucket: BucketCommand = {
         tokenRefillRate: 95,
         tokenCap: 400,

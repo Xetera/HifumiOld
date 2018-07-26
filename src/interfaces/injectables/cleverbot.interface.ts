@@ -1,20 +1,21 @@
 import {Cleverbot as Clevertype} from "clevertype";
-import TokenBucket from "../../moderation/TokenBucket";
 import {Client, Message} from "discord.js";
+import {ITokenBucket} from "./tokenBucket.interface";
 
 export interface Ignores {
     ignoreUntil: Date | undefined;
     ignoring: boolean;
 }
 
-export interface ICleverbot {
+export abstract class ICleverbot {
     cleverbot: Clevertype;
     identifier: RegExp;
     users: {[id: string]: {warnings: number, ignores: Ignores}};
-    tokenBucket: TokenBucket;
-    setEmotion(mood: number): void ;
-    checkMessage(message : Message, bot: Client) : Promise<void>;
-    isUserRepeating(message: Message): boolean;
-    say(message: Message, phrase: string, id: string, replaceKeyword: boolean) : Promise<string>;
-    isRateLimited(id: string, message: Message): boolean;
+    tokenBucket: ITokenBucket;
+    available: boolean;
+    abstract setEmotion(mood: number): void ;
+    abstract checkMessage(message : Message, bot: Client) : Promise<void>;
+    abstract isUserRepeating(message: Message): boolean;
+    abstract say(message: Message, phrase: string, id: string, replaceKeyword: boolean) : Promise<string>;
+    abstract isRateLimited(id: string, message: Message): boolean;
 }

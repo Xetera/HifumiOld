@@ -9,11 +9,11 @@ export interface BucketCommand {
     cost: number;
 }
 
-export interface ITokenBucket {
+export abstract class ITokenBucket {
     cleverbotBucket: BucketCommand;
     registry: {[command: string]: BucketCommand};
     cleverbot: {[user: string]: Ticket};
     commands: {[user: string]: Ticket};
-    registerCommand(commandName: string,tokenFlow: number,err: (msg: string) => any): any;
-    isCleverbotRateLimited(user: string): boolean;
+    abstract registerCommand(commandName: string,tokenFlow: number,err: (msg: string) => any): any;
+    abstract isCleverbotRateLimited(user: string): boolean;
 }

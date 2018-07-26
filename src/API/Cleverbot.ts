@@ -6,22 +6,30 @@ import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import safeSendMessage from "../handlers/safe/SafeSendMessage";
 import {formattedTimeString, randRange, sanitizeUserInput, StringUtils} from "../utility/Util";
 import prefixReminderEmbed from "../embeds/misc/prefixReminderEmbed";
-import TokenBucket from "../moderation/TokenBucket";
-import {inject, injectable} from "inversify";
-import {Types} from "../interfaces/injectables/types.interface";
 import {ICleverbot, Ignores} from "../interfaces/injectables/cleverbot.interface";
 import moment = require("moment");
-import 'reflect-metadata'
+import {ITokenBucket} from "../interfaces/injectables/tokenBucket.interface";
+import {Inject, Singleton} from "typescript-ioc";
 
-@injectable()
-export class Cleverbot implements ICleverbot {
+@Singleton
+export class Cleverbot extends ICleverbot {
+    readonly identifier : RegExp = /hifumi/i;
     cleverbot : Clevertype;
-    identifier : RegExp = /hifumi/i;
     users: {[id: string]: {warnings: number, ignores: Ignores}} = {};
-    @inject(Types.TokenBucket) tokenBucket: TokenBucket;
-    constructor(apiKey : string){
+    @Inject tokenBucket: ITokenBucket;
+
+    constructor(){
+        super();
+        let apiKey;
+        if (process.env['CLEVERBOT_TOKEN']){
+            apiKey = process.env['CLEVERBOT_TOKEN'];
+        } else {
+            this.available = false;
+            debug.warning(`CLEVERBOT_TOKEN environment variable not found, Cleverbot module is OFF`);
+            return;
+        }
         const configuration: Config = {
-            apiKey: apiKey,
+            apiKey: apiKey!,
             mood: {
                 regard: 30,
                 emotion: 70,
