@@ -5,3 +5,4 @@ refactor.json
 *.js
 /dist
 src/commands/Help.json
+*.env

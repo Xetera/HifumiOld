@@ -3,6 +3,7 @@ import {
 } from "./events/systemStartup";
 import gb from './misc/Globals';
 import 'reflect-metadata';
+import * as dotenv from 'dotenv'
 import onReady from './events/onReady'
 import onMessage from './events/onMessage'
 import onGuildMemberAdd from "./events/onGuildMemberAdd";
@@ -19,10 +20,12 @@ import {Client} from "discord.js";
 import websocketErrorHandler from "./handlers/process/websocketErrorHandler";
 import websocketWarningHandler from "./handlers/process/websocketWarningHandler";
 import {debug} from "./utility/Logging";
-import './misc/inversify.config'
+import {setupContainers} from "./misc/ioc.config";
 
+
+dotenv.config();
 setupProcess();
-gb.ENV  = getEnvironmentSettings();
+gb.ENV = getEnvironmentSettings();
 // lol @ me passing in "global" variables
 const [BOT_TOKEN, CLEVERBOT_TOKEN] : string[] = getTokens(gb.ENV);
 const DATABASE_CONFIG : string = getDatabaseConnection(gb.ENV);
@@ -36,6 +39,7 @@ async function main(){
 
     bot.on('ready', async() =>{
         gb.ownerID = await onReady(bot);
+        setupContainers();
         gb.instance = await createInstance(bot, BOT_TOKEN, CLEVERBOT_TOKEN, DATABASE_CONFIG);
         gb.instance.trackList.initializeGuilds();
         setInterval(() => {
