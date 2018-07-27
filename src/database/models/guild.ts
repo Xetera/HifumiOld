@@ -36,61 +36,61 @@ export class Guild {
     spam_filter: boolean;
 
     @Column({nullable: true})
-    welcome_message: string;
+    welcome_message?: string;
 
     /* Channel Destinations */
     @Column({nullable: true})
-    welcome_channel: string;
+    welcome_channel?: string;
 
     @Column({nullable: true})
-    warnings_channel: string;
+    warnings_channel?: string;
 
     @Column({nullable: true})
-    logs_channel: string;
+    logs_channel?: string;
 
     @Column({nullable: true})
-    chat_channel: string;
+    chat_channel?: string;
 
     @Column({nullable: true})
-    suggestions_channel: string;
+    suggestions_channel?: string;
 
     /* TODO: $logs update*/
     @Column({nullable: true})
-    joins_logging_channel: string;
+    joins_logging_channel?: string;
 
     @Column({nullable: true})
-    leave_logging_channel: string;
+    leave_logging_channel?: string;
 
     @Column({nullable: true})
-    mute_logging_channel: string;
+    mute_logging_channel?: string;
 
     @Column({nullable: true})
-    invite_logging_channel: string;
+    invite_logging_channel?: string;
 
     @Column({nullable: true})
-    ban_logging_channel: string;
+    ban_logging_channel?: string;
 
     @Column({nullable: true})
-    unban_logging_channel: string;
+    unban_logging_channel?: string;
 
     @Column({nullable: true})
-    channel_management_logging_channel: string;
+    channel_management_logging_channel?: string;
 
     @Column({nullable: true})
-    suggestion_logging_channel: string;
+    suggestion_logging_channel?: string;
 
     @Column({nullable: true})
-    ping_logging_channel: string;
+    ping_logging_channel?: string;
 
     @Column({nullable: true})
-    spam_logging_channel: string;
+    spam_logging_channel?: string;
 
     @Column({nullable: true})
-    command_logging_channel: string;
+    command_logging_channel?: string;
     /*END $logs update*/
 
     @Column({nullable: true})
-    mute_role: string;
+    mute_role?: string;
 
     /* Invite Settings */
     @Column({default: 4})
