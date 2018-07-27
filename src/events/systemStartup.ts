@@ -3,7 +3,6 @@ import {Instance} from "../misc/Globals";
 import {Client, Message} from "discord.js";
 import {debug} from '../utility/Logging'
 import {MessageQueue} from "../moderation/MessageQueue";
-import CommandHandler  from "../handlers/commands/CommandHandler";
 import Tracklist from "../moderation/Tracklist";
 import {MuteQueue} from "../moderation/MuteQueue";
 import {default as catchUncaughtExceptions} from '../handlers/process/uncaughtException'

@@ -1,5 +1,5 @@
 import * as Discord from 'discord.js'
-import {DiscordAPIError, Guild, GuildMember, User} from "discord.js";
+import {Client, DiscordAPIError, Guild, GuildMember, User} from "discord.js";
 import {getMuteTime, raidDetectionInterval} from "../utility/Settings";
 import Timer = NodeJS.Timer;
 import { debug} from "../utility/Logging";
@@ -9,6 +9,7 @@ import gb from "../misc/Globals";
 import {formattedTimeString} from "../utility/Util";
 import {Offense} from "./interfaces";
 import unmuteDMEmbed from "../embeds/moderation/unmuteDMEmbed";
+import {Container} from "typescript-ioc";
 
 
 class MutedMember  {
@@ -62,7 +63,8 @@ export class MuteQueue {
     private sortGuild(guildId: string){
         const arr: MutedMember[] | undefined = this.queue.get(guildId);
         if (!arr){
-            const guild = gb.instance.bot.guilds.get(guildId);
+            const bot: Client = Container.get(Client);
+            const guild = bot.guilds.get(guildId);
             debug.error(`Tried to sort a guild not registered in the muteQueue\nName:${guild ? guild.name: 'unknown guild'}`);
             return;
         }

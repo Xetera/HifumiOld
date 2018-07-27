@@ -21,10 +21,12 @@ import websocketErrorHandler from "./handlers/process/websocketErrorHandler";
 import websocketWarningHandler from "./handlers/process/websocketWarningHandler";
 import {debug} from "./utility/Logging";
 import {setupContainers} from "./misc/ioc.config";
+import {Container} from "typescript-ioc";
 
 
 dotenv.config();
 setupProcess();
+setupContainers();
 gb.ENV = getEnvironmentSettings();
 // lol @ me passing in "global" variables
 const [BOT_TOKEN, CLEVERBOT_TOKEN] : string[] = getTokens(gb.ENV);
@@ -33,13 +35,12 @@ const DATABASE_CONFIG : string = getDatabaseConnection(gb.ENV);
 main();
 
 async function main(){
-    const bot = new Client();
+    const bot: Client = Container.get(Client);
     debug.info('Logging in...', 'Startup');
     bot.login(BOT_TOKEN);
 
     bot.on('ready', async() =>{
         gb.ownerID = await onReady(bot);
-        setupContainers();
         gb.instance = await createInstance(bot, BOT_TOKEN, CLEVERBOT_TOKEN, DATABASE_CONFIG);
         gb.instance.trackList.initializeGuilds();
         setInterval(() => {

@@ -1,7 +1,8 @@
-import gb from "../../misc/Globals";
+import {Client} from "discord.js";
+import {Container} from "typescript-ioc";
 
 export default function getInvite(){
-    const bot = gb.instance.bot;
+    const bot = Container.get(Client);
     const selfId = bot.user.id;
     /* currently using custom permissions with
     Read Messages

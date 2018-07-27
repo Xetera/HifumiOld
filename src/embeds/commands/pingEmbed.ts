@@ -1,8 +1,8 @@
-import {RichEmbed} from "discord.js";
-import gb from "../../misc/Globals";
+import {Client, RichEmbed} from "discord.js";
+import {Container} from "typescript-ioc";
 
 export default function pingEmbed(){
-    const ping: number = gb.instance.bot.ping;
+    const ping: number = (<Client> Container.get(Client)).ping;
     let color;
     if (ping < 100){
         color = '#91ff67'
