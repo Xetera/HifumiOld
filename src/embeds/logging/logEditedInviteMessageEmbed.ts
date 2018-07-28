@@ -1,10 +1,10 @@
 import { Message, RichEmbed} from "discord.js";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import moment = require("moment");
 
 export default async function logEditedInviteMessageEmbed(message: Message, oldMessage: Message, newContent: string){
-    const currentStrikes = await gb.instance.database.getInviteStrikes(message.guild.id, message.author.id);
-    const maxStrikes = await gb.instance.database.getInviteBanThreshold(message.guild.id);
+    const currentStrikes = await gb.database.getInviteStrikes(message.guild.id, message.author.id);
+    const maxStrikes = await gb.database.getInviteBanThreshold(message.guild.id);
     return new RichEmbed()
         .setTitle(`Invite Deleted`)
         .setColor(`#ff4d4c`)

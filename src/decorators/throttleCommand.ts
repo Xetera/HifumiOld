@@ -1,7 +1,7 @@
 import {CommandParameters} from "../handlers/commands/CommandHandler";
 import moment = require("moment");
 import commandThrottleEmbed from "../embeds/commands/commandThrottleEmbed";
-import gb from "../misc/Globals";
+import {gb} from "../misc/Globals";
 import {debug} from "../utility/Logging";
 let throttleMap: {[user_id: string]: {[id:string]: Date}} = {};
 

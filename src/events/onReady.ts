@@ -1,14 +1,13 @@
-import * as Discord from'discord.js'
+import * as Discord from 'discord.js'
 import {debug, startupTable} from '../utility/Logging'
-import {default as gb, emojiName} from "../misc/Globals";
-import {Environments} from "./systemStartup";
+import {gb, emojiName} from "../misc/Globals";
+import {createInstance, Environments} from "./systemStartup";
 import {Client, Emoji} from "discord.js";
 import updatePresence from "../actions/UpdatePresence";
 
 
-
 // returning owner id at the end
-export default function onReady(bot: Client): Promise<string> {
+export default async function onReady(bot: Client): Promise<void> {
     gb.allMembers = 0;
     debug.info(`Invite link: https://discordapp.com/oauth2/authorize?client_id=372615866652557312&scope=bot&permissions=268463300`);
 
@@ -27,33 +26,58 @@ export default function onReady(bot: Client): Promise<string> {
     startupTable(startupGuild);
     setGlobals(bot);
     updatePresence(bot);
-    return bot.fetchApplication().then((app : Discord.OAuth2Application)=> {
+    bot.fetchApplication().then((app: Discord.OAuth2Application) => {
         debug.info(`${bot.user.username} is fully online.`, "Ready");
-        return app.owner.id;
+        gb.ownerID = app.owner.id;
     });
+
+    const instances = await createInstance(bot);
+    gb.database = instances.database;
+    gb.bot = bot;
+    gb.database = instances.database;
+    gb.hifumi = instances.hifumi;
+    gb.messageQueue = instances.messageQueue;
+    gb.muteQueue = instances.muteQueue;
+    gb.commandHandler = instances.commandHandler;
+    gb.trackList = instances.trackList;
+    gb.trackList.initializeGuilds();
+    setInterval(() => {
+        updatePresence(bot);
+    }, 1000 * 60 * 10);
 }
 
-function setGlobals(bot : Discord.Client){
-    if (gb.ENV === Environments.Live){
-        try{
-            gb.emojiGuild = bot.guilds.find('id', process.env.EMOJI_GUILD);
+function setGlobals(bot: Discord.Client) {
+    if (gb.ENV === Environments.Production) {
+        if (!process.env['EMOJI_GUILD']) {
+            debug.error(
+                `Missing environment variable 'EMOJI_GUILD' in production mode!`
+            );
+            return process.exit(1);
         }
-        catch {}
-
     }
     else {
-        try {
-            gb.emojiGuild = bot.guilds.find('id', require('../../config0.json').EMOJI_GUILD);
+        if (!process.env['EMOJI_GUILD']) {
+            return debug.warning(
+                `The env variable 'EMOJI_GUILD was not set, Hifumi will be omitting custom emojis.`
+            );
         }
-        catch {}
     }
+    const guild = bot.guilds.find(g => g.id === process.env['EMOJI_GUILD']);
+    if (!guild && gb.ENV === Environments.Development){
+        debug.error(`Could not find the emoji guild ${process.env['EMOJI_GUILD']}!`);
+        return process.exit(1)
+    } else if (!guild && gb.ENV === Environments.Production){
+        return debug.warning(`Emoji guild ${process.env['EMOJI_GUILD']} could not be found, skipping custom emojis`);
+    }
+    gb.emojiGuild = guild;
     setEmojis();
 }
 
-function setEmojis(){
+function setEmojis() {
     gb.emojis = new Map<emojiName, Emoji>();
-    if (gb.emojiGuild)
-        gb.emojiGuild.emojis.array().forEach(function (emoji) {
+    if (gb.emojiGuild){
+        gb.emojiGuild.emojis.forEach(emoji => {
             gb.emojis.set(emoji.name, emoji);
         })
+    }
 }

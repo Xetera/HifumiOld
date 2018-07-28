@@ -1,6 +1,6 @@
 import {LogManager} from "../handlers/logging/logManager";
 import {Channel, TextChannel, VoiceChannel} from "discord.js";
-import {default as gb} from "../misc/Globals";
+import {gb} from "../misc/Globals";
 
 export default async function onChannelCreate(channel: Channel){
     if (!(channel instanceof TextChannel) && !(channel instanceof VoiceChannel)){
@@ -9,8 +9,8 @@ export default async function onChannelCreate(channel: Channel){
 
     if (!channel.guild.available
         || gb.sleeping
-        || !gb.instance.database.ready
-        ||!await gb.instance.database.getGuildEnabled(channel.guild.id)){
+        || !gb.database.ready
+        ||!await gb.database.getGuildEnabled(channel.guild.id)){
         return;
     }
 

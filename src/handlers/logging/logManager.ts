@@ -12,7 +12,7 @@ import {
 } from "discord.js";
 import {debug} from "../../utility/Logging";
 import logMutedEmbed from "../../embeds/logging/logMuteEmbed";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import logBanEmbed from "../../embeds/logging/logBanEmbed";
 import logMemberJoinEmbed from "../../embeds/logging/logMemberJoinEmbed";
 import logMemberLeaveEmbed from "../../embeds/logging/logMemberLeaveEmbed";
@@ -91,7 +91,7 @@ export class LogManager {
     }
 
     public static async logMutedUser(member: GuildMember, mutedBy: GuildMember, reason: string, duration: number){
-        const channel = await gb.instance.database.getGuildProperty(
+        const channel = await gb.database.getGuildProperty(
             member.guild.id,
             'mute_logging_channel'
         );
@@ -101,7 +101,7 @@ export class LogManager {
     }
 
     public static async logMemberJoin(member: GuildMember){
-        const channel = await gb.instance.database.getGuildProperty(
+        const channel = await gb.database.getGuildProperty(
             member.guild.id,
             'joins_logging_channel'
         );
@@ -111,7 +111,7 @@ export class LogManager {
     }
 
     public static async  logMemberLeave(member: GuildMember){
-        const channel = await gb.instance.database.getGuildProperty(
+        const channel = await gb.database.getGuildProperty(
             member.guild.id,
             'leave_logging_channel'
         );
@@ -124,7 +124,7 @@ export class LogManager {
         if (recursion && recursion > 3){
             return debug.warning(`Could not find a ban log after an ban event was fired in ${guild.name}`);
         }
-        const channel = await gb.instance.database.getGuildProperty(
+        const channel = await gb.database.getGuildProperty(
             guild.id,
             'ban_logging_channel'
         );
@@ -146,7 +146,7 @@ export class LogManager {
     }
 
     public static async logTrackedBan(guild: Guild, member: User, offense: Offense){
-        const channel = await gb.instance.database.getGuildProperty(
+        const channel = await gb.database.getGuildProperty(
             guild.id,
             'ban_logging_channel'
         );
@@ -163,7 +163,7 @@ export class LogManager {
             return debug.warning(`Could not find an unban log after an unban event was fired in ${guild.name}`);
         }
 
-        const channel = await gb.instance.database.getGuildProperty(
+        const channel = await gb.database.getGuildProperty(
             guild.id,
             'unban_logging_channel'
         );
@@ -201,7 +201,7 @@ export class LogManager {
             return debug.warning(`Could not find a channel create log after an channel create event was fired in ${target.guild.name}`);
         }
 
-        const channel = await gb.instance.database.getGuildProperty(
+        const channel = await gb.database.getGuildProperty(
             target.guild.id,
             'channel_management_logging_channel'
         );
@@ -230,7 +230,7 @@ export class LogManager {
         if (!(target instanceof TextChannel) && !(target instanceof VoiceChannel))
             return;
 
-        const channel = await gb.instance.database.getGuildProperty(
+        const channel = await gb.database.getGuildProperty(
             target.guild.id,
             'channel_management_logging_channel'
         );
@@ -253,7 +253,7 @@ export class LogManager {
         if (!(channel instanceof TextChannel) && !(channel instanceof VoiceChannel))
             return;
 
-        const target = await gb.instance.database.getGuildProperty(
+        const target = await gb.database.getGuildProperty(
             channel.guild.id,
             'ping_logging_channel'
         );
@@ -263,7 +263,7 @@ export class LogManager {
     }
 
     public static async logMentionSpam(message: Message){
-        const target = await gb.instance.database.getGuildProperty(
+        const target = await gb.database.getGuildProperty(
             message.guild.id,
             'ping_logging_channel'
         );
@@ -279,7 +279,7 @@ export class LogManager {
     }
 
     public static async logCommandExecution(message: Message, command: string){
-        const target = await gb.instance.database.getGuildProperty(
+        const target = await gb.database.getGuildProperty(
             message.guild.id,
             'command_logging_channel'
         );
@@ -289,7 +289,7 @@ export class LogManager {
     }
 
     public static async logIllegalInvite(message: Message){
-        const target = await gb.instance.database.getGuildProperty(
+        const target = await gb.database.getGuildProperty(
             message.guild.id,
             'invite_logging_channel'
         );
@@ -299,7 +299,7 @@ export class LogManager {
     }
 
     public static async logIllegalEditedInvited(oldM: Message, newM: Message){
-        const target = await gb.instance.database.getGuildProperty(
+        const target = await gb.database.getGuildProperty(
             newM.guild.id,
             'invite_logging_channel'
         );
@@ -309,7 +309,7 @@ export class LogManager {
     }
 
     public static async logNewSuggestion(member: GuildMember) {
-        const target = await gb.instance.database.getGuildProperty(
+        const target = await gb.database.getGuildProperty(
             member.guild.id,
             'suggestion_logging_channel'
         );

@@ -1,6 +1,6 @@
 import { Message, TextChannel} from "discord.js";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import setConfigChannelEmbed from "../../embeds/commands/configEmbed/setConfigChannelEmbed";
 import {random} from "../../utility/Util";
 import {runtimeErrorResponses} from "../../interfaces/Replies";
@@ -12,7 +12,7 @@ import successEmbed from "../../embeds/commands/successEmbed";
 
 async function setChatChannel(message: Message, channel: TextChannel) {
     try {
-        await gb.instance.database.setChatChannel(message.guild.id, channel.id);
+        await gb.database.setChatChannel(message.guild.id, channel.id);
         await message.channel.send(
             setConfigChannelEmbed(channel, 'chat')
         );
@@ -34,7 +34,7 @@ async function run(message: Message, input: [(TextChannel | boolean | undefined)
     }
     else if (target === false) {
         try {
-            await gb.instance.database.removeChatChannel(message.guild.id);
+            await gb.database.removeChatChannel(message.guild.id);
             return safeSendMessage(message.channel, successEmbed(message.member, `Removed your chat channel.`));
         }
         catch (err) {

@@ -1,5 +1,5 @@
 import {DiscordAPIError,  Message} from "discord.js";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {codeBlock} from "../../utility/Markdown";
 import safeMessageUser from "../../handlers/safe/SafeMessageUser";
@@ -34,7 +34,7 @@ export default async function run(message: Message, input: [string]){
 
     let response;
     try {
-        response = gb.instance.eval(message, req);
+        response = gb.eval(message, req);
     }
     catch (err) {
         response = err.toString();

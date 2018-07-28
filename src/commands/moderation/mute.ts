@@ -1,5 +1,5 @@
 import {Message, GuildMember} from "discord.js";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import moment = require("moment");
 import {formattedTimeString} from "../../utility/Util";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
@@ -44,7 +44,7 @@ async function run(message: Message, input: [GuildMember, number, string]): Prom
 
     const unmuteDate = moment(new Date()).add(duration, 'm').toDate();
 
-    gb.instance.muteQueue.add(
+    gb.muteQueue.add(
         member,
         message.member,
         unmuteDate,

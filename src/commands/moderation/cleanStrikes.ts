@@ -2,7 +2,7 @@ import {GuildMember, Message} from 'discord.js'
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../decorators/expects";
 import {UserPermissions} from "../../handlers/commands/command.interface";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import {randomRuntimeError} from "../../interfaces/Replies";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
@@ -12,7 +12,7 @@ async function run(message: Message, input: [GuildMember]): Promise<any> {
     const [member] = input;
     let deleted;
     try {
-        deleted = await gb.instance.database.deleteAllInfractions(member.guild.id, member.id);
+        deleted = await gb.database.deleteAllInfractions(member.guild.id, member.id);
     } catch (e) {
         return handleFailedCommand(message.channel, randomRuntimeError())
     }

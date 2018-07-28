@@ -4,7 +4,7 @@ import {random} from "../../utility/Util";
 import {debug} from '../../utility/Logging'
 import setConfigChannelEmbed from "../../embeds/commands/configEmbed/setConfigChannelEmbed";
 import {Guild} from "../../database/models/guild";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import setConfigChannelFailEmbed from "../../embeds/commands/configEmbed/setConfigChannelFailEmbed";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {Command} from "../../handlers/commands/Command";
@@ -14,7 +14,7 @@ import successEmbed from "../../embeds/commands/successEmbed";
 
 async function setLogsChannel(message: Message, channel?: TextChannel){
     try{
-        const r: Partial<Guild> = await gb.instance.database.setLogsChannel(
+        const r: Partial<Guild> = await gb.database.setLogsChannel(
             message.guild.id , channel && channel.id || undefined
         );
         if (!channel){
@@ -40,11 +40,11 @@ async function setLogsChannel(message: Message, channel?: TextChannel){
 async function run(message: Message, input: [(TextChannel | boolean | undefined)]): Promise<any> {
     const [channel] = input;
     if (channel instanceof  TextChannel) {
-        await gb.instance.database.setLogsChannel(message.guild.id, undefined);
+        await gb.database.setLogsChannel(message.guild.id, undefined);
         setLogsChannel(message, channel);
         return;
     } else if (channel === false) {
-        await gb.instance.database.removeLogsChannel(message.guild.id);
+        await gb.database.removeLogsChannel(message.guild.id);
         setLogsChannel(message, undefined);
         return;
     }

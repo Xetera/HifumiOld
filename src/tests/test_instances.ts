@@ -6,7 +6,7 @@ credentials.host = 'localhost';
 credentials.port = 5432;
 credentials.database = 'discord';
 
-gb.ENV  = getEnvironmentSettings();
+gb.ENV  = setupEnvironment();
 
 const [BOT_TOKEN, CLEVERBOT_TOKEN] : string[] = getTokens(gb.ENV);
 const DATABASE_URL : string = getDatabaseConnection(gb.ENV);
@@ -15,7 +15,7 @@ function createInstance(): Instance {
     // this is how we avoid scoping problems, a little ugly but
     // it gets the job done
     let bot =new Discord.Client();
-    let alexa = new Cleverbot(CLEVERBOT_TOKEN);
+    let hifumi = new Cleverbot(CLEVERBOT_TOKEN);
     let database = new Database(DATABASE_URL);
     let muteQueue = new MuteQueue();
     let trackList = new Tracklist();
@@ -24,7 +24,7 @@ function createInstance(): Instance {
     let heroku = new Heroku();
     return {
         bot: bot,
-        alexa: alexa,
+        hifumi: hifumi,
         muteQueue: muteQueue,
         database: database,
         messageQueue: messageQueue,
@@ -49,23 +49,23 @@ describe('Handling commands', () => {
 
 describe('Cleverbot', function() {
     it('Error on setting clevertype emotion incorrectly', () => {
-        expects(() => instances.alexa.setEmotion(101)).to.throw(RangeError);
+        expects(() => instances.hifumi.setEmotion(101)).to.throw(RangeError);
     });
     it('Error on setting clevertype regard incorrectly', () => {
-        expects(() => instances.alexa.setRegard(101)).to.throw(RangeError);
+        expects(() => instances.hifumi.setRegard(101)).to.throw(RangeError);
     });
     it('Error on setting clevertype engagement incorrectly', () => {
-        expects(() => instances.alexa.setEngagement(101)).to.throw(RangeError);
+        expects(() => instances.hifumi.setEngagement(101)).to.throw(RangeError);
     });
     this.timeout(20000);
     it('Getting cleverbot response', function(done : MochaDone) {
-        instances.alexa.say('hello').then((reply: any)=> {
+        instances.hifumi.say('hello').then((reply: any)=> {
             expects(reply).to.be.a('string');
             done();
         })
     }).timeout(20000);
     it('Clevertype correctly recording calls', () => {
-        expects(instances.alexa.cleverbot.callAmount).to.equal(1);
+        expects(instances.hifumi.cleverbot.callAmount).to.equal(1);
     });
 });
 */

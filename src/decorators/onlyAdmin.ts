@@ -1,5 +1,5 @@
 import {Message} from "discord.js";
-import gb from "../misc/Globals";
+import {gb} from "../misc/Globals";
 
 import missingAdminEmbed from "../embeds/permissions/missingAdminEmbed";
 

@@ -1,7 +1,7 @@
 import {highlight} from "../../utility/Markdown";
 import {Channel, RichEmbed, TextChannel} from "discord.js";
 import {pluralize, random} from "../../utility/Util";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import ReactionManager from "../../handlers/internal/reactions/reactionManager";
 import {warningEmbedColor} from "../../utility/Settings";
 import {Command} from "../../handlers/commands/Command";
@@ -19,7 +19,7 @@ export default async function invalidParametersEmbed(prefix: string, command: Co
         .addField(`Example`, highlight(example))
         .setFooter(`=> ${prefix}help ${name} <= for more info`);
 
-    if (channel instanceof TextChannel && await gb.instance.database.getReactions(channel.guild.id)){
+    if (channel instanceof TextChannel && await gb.database.getReactions(channel.guild.id)){
         embed.setThumbnail(random(rm.sorry.concat(rm.shy)));
     }
     return embed;

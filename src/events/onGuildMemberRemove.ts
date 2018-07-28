@@ -1,5 +1,5 @@
 import * as Discord from "discord.js";
-import gb from "../misc/Globals";
+import {gb} from "../misc/Globals";
 import { Message} from "discord.js";
 import safeDeleteMessage from "../handlers/safe/SafeDeleteMessage";
 import {LogManager} from "../handlers/logging/logManager";
@@ -11,8 +11,8 @@ export default async function onGuildMemberRemove(member : Discord.GuildMember) 
 
     if (!member.guild.available
         || gb.sleeping
-        || !gb.instance.database.ready
-        || !await gb.instance.database.getGuildEnabled(member.guild.id)){
+        || !gb.database.ready
+        || !await gb.database.getGuildEnabled(member.guild.id)){
         return;
     }
     let logs;
@@ -28,7 +28,7 @@ export default async function onGuildMemberRemove(member : Discord.GuildMember) 
     if (logs)
         isBan = logs.entries.first().action === 'MEMBER_BAN_ADD';
 
-    const welcomeMessage: Message | undefined = gb.instance.database.unCacheWelcomeMessage(member);
+    const welcomeMessage: Message | undefined = gb.database.unCacheWelcomeMessage(member);
     if (welcomeMessage) {
         safeDeleteMessage(welcomeMessage);
     }

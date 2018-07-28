@@ -21,7 +21,7 @@ export async function resolveMember(arg: string, message: Message, options: {fai
     if (userId && arg.length === 18){
         const attempt = message.guild.members.get(arg);
         // if (!attempt && options.global){
-        //     return gb.instance.bot.fetchUser(arg);
+        //     return gb.bot.fetchUser(arg);
         // }
         return attempt;
     }

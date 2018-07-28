@@ -1,5 +1,5 @@
 import * as Discord from "discord.js";
-import gb from "../misc/Globals";
+import {gb} from "../misc/Globals";
 
 export default function onlyOwner(target : any, key: any , descriptor: any) {
     const originalMethod = descriptor.value;

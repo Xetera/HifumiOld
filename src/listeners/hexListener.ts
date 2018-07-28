@@ -2,7 +2,7 @@ import {Message} from "discord.js";
 import {hexRegex, specialCharRegex} from "./Regex";
 import Color from "../API/color";
 import safeSendMessage from "../handlers/safe/SafeSendMessage";
-import gb from "../misc/Globals";
+import {gb} from "../misc/Globals";
 
 const exclusions = [
     'embed',
@@ -14,7 +14,7 @@ export default async function hexListener(message: Message){
     if (!match)
         return;
     const hex = match[2];
-    const prefix = await gb.instance.database.getPrefix(message.guild.id);
+    const prefix = await gb.database.getPrefix(message.guild.id);
 
     /**
      * idk if this might be a problem in the future

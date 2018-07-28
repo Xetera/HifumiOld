@@ -1,8 +1,8 @@
 import {RichEmbed} from "discord.js";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 
 export default function pingEmbed(){
-    const ping: number = gb.instance.bot.ping;
+    const ping: number = gb.bot.ping;
     let color;
     if (ping < 100){
         color = '#91ff67'

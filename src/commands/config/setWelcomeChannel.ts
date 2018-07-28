@@ -3,7 +3,7 @@ import {runtimeErrorResponses} from "../../interfaces/Replies";
 import {random} from "../../utility/Util";
 import {debug} from '../../utility/Logging'
 import setConfigChannelEmbed from "../../embeds/commands/configEmbed/setConfigChannelEmbed";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import {Guild} from "../../database/models/guild";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {Command} from "../../handlers/commands/Command";
@@ -13,7 +13,7 @@ import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import successEmbed from "../../embeds/commands/successEmbed";
 
 function setWelcomeChannel(message: Message, channel: Channel) {
-    gb.instance.database.setWelcomeChannel(message.guild.id, channel.id).then((r: Partial<Guild>) => {
+    gb.database.setWelcomeChannel(message.guild.id, channel.id).then((r: Partial<Guild>) => {
         safeSendMessage(message.channel,
             setConfigChannelEmbed(channel, 'welcome')
         );
@@ -31,7 +31,7 @@ async function run(message: Message, input: [(TextChannel | boolean | undefined)
     }
     else if (channel === false) {
         try {
-            await gb.instance.database.removeWelcomeChannel(message.guild.id);
+            await gb.database.removeWelcomeChannel(message.guild.id);
         } catch (err) {
             return handleFailedCommand(message.channel,
                 `Something went wrong, I couldn't clear your welcome channel!`

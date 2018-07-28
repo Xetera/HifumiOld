@@ -90,5 +90,6 @@ export const command: Command = new Command(
         category: 'Fun',
         expects: [{type: ArgType.Message}],
         run: run,
+        dependsOn: 'WHATANIME_KEY'
     }
 );

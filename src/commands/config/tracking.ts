@@ -1,5 +1,5 @@
 import {Message} from "discord.js";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../decorators/expects";
@@ -9,7 +9,7 @@ export async function setMemberTracking(message: Message, input: [(boolean | und
     const [choice] = input;
     // could also be false, can't check with !
     if (choice === undefined){
-        const status = await gb.instance.database.getTrackNewMembers(message.guild.id);
+        const status = await gb.database.getTrackNewMembers(message.guild.id);
         if (status){
             safeSendMessage(message.channel, `My tracking setting is currently on.`);
         } else {
@@ -18,7 +18,7 @@ export async function setMemberTracking(message: Message, input: [(boolean | und
         return;
     }
 
-    await gb.instance.database.setTrackNewMembers(message.guild.id, choice);
+    await gb.database.setTrackNewMembers(message.guild.id, choice);
     if (!choice)
         safeSendMessage(message.channel, `No longer tracking new members in this server.`);
     else

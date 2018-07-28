@@ -1,7 +1,7 @@
 import * as Discord from 'discord.js'
 import {Cleverbot as Clevertype, Config} from 'clevertype'
 import {debug} from '../utility/Logging'
-import gb from "../misc/Globals";
+import {gb} from "../misc/Globals";
 import { Message, MessageMentions, TextChannel} from "discord.js";
 import moment = require("moment");
 import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
@@ -50,24 +50,25 @@ export class Cleverbot {
 
     public async checkMessage(message : Message, bot :Discord.Client) : Promise<void> {
         if (message.system
+            || !this.available
             || message.attachments.size
             || !(message.channel instanceof TextChannel)
             || StringUtils.isUrl(message.content)
             || StringUtils.isEmoji(message.content)
-            || await gb.instance.database.isUserIgnored(message.member)){
+            || await gb.database.isUserIgnored(message.member)){
             return;
         }
 
         let cleverbotCall = message.isMentioned(bot.user);
         if (cleverbotCall && !message.content.replace(MessageMentions.USERS_PATTERN, '')){
-            return void safeSendMessage(message.channel, prefixReminderEmbed(await gb.instance.database.getPrefix(message.guild.id)), 30000);
+            return void safeSendMessage(message.channel, prefixReminderEmbed(await gb.database.getPrefix(message.guild.id)), 30000);
         }
 
-        const chatChannelId = await gb.instance.database.getChatChannel(message.guild.id);
+        const chatChannelId = await gb.database.getChatChannel(message.guild.id);
 
         if (message.channel.id === chatChannelId || cleverbotCall || message.isMentioned(bot.user)) {
 
-            if (!gb.instance.database.ready) {
+            if (!gb.database.ready) {
                 safeSendMessage(message.channel, `😰 give me some time to get set up first.`);
                 return void debug.info(`Got message from ${message.guild.name} but the DB hasn't finished caching.`);
             }
@@ -75,7 +76,7 @@ export class Cleverbot {
             // don't respond to messages not meant for me
             if (message.mentions.users.size !== 0 && !message.isMentioned(bot.user))
                 return;
-            else if (message.content.startsWith('-') || message.content.startsWith(await gb.instance.database.getPrefix(message.guild.id)))
+            else if (message.content.startsWith('-') || message.content.startsWith(await gb.database.getPrefix(message.guild.id)))
                 return;
             else if (this.isRateLimited(message.member.id, message)){
                 return;
@@ -136,7 +137,7 @@ export class Cleverbot {
             parsedArg = phrase;
 
         return this.cleverbot.say(parsedArg, id).then((response: string) => {
-            gb.instance.database.incrementCleverbotCalls(message.guild.id);
+            gb.database.incrementCleverbotCalls(message.guild.id);
             if (!response) {
                 debug.warning(`Couldn't get a response...`, `Cleverbot`);
                 return this.say(message, phrase, id, replaceKeyword);

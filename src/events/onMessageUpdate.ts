@@ -3,14 +3,14 @@ import {discordInviteRegex} from "../listeners/Regex";
 import {debug} from '../utility/Logging'
 import {LogManager} from "../handlers/logging/logManager";
 import deleteInvite from "../moderation/InviteRemover";
-import {default as gb} from "../misc/Globals";
+import {gb} from "../misc/Globals";
 
 export default async function onMessageUpdate(oldMessage : Discord.Message, newMessage : Discord.Message){
     if (!newMessage.guild
         || gb.sleeping
         || !newMessage.guild.available
-        || !gb.instance.database.ready
-        ||(newMessage.guild && !await gb.instance.database.getGuildEnabled(newMessage.guild.id))){
+        || !gb.database.ready
+        ||(newMessage.guild && !await gb.database.getGuildEnabled(newMessage.guild.id))){
         return
     }
 

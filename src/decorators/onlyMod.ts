@@ -1,6 +1,6 @@
 import * as Discord from "discord.js";
 import missingModEmbed from "../embeds/permissions/missingModEmbed";
-import gb from "../misc/Globals";
+import {gb} from "../misc/Globals";
 
 export default function onlyMod(target : any, key: any, descriptor: any) {
     const original = descriptor.value;

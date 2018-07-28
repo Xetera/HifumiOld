@@ -1,5 +1,5 @@
 import {Message} from "discord.js";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {DeleteResult} from "typeorm";
 import {Infraction} from "../../database/models/infraction";
@@ -19,7 +19,7 @@ enum EStrikeRejections {
 
 async function run(message: Message, input: [number]): Promise<any> {
     const [id] = input;
-    return gb.instance.database.getInfractionById(id).then((r: Infraction|undefined) => {
+    return gb.database.getInfractionById(id).then((r: Infraction|undefined) => {
         if (!r){
             handleFailedCommand(
                 message.channel, `There's no such strike`
@@ -34,7 +34,7 @@ async function run(message: Message, input: [number]): Promise<any> {
         }
         return Promise.resolve(r);
     }).then((r: Infraction) => {
-        return Promise.all([gb.instance.database.deleteInfractionById(id, message.guild.id), r]);
+        return Promise.all([gb.database.deleteInfractionById(id, message.guild.id), r]);
     }).then((r: [DeleteResult, Infraction]) => {
         const [, infraction] = r;
         return Promise.all([safeSendMessage(message.channel, `Strike #${id} has vanished.`), infraction]);

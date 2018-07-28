@@ -1,5 +1,5 @@
 import {RichEmbed} from "discord.js";
-import gb from "../../../misc/Globals";
+import {gb} from "../../../misc/Globals";
 
 export default function doggoEmbed(url: string){
     const sections = url.split('/');

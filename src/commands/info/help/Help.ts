@@ -2,7 +2,7 @@ import {Message, RichEmbed} from "discord.js";
 import commandNotFoundEmbed from "../../../embeds/commands/commandNotFoundEmbed";
 import { random} from "../../../utility/Util";
 import {commandEmbedColor} from "../../../utility/Settings";
-import gb from "../../../misc/Globals";
+import {gb} from "../../../misc/Globals";
 import helpMacroEmbed from "../../../embeds/commands/info/helpMacroEmbed";
 import {ArgType} from "../../../decorators/expects";
 import {Command} from "../../../handlers/commands/Command";
@@ -11,14 +11,14 @@ import commandHelpEmbed from "../../../embeds/commands/info/commandHelpEmbed";
 import CommandHandler from "../../../handlers/commands/CommandHandler";
 async function run(message: Message, input: [string | undefined]): Promise<any> {
     const [choice] = input;
-    const prefix: string = await gb.instance.database.getPrefix(message.guild.id);
+    const prefix: string = await gb.database.getPrefix(message.guild.id);
 
     if (choice){
         return getSpecificHelp(message, choice, prefix);
     }
 
     let embed = new RichEmbed();
-    const commands = gb.instance.commandHandler.commands;
+    const commands = gb.commandHandler.commands;
     let sortedCommands: {[type:string]: Command[]} = commands.reduce((obj: {[type:string]: Command[]}, command: Command) => {
         // we don't want to send ALL the settings commands in help
         if (command.hidden)
@@ -77,9 +77,9 @@ export const command: Command = new Command(
 );
 
 async function getSpecificHelp(message: Message, arg: string, prefix: string){
-    const command: Command | undefined = gb.instance.commandHandler.commands.find(cmd => cmd.names.includes(arg));
+    const command: Command | undefined = gb.commandHandler.commands.find(cmd => cmd.names.includes(arg));
     if (!command) {
-        const macro = await gb.instance.database.getMacro(message.guild.id, arg);
+        const macro = await gb.database.getMacro(message.guild.id, arg);
         if (macro){
             return safeSendMessage(message.channel, helpMacroEmbed(message.guild, macro));
         }

@@ -1,5 +1,5 @@
 import {Message} from "discord.js";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import {Guild} from "../../database/models/guild";
 import setReactionsEmbed from "../../embeds/commands/configEmbed/setReactionsEmbed";
 import {Command} from "../../handlers/commands/Command";
@@ -9,7 +9,7 @@ import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 
 export async function reactions(message: Message, input: [boolean]){
     const [state] = input;
-    gb.instance.database.setReactions(message.guild.id, state).then((r: Partial<Guild>) =>{
+    gb.database.setReactions(message.guild.id, state).then((r: Partial<Guild>) =>{
         // we're setting reactions when we're upserting so it gets reflected
         // back to us for sure
         safeSendMessage(message.channel, setReactionsEmbed(state));

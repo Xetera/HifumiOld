@@ -1,6 +1,6 @@
 import * as Discord from 'discord.js'
 import { getMemberTrackDuration, securityLevel, SecurityLevels} from "../utility/Settings";
-import {default as gb} from "../misc/Globals";
+import {gb} from "../misc/Globals";
 import {Guild, GuildMember, Message} from "discord.js";
 import {Offense} from "./interfaces";
 import banTrackedUserForInvite from "../actions/punishments/tracklist/BanTrackedUserForInvite";
@@ -28,7 +28,7 @@ export default class Tracklist {
 
     // called on startup
     public initializeGuilds(){
-        const guildIds = gb.instance.bot.guilds.map(guild => guild.id);
+        const guildIds = gb.bot.guilds.map(guild => guild.id);
         for (let i in guildIds){
             this.members.set(guildIds[i], []);
         }
@@ -46,13 +46,13 @@ export default class Tracklist {
     public getAllMembers(){
         let out = '';
         this.members.forEach((value, key) => {
-            out += `${gb.instance.bot.guilds.get(key)!.name}: ${value.join(', ')} \n`;
+            out += `${gb.bot.guilds.get(key)!.name}: ${value.join(', ')} \n`;
         });
         return out;
     }
 
     public async add(member: Discord.GuildMember){
-        if (!await gb.instance.database.getTrackNewMembers(member.guild.id)){
+        if (!await gb.database.getTrackNewMembers(member.guild.id)){
             return;
         }
 

@@ -13,7 +13,7 @@ import {
     noMissingMuteOverwritesEmbed
 } from "../../embeds/commands/configEmbed/channelPermissionsCalculatorEmbed";
 import {debug} from "../../utility/Logging";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 
 export default function identifyMuteRole(message: Message){
@@ -57,7 +57,7 @@ export default function identifyMuteRole(message: Message){
     return {total: total, tally: muteRole};
     /*
     let embed;
-    const prefix = gb.instance.database.getPrefix(message.guild.id);
+    const prefix = gb.database.getPrefix(message.guild.id);
     if (!total.missing.length) {
         embed = noMissingMuteOverwritesEmbed(muteRole.role.name);
     }
@@ -174,7 +174,7 @@ export async function muteCoverage(message: Message){
     });
 
     let embed;
-    const prefix = await gb.instance.database.getPrefix(message.guild.id);
+    const prefix = await gb.database.getPrefix(message.guild.id);
     if (!total.missing.length) {
         embed = noMissingMuteOverwritesEmbed(muteRole.role.name);
     }

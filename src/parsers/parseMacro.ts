@@ -3,7 +3,7 @@ import axios, {AxiosResponse} from 'axios'
 import {isMedia} from "../API/imageChecker";
 import {Macro} from "../database/models/macro";
 import {debug} from "../utility/Logging";
-import gb from "../misc/Globals";
+import {gb} from "../misc/Globals";
 import {AnimeUtils} from "../utility/animeUtils";
 import isPicture = AnimeUtils.isPicture;
 
@@ -94,7 +94,7 @@ export function buildMacro(macro: Macro) {
         return out;
     }
     else {
-        const guild = gb.instance.bot.guilds.get(macro.guild_id);
+        const guild = gb.bot.guilds.get(macro.guild_id);
         debug.error(
             `A macro from guild ${guild ? guild.name : 'unknown guild'} ` +
             `tried to send a macro with no content or links, this should never happen!`);

@@ -1,5 +1,5 @@
 import {Message, TextChannel} from "discord.js";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import setConfigChannelEmbed from "../../embeds/commands/configEmbed/setConfigChannelEmbed";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {debug} from "../../utility/Logging";
@@ -10,7 +10,7 @@ import {UserPermissions} from "../../handlers/commands/command.interface";
 
 async function setSuggestionsChannel(message: Message, channel: string | undefined){
     try{
-        await gb.instance.database.setSuggestionsChannel(message.guild.id, channel);
+        await gb.database.setSuggestionsChannel(message.guild.id, channel);
         const embed = setConfigChannelEmbed(message.channel, 'suggestions');
         safeSendMessage(message.channel, embed);
     }

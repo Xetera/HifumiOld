@@ -1,7 +1,7 @@
 import {GuildMember, RichEmbed, User} from "discord.js";
 import moment = require("moment");
 import {Note} from "../../database/models/note";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import {getMemberTrackDuration} from "../../utility/Settings";
 import {Infraction} from "../../database/models/infraction";
 import InfractionHandler from "../../handlers/internal/infractions/InfractionHandler";
@@ -13,8 +13,8 @@ export default async function historyEmbed(member: GuildMember | User, notes: No
     const url          = member instanceof User ? member.avatarURL : member.user.avatarURL;
     const joinDate     = member instanceof User ? undefined : member.joinedAt;
     const creationDate = member instanceof User ? member.createdAt : member.user.createdAt;
-    const tracked      = member instanceof User ? undefined : gb.instance.trackList.getMember(member);
-    const history_calls= member instanceof User ? '?' : await gb.instance.database.getHistoryCalls(member.guild.id, member.id);
+    const tracked      = member instanceof User ? undefined : gb.trackList.getMember(member);
+    const history_calls= member instanceof User ? '?' : await gb.database.getHistoryCalls(member.guild.id, member.id);
 
     const embed = new RichEmbed()
         .setTitle(`${username}'s History`)

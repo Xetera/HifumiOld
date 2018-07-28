@@ -3,7 +3,7 @@ import * as dbg from 'debug'
 import inviteListener from '../listeners/InviteListener'
 import * as moment from "moment";
 import {MessageType} from "../interfaces/identifiers";
-import {default as gb} from "../misc/Globals";
+import {gb} from "../misc/Globals";
 import DMCommandHandler from "../handlers/commands/DMCommandHandler";
 import pingListener from "../listeners/pingListener";
 import memeListener from "../listeners/memeListener";
@@ -21,11 +21,11 @@ interface Message extends Discord.Message {
 }
 
 function middleWare(msg: Discord.Message, ignored: boolean){
-    const {messageQueue, alexa, bot, database} = gb.instance;
+    const {messageQueue, hifumi, bot, database} = gb;
     const message = <Message> msg;
     message.sent = moment(new Date()).toDate();
     messageQueue.add(message);
-    alexa.checkMessage(message, bot);
+    hifumi.checkMessage(message, bot);
     pingListener(message, database);
     inviteListener(message);
     if (!ignored) {
@@ -39,13 +39,13 @@ export default async function onMessage(message: Discord.Message){
     // we don't want to look at bot messages at all
     if (message.author.bot
         || gb.sleeping
-        || !gb.instance
-        || !gb.instance.database.ready
+        || !gb
+        || !gb.database.ready
         || message.guild && !message.guild.available
-        || (message.guild && await gb.instance.database.getChannelIgnored(message.guild.id, message.channel.id))){
+        || (message.guild && await gb.database.getChannelIgnored(message.guild.id, message.channel.id))){
         return;
     }
-    else if (!gb.instance || !gb.instance.database.ready) {
+    else if (!gb || !gb.database.ready) {
         return void debug.info(`Got message from ${message.guild.name} but the DB hasn't finished caching.`);
     }
 
@@ -56,8 +56,8 @@ export default async function onMessage(message: Discord.Message){
     let guildEnabled;
     let userIgnored;
     if (messageType === MessageType.GuildMessage){
-        guildEnabled = await gb.instance.database.getGuildEnabled(message.guild.id);
-        userIgnored = await gb.instance.database.isUserIgnored(message.member);
+        guildEnabled = await gb.database.getGuildEnabled(message.guild.id);
+        userIgnored = await gb.database.isUserIgnored(message.member);
         if (guildEnabled)
             middleWare(message, userIgnored);
     }
@@ -67,13 +67,13 @@ export default async function onMessage(message: Discord.Message){
     else if (messageType === MessageType.PrivateMessage)
         return DMCommandHandler(message);
 
-    const prefix = await gb.instance.database.getPrefix(message.guild.id)
+    const prefix = await gb.database.getPrefix(message.guild.id)
 
     if (!message.content.startsWith(prefix))
         return;
 
     // right now this only supports 1 char length prefix but we can change that later
     if (guildEnabled && !userIgnored){
-        return gb.instance.commandHandler.handler(message);
+        return gb.commandHandler.handler(message);
     }
 }

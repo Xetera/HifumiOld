@@ -1,6 +1,6 @@
 import {GuildMember, Message} from "discord.js";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import {debug} from "../../utility/Logging";
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../decorators/expects";
@@ -11,7 +11,7 @@ import successEmbed from "../../embeds/commands/successEmbed";
 async function run(message: Message, input: [GuildMember, string]): Promise<any> {
     const [member, note] = input;
     try {
-        await gb.instance.database.addNote(message.guild, message.member, member, note);
+        await gb.database.addNote(message.guild, message.member, member, note);
     } catch (e) {
         debug.error(e);
         return handleFailedCommand(message.channel, `I couldn't add that note!`);

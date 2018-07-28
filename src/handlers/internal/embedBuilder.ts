@@ -2,7 +2,7 @@ import {TemplatedMessage} from "../../parsers/parsers.interface";
 import templateParser from "../../parsers/templateParser";
 import { Message, RichEmbed} from "discord.js";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 
 enum IEmbedBuilderErrors {
     INVALID_COLOR = 'invalid color'
@@ -138,7 +138,7 @@ export default class EmbedBuilder {
         const existing = this.embeds[message.member.id];
         if (!existing){
             return handleFailedCommand(
-                message.channel, `Hey you don't have an existing embed, make one with ${await gb.instance.database.getPrefix(message.guild.id)}embed`
+                message.channel, `Hey you don't have an existing embed, make one with ${await gb.database.getPrefix(message.guild.id)}embed`
             );
         }
 

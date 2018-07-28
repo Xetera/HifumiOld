@@ -1,6 +1,6 @@
 import {Message} from "discord.js";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import {debug} from "../../utility/Logging";
 import {DeleteResult} from "typeorm"
 import {Command} from "../../handlers/commands/Command";
@@ -12,7 +12,7 @@ import {UserPermissions} from "../../handlers/commands/command.interface";
 async function run(message: Message, args: [number]): Promise<any> {
     const [noteId] = args;
 
-    gb.instance.database.deleteNote(message.guild, noteId.toString()).then((res: DeleteResult) => {
+    gb.database.deleteNote(message.guild, noteId.toString()).then((res: DeleteResult) => {
         if (res == null){
             return void handleFailedCommand(
                 message.channel,

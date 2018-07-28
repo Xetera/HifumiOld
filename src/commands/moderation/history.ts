@@ -1,5 +1,5 @@
 import {GuildMember, Message} from "discord.js";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import historyEmbed from "../../embeds/commands/historyEmbed";
 import {debug} from "../../utility/Logging";
 import {Note} from "../../database/models/note";
@@ -12,7 +12,7 @@ import {UserPermissions} from "../../handlers/commands/command.interface";
 
 async function run(message: Message, input: [GuildMember]): Promise<any> {
     const [target] = input;
-    const database: Database = gb.instance.database;
+    const database: Database = gb.database;
     return Promise.all([
         database.getNotes(target.id, message.guild.id),
         database.getInfractions(message.guild.id, target.id),

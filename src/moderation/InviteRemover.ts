@@ -1,4 +1,4 @@
-import gb from "../misc/Globals";
+import {gb} from "../misc/Globals";
 import safeMessageUser from "../handlers/safe/SafeMessageUser";
 import {Offense} from "./interfaces";
 import safeDeleteMessage from "../handlers/safe/SafeDeleteMessage";
@@ -11,27 +11,27 @@ import {APIErrors} from "../interfaces/Errors";
 
 export default function deleteInvite(message: Message, editedMessage: boolean = false): Promise<number> {
     const sender = message.author.username;
-    const trackList = gb.instance.trackList;
+    const trackList = gb.trackList;
     if (!message.guild.me.hasPermission('MANAGE_MESSAGES')){
        return Promise.reject(new Error(APIErrors.MISSING_PERMISSIONS));
     }
     return safeDeleteMessage(message).then(()=> {
         debug.info(`Deleted invite link from ${sender}`);
-        return gb.instance.database.incrementInviteStrike(message.member)
+        return gb.database.incrementInviteStrike(message.member)
     }).then(async(strikeCount : number) => {
         debug.silly(`${message.member.displayName} has ` + strikeCount + " strikes on record", `InviteListener`);
 
         if (trackList.isNewMember(message.member)
-            && await gb.instance.database.getTrackNewMembers(message.guild.id)
+            && await gb.database.getTrackNewMembers(message.guild.id)
             && strikeCount > 2){
 
             debug.info(`Advertiser ${message.author.username} was a tracked member, attempting to ban...`, `InviteListener`);
             trackList.punishNewMember(message.member, Offense.InviteLink);
         }
-        else if (strikeCount >= await gb.instance.database.getInviteBanThreshold(message.guild.id)){
+        else if (strikeCount >= await gb.database.getInviteBanThreshold(message.guild.id)){
             await banForInviteSpam(message.member);
         }
-        else if (strikeCount === await gb.instance.database.getInviteWarnThreshold(message.guild.id)){
+        else if (strikeCount === await gb.database.getInviteWarnThreshold(message.guild.id)){
             safeMessageUser(message.member, await inviteWarningDMEmbed(message.guild));
         }
         if (!editedMessage){
@@ -40,6 +40,6 @@ export default function deleteInvite(message: Message, editedMessage: boolean = 
         return strikeCount;
     }).catch(err => {
         debug.error(`Error while incrementing invite strikes for ${message.author.username}` + err, `InviteListener`);
-        return gb.instance.database.getInviteStrikes(message.guild.id, message.member.id);
+        return gb.database.getInviteStrikes(message.guild.id, message.member.id);
     })
 }

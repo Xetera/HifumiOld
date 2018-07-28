@@ -1,7 +1,7 @@
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 
 export default function getInvite(){
-    const bot = gb.instance.bot;
+    const bot = gb.bot;
     const selfId = bot.user.id;
     /* currently using custom permissions with
     Read Messages

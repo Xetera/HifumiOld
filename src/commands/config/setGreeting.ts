@@ -1,5 +1,5 @@
 import {Message} from "discord.js";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import {debug} from "../../utility/Logging";
@@ -25,7 +25,7 @@ async function run(message: Message, input: [string]): Promise<any> {
         const [content] = input;
         await safeSendMessage(message.channel, parseTemplatePlaceholders(message.member, content));
         try {
-            await gb.instance.database.setWelcomeMessage(message.guild.id, content)
+            await gb.database.setWelcomeMessage(message.guild.id, content)
         } catch (err){
             debug.error('STACK ERROR');
             debug.error(err.stack);
@@ -69,7 +69,7 @@ async function run(message: Message, input: [string]): Promise<any> {
     const image = fields['image'];
 
     return safeSendMessage(message.channel, guildMemberAddEmbed(message.member, description, title, footer, color, thumbnail, image)).then(() => {
-        gb.instance.database.setWelcomeMessage(message.guild.id, final).then(() => {
+        gb.database.setWelcomeMessage(message.guild.id, final).then(() => {
         }).catch((err: any) => {
             console.log('STACK ERROR');
             debug.error(err, `setWelcomeMessage`);

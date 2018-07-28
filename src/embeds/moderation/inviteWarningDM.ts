@@ -1,5 +1,5 @@
 import {Guild, RichEmbed} from "discord.js";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import {warningEmbedColor} from "../../utility/Settings";
 import ReactionManager from "../../handlers/internal/reactions/reactionManager";
 
@@ -8,8 +8,8 @@ export default async function inviteWarningDMEmbed(guild: Guild): Promise<RichEm
     // later some guilds may want to ban on different amount of invites
     // Done ^
 
-    const current = await  gb.instance.database.getInviteWarnThreshold(guild.id);
-    const max = await gb.instance.database.getInviteBanThreshold(guild.id)
+    const current = await  gb.database.getInviteWarnThreshold(guild.id);
+    const max = await gb.database.getInviteBanThreshold(guild.id)
     const embed = new RichEmbed()
         .setTitle(`Invite Warning`)
         .setColor(warningEmbedColor)

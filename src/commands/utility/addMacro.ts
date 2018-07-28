@@ -1,6 +1,6 @@
 import {Message} from "discord.js";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import {Help} from "../info/help/help.interface";
 import {debug} from "../../utility/Logging";
 import {Macro} from "../../database/models/macro";
@@ -34,15 +34,15 @@ async function run(message: Message, input: [string, string]): Promise<any> {
     }
 
     try {
-        const count = await gb.instance.database.getMacroCount(message.guild.id);
+        const count = await gb.database.getMacroCount(message.guild.id);
 
-        if (count >= 50 && !await gb.instance.database.getPremium(message.guild.id)) {
+        if (count >= 50 && !await gb.database.getPremium(message.guild.id)) {
             return void handleFailedCommand(
                 message.channel, "Whoa, you already have 50 macros saved, time to delete some"
             );
         }
 
-        const found: Macro | undefined = await gb.instance.database.getMacro(message.guild.id, macroName);
+        const found: Macro | undefined = await gb.database.getMacro(message.guild.id, macroName);
         if (found) {
             return void handleFailedCommand(
                 message.channel, `A macro with the name **${macroName}** already exists in this server.`
@@ -53,9 +53,9 @@ async function run(message: Message, input: [string, string]): Promise<any> {
         if (!content && !links){
             return;
         }
-        const prefix = await gb.instance.database.getPrefix(message.guild.id);
+        const prefix = await gb.database.getPrefix(message.guild.id);
 
-        const macro: Partial<Macro>|undefined = await gb.instance.database.addMacro(message, macroName, content, links);
+        const macro: Partial<Macro>|undefined = await gb.database.addMacro(message, macroName, content, links);
         if (macro){
             return safeSendMessage(message.channel, successEmbed(message.member, `Macro **${prefix}${macroName}** saved.`));
         }

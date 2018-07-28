@@ -6,7 +6,7 @@ import {
     UpdateResult
 } from 'typeorm'
 import {IORMConfig} from "./ormconfig.interface";
-import gb from "../misc/Globals";
+import {gb} from "../misc/Globals";
 import {Environments} from "../events/systemStartup";
 import {debug} from "../utility/Logging";
 import {User} from "./models/user";
@@ -45,15 +45,15 @@ export class Database {
     constructor() {
         this.env = gb.ENV;
         debug.info(`Logging into postgres in ${this.env === Environments.Development ? 'dev' : 'live'} mode.`, `Database`);
-        const connString: string | undefined = process.env['POSTGRES_URL'] || process.env['DATABASE_URL'];
+        const connString: string | undefined = process.env['DATABASE_URL'] || process.env['POSTGRES_URL'];
         if (!connString){
             const error: Error = new Error(
-                "Missing 'POSTGRES_URL' or 'DATABASE_URL' environment variable " +
+                "Missing 'POSTGRES_URL' or 'DATABASE_URL' environment variable, " +
                 "this bot cannot run without a postgres connection. Make sure you've properly " +
                 "configured your environment variables or set up a .env file with the required info."
             );
-            handleFatalErrorGracefully(error);
-            return;
+            debug.error(error);
+            return process.exit(1);
         }
         this.connect(connString).then(conn => {
             debug.info(`Logged into postgres`, `Database`);
@@ -134,7 +134,7 @@ export class Database {
      */
     public async sync(): Promise<void> {
         debug.silly(`Crosschecking database`, `Database`);
-        const guilds = gb.instance.bot.guilds.array();
+        const guilds = gb.bot.guilds.array();
         for (let i in guilds) {
             const guild = guilds[i];
             // setting each server

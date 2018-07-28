@@ -1,14 +1,14 @@
 import {Channel, RichEmbed, TextChannel} from "discord.js";
 import lavenshteinDistance from "../../utility/LavenshteinDistance";
 import ReactionManager from "../../handlers/internal/reactions/reactionManager";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import {Command} from "../../handlers/commands/Command";
 
 export default async function commandNotFoundEmbed(channel: Channel, commandName: string, pool?: string[]){
     if (!(channel instanceof TextChannel)){
         throw new Error('Can only send embeds to a channel');
     }
-    const commands = gb.instance.commandHandler.commands;
+    const commands = gb.commandHandler.commands;
     if (pool){
         pool = commands.map((c:Command)=> c.names[0]).concat(pool)
     }
@@ -38,7 +38,7 @@ export default async function commandNotFoundEmbed(channel: Channel, commandName
     const embed = new RichEmbed()
         .addField(reaction, didYouMean)
         .setColor('#ffdd51')
-        .setFooter(`=> ${await gb.instance.database.getPrefix(channel.guild.id)}hints off <= to disable hints`);
+        .setFooter(`=> ${await gb.database.getPrefix(channel.guild.id)}hints off <= to disable hints`);
 
     if (await ReactionManager.canSendReactions(channel.guild.id)){
         embed.setThumbnail(image);

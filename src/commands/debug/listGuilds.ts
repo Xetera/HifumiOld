@@ -1,14 +1,14 @@
 import {Message} from "discord.js";
 import {codeBlock} from "../../utility/Markdown";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../decorators/expects";
 import {UserPermissions} from "../../handlers/commands/command.interface";
 
 async function run(message: Message): Promise<any> {
-    const guilds = await gb.instance.database.getGuilds();
+    const guilds = await gb.database.getGuilds();
     const rows = guilds.map(g => {
-        const guild = gb.instance.bot.guilds.get(g.id);
+        const guild = gb.bot.guilds.get(g.id);
         if (!guild) {
             return `GUILD [${g.id}] MISSING`
         }

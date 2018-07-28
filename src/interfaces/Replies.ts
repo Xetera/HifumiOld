@@ -1,7 +1,7 @@
 import {random} from "../utility/Util";
 import getInvite from "../commands/DM/getInvite";
 import {GuildMember} from "discord.js";
-import gb from "../misc/Globals";
+import {gb} from "../misc/Globals";
 
 export const adminOnlyCommand : string = 'This command is only available to admins.';
 

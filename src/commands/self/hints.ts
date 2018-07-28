@@ -1,5 +1,5 @@
 import {Message} from "discord.js";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../decorators/expects";
 import {UserPermissions} from "../../handlers/commands/command.interface";
@@ -10,7 +10,7 @@ import {randomRuntimeError} from "../../interfaces/Replies";
 export async function hints(message: Message, input: [boolean]){
     const [state] = input;
     try {
-        await gb.instance.database.setCommandHints(message.guild.id, state);
+        await gb.database.setCommandHints(message.guild.id, state);
     }
     catch (err) {
         return safeSendMessage(message.channel, randomRuntimeError());

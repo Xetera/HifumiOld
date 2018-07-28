@@ -1,6 +1,6 @@
 import { GuildMember, Message} from "discord.js";
 import {debug} from "../../../utility/Logging";
-import gb from "../../../misc/Globals";
+import {gb} from "../../../misc/Globals";
 import {Infraction} from "../../../database/models/infraction";
 import {
     InfractionRejectionReason,
@@ -43,7 +43,7 @@ export default class InfractionHandler {
      * @returns {Promise<number>} - Max strike limit of the target guild
      */
     private static async memberCanInfract(member: GuildMember, target: GuildMember, weight: number): Promise<number> {
-        const infractionLimit = await gb.instance.database.getInfractionLimit(member.guild.id);
+        const infractionLimit = await gb.database.getInfractionLimit(member.guild.id);
 
         if (!member.hasPermission('BAN_MEMBERS')){
             debug.silly(`User ${member.user.username} cannot infract members, missing mod.`);
@@ -96,7 +96,7 @@ export default class InfractionHandler {
      */
     public async addInfraction(message: Message, staff: GuildMember, target: GuildMember, reason: string, weight: number): Promise<boolean> {
         return InfractionHandler.memberCanInfract(staff, target, weight).then(async(infractionLimit: number) => {
-            const currentUserStrikes: Infraction[] = await gb.instance.database.getInfractions(target.guild.id, target.id);
+            const currentUserStrikes: Infraction[] = await gb.database.getInfractions(target.guild.id, target.id);
             const activeInfractions = this.getActiveInfractions(currentUserStrikes);
             const currentWeight = activeInfractions.reduce((total, inf) => total + inf.infraction_weight, 0);
 
@@ -115,12 +115,12 @@ export default class InfractionHandler {
                 isBan = true;
             }
 
-            return Promise.all([gb.instance.database.addInfraction(staff, target, reason, weight), staff, target, infractionLimit, isBan, currentWeight]);
+            return Promise.all([gb.database.addInfraction(staff, target, reason, weight), staff, target, infractionLimit, isBan, currentWeight]);
         }).then(async(r: [Partial<Infraction>, GuildMember, GuildMember, number, boolean, number]) => {
             const [response, staff, target, strikeLimit, isBan, currentWeight] = r;
 
             if (isBan && target.bannable){
-                const infractions: Infraction[] = await gb.instance.database.getInfractions(target.guild.id);
+                const infractions: Infraction[] = await gb.database.getInfractions(target.guild.id);
                 const currentIndex = infractions.findIndex(i => i.infraction_id === response.infraction_id);
                 const currentInfraction = infractions.splice(currentIndex, 1)[0];
                 const embed = banByInfractionDMEmbed(target, currentInfraction, infractions);

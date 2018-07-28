@@ -1,6 +1,6 @@
 import {Message, TextChannel} from "discord.js";
 import {handleFailedCommand} from "../../../embeds/commands/commandExceptionEmbed";
-import gb from "../../../misc/Globals";
+import {gb} from "../../../misc/Globals";
 import {LoggingChannelType} from "../../../database/models/guild";
 import safeSendMessage from "../../../handlers/safe/SafeSendMessage";
 
@@ -96,7 +96,7 @@ export default function logs(message: Message, input: [string, (TextChannel | bo
 
     // @ts-ignore
     // Typescript isn't a big fan of spread used in arguments
-    gb.instance.database.changeSpecificLoggingChannel(...args).then(() => {
+    gb.database.changeSpecificLoggingChannel(...args).then(() => {
         safeSendMessage(message.channel, `Changed ${setting} settings.`)
     })
 

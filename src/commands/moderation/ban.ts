@@ -7,7 +7,7 @@ import successEmbed from "../../embeds/commands/successEmbed";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {PermissionUtils} from "../../utility/permissionUtils";
 import resolveBooleanUncertainty from "../../resolvers/resolveBooleanUncertainty";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 
 async function run(message: Message, input: [GuildMember, (string | undefined)]): Promise<any> {
     const [member, reason] = input;
@@ -35,7 +35,7 @@ async function run(message: Message, input: [GuildMember, (string | undefined)])
             `I cannot ban this person.`
         );
     }
-    const infractions = await gb.instance.database.getInfractions(message.guild.id, message.member.id);
+    const infractions = await gb.database.getInfractions(message.guild.id, message.member.id);
 
     const yes = await resolveBooleanUncertainty(message, `This member has **${infractions.length}** warnings on record.`, 15);
 

@@ -5,7 +5,7 @@ import Timer = NodeJS.Timer;
 import { debug} from "../utility/Logging";
 import moment = require("moment");
 import muteUser from "../actions/punishments/MuteUser";
-import gb from "../misc/Globals";
+import {gb} from "../misc/Globals";
 import {formattedTimeString} from "../utility/Util";
 import {Offense} from "./interfaces";
 import unmuteDMEmbed from "../embeds/moderation/unmuteDMEmbed";
@@ -62,7 +62,7 @@ export class MuteQueue {
     private sortGuild(guildId: string){
         const arr: MutedMember[] | undefined = this.queue.get(guildId);
         if (!arr){
-            const guild = gb.instance.bot.guilds.get(guildId);
+            const guild = gb.bot.guilds.get(guildId);
             debug.error(`Tried to sort a guild not registered in the muteQueue\nName:${guild ? guild.name: 'unknown guild'}`);
             return;
         }
@@ -88,7 +88,7 @@ export class MuteQueue {
         let guild : MutedMember[] | undefined = this.queue.get(member.guild.id);
 
         let role: Discord.Role | undefined;
-        const savedRoleId = await gb.instance.database.getMuteRole(member.guild.id);
+        const savedRoleId = await gb.database.getMuteRole(member.guild.id);
         if (savedRoleId){
             role = member.guild.roles.get(savedRoleId);
         }
@@ -131,8 +131,8 @@ export class MuteQueue {
             if (guild!.length > 1)
                 this.sortGuild(member.guild.id);
             if (result){
-                gb.instance.messageQueue.removeUsersRecentMessages(member);
-                gb.instance.database.addMutedUser(member.guild.id, member.id, unmuteDate);
+                gb.messageQueue.removeUsersRecentMessages(member);
+                gb.database.addMutedUser(member.guild.id, member.id, unmuteDate);
                 this.scheduleUnmute(member, reason, duration);
                 return true;
             }

@@ -1,5 +1,5 @@
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import {Guild} from "../../database/models/guild";
 import {debug} from "../../utility/Logging";
 import {Message} from 'discord.js'
@@ -14,7 +14,7 @@ export default async function setPrefix(message: Message, input: [string]){
         return handleFailedCommand(message.channel, `Only single character prefixes are supported right now.`);
 
     try {
-        const res: Partial<Guild> = await gb.instance.database.setPrefix(message.guild.id, prefix);
+        const res: Partial<Guild> = await gb.database.setPrefix(message.guild.id, prefix);
         safeSendMessage(message.channel, 'Prefix changed to ' + res.prefix);
     }
     catch(err) {

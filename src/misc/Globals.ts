@@ -9,19 +9,25 @@ import {Message} from "discord.js";
 import Tracklist from "../moderation/Tracklist";
 
 export type emojiName = string;
-interface Globals {
+interface Globals extends Instance {
     ownerID: string;
     emojiGuild: Discord.Guild;
     ENV: Environments;
     allMembers: number;
     emojis: Map<emojiName, Discord.Emoji>;
-    instance: Instance;
     sleeping: boolean;
+    bot: Discord.Client,
+    hifumi: Cleverbot,
+    muteQueue: MuteQueue,
+    messageQueue: MessageQueue,
+    database : Database,
+    commandHandler:CommandHandler,
+    trackList: Tracklist,
 }
 
 export interface Instance {
     bot: Discord.Client,
-    alexa: Cleverbot,
+    hifumi: Cleverbot,
     muteQueue: MuteQueue,
     messageQueue: MessageQueue,
     database : Database,
@@ -31,7 +37,6 @@ export interface Instance {
     eval(message: Message, x : any): any
 }
 
-let gb : Globals = <Globals>{
+export let gb : Globals = <Globals>{
     sleeping: false
 };
-export default gb;

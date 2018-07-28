@@ -1,4 +1,4 @@
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import {Message, MessageReaction, ReactionCollector, User} from "discord.js";
 import {Suggestion} from "../../database/models/suggestion";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
@@ -14,8 +14,8 @@ async function run(message: Message): Promise<any> {
     let index = 0;
     let end = false;
 
-    const prefix = await gb.instance.database.getPrefix(message.guild.id);
-    const suggestions: Suggestion[] = await gb.instance.database.getPendingSuggestions(message.guild.id);
+    const prefix = await gb.database.getPrefix(message.guild.id);
+    const suggestions: Suggestion[] = await gb.database.getPendingSuggestions(message.guild.id);
     const embed = await getSuggestionEmbed(message, suggestions, index, prefix);
     const suggestionMenu = <Message> await safeSendMessage(message.channel, embed);
 

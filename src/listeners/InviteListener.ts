@@ -2,7 +2,7 @@ import {Message} from 'discord.js'
 import {discordInviteRegex} from "./Regex";
 import {debug} from '../events/onMessage'
 import {securityLevel, SecurityLevels} from "../utility/Settings";
-import gb from "../misc/Globals";
+import {gb} from "../misc/Globals";
 import deleteInvite from "../moderation/InviteRemover";
 
 export default async function inviteListener(message: Message){
@@ -13,7 +13,7 @@ export default async function inviteListener(message: Message){
         || securityLevel === SecurityLevels.Dangerous
         || message.member.hasPermission('BAN_MEMBERS')
         || message.author.id === gb.ownerID
-        || await gb.instance.database.getAllowGuildInvites(message.guild.id)) {
+        || await gb.database.getAllowGuildInvites(message.guild.id)) {
         return;
     }
 

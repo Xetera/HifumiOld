@@ -4,7 +4,7 @@ import Anime from "../../API/anime";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {randomRuntimeError} from "../../interfaces/Replies";
 import {debug} from "../../utility/Logging";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import {random} from "../../utility/Util";
 import {Command} from "../../handlers/commands/Command";
 
@@ -40,6 +40,7 @@ export const command: Command = new Command(
         examples: ['{{prefix}}anime New Game!', '{{prefix}}anime Zero no Tsukaima'],
         category: 'Fun',
         expects: [{type: ArgType.Message}],
-        run: run
+        run: run,
+        dependsOn: ['ANILIST_CLIENT_ID', 'ANILIST_CLIENT_SECRET']
     }
 );

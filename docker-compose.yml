@@ -9,7 +9,7 @@ services:
     - redis
     environment:
       - ENV=DEVELOPMENT
-      - DATABASE_URL=postgres://postgres:@host.docker.internal:5432/discord
+      - DATABASE_URL=postgres://postgres:@host.docker.internal:5432/discord_test
       - REDISCLOUD_URL=redis://host.docker.internal:6379
     depends_on:
       - "postgres"
@@ -21,6 +21,6 @@ services:
     image: postgres:10.3
     restart: always
     environment:
-      - POSTGRES_DB=discord
+      - POSTGRES_DB=discord_test
       - POSTGRES_USER=hifumi
       - POSTGRES_PASSWORD=eagle_jump

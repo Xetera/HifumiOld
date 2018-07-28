@@ -1,7 +1,7 @@
 import * as Discord from "discord.js";
 import {random} from "../utility/Util";
 import {welcomeMessages} from "../interfaces/Replies";
-import {default as gb} from "../misc/Globals";
+import {gb} from "../misc/Globals";
 import {Channel, GuildMember, Message, TextChannel} from "discord.js";
 import {LogManager} from "../handlers/logging/logManager";
 import {debug} from "../utility/Logging";
@@ -10,17 +10,17 @@ import {TemplatedMessage} from "../parsers/parsers.interface";
 import templateParser from "../parsers/templateParser";
 
 export default async function onGuildMemberAdd(member : Discord.GuildMember): Promise<void> {
-    if (!gb.instance.database.ready
+    if (!gb.database.ready
         || gb.sleeping
         || member.user.bot
-        || !await gb.instance.database.getGuildEnabled(member.guild.id)
+        || !await gb.database.getGuildEnabled(member.guild.id)
         || !member.guild.available){
         return
     }
 
-    const database = gb.instance.database;
+    const database = gb.database;
     await database.addMember(member);
-    await gb.instance.trackList.add(member);
+    await gb.trackList.add(member);
 
     // we will change this later to fetch from a Database instead of using a preset name
     const [welcomeChannelId, customMessage] = await Promise.all([
@@ -84,6 +84,6 @@ function sendEmbed(channel: TextChannel, member: GuildMember, welcomeMessage?: s
             welcomeMessage.react(kanna_wave);
         else
             debug.error('Could not react to new user joining with kanna_wave');
-        gb.instance.database.cacheWelcomeMessage(member, welcomeMessage);
+        gb.database.cacheWelcomeMessage(member, welcomeMessage);
     });
 }

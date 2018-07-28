@@ -2,7 +2,7 @@ import {Message} from "discord.js";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {randomRuntimeError} from "../../interfaces/Replies";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 
 export default async function setInviteBan(message: Message, input: [number]){
     const [limit] = input;
@@ -13,7 +13,7 @@ export default async function setInviteBan(message: Message, input: [number]){
         );
     }
 
-    const warnLimit = await gb.instance.database.getInviteWarnThreshold(message.guild.id);
+    const warnLimit = await gb.database.getInviteWarnThreshold(message.guild.id);
     if (limit < warnLimit){
         return void handleFailedCommand(
             message.channel, `Your current invite warning limit is ${warnLimit}, I can't ban members before warning them`
@@ -21,7 +21,7 @@ export default async function setInviteBan(message: Message, input: [number]){
     }
 
     try {
-        await gb.instance.database.setInviteBanThreshold(message.guild.id, limit);
+        await gb.database.setInviteBanThreshold(message.guild.id, limit);
     }
     catch {
         safeSendMessage(message.channel, randomRuntimeError())

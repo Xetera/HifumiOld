@@ -1,4 +1,4 @@
-import gb from "../../../misc/Globals";
+import {gb} from "../../../misc/Globals";
 
 export default class ReactionManager /* extends Singleton */{
     private static _instance: ReactionManager;
@@ -62,7 +62,7 @@ export default class ReactionManager /* extends Singleton */{
     }
 
     public static async canSendReactions(guildId: string): Promise<boolean>{
-        return gb.instance.database.getReactions(guildId);
+        return gb.database.getReactions(guildId);
     }
 
 

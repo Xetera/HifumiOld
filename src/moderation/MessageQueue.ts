@@ -8,7 +8,7 @@ import {
 import {debug} from '../utility/Logging'
 import {Database} from "../database/Database";
 import Tracklist from "./Tracklist";
-import gb from "../misc/Globals";
+import {gb} from "../misc/Globals";
 import {Offense} from "./interfaces";
 import { GuildMember,} from "discord.js";
 import safeBulkDelete from "../handlers/safe/safeBulkDelete";
@@ -67,12 +67,12 @@ export class MessageQueue {
 
         if (isUserSpamming){
             // checking if the user is new before punishing
-            const spamFilter = await gb.instance.database.getSpamFilter(member.guild.id);
+            const spamFilter = await gb.database.getSpamFilter(member.guild.id);
             if (!spamFilter){
                 return;
             }
-            const watchlist = gb.instance.trackList;
-            if (watchlist.isNewMember(member) && await gb.instance.database.getTrackNewMembers(member.guild.id)){
+            const watchlist = gb.trackList;
+            if (watchlist.isNewMember(member) && await gb.database.getTrackNewMembers(member.guild.id)){
                 return watchlist.punishNewMember(member, Offense.Spam);
             }
 

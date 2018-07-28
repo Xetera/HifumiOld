@@ -1,7 +1,7 @@
 import {Message} from "discord.js";
 import {debug} from '../../utility/Logging'
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
-import gb from "../../misc/Globals";
+import {gb} from "../../misc/Globals";
 import {Guild} from "../../database/models/guild";
 import getSettingsEmbed from "../../embeds/commands/configEmbed/getConfig";
 import setPrefix from "./SetPrefix";
@@ -24,7 +24,7 @@ export default async function settings(message : Message, input: [(string | unde
     const [setting, choice] = input;
 
     const guild = message.guild;
-    const cache: Guild = await gb.instance.database.getGuild(guild.id);
+    const cache: Guild = await gb.database.getGuild(guild.id);
 
     if (!cache) {
         debug.error(`Guild ${guild.name} was not found in cache.`, `getConfig`);

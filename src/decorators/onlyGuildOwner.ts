@@ -1,5 +1,5 @@
 import * as Discord from "discord.js";
-import gb from "../misc/Globals";
+import {gb} from "../misc/Globals";
 import missingGuildOwnerEmbed from "../embeds/permissions/missingGuildOwnerEmbed";
 
 export default function onlyGuildOwner(target : any, key: any , descriptor: any) {
