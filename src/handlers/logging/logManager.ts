@@ -1,19 +1,16 @@
 import {
     Channel,
-    DiscordAPIError,
     Guild,
     GuildAuditLogs, GuildAuditLogsActions,
     GuildAuditLogsEntry,
     GuildMember,
     Message,
-    Permissions,
     RichEmbed,
     TextChannel,
     User,
     VoiceChannel
 } from "discord.js";
-import {debug, log} from "../../utility/Logging";
-import muteDMEmbed from "../../embeds/moderation/muteDMEmbed";
+import {debug} from "../../utility/Logging";
 import logMutedEmbed from "../../embeds/logging/logMuteEmbed";
 import gb from "../../misc/Globals";
 import logBanEmbed from "../../embeds/logging/logBanEmbed";
@@ -28,13 +25,10 @@ import logWatchlistInviteBanEmbed from "../../embeds/logging/tracklist/logTrackl
 import logEveryonePingEmbed from "../../embeds/logging/warnings/logEveryonePingEmbed";
 import logMentionSpamEmbed from "../../embeds/logging/warnings/logMentionSpamEmbed";
 import logCommandExecutionEmbed from "../../embeds/logging/logCommandExecutionEmbed";
-import {APIErrors} from "../../interfaces/Errors";
 import safeSendMessage from "../safe/SafeSendMessage";
 import logInviteMessageEmbed from "../../embeds/logging/logInviteMessageEmbed";
 import logEditedInviteMessageEmbed from "../../embeds/logging/logEditedInviteMessageEmbed";
-import {Suggestion} from "../../database/models/suggestion";
 import logNewSuggestionEmbed from "../../embeds/logging/suggestions/logNewSuggestionEmbed";
-import {defaultCoreCipherList} from "constants";
 
 enum LogAction {
     JOIN = 'join',

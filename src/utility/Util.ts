@@ -1,15 +1,12 @@
 import {
     CategoryChannel,
     Channel, Collection,
-    DiscordAPIError,
-    Guild,
     GuildMember, Invite,
     Message, PermissionOverwrites,
     PermissionResolvable,
     Permissions, Role, TextChannel
 } from "discord.js";
-import {debug} from "../events/onMessage";
-import {discordInviteRegex, emojiRegex, urlRegex} from "../listeners/Regex";
+import { emojiRegex, urlRegex} from "../listeners/Regex";
 
 
 /**

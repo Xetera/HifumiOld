@@ -1,8 +1,6 @@
 import resolveNumberedUncertainty from "./resolveNumberedUncertainty";
-import conflictOnChannelResolveEmbed from "../embeds/resolvers/conflictOnChannelResolveEmbed";
 import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
-import {DMChannel, Message, MessageMentions, Role, TextChannel, VoiceChannel} from "discord.js";
-import {AllChannelTypes} from "../decorators/expects";
+import { Message, MessageMentions, Role} from "discord.js";
 import conflictOnRoleResolveEmbed from "../embeds/resolvers/conflictOnRoleResolveEmbed";
 
 export default async function roleResolver(message: Message, arg: string) {

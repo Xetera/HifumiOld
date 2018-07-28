@@ -16,10 +16,6 @@ import {debug} from "../../utility/Logging";
 import gb from "../../misc/Globals";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 
-interface IRoleCoverage{
-    override: Map<Role, TextChannel[]>;
-    missing: TextChannel[];
-}
 export default function identifyMuteRole(message: Message){
     const chnls: Collection<string, GuildChannel> = message.guild.channels;
 
@@ -27,7 +23,7 @@ export default function identifyMuteRole(message: Message){
     const channels: TextChannel[] = chnls.array().filter(channel => channel.type === 'text');
 
     const sendMessagePerms = Permissions.resolve('SEND_MESSAGES'); // 2048
-    let missingPermissions: TextChannel[] = [];
+    //let missingPermissions: TextChannel[] = [];
 
     const total = channels.reduce((obj:{override: Map<Role, TextChannel[]>, missing: TextChannel[]}, channel: TextChannel ) => {
         const permissionArray =  channel.permissionOverwrites.array();
@@ -146,7 +142,7 @@ export async function muteCoverage(message: Message){
     const channels: TextChannel[] = chnls.array().filter(channel => channel.type === 'text');
 
     const sendMessagePerms = Permissions.resolve('SEND_MESSAGES'); // 2048
-    let missingPermissions: TextChannel[] = [];
+    //let missingPermissions: TextChannel[] = [];
 
     const total = channels.reduce((obj:{override: Map<Role, TextChannel[]>, missing: TextChannel[]}, channel: TextChannel ) => {
         const permissionArray =  channel.permissionOverwrites.array();

@@ -1,8 +1,5 @@
 import * as Discord from 'discord.js'
-import {Database} from "../database/Database";
-import * as dbg from "debug";
-import {default as gb, Instance} from "../misc/Globals";
-import {TextChannel} from "discord.js";
+import {default as gb} from "../misc/Globals";
 import {debug} from "../utility/Logging";
 
 

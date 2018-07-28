@@ -1,5 +1,4 @@
 import {MigrationInterface, QueryRunner, Table, TableColumn, TableForeignKey} from "typeorm";
-import {User} from "../models/user";
 
 export class inviteBanPatch1524432864181 implements MigrationInterface {
 

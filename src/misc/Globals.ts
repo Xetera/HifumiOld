@@ -4,10 +4,9 @@ import {MuteQueue} from "../moderation/MuteQueue";
 import {MessageQueue} from "../moderation/MessageQueue";
 import {Database} from "../database/Database";
 import {Environments} from "../events/systemStartup";
-import CommandHandler, {CommandParameters} from "../handlers/commands/CommandHandler";
-import {Message, Snowflake} from "discord.js";
+import CommandHandler  from "../handlers/commands/CommandHandler";
+import {Message} from "discord.js";
 import Tracklist from "../moderation/Tracklist";
-import {LogManager} from "../handlers/logging/logManager";
 
 export type emojiName = string;
 interface Globals {

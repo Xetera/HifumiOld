@@ -1,17 +1,13 @@
 import * as Discord from "discord.js";
-import * as dbg from "debug";
 import {random} from "../utility/Util";
 import {welcomeMessages} from "../interfaces/Replies";
-import {Database} from "../database/Database";
-import {default as gb, Instance} from "../misc/Globals";
+import {default as gb} from "../misc/Globals";
 import {Channel, GuildMember, Message, TextChannel} from "discord.js";
 import {LogManager} from "../handlers/logging/logManager";
 import {debug} from "../utility/Logging";
 import guildMemberAddEmbed from "../embeds/events/onGuildMemberAddEmbed";
 import {TemplatedMessage} from "../parsers/parsers.interface";
-import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import templateParser from "../parsers/templateParser";
-import safeSendMessage from "../handlers/safe/SafeSendMessage";
 
 export default async function onGuildMemberAdd(member : Discord.GuildMember): Promise<void> {
     if (!gb.instance.database.ready

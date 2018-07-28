@@ -1,10 +1,5 @@
-import {ArgOptions, ArgType, DecoratorReturnSignature} from "./expects";
-import {register} from "../handlers/commands/registry";
-import {Message, PermissionResolvable, Permissions} from "discord.js";
-import gb from "../misc/Globals";
-import missingAdminEmbed from "../embeds/permissions/missingAdminEmbed";
+import {Message, PermissionResolvable} from "discord.js";
 import safeSendMessage from "../handlers/safe/SafeSendMessage";
-import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import missingSelfPermission from "../embeds/permissions/missingSelfPermission";
 
 export function requires(permission: PermissionResolvable | PermissionResolvable[]) {

@@ -1,4 +1,4 @@
-import {Message, Permissions, Role} from "discord.js";
+import {Message, Role} from "discord.js";
 import {checkMuteCoverage, checkMuteRoleExisting} from "./checkChannelPermissions";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {noMissingMuteOverwritesEmbed} from "../../embeds/commands/configEmbed/channelPermissionsCalculatorEmbed";

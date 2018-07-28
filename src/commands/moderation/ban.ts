@@ -7,7 +7,6 @@ import successEmbed from "../../embeds/commands/successEmbed";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {PermissionUtils} from "../../utility/permissionUtils";
 import resolveBooleanUncertainty from "../../resolvers/resolveBooleanUncertainty";
-import areYouSureEmbed from "../../embeds/commands/areYouSureEmbed";
 import gb from "../../misc/Globals";
 
 async function run(message: Message, input: [GuildMember, (string | undefined)]): Promise<any> {

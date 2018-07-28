@@ -6,7 +6,7 @@ import {MuteQueue} from "../../moderation/MuteQueue";
 import {MessageQueue} from "../../moderation/MessageQueue";
 import commandNotFoundEmbed from "../../embeds/commands/commandNotFoundEmbed";
 import {Macro} from "../../database/models/macro";
-import {ArgOptions, ArgType} from "../../decorators/expects";
+import {ArgOptions} from "../../decorators/expects";
 import argParse from "../../parsers/argParse";
 import {LogManager} from "../logging/logManager";
 import safeDeleteMessage from "../safe/SafeDeleteMessage";

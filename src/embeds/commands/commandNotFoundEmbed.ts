@@ -1,10 +1,8 @@
 import {Channel, RichEmbed, TextChannel} from "discord.js";
 import lavenshteinDistance from "../../utility/LavenshteinDistance";
-import {Help} from "../../commands/info/help/help.interface";
 import ReactionManager from "../../handlers/internal/reactions/reactionManager";
 import gb from "../../misc/Globals";
 import {Command} from "../../handlers/commands/Command";
-const help: Help = require('../../commands/help.json');
 
 export default async function commandNotFoundEmbed(channel: Channel, commandName: string, pool?: string[]){
     if (!(channel instanceof TextChannel)){

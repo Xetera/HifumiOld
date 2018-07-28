@@ -1,4 +1,4 @@
-import axios, {AxiosResponse} from "axios";
+import{AxiosResponse} from "axios";
 
 export async function isMedia(r: AxiosResponse) {
     try {

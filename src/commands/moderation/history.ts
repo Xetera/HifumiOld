@@ -1,4 +1,4 @@
-import {GuildMember, Message, Permissions, TextChannel, User} from "discord.js";
+import {GuildMember, Message} from "discord.js";
 import gb from "../../misc/Globals";
 import historyEmbed from "../../embeds/commands/historyEmbed";
 import {debug} from "../../utility/Logging";

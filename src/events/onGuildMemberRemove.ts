@@ -1,7 +1,6 @@
 import * as Discord from "discord.js";
-import * as dbg from "debug";
 import gb from "../misc/Globals";
-import {GuildAuditLogs, Message} from "discord.js";
+import { Message} from "discord.js";
 import safeDeleteMessage from "../handlers/safe/SafeDeleteMessage";
 import {LogManager} from "../handlers/logging/logManager";
 import {debug} from "../utility/Logging";

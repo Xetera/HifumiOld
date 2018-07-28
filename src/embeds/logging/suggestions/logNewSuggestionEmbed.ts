@@ -1,6 +1,5 @@
 import gb from "../../../misc/Globals";
 import {GuildMember, RichEmbed} from "discord.js";
-import {Suggestion} from "../../../database/models/suggestion";
 
 export default async function logNewSuggestionEmbed(member: GuildMember){
     const prefix = await gb.instance.database.getPrefix(member.guild.id);

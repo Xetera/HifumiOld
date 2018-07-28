@@ -4,7 +4,7 @@ import gb from "../../misc/Globals";
 import {Help} from "../info/help/help.interface";
 import {debug} from "../../utility/Logging";
 import {Macro} from "../../database/models/macro";
-import {buildMacro, parseMacro} from "../../parsers/parseMacro";
+import { parseMacro} from "../../parsers/parseMacro";
 import {urlRegex} from "../../listeners/Regex";
 const help: Help = require('../../commands/help.json');
 import {Command} from "../../handlers/commands/Command";

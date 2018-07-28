@@ -1,15 +1,10 @@
 import {
     Channel,
-    Collection, DMChannel,
-    Guild,
-    GuildMember,
     Message,
     MessageMentions,
     TextChannel,
-    User,
     VoiceChannel
 } from "discord.js";
-import {debug} from "../utility/Logging";
 import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import conflictOnChannelResolveEmbed from "../embeds/resolvers/conflictOnChannelResolveEmbed";
 import {AllChannelTypes} from "../decorators/expects";

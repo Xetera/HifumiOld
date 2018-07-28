@@ -1,6 +1,4 @@
-import {GuildMember, Role} from "discord.js";
-import {subtractArrays} from "../utility/Util";
-import gb from "../misc/Globals";
+import {GuildMember} from "discord.js";
 
 /**
  *

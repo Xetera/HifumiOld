@@ -1,6 +1,6 @@
 import {RichEmbed} from "discord.js";
 import {ICharacter, IVoiceActor} from "../../../../API/anime.interface";
-import {emptySpace, normalizeString, StringUtils} from "../../../../utility/Util";
+import { normalizeString, StringUtils} from "../../../../utility/Util";
 import {AnimeUtils} from "../../../../utility/animeUtils";
 
 export default function getCharacterEmbed(character: ICharacter, VA?: IVoiceActor){

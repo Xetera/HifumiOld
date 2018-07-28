@@ -1,4 +1,4 @@
-import {Channel, Message, TextChannel} from "discord.js";
+import { Message, TextChannel} from "discord.js";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import gb from "../../misc/Globals";
 import setConfigChannelEmbed from "../../embeds/commands/configEmbed/setConfigChannelEmbed";
@@ -9,7 +9,6 @@ import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../decorators/expects";
 import {UserPermissions} from "../../handlers/commands/command.interface";
 import successEmbed from "../../embeds/commands/successEmbed";
-import guildMemberAddEmbed from "../../embeds/events/onGuildMemberAddEmbed";
 
 async function setChatChannel(message: Message, channel: TextChannel) {
     try {

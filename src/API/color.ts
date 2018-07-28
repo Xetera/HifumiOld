@@ -1,6 +1,5 @@
-import Anime from "./anime";
 import axios, {AxiosResponse} from 'axios'
-import {ColorFractions, ColorResponse} from "./color.interface";
+import { ColorResponse} from "./color.interface";
 import {RichEmbed} from "discord.js";
 export default class Color {
     private static endpoint = 'http://www.thecolorapi.com/id?hex=';

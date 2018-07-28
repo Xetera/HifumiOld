@@ -1,5 +1,5 @@
 import * as Discord from 'discord.js'
-import {DiscordAPIError, DMChannel, Message, MessageOptions, RichEmbed, VoiceChannel} from "discord.js";
+import {DiscordAPIError, Message, MessageOptions, RichEmbed, VoiceChannel} from "discord.js";
 import {APIErrors} from "../../interfaces/Errors";
 import {debug} from '../../utility/Logging'
 import safeDeleteMessage from "./SafeDeleteMessage";

@@ -1,4 +1,4 @@
-import {GuildMember, RichEmbed, User} from "discord.js";
+import { RichEmbed, User} from "discord.js";
 
 export default function logTracklistSpamBanEmbed(user: User): RichEmbed{
     return new RichEmbed()

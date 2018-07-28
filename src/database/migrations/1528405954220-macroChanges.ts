@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner, Table, TableColumn} from "typeorm";
+import {MigrationInterface, QueryRunner, TableColumn} from "typeorm";
 import {Macro} from "../models/macro";
 import {parseMacro} from "../../parsers/parseMacro";
 

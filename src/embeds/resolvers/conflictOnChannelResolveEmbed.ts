@@ -1,4 +1,4 @@
-import {Channel, GuildMember, RichEmbed, TextChannel, VoiceChannel} from "discord.js";
+import {RichEmbed, TextChannel, VoiceChannel} from "discord.js";
 import ReactionManager from "../../handlers/internal/reactions/reactionManager";
 
 export default async function conflictOnChannelResolveEmbed(channels: TextChannel[] & VoiceChannel[], identifier: string){

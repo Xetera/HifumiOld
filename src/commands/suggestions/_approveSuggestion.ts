@@ -5,7 +5,6 @@ import {UpdateResult} from "typeorm";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import {debug} from "../../utility/Logging";
 import suggestionEmbed from "../../embeds/commands/suggestions/suggestionEmbed";
-import {Suggestion} from "../../database/models/suggestion";
 
 export default async function approveSuggestion(message: Message, input: [string]){
     const [id] = input;

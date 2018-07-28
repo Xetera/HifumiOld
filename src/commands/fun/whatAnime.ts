@@ -1,9 +1,9 @@
-import {Message, TextChannel} from 'discord.js'
+import {Message} from 'discord.js'
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../decorators/expects";
 import Anime from "../../API/anime";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
-import {getPastMessagesReverse, getUrlExtension, random, StringUtils} from "../../utility/Util";
+import { getUrlExtension, StringUtils} from "../../utility/Util";
 import {urlRegex} from "../../listeners/Regex";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import whatAnimePlaceholder from "../../embeds/commands/fun/anime/whatAnimePlaceholder";

@@ -2,9 +2,7 @@ import safeMessageUser from "./SafeMessageUser";
 import {DiscordAPIError, GuildMember, RichEmbed} from "discord.js";
 import {debug} from "../../actions/Actions";
 import {APIErrors} from "../../interfaces/Errors";
-import {log} from "../../utility/Logging";
 import {getOnBanMessageSnipeCount} from "../../utility/Settings";
-import {LogManager} from "../logging/logManager";
 import gb from "../../misc/Globals";
 
 export default async function safeBanUser(member : GuildMember, reason: string, banMessage?: string|RichEmbed) : Promise<void>{

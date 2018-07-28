@@ -1,4 +1,4 @@
-import {Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, OneToMany, JoinTable} from "typeorm";
+import {Entity, Column, PrimaryColumn} from "typeorm";
 import 'reflect-metadata';
 
 export enum LoggingChannelType{

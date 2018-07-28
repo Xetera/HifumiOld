@@ -1,8 +1,7 @@
 import {TemplatedMessage} from "../../parsers/parsers.interface";
 import templateParser from "../../parsers/templateParser";
-import {Channel, ColorResolvable, Message, RichEmbed} from "discord.js";
+import { Message, RichEmbed} from "discord.js";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
-import safeSendMessage from "../safe/SafeSendMessage";
 import gb from "../../misc/Globals";
 
 enum IEmbedBuilderErrors {
@@ -35,14 +34,14 @@ export default class EmbedBuilder {
         return values;
     };
 
-    private checkValidColor(color: string){
-        const int = Number(color);
-
-        return Number.isInteger(int) || (['AQUA' ,'GREEN' ,'BLUE' ,'PURPLE' ,'GOLD' ,'ORANGE' ,'RED'
-        ,'GREY' ,'DARKER_GREY' ,'NAVY' ,'DARK_AQUA' ,'DARK_GREEN' ,'DARK_BLUE'
-        ,'DARK_PURPLE' ,'DARK_GOLD' ,'DARK_ORANGE' ,'DARK_RED' ,'DARK_GREY' ,'LIGHT_GREY'
-        ,'DARK_NAVY' ,'RANDOM'].includes(color));
-    }
+    // private checkValidColor(color: string){
+    //     const int = Number(color);
+    //
+    //     return Number.isInteger(int) || (['AQUA' ,'GREEN' ,'BLUE' ,'PURPLE' ,'GOLD' ,'ORANGE' ,'RED'
+    //     ,'GREY' ,'DARKER_GREY' ,'NAVY' ,'DARK_AQUA' ,'DARK_GREEN' ,'DARK_BLUE'
+    //     ,'DARK_PURPLE' ,'DARK_GOLD' ,'DARK_ORANGE' ,'DARK_RED' ,'DARK_GREY' ,'LIGHT_GREY'
+    //     ,'DARK_NAVY' ,'RANDOM'].includes(color));
+    // }
 
     private getTemplateFields(x: string[]){
         let final;

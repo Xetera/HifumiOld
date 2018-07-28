@@ -1,5 +1,4 @@
 import {DiscordAPIError, Message} from "discord.js";
-import * as dbg from 'debug'
 import {APIErrors} from "../../interfaces/Errors";
 import {debug} from "../../utility/Logging";
 

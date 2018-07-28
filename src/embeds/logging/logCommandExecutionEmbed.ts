@@ -1,4 +1,4 @@
-import {Channel, GuildMember, RichEmbed, TextChannel} from "discord.js";
+import { GuildMember, RichEmbed, TextChannel} from "discord.js";
 
 export default function logCommandExecutionEmbed(member: GuildMember, channel: TextChannel, command: string){
     return new RichEmbed()

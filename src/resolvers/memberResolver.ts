@@ -1,13 +1,10 @@
-import {Collection, Guild, GuildMember, Message, User} from "discord.js";
-import gb from "../misc/Globals";
+import { GuildMember, Message} from "discord.js";
 import conflictOnNameResolveEmbed from "../embeds/resolvers/conflictOnNameResolveEmbed";
-import {debug} from "../utility/Logging";
 import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import {userResolvedEmbed} from "../embeds/resolvers/userResolvedEmbed";
 import resolveNumberedUncertainty from "./resolveNumberedUncertainty";
 import resolveBooleanUncertainty from "./resolveBooleanUncertainty";
 import {sanitizeUserInput, UserUtils} from "../utility/Util";
-import {AllChannelTypes} from "../decorators/expects";
 
 export async function resolveMember(arg: string, message: Message, options: {fail?: boolean, strict?: boolean, global?: boolean}/*global: any = false, fail: boolean = true*/): Promise<GuildMember | undefined> {
     // Can't set default values for objects

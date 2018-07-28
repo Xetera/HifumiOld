@@ -1,4 +1,4 @@
-import {Command, Help} from "../commands/info/help/help.interface";
+import {Help} from "../commands/info/help/help.interface";
 
 const help: Help = require('../commands/help.json');
 

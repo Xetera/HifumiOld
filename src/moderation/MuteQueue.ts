@@ -1,17 +1,11 @@
 import * as Discord from 'discord.js'
-import * as dbg from "debug";
-import {DiscordAPIError, Guild, GuildMember, Role, User} from "discord.js";
+import {DiscordAPIError, Guild, GuildMember, User} from "discord.js";
 import {getMuteTime, raidDetectionInterval} from "../utility/Settings";
 import Timer = NodeJS.Timer;
-import {log, debug} from "../utility/Logging";
-import {Moment} from "moment";
+import { debug} from "../utility/Logging";
 import moment = require("moment");
-import raidMode from "../actions/RaidMode";
-import {Database} from "../database/Database";
 import muteUser from "../actions/punishments/MuteUser";
-import safeBanUser from "../handlers/safe/SafeBanUser";
 import gb from "../misc/Globals";
-import {advertiseOnBan} from "../interfaces/Replies";
 import {formattedTimeString} from "../utility/Util";
 import {Offense} from "./interfaces";
 import unmuteDMEmbed from "../embeds/moderation/unmuteDMEmbed";

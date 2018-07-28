@@ -1,4 +1,4 @@
-import {ArgOptions, ArgType} from "../../decorators/expects";
+import {ArgOptions} from "../../decorators/expects";
 
 export const REGISTRY = new Map<string, Map<string, ArgOptions[]>>();
 export function register(cls: string, property: string, decorator: ArgOptions) {

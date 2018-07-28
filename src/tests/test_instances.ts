@@ -1,17 +1,4 @@
 import 'mocha'
-import {expect} from 'chai'
-import * as Discord from "discord.js";
-import CommandHandler, {CommandParameters} from "../handlers/commands/CommandHandler";
-import {MessageQueue} from "../moderation/MessageQueue";
-import {Cleverbot} from "../API/Cleverbot";
-import {MuteQueue} from "../moderation/MuteQueue";
-import {Instance} from "../misc/Globals";
-import Tracklist from "../moderation/Tracklist";
-import {getDatabaseConnection, getEnvironmentSettings, getTokens} from "../events/systemStartup";
-import gb from "../misc/Globals";
-import {Message} from "discord.js";
-import {Database} from "../database/Database";
-const Heroku = require('heroku-client');
 /*
 let credentials = <PostgresDevLoginConfig>{};
 credentials.user = 'postgres';

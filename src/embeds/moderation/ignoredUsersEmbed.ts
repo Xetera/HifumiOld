@@ -1,6 +1,5 @@
 import {User} from "../../database/models/user";
 import {Guild, RichEmbed} from "discord.js";
-import gb from "../../misc/Globals";
 import {IgnoredChannel} from "../../database/models/ignoredChannel";
 
 export default function ignoredUsersEmbed(ignored: [IgnoredChannel[], User[]], guild: Guild){

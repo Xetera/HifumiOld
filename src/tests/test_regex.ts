@@ -1,4 +1,3 @@
-import * as Discord from 'discord.js'
 import 'mocha'
 import {expect} from 'chai'
 import {discordInviteRegex} from '../listeners/Regex'

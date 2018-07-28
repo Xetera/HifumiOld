@@ -1,7 +1,5 @@
 import * as Discord from 'discord.js'
 import {default as gb} from "../misc/Globals";
-import {Guild} from "discord.js";
-import {HifumiAPI} from "../API/hifumiAPI";
 
 export default async function updatePresence(bot : Discord.Client) : Promise<void> {
     gb.allMembers = 0;

@@ -1,5 +1,4 @@
-import {Guild, GuildMember} from "discord.js";
-import gb from "../misc/Globals";
+import {Guild} from "discord.js";
 
 
 export default async function onGuildUpdate(oldGuild : Guild, newGuild : Guild){

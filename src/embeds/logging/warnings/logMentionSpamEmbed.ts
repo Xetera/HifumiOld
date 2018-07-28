@@ -3,7 +3,7 @@ import {warningEmbedColor} from "../../../utility/Settings";
 
 export default function logMentionSpamEmbed(member: GuildMember, channel: Channel, content: string, mentioned: GuildMember[]) {
     return new RichEmbed()
-        .setColor('warningEmbedColor')
+        .setColor(warningEmbedColor)
         .addField(`Ping Warning`, `${member} tried to mention ${mentioned.length} users at once in ${channel}.`)
         .addField(`Message Content`, content)
         .setThumbnail(member.user.avatarURL)

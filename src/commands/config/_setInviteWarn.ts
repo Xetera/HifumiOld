@@ -2,7 +2,6 @@ import {Message} from "discord.js";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import gb from "../../misc/Globals";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
-import catchUnhandledRejections from "../../handlers/process/unhandledRejection";
 import {randomRuntimeError} from "../../interfaces/Replies";
 
 export default async function setInviteWarn(message: Message, input: [number]){

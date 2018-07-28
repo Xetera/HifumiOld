@@ -2,12 +2,10 @@ import {getBulkDeleteCount} from "../../utility/Settings";
 import {
     Channel,
     Collection, DiscordAPIError,
-    GuildMember,
     Message,
     Snowflake,
     TextChannel
 } from "discord.js";
-import moment = require("moment");
 import {debug} from "../../utility/Logging";
 
 export default async function safeBulkDelete(channel: Channel, messages?:  Message[]): Promise<number> {

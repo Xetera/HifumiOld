@@ -1,5 +1,5 @@
 import {LogManager} from "../handlers/logging/logManager";
-import {Channel, DMChannel, TextChannel, VoiceChannel} from "discord.js";
+import {Channel, TextChannel, VoiceChannel} from "discord.js";
 import {default as gb} from "../misc/Globals";
 
 export default async function onChannelCreate(channel: Channel){

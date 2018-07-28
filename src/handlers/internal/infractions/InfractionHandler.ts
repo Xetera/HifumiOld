@@ -1,22 +1,15 @@
-import {Collection, GuildMember, Message, MessageCollector} from "discord.js";
+import { GuildMember, Message} from "discord.js";
 import {debug} from "../../../utility/Logging";
-import {handleFailedCommand} from "../../../embeds/commands/commandExceptionEmbed";
 import gb from "../../../misc/Globals";
 import {Infraction} from "../../../database/models/infraction";
-import areYouSureEmbed from "../../../embeds/commands/areYouSureEmbed";
 import {
     InfractionRejectionReason,
     InfractionRequestRejection,
-    isInfractionRequestRejection
 } from "./infractions.interface";
-import {APIErrors} from "../../../interfaces/Errors";
-import {runtimeErrorResponses} from "../../../interfaces/Replies";
-import {emptySpace, random} from "../../../utility/Util";
 import infractionDMEmbed from "../../../embeds/moderation/infractionDMEmbed";
 import resolveBooleanUncertainty from "../../../resolvers/resolveBooleanUncertainty";
 import banByInfractionDMEmbed from "../../../embeds/moderation/banByInfractionDMEmbed";
 import moment = require("moment");
-import safeSendMessage from "../../safe/SafeSendMessage";
 import safeBanUser from "../../safe/SafeBanUser";
 
 export default class InfractionHandler {

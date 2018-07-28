@@ -1,5 +1,5 @@
 import gb from "../../misc/Globals";
-import {Message, MessageCollector, MessageReaction, ReactionCollector, User} from "discord.js";
+import {Message, MessageReaction, ReactionCollector, User} from "discord.js";
 import {Suggestion} from "../../database/models/suggestion";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import getSuggestionEmbed from "../../embeds/commands/suggestions/getSuggestionEmbed";
@@ -12,7 +12,6 @@ import {UserPermissions} from "../../handlers/commands/command.interface";
 
 async function run(message: Message): Promise<any> {
     let index = 0;
-    let errored = false;
     let end = false;
 
     const prefix = await gb.instance.database.getPrefix(message.guild.id);
@@ -50,7 +49,6 @@ async function run(message: Message): Promise<any> {
         else if (emoji === '✅') {
             approveSuggestion(message, [suggestions[index].suggestion_id])
                 .catch(() => {
-                    errored = true;
                     suggestionMenu.delete();
                 });
             suggestions.splice(index, 1);

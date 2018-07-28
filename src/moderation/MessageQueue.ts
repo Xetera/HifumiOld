@@ -3,21 +3,19 @@ import * as moment from "moment";
 
 import {MuteQueue} from "./MuteQueue";
 import {
-    getBulkDeleteCount, getMuteDate, getMuteTime, getSpamTolerance, securityLevel,
-    SecurityLevels
+     getMuteDate, getSpamTolerance,
 } from "../utility/Settings";
 import {debug} from '../utility/Logging'
 import {Database} from "../database/Database";
 import Tracklist from "./Tracklist";
 import gb from "../misc/Globals";
 import {Offense} from "./interfaces";
-import {Channel, GuildMember, Message} from "discord.js";
+import { GuildMember,} from "discord.js";
 import safeBulkDelete from "../handlers/safe/safeBulkDelete";
 
 interface CachedMessage extends Discord.Message {
     sent : Date;
 }
-type messageCollection = Discord.Collection<Discord.Snowflake, Discord.Message>;
 
 export class MessageQueue {
     queue : Map<string, CachedMessage[]>;
@@ -131,18 +129,6 @@ export class MessageQueue {
                 message.guild.id === member.guild.id && message.sent > tolerance;
         }
         );
-    }
-
-    private getAllUserMessages(member : Discord.GuildMember) : CachedMessage[] | void {
-        const messages : CachedMessage[] | undefined = this.queue.get(member.guild.id);
-        if (messages === undefined) return debug.error(`Guild ${member.guild} has no messages to get`, "MessageQueue");
-        return messages.filter(message => {
-            return message.author.id === member.id
-        })
-    }
-
-    private getMutedRole(guild : Discord.Guild){
-
     }
 
     public getQueue(channel : Discord.Channel){

@@ -1,5 +1,4 @@
 import {StringUtils} from "../utility/Util";
-import {MessageOptions} from "discord.js";
 import axios, {AxiosResponse} from 'axios'
 import {isMedia} from "../API/imageChecker";
 import {Macro} from "../database/models/macro";

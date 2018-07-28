@@ -1,4 +1,3 @@
-import * as Discord from 'discord.js'
 import gb from "../../misc/Globals";
 
 export default function getInvite(){

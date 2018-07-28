@@ -3,7 +3,6 @@ import moment = require("moment");
 import {Note} from "../../database/models/note";
 import gb from "../../misc/Globals";
 import {getMemberTrackDuration} from "../../utility/Settings";
-import {emptySpace} from "../../utility/Util";
 import {Infraction} from "../../database/models/infraction";
 import InfractionHandler from "../../handlers/internal/infractions/InfractionHandler";
 
