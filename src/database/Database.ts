@@ -21,6 +21,7 @@ import moment = require("moment");
 import {MutedUser} from "./models/mutedUser";
 import {Suggestion} from "./models/suggestion";
 import {IgnoredChannel} from "./models/ignoredChannel";
+import {handleFatalErrorGracefully} from "../handlers/process/fatal";
 const rootConfig: IORMConfig = require('../../ormconfig.json');
 
 interface IWelcomeMessage {
@@ -34,7 +35,6 @@ export interface ORMUpdateResult<T> extends UpdateResult {
 
 export class Database {
     env: Environments;
-    connectionString: string;
     conn: Connection;
     /**
      * Tells when the database is ready for other instances to query
@@ -42,11 +42,20 @@ export class Database {
      */
     ready: boolean = false;
     welcomeMessages: {[id: string]: IWelcomeMessage[]} = {};
-    constructor(url: string) {
+    constructor() {
         this.env = gb.ENV;
-        this.connectionString = url;
         debug.info(`Logging into postgres in ${this.env === Environments.Development ? 'dev' : 'live'} mode.`, `Database`);
-        this.connect(url).then(conn => {
+        const connString: string | undefined = process.env['POSTGRES_URL'] || process.env['DATABASE_URL'];
+        if (!connString){
+            const error: Error = new Error(
+                "Missing 'POSTGRES_URL' or 'DATABASE_URL' environment variable " +
+                "this bot cannot run without a postgres connection. Make sure you've properly " +
+                "configured your environment variables or set up a .env file with the required info."
+            );
+            handleFatalErrorGracefully(error);
+            return;
+        }
+        this.connect(connString).then(conn => {
             debug.info(`Logged into postgres`, `Database`);
             this.conn = conn;
             return this.sync();
@@ -54,9 +63,7 @@ export class Database {
             this.ready = true;
         }).catch(err => {
             debug.error(`Could not connect to the database properly ...exiting application`);
-            debug.error(err);
-            gb.sleeping = true;
-            gb.instance.bot.user.setActivity('Sleeping...');
+            handleFatalErrorGracefully(err);
         });
     }
 
