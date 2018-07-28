@@ -9,7 +9,7 @@
       <td><strong>Language:</strong> Typescript</td>
       <td><strong>Library:</strong> Discord.js</td>
       <td><a href="https://www.hifumi.io">Hifumi's Website</a></td>
-      <td><a href="https://discordapp.com/oauth2/authorize?client_id=372615866652557312&scope=bot&permissions=268463300">Invite Me!</a>       </td> 
+      <td><a href="https://discordapp.com/oauth2/authorize?client_id=372615866652557312&scope=bot&permissions=268463300">Invite Me!</a>       </td>
       <td><a href="https://discord.gg/RM6KUrf">Join the Support Server</a></td>
   </tr>
 </table>
@@ -20,7 +20,7 @@
 
 ## Features
 
-* Moderation: 🚫 Get all your moderators on the same page 
+* Moderation: 🚫 Get all your moderators on the same page
     * _**Anti-Spam**_ Hifumi automatically removes messages and mutes people when she detects spamming.
     * _**Invite Filtering**_ Invites are automatically removed and added to a users history, offenders are banned after 5 invites by default or a custom value if needed.
     * _**New Member Tracking**_ To combat raiders, she has an option to track people who have joined in the past 5 minutes more closely. Banning on 2 invites instead of the custom limit (if invites are not allowed) and banning on detecting first spam instead of muting.
@@ -32,7 +32,7 @@
     * `$nuke` - Clean all previous messages in a channel of a given amount
     * `$snipe` - Remove messages in a channel from a specific user
     * `$ignore` - Stop listening for commands and conversations from a specific user or channel
-    
+
 * Management: 🛠️ Tools to make server management easier
     * `$suggest`- Suggest something that you would like to see get added in the server
     * `$suggestions` - Look through suggestions that are waiting approval, approve the serious ones, deny the jokes by clicking on reactions
@@ -44,7 +44,7 @@
 * Customization: ⚙ Change Hifumi to fit your server
     * `$setgreeting` - Customize the message you want Hifumi to greet new members with
     * `$log` - Change logging settings by assigning a channel for a specific category of logs or turning it off entirely
-        * Logging options: **joins**, **leaves**, **mutes**, **bans**, **unbans**, **channel management**, **suggestions**, **commands**, **invites**, **ping spam** 
+        * Logging options: **joins**, **leaves**, **mutes**, **bans**, **unbans**, **channel management**, **suggestions**, **commands**, **invites**, **ping spam**
     * `$settings` - Changes bot settings
         * `$settings prefix` - Changes the prefix I reply to
         * `$settings hints` - Hifumi tries to guess what you meant when you enter incorrect commands
@@ -54,7 +54,7 @@
         * `$settings invitewarn` - Threshold for warning members for sending invites
         * `$settings inviteban` - Threshold for banning members for sending invites
         * `$settings strikelimit` - Max number of strikes a user can have before getting banned (3 by default)
-        
+
 * Fun: 🎉 Time to relax
     * `$anime` - Sends details about a specific anime and the date the next ep comes out on (if still airing)
     * `$character` - Sends information about an anime character
@@ -62,7 +62,7 @@
     * `$doggo` - Sends a cute 🐶 and its breed
     * `$randomquote` - A quote... that is random
     * `$ch` - Random cyanide and happiness comic
-    
+
 ## Program Structure and Architecture
 
 <div align="center">
@@ -78,23 +78,23 @@
 #### Declaration
 Commands are all declared under `src/commands/**/*.ts` and are globbed in `src/handlers/commands/CommandHandler.ts`.
 
-The addition of a new command _only_ requires that a variable called `command` is exported somewhere inside `src/commands` 
+The addition of a new command _only_ requires that a variable called `command` is exported somewhere inside `src/commands`
 
 #### Parsing
-Before commands are called, information is parsed in `src/parsers/argParse.ts`. 
+Before commands are called, information is parsed in `src/parsers/argParse.ts`.
 
 All command requirements like arguments and user/client permissions are declared in the **Command** object that is exported and parsed before calling the command.
 
 A command is only called if these requirements are met.
 
-All necessary arguments are passed into the `run` function's second parameter as a tuple. 
+All necessary arguments are passed into the `run` function's second parameter as a tuple.
 
 [More info...](https://github.com/Xetera/Hifumi/blob/master/src/commands/README.md)
 
 ### Database
 [TypeORM](https://github.com/typeorm/typeorm) is used for all database transactions.
 
-A Redis cache layer is used to speed up common actions like fetching guild prefixes. 
+A Redis cache layer is used to speed up common actions like fetching guild prefixes.
 
 Database information is stored in `src/database` including
 * Models
@@ -110,31 +110,6 @@ This script is set on a cron job of regular intervals, and an X amount of backup
 
 A backup-restoration script is available to restore the latest backup if necessary.
 
-### Inversion of Control
-All objects that are required in the global scope or inside other classes are handled by [typescript-ioc](https://github.com/thiagobustamante/typescript-ioc) to avoid the usage of global singletons.
-
-Classes that depend on other classes, such as `Cleverbot -> TokenBucket` get their dependencies declared as such
-```ts
-@Singleton
-export class Cleverbot extends ICleverbot {
-    readonly identifier : RegExp = /hifumi/i;
-    cleverbot : Clevertype;
-    @Inject tokenBucket: ITokenBucket;
-    // implementation...
-}
-```
-
-In order to not depend on classes themselves but rather an "interface" are declared as `abstract` classes instead inside `src/interfaces/injectables`.
-
-These classes are extended to provide functionality and are injected as necessary or fetched from the container. The abstract class itself is relied upon for type inference rather than the class implementation which prevents circular dependencies.
-```ts
-export abstract class ICleverbot {
-    identifier: RegExp;
-    cleverbot: Clevertype;
-    tokenBucket: ITokenBucket;
-    abstract isRateLimited(id: string, message: Message): boolean;
-}
-```
 ## Setting Up Hifumi
 Coming soon...
 

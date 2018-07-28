@@ -204,7 +204,6 @@ export default class CommandHandler implements indexSignature {
             }
 
             const missingP = CommandHandler.getMissingUserPermission(message.member, command);
-            console.log(missingP);
 
             if (missingP === UserPermissions.Administrator && !message.member.hasPermission('ADMINISTRATOR')){
                 return safeSendMessage(message.channel, await missingAdminEmbed(message.guild));
