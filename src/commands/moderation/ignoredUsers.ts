@@ -1,5 +1,4 @@
 import {Message} from "discord.js";
-import gb from "../../misc/Globals";
 import {User} from "../../database/models/user";
 import ignoredEmbed from "../../embeds/moderation/ignoredUsersEmbed";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
@@ -7,11 +6,14 @@ import {IgnoredChannel} from "../../database/models/ignoredChannel";
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../interfaces/arg.interface";
 import {UserPermissions} from "../../interfaces/command.interface";
+import {IDatabase} from "../../interfaces/injectables/datbase.interface";
+import {Container} from "typescript-ioc";
 
 async function run(message: Message): Promise<any> {
+    const database: IDatabase = Container.get(IDatabase)
     Promise.all([
-        gb.instance.database.getIgnoredChannels(message.guild.id),
-        gb.instance.database.getIgnoredUsers(message.guild.id)
+        database.getIgnoredChannels(message.guild.id),
+        database.getIgnoredUsers(message.guild.id)
     ]).then((res: [IgnoredChannel[], User[]]) => {
         safeSendMessage(message.channel, ignoredEmbed(res, message.guild));
     });

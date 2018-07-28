@@ -5,7 +5,7 @@ import {GuildMember} from "discord.js";
  */
 export default async function onGuildMemberUpdate(oldMember : GuildMember, newMember : GuildMember){
     /*
-    if (!newMember.guild.available || !await gb.instance.database.getGuildEnabled(oldMember.guild.id)){
+    if (!newMember.guild.available || !await database.getGuildEnabled(oldMember.guild.id)){
         return;
     }
 

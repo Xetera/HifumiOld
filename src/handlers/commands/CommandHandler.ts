@@ -1,5 +1,4 @@
 import * as Discord from "discord.js";
-import gb from "../../misc/Globals";
 import commandNotFoundEmbed from "../../embeds/commands/commandNotFoundEmbed";
 import {Macro} from "../../database/models/macro";
 import argParse from "../../parsers/argParse";
@@ -17,10 +16,14 @@ import missingSelfPermission from "../../embeds/permissions/missingSelfPermissio
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import {debug} from "../../utility/Logging";
 import {GuildMember, Message, PermissionResolvable, TextChannel} from "discord.js";
-import {Singleton} from "typescript-ioc";
+import {Inject, Singleton} from "typescript-ioc";
 import {CommandParameters, ICommandHandler, UserInputData} from "../../interfaces/injectables/commandHandler.interface";
+import {IClient} from "../../interfaces/injectables/client.interface";
+import {IDatabase} from "../../interfaces/injectables/datbase.interface";
+import {Environments} from "../../events/systemStartup";
+import {handleFatalErrorGracefully} from "../process/fatal";
 
-function isMessage(message : any) : message is Discord.Message {
+function isMessage(message: any): message is Discord.Message {
     return <Discord.Message> message.content !== undefined;
 }
 
@@ -28,28 +31,63 @@ function isMessage(message : any) : message is Discord.Message {
 export default class CommandHandler extends ICommandHandler {
     commands: Command[] = [];
     restarting: boolean = false;
-    constructor(){
+    @Inject client: IClient;
+    @Inject database: IDatabase;
+
+    constructor() {
         super();
         this.glob();
     }
 
-    public glob(){
+    private isCommandMissingDependency(command: Command): string | false {
+        const reqEnv = command.dependsOn;
+        if (!reqEnv) {
+            return false;
+        }
+        if (Array.isArray(reqEnv)) {
+            for (const env in reqEnv) {
+                if (!process.env[env]) {
+                    return env;
+                }
+            }
+        }
+        else if (!process.env[reqEnv]) {
+            return reqEnv;
+        }
+        return false;
+    }
+
+    public glob() {
         glob(__dirname + '/../../commands/**/*.js', {absolute: false}, ((err, matches) => {
-            if (err){
+            if (err) {
                 return void console.error(err);
             }
-            for (let fileName of matches){
+            for (let fileName of matches) {
                 const file = require(fileName);
-                if (file.command){
-                    this.commands.push(<Command> file.command);
+                if (file.command) {
+                    const command: Command = file.command;
+                    const missing = this.isCommandMissingDependency(file.command);
+                    if (missing && this.client.env === Environments.Development) {
+                        debug.warning(
+                            `${command.names[0]} is missing the required env variable '${missing}' ` +
+                            `it will not be loaded.`
+                        );
+                        continue;
+                    } else if (missing && this.client.env === Environments.Production) {
+                        return handleFatalErrorGracefully(new Error(
+                            `${command.names[0]} is missing the required env variable '${missing}' ` +
+                            `in production mode!`
+                        ))
+                    }
+                    this.commands.push(command);
                 }
             }
         }));
     }
 
-    public async parseInput(message : Discord.Message): Promise<UserInputData | undefined> {
-        let args : string[] = [];
-        const prefix = await gb.instance.database.getPrefix(message.guild.id);
+    public async parseInput(message: Discord.Message): Promise<UserInputData | undefined> {
+        let args: string[] = [];
+        const prefix = await this.database.getPrefix(message.guild.id);
         // removing excess whitespace between words that can't be removed with .trim()
         const messageContent = message.content.replace(/ +/g, ' ').trim();
         if (isMessage(message))
@@ -57,7 +95,7 @@ export default class CommandHandler extends ICommandHandler {
         else
             throw new TypeError(`'${message}' is not a Message object.`);
 
-        let input : string | undefined = args.shift()!;
+        let input: string | undefined = args.shift()!;
 
         // detecting stealth command
         // setting the rest of the properties later
@@ -65,19 +103,19 @@ export default class CommandHandler extends ICommandHandler {
             args: args
         };
 
-        if (input === prefix || input === prefix + prefix){
+        if (input === prefix || input === prefix + prefix) {
             return;
         }
 
-        else if (input.substring(0, 2) === prefix + prefix){
+        else if (input.substring(0, 2) === prefix + prefix) {
             debug.silly(`[${message.guild.name}]<${message.author}> Entered a stealth command`, 'CommandHandler');
             out.stealth = true;
             out.command = input.substring(2);
             return out;
         }
-        else if (input[0] === prefix){
+        else if (input[0] === prefix) {
             out.stealth = false;
-            out.command=input.substring(1);
+            out.command = input.substring(1);
             return out;
         }
 
@@ -85,13 +123,13 @@ export default class CommandHandler extends ICommandHandler {
         return;
     }
 
-    public async handler(message : Message) {
+    public async handler(message: Message) {
         if (this.restarting)
             return;
         const inputData: UserInputData | undefined = await this.parseInput(message);
         if (inputData === undefined)
             return;
-        else if (inputData.stealth){
+        else if (inputData.stealth) {
             safeDeleteMessage(message);
         }
 
@@ -100,13 +138,13 @@ export default class CommandHandler extends ICommandHandler {
         else
             return debug.error(`A non text channel command was forwarded to CommandHandler`, 'CommandHandler');
 
-        const params = <CommandParameters> gb.instance;
+        const params = <CommandParameters> {};
         params.args = inputData.args;
         params.message = message;
         params.input = [];
 
         for (let i in this.commands) {
-            const match = this.commands[i].names.find(name => name.toLowerCase()  ===inputData.command.toLowerCase());
+            const match = this.commands[i].names.find(name => name.toLowerCase() === inputData.command.toLowerCase());
             if (!match)
                 continue;
             const execution = this.commands[i];
@@ -124,18 +162,19 @@ export default class CommandHandler extends ICommandHandler {
         }
 
         // User input is not a command, checking macros
-        const macros: Macro[] = await gb.instance.database.getMacros(message.guild.id);
+        //TODO: refactor this later or something idk
+        const macros: Macro[] = await this.database.getMacros(message.guild.id);
         let targetMacro: Macro | undefined;
-        if (macros.length){
+        if (macros.length) {
             targetMacro = macros.find(macro => macro.macro_name === inputData.command);
             if (targetMacro) {
-                gb.instance.database.incrementMacroCalls(message.guild.id, message.author.id);
+                this.database.incrementMacroCalls(message.guild.id, message.author.id);
                 const content = await buildMacro(targetMacro);
                 const isPureMessage = typeof content[0] !== 'object' && (!content[1] || typeof content[1] !== 'object');
-                if (isPureMessage){
+                if (isPureMessage) {
                     try {
                         return message.channel.send(content);
-                    } catch (err){
+                    } catch (err) {
                         return handleFailedCommand(message.channel,
                             `There was a problem sending that macro, this an error`
                         )
@@ -148,21 +187,21 @@ export default class CommandHandler extends ICommandHandler {
         }
 
         // User input is not a command OR a macro, checking if guild has hints enabled
-        const hints = await gb.instance.database.getCommandHints(message.guild.id);
-        if (hints){
-            safeSendMessage( message.channel,
+        const hints = await this.database.getGuildColumn(message.guild.id, 'hints');
+        if (hints) {
+            safeSendMessage(message.channel,
                 await commandNotFoundEmbed(message.channel, inputData.command, macros.map(macro => macro.macro_name)),
-            30);
+                30);
         }
         message.channel.stopTyping();
     }
 
-    private async _run(message: Message, command: Command, params: CommandParameters){
+    private async _run(message: Message, command: Command, params: CommandParameters) {
         params.expect = command.expects;
         const [name] = command.names;
         params.name = name;
         try {
-            if (CommandHandler.checkBrokenFunction(command)){
+            if (CommandHandler.checkBrokenFunction(command)) {
                 return void handleFailedCommand(
                     message.channel,
                     "**Ding!** You've just been struck by the magic of spaghetti code!\n" +
@@ -174,21 +213,21 @@ export default class CommandHandler extends ICommandHandler {
             }
             // checking permissions first
             const missingC = CommandHandler.getMissingClientPermissions(message.member, command);
-            if(missingC.length){
-               return safeSendMessage(message.channel, await missingSelfPermission(message.guild, missingC));
+            if (missingC.length) {
+                return safeSendMessage(message.channel, await missingSelfPermission(message.guild, missingC));
             }
 
-            const missingP = CommandHandler.getMissingUserPermission(message.member, command);
+            const missingP = this.getMissingUserPermission(message.member, command);
             console.log(missingP);
 
-            if (missingP === UserPermissions.Administrator && !message.member.hasPermission('ADMINISTRATOR')){
+            if (missingP === UserPermissions.Administrator && !message.member.hasPermission('ADMINISTRATOR')) {
                 return safeSendMessage(message.channel, await missingAdminEmbed(message.guild));
             }
 
-            else if (missingP === UserPermissions.Moderator && !message.member.hasPermission('BAN_MEMBERS')){
+            else if (missingP === UserPermissions.Moderator && !message.member.hasPermission('BAN_MEMBERS')) {
                 return safeSendMessage(message.channel, await missingModEmbed(message.guild));
             }
-            else if (missingP === UserPermissions.GuildOwner && message.member.id !== message.member.guild.ownerID){
+            else if (missingP === UserPermissions.GuildOwner && message.member.id !== message.member.guild.ownerID) {
                 return safeSendMessage(message.channel, missingGuildOwnerEmbed(message.guild));
             }
 
@@ -197,7 +236,7 @@ export default class CommandHandler extends ICommandHandler {
                 return;
 
             command.run(params.message, <any> params.input);
-            gb.instance.database.incrementCommandCalls(message.guild.id, message.author.id);
+            this.database.incrementCommandCalls(message.guild.id, message.author.id);
         }
         catch (error) {
             debug.error(`Unexpected error while executing ${command}\n` + error.stack)
@@ -209,41 +248,41 @@ export default class CommandHandler extends ICommandHandler {
      * our input parameter is a tuple we can't just compare the length of one's parameter to another we can only
      * check to see if I forgot to change the default :expects parameter from None to something else, that's about it
      */
-    private static checkBrokenFunction(command: Command){
+    private static checkBrokenFunction(command: Command) {
         return command.argLength < command.run.length - 1;
     }
 
     private static getMissingClientPermissions(executor: GuildMember, command: Command): PermissionResolvable[] {
         const clientPerms = command.clientPermissions;
         // no permissions of any kind required
-        if ((!clientPerms || !clientPerms.length || executor.guild.me.hasPermission('ADMINISTRATOR'))){
+        if ((!clientPerms || !clientPerms.length || executor.guild.me.hasPermission('ADMINISTRATOR'))) {
             return [];
         }
-        if (clientPerms && clientPerms.length){
+        if (clientPerms && clientPerms.length) {
             const missing = executor.guild.me.missingPermissions(clientPerms);
-            if (missing.length){
+            if (missing.length) {
                 return missing
             }
         }
         return [];
     }
 
-    public static getMissingUserPermission(executor: GuildMember, command: Command): UserPermissions | false {
+    public getMissingUserPermission(executor: GuildMember, command: Command): UserPermissions | false {
         // !command.userPermissions also catches UserPermissions === 0
         // by default since it's an enum
-        if (executor.id === gb.ownerID){
+        if (executor.id === this.client.owner) {
             return false;
         }
-        else if (!command.userPermissions && command.userPermissions !== ''){
+        else if (!command.userPermissions && command.userPermissions !== '') {
             return false;
         }
-        else if (command.userPermissions === UserPermissions.Administrator && !executor.hasPermission('ADMINISTRATOR')){
+        else if (command.userPermissions === UserPermissions.Administrator && !executor.hasPermission('ADMINISTRATOR')) {
             return UserPermissions.Administrator;
         }
-        else if (command.userPermissions === UserPermissions.Moderator && !executor.hasPermission('BAN_MEMBERS')){
+        else if (command.userPermissions === UserPermissions.Moderator && !executor.hasPermission('BAN_MEMBERS')) {
             return UserPermissions.Moderator;
         }
-        else if (command.userPermissions === UserPermissions.GuildOwner && executor.id !== executor.guild.ownerID){
+        else if (command.userPermissions === UserPermissions.GuildOwner && executor.id !== executor.guild.ownerID) {
             return UserPermissions.GuildOwner
         }
         else {
@@ -251,13 +290,13 @@ export default class CommandHandler extends ICommandHandler {
         }
     }
 
-    public findCommand(targetName: string, excludeOwner: boolean = false){
-        for (let command of this.commands){
+    public findCommand(targetName: string, excludeOwner: boolean = false) {
+        for (let command of this.commands) {
             // Could be shorter, but this is easier to read
-            if (excludeOwner && command.userPermissions === UserPermissions.BotOwner){
+            if (excludeOwner && command.userPermissions === UserPermissions.BotOwner) {
                 continue;
             }
-            if (command.names.includes(targetName)){
+            if (command.names.includes(targetName)) {
                 return command;
             }
         }

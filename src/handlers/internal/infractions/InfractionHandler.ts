@@ -1,6 +1,5 @@
 import { GuildMember, Message} from "discord.js";
 import {debug} from "../../../utility/Logging";
-import gb from "../../../misc/Globals";
 import {Infraction} from "../../../database/models/infraction";
 import {
     InfractionRejectionReason,
@@ -11,23 +10,22 @@ import resolveBooleanUncertainty from "../../../resolvers/resolveBooleanUncertai
 import banByInfractionDMEmbed from "../../../embeds/moderation/banByInfractionDMEmbed";
 import moment = require("moment");
 import safeBanUser from "../../safe/SafeBanUser";
+import {Inject, Singleton} from "typescript-ioc";
+import {IDatabase} from "../../../interfaces/injectables/datbase.interface";
+import {IClient} from "../../../interfaces/injectables/client.interface";
+import {IInfractionHandler} from "../../../interfaces/injectables/infractionHandler.interface";
 
-export default class InfractionHandler {
-    private static _instance: InfractionHandler;
-    private constructor(){}
-    public static getInstance(): InfractionHandler {
-        if (!InfractionHandler._instance){
-            InfractionHandler._instance = new this();
-        }
-        return InfractionHandler._instance;
-    }
+@Singleton
+export default class InfractionHandler extends IInfractionHandler {
+    @Inject database: IDatabase;
+    @Inject client: IClient;
 
     public getActiveInfractions(infractions: Infraction[]): Infraction[]{
         const date = new Date();
         return infractions.filter(i => i.expiration_date >= date);
     }
 
-    public static formatInfraction(i: Infraction, anonymous: boolean = false){
+    public formatInfraction(i: Infraction, anonymous: boolean = false){
         return '' +
             `${anonymous ? '' : `**ID**: ${i.infraction_id}  **Issued By**: ${i.staff_name}\n`}` +
             `**Expired**: ${i.expiration_date <= new Date() ? 'Yes' : '__No__'}  ` +
@@ -42,9 +40,11 @@ export default class InfractionHandler {
      * @param {number} weight
      * @returns {Promise<number>} - Max strike limit of the target guild
      */
-    private static async memberCanInfract(member: GuildMember, target: GuildMember, weight: number): Promise<number> {
-        const infractionLimit = await gb.instance.database.getInfractionLimit(member.guild.id);
-
+    private async memberCanInfract(member: GuildMember, target: GuildMember, weight: number): Promise<number> {
+        const infractionLimit = await this.database.getGuildColumn(member.guild.id, 'infraction_limit');
+        if (!infractionLimit){
+            return 3;
+        }
         if (!member.hasPermission('BAN_MEMBERS')){
             debug.silly(`User ${member.user.username} cannot infract members, missing mod.`);
             return Promise.reject(
@@ -95,8 +95,8 @@ export default class InfractionHandler {
      * @returns {Promise<boolean>} - is user banned
      */
     public async addInfraction(message: Message, staff: GuildMember, target: GuildMember, reason: string, weight: number): Promise<boolean> {
-        return InfractionHandler.memberCanInfract(staff, target, weight).then(async(infractionLimit: number) => {
-            const currentUserStrikes: Infraction[] = await gb.instance.database.getInfractions(target.guild.id, target.id);
+        return this.memberCanInfract(staff, target, weight).then(async(infractionLimit: number) => {
+            const currentUserStrikes: Infraction[] = await this.database.getInfractions(target.guild.id, target.id);
             const activeInfractions = this.getActiveInfractions(currentUserStrikes);
             const currentWeight = activeInfractions.reduce((total, inf) => total + inf.infraction_weight, 0);
 
@@ -115,12 +115,12 @@ export default class InfractionHandler {
                 isBan = true;
             }
 
-            return Promise.all([gb.instance.database.addInfraction(staff, target, reason, weight), staff, target, infractionLimit, isBan, currentWeight]);
+            return Promise.all([this.database.addInfraction(staff, target, reason, weight), staff, target, infractionLimit, isBan, currentWeight]);
         }).then(async(r: [Partial<Infraction>, GuildMember, GuildMember, number, boolean, number]) => {
             const [response, staff, target, strikeLimit, isBan, currentWeight] = r;
 
             if (isBan && target.bannable){
-                const infractions: Infraction[] = await gb.instance.database.getInfractions(target.guild.id);
+                const infractions: Infraction[] = await this.database.getInfractions(target.guild.id);
                 const currentIndex = infractions.findIndex(i => i.infraction_id === response.infraction_id);
                 const currentInfraction = infractions.splice(currentIndex, 1)[0];
                 const embed = banByInfractionDMEmbed(target, currentInfraction, infractions);

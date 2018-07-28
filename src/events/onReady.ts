@@ -1,59 +1,75 @@
-import * as Discord from'discord.js'
 import {debug, startupTable} from '../utility/Logging'
-import {default as gb, emojiName} from "../misc/Globals";
 import {Environments} from "./systemStartup";
-import {Client, Emoji} from "discord.js";
 import updatePresence from "../actions/UpdatePresence";
-
+import {loadContainers} from "../misc/ioc.config";
+import {ITracklist} from "../interfaces/injectables/tracklist.interface";
+import {Container} from "typescript-ioc";
+import {IClient} from "../interfaces/injectables/client.interface";
+import {handleFatalErrorGracefully} from "../handlers/process/fatal";
 
 
 // returning owner id at the end
-export default function onReady(bot: Client): Promise<string> {
-    gb.allMembers = 0;
+export default async function onReady(bot: IClient): Promise<void> {
+    const env = process.env['ENVIRONMENT'];
+    if (env && (env.toLowerCase() === 'prod' || env.toLowerCase() === 'production')) {
+        debug.info(`Running in Production mode.`);
+        bot.env = Environments.Production;
+    } else {
+        debug.info(`Running in Development mode.`);
+        bot.env = Environments.Development;
+    }
     debug.info(`Invite link: https://discordapp.com/oauth2/authorize?client_id=372615866652557312&scope=bot&permissions=268463300`);
 
-    let guilds = bot.guilds.array();
     let startupGuild = [];
 
-    for (let guild of guilds) {
-        gb.allMembers += guild.members.size;
+    for (let [, guild] of bot.guilds) {
         startupGuild.push({
             name: guild.name,
             members: guild.members.size,
             channels: guild.channels.size
         });
     }
+    const trackList: ITracklist = Container.get(ITracklist);
 
     startupTable(startupGuild);
     setGlobals(bot);
     updatePresence(bot);
-    return bot.fetchApplication().then((app : Discord.OAuth2Application)=> {
-        debug.info(`${bot.user.username} is fully online.`, "Ready");
-        return app.owner.id;
-    });
+    loadContainers();
+    trackList.initializeGuilds();
+    setInterval(() => {
+        updatePresence(bot);
+    }, 1000 * 60 * 10);
+
+    const app = await bot.fetchApplication();
+    bot.owner = app.owner.id;
+    debug.info(`Ready event handler done.`, "Ready");
 }
 
-function setGlobals(bot : Discord.Client){
-    if (gb.ENV === Environments.Live){
-        try{
-            gb.emojiGuild = bot.guilds.find('id', process.env.EMOJI_GUILD);
+function setGlobals(bot: IClient) {
+    const eGuild = process.env['EMOJI_GUILD'];
+    if (bot.env === Environments.Production) {
+        if (!eGuild) {
+            return handleFatalErrorGracefully(
+                new Error(
+                    "Bot is started in production mode but is missing " +
+                    "'EMOJI_GUILD' env variable"
+                )
+            );
         }
-        catch {}
-
-    }
-    else {
-        try {
-            gb.emojiGuild = bot.guilds.find('id', require('../../config0.json').EMOJI_GUILD);
+        const guild = bot.guilds.get(eGuild);
+        if (!guild) {
+            return handleFatalErrorGracefully(
+                new Error(
+                    `Could not find the emoji server ${eGuild} ` +
+                    `in the servers list in production mode.`
+                )
+            );
         }
-        catch {}
+        bot.emojiGuild = guild;
+        return
     }
-    setEmojis();
-}
-
-function setEmojis(){
-    gb.emojis = new Map<emojiName, Emoji>();
-    if (gb.emojiGuild)
-        gb.emojiGuild.emojis.array().forEach(function (emoji) {
-            gb.emojis.set(emoji.name, emoji);
-        })
+    if (!eGuild){
+        return;
+    }
+    bot.emojiGuild = bot.guilds.get(eGuild);
 }

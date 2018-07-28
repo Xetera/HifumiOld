@@ -1,15 +1,17 @@
 import {Message, TextChannel} from "discord.js";
 import {handleFailedCommand} from "../../../embeds/commands/commandExceptionEmbed";
-import gb from "../../../misc/Globals";
 import {LoggingChannelType} from "../../../database/models/guild";
 import safeSendMessage from "../../../handlers/safe/SafeSendMessage";
 import {Command} from "../../../handlers/commands/Command";
 import {UserPermissions} from "../../../interfaces/command.interface";
 import {ArgType} from "../../../interfaces/arg.interface";
+import {IDatabase} from "../../../interfaces/injectables/datbase.interface";
+import {Container} from "typescript-ioc";
 
 export default function logs(message: Message, input: [string, (TextChannel | boolean)]){
     const [setting, choice] = input;
 
+    const database: IDatabase = Container.get(IDatabase);
     let destination: string | null;
     if (choice instanceof TextChannel){
         if (!message.guild.me.permissionsIn(choice).has('SEND_MESSAGES')){
@@ -98,7 +100,7 @@ export default function logs(message: Message, input: [string, (TextChannel | bo
 
     // @ts-ignore
     // Typescript isn't a big fan of spread used in arguments
-    gb.instance.database.changeSpecificLoggingChannel(...args).then(() => {
+    database.changeSpecificLoggingChannel(...args).then(() => {
         safeSendMessage(message.channel, `Changed ${setting} settings.`)
     })
 

@@ -13,7 +13,7 @@ export default async function inviteListener(message: Message){
         || securityLevel === SecurityLevels.Dangerous
         || message.member.hasPermission('BAN_MEMBERS')
         || message.author.id === gb.ownerID
-        || await gb.instance.database.getAllowGuildInvites(message.guild.id)) {
+        || await database.getGuildColumn(message.guild.id, 'allows_invites')) {
         return;
     }
 

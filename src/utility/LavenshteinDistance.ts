@@ -1,7 +1,3 @@
-import {Help} from "../commands/info/help/help.interface";
-
-const help: Help = require('../commands/help.json');
-
 // No idea how this works, copy pasted from somewhere, god bless
 function getEditDistance(a: string, b: string): number {
     const an = a ? a.length : 0;
@@ -52,7 +48,7 @@ interface DistanceType {
 }
 
 
-export default function lavenshteinDistance(input: string, pool: string[] = help.commands.map(c => c.name)): string {
+export default function lavenshteinDistance(input: string, pool: string[]): string {
     if (input.length > 20 && input.split( ' ')[0] !== 'settings')
         return 'to spam me like some kind of dummy';
 

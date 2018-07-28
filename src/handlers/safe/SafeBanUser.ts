@@ -3,9 +3,11 @@ import {DiscordAPIError, GuildMember, RichEmbed} from "discord.js";
 import {debug} from "../../actions/Actions";
 import {APIErrors} from "../../interfaces/Errors";
 import {getOnBanMessageSnipeCount} from "../../utility/Settings";
-import gb from "../../misc/Globals";
+import {IDatabase} from "../../interfaces/injectables/datbase.interface";
+import {Container} from "typescript-ioc";
 
 export default async function safeBanUser(member : GuildMember, reason: string, banMessage?: string|RichEmbed) : Promise<void>{
+    const database: IDatabase = Container.get(IDatabase)
     const memberName : string = member.nickname||member.user.username;
     if (!member.bannable || !member.guild.me.hasPermission("BAN_MEMBERS")){
         debug.warning(
@@ -24,7 +26,7 @@ export default async function safeBanUser(member : GuildMember, reason: string, 
     }
     return member.ban(banOptions).then((banned : GuildMember)=> {
         debug.info(`Banned member ${memberName} from ${banned.guild.name}.`);
-        gb.instance.database.incrementBanCount(banned.guild.id);
+        database.incrementBanCount(banned.guild.id);
         // we're already logging all bans
         // LogManager.logBan(member.guild, member.user);
     }).catch((err : DiscordAPIError) => {

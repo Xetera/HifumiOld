@@ -1,7 +1,10 @@
-import gb from "../../../misc/Globals";
+import {Inject, Singleton} from "typescript-ioc";
+import {IDatabase} from "../../../interfaces/injectables/datbase.interface";
+import {IReactionManager} from "../../../interfaces/injectables/reactionManager.interface";
 
-export default class ReactionManager /* extends Singleton */{
-    private static _instance: ReactionManager;
+@Singleton
+export default class ReactionManager extends IReactionManager {
+    @Inject database: IDatabase;
     // Storing the URLs of the reactions
     // image dimensions are in ? x 150 pixels dimensions
     // to prevent it from flooding the chat
@@ -52,17 +55,8 @@ export default class ReactionManager /* extends Singleton */{
     public readonly giggle: string = 'https://i.imgur.com/wPEjqIr.gif';
     public readonly mad: string = 'https://i.imgur.com/dt3abLq.png';
 
-    private constructor(){}
-
-    public static getInstance() {
-        if (!ReactionManager._instance) {
-            ReactionManager._instance = new this();
-        }
-        return ReactionManager._instance;
-    }
-
-    public static async canSendReactions(guildId: string): Promise<boolean>{
-        return gb.instance.database.getReactions(guildId);
+    public async canSendReactions(guildId: string): Promise<boolean>{
+        return await this.database.getGuildColumn(guildId, 'reactions') || false;
     }
 
 

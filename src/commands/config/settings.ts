@@ -1,7 +1,6 @@
 import {Message} from "discord.js";
 import {debug} from '../../utility/Logging'
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
-import gb from "../../misc/Globals";
 import {Guild} from "../../database/models/guild";
 import getSettingsEmbed from "../../embeds/commands/configEmbed/getConfig";
 import setPrefix from "./SetPrefix";
@@ -19,12 +18,15 @@ import setInviteBan from "./_setInviteBan";
 import {Command} from "../../handlers/commands/Command";
 import {UserPermissions} from "../../interfaces/command.interface";
 import {ArgType} from "../../interfaces/arg.interface";
+import {IDatabase} from "../../interfaces/injectables/datbase.interface";
+import {Container} from "typescript-ioc";
 
 export default async function settings(message : Message, input: [(string | undefined), (string | undefined)]) {
     const [setting, choice] = input;
 
+    const database: IDatabase = Container.get(IDatabase);
     const guild = message.guild;
-    const cache: Guild = await gb.instance.database.getGuild(guild.id);
+    const cache: Guild = await database.getGuild(guild.id);
 
     if (!cache) {
         debug.error(`Guild ${guild.name} was not found in cache.`, `getConfig`);

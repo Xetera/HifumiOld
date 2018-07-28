@@ -1,31 +1,36 @@
 import * as Discord from "discord.js";
 import {random} from "../utility/Util";
 import {welcomeMessages} from "../interfaces/Replies";
-import {default as gb} from "../misc/Globals";
 import {Channel, GuildMember, Message, TextChannel} from "discord.js";
 import {LogManager} from "../handlers/logging/logManager";
 import {debug} from "../utility/Logging";
 import guildMemberAddEmbed from "../embeds/events/onGuildMemberAddEmbed";
 import {TemplatedMessage} from "../parsers/parsers.interface";
 import templateParser from "../parsers/templateParser";
+import {IClient} from "../interfaces/injectables/client.interface";
+import {ITracklist} from "../interfaces/injectables/tracklist.interface";
+import {Container} from "typescript-ioc";
+import {IDatabase} from "../interfaces/injectables/datbase.interface";
 
 export default async function onGuildMemberAdd(member : Discord.GuildMember): Promise<void> {
-    if (!gb.instance.database.ready
-        || gb.sleeping
+    const database: IDatabase = Container.get(IDatabase);
+    const bot: IClient = Container.get(IClient);
+    const trackList: ITracklist = Container.get(ITracklist);
+    if (!database.ready
+        || bot.sleeping
         || member.user.bot
-        || !await gb.instance.database.getGuildEnabled(member.guild.id)
+        || !await database.getGuildColumn(member.guild.id, 'enabled')
         || !member.guild.available){
         return
     }
 
-    const database = gb.instance.database;
     await database.addMember(member);
-    await gb.instance.trackList.add(member);
+    await trackList.add(member);
 
     // we will change this later to fetch from a Database instead of using a preset name
     const [welcomeChannelId, customMessage] = await Promise.all([
-        database.getWelcomeChannel(member.guild.id),
-        database.getWelcomeMessage(member.guild.id)
+        database.getGuildColumn(member.guild.id, 'welcome_channel'),
+        database.getGuildColumn(member.guild.id, 'welcome_message')
     ]);
 
     if (welcomeChannelId) {
@@ -43,6 +48,7 @@ export default async function onGuildMemberAdd(member : Discord.GuildMember): Pr
 }
 
 function sendEmbed(channel: TextChannel, member: GuildMember, welcomeMessage?: string){
+    const database: IDatabase = Container.get(IDatabase);
     let defaultChannelEmbed;
     if (welcomeMessage){
         const fields: TemplatedMessage | string = templateParser(
@@ -84,6 +90,6 @@ function sendEmbed(channel: TextChannel, member: GuildMember, welcomeMessage?: s
             welcomeMessage.react(kanna_wave);
         else
             debug.error('Could not react to new user joining with kanna_wave');
-        gb.instance.database.cacheWelcomeMessage(member, welcomeMessage);
+        database.cacheWelcomeMessage(member, welcomeMessage);
     });
 }

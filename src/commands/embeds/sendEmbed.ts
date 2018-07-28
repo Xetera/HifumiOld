@@ -4,15 +4,17 @@ import {ArgType} from "../../interfaces/arg.interface";
 import EmbedBuilder from "../../handlers/internal/embedBuilder";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
-import gb from "../../misc/Globals";
+import {IDatabase} from "../../interfaces/injectables/datbase.interface";
+import {Container} from "typescript-ioc";
 
 async function run(message: Message, input: [(Channel | undefined)]): Promise<any> {
+    const database: IDatabase = Container.get(IDatabase)
     const [channel] = input;
     const embed: RichEmbed | void = await EmbedBuilder.getInstance().getEmbed(message);
     if (embed){
         return safeSendMessage(channel || message.channel, embed);
     }
-    const prefix = await gb.instance.database.getPrefix(message.guild.id);
+    const prefix = await database.getPrefix(message.guild.id);
     return await handleFailedCommand(
         message.channel, `You haven't created an embed yet! use ${prefix}embed to build one!`
     );

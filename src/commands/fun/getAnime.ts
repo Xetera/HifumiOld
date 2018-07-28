@@ -1,12 +1,13 @@
 import {Message, RichEmbed} from 'discord.js'
 import {ArgType} from "../../interfaces/arg.interface";
-import Anime from "../../API/anime";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {randomRuntimeError} from "../../interfaces/Replies";
 import {debug} from "../../utility/Logging";
-import gb from "../../misc/Globals";
 import {random} from "../../utility/Util";
 import {Command} from "../../handlers/commands/Command";
+import {IAnime} from "../../interfaces/injectables/anime.interface";
+import {Container} from "typescript-ioc";
+import {IClient} from "../../interfaces/injectables/client.interface";
 
 export const animePlaceholders = [
     'Searching...',
@@ -20,11 +21,13 @@ export const animePlaceholders = [
 
 async function run(message: Message, input: [string]): Promise<any> {
     const [anime] = input;
+    const animeInstance: IAnime = Container.get(IClient);
+    const client: IClient = Container.get(IClient);
     const placeholder = <Message> await safeSendMessage(
         message.channel,
-        `${gb.emojis.get('hifumi_kanna_inspect')} ${random(animePlaceholders)}`
+        `${client.getEmoji('hifumi_kanna_inspect')} ${random(animePlaceholders)}`
     );
-    Anime.getInstance().getAnime(message, anime).then((embed: string | RichEmbed) => {
+    animeInstance.getAnime(message, anime).then((embed: string | RichEmbed) => {
         placeholder.edit(embed);
     }).catch((err: Error)=>{
         debug.error(err, `Anime`);

@@ -1,6 +1,7 @@
 import * as Discord from'discord.js'
-import gb from "../misc/Globals";
 const cli = require('heroku-cli-util');
+import {Container} from "typescript-ioc";
+import {IDatabase} from "../interfaces/injectables/datbase.interface";
 
 export let debug = {
     silly  : function(obj : any, identifier:string = ''){
@@ -41,8 +42,9 @@ export function startupTable(guilds : GuildStats[]){
 
 // TODO: remove this and just convert everything that bot sends into embeds
 export function log(guild: Discord.Guild, message : string) : void {
+    const database: IDatabase = Container.get(IDatabase)
     message = message.replace('@', '@');
-    const logsChannel = gb.instance.database.getLogsChannel(guild.id);
+    const logsChannel = database.getGuildColumn(guild.id, 'logs_channel');
     if (!logsChannel){
         return debug.info(`Tried to log a message in ${guild.name} but a logs channel was not found.`);
     }

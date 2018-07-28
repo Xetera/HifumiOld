@@ -1,20 +1,24 @@
-import {Message, RichEmbed} from 'discord.js'
+import {Message} from 'discord.js'
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../interfaces/arg.interface";
-import Anime from "../../API/anime";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {debug} from "../../utility/Logging";
 import {randomRuntimeError} from "../../interfaces/Replies";
+import {IAnime} from "../../interfaces/injectables/anime.interface";
+import {Container} from "typescript-ioc";
 
 async function run(message: Message, input: [string]): Promise<any> {
     const [character] = input;
     const placeholder = <Message> await safeSendMessage(message.channel, 'Searching...');
-    Anime.getInstance().getCharacter(message, character).then((embed: RichEmbed) => {
+    const anime: IAnime = Container.get(IAnime);
+
+    try {
+        const embed = await anime.getCharacter(message, character);
         placeholder.edit(embed);
-    }).catch(err => {
+    } catch (err) {
         debug.error(err, `getCharacter`);
         placeholder.edit(randomRuntimeError());
-    })
+    }
 }
 
 export const command: Command = new Command(

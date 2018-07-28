@@ -1,7 +1,6 @@
 import {Cleverbot as Clevertype, Config} from 'clevertype'
 import {debug} from '../utility/Logging'
-import gb from "../misc/Globals";
-import {Client, Message, MessageMentions, TextChannel} from "discord.js";
+import {Message, MessageMentions, TextChannel} from "discord.js";
 import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import safeSendMessage from "../handlers/safe/SafeSendMessage";
 import {formattedTimeString, randRange, sanitizeUserInput, StringUtils} from "../utility/Util";
@@ -10,14 +9,17 @@ import {ICleverbot, Ignores} from "../interfaces/injectables/cleverbot.interface
 import moment = require("moment");
 import {ITokenBucket} from "../interfaces/injectables/tokenBucket.interface";
 import {Inject, Singleton} from "typescript-ioc";
+import {IDatabase} from "../interfaces/injectables/datbase.interface";
+import {IClient} from "../interfaces/injectables/client.interface";
 
 @Singleton
 export class Cleverbot extends ICleverbot {
     readonly identifier : RegExp = /hifumi/i;
     cleverbot : Clevertype;
     users: {[id: string]: {warnings: number, ignores: Ignores}} = {};
+    @Inject client: IClient;
     @Inject tokenBucket: ITokenBucket;
-
+    @Inject database: IDatabase;
     constructor(){
         super();
         let apiKey;
@@ -57,34 +59,36 @@ export class Cleverbot extends ICleverbot {
         this.cleverbot.setRegard(mood);
     }
 
-    public async checkMessage(message : Message, bot: Client) : Promise<void> {
+    public async checkMessage(message : Message) : Promise<void> {
         if (message.system
             || message.attachments.size
             || !(message.channel instanceof TextChannel)
             || StringUtils.isUrl(message.content)
             || StringUtils.isEmoji(message.content)
-            || await gb.instance.database.isUserIgnored(message.member)){
+            || await this.database.isUserIgnored(message.member)){
             return;
         }
 
-        let cleverbotCall = message.isMentioned(bot.user);
+        let cleverbotCall = message.isMentioned(this.client.user);
         if (cleverbotCall && !message.content.replace(MessageMentions.USERS_PATTERN, '')){
-            return void safeSendMessage(message.channel, prefixReminderEmbed(await gb.instance.database.getPrefix(message.guild.id)), 30000);
+            return void safeSendMessage(message.channel, prefixReminderEmbed(await this.database.getPrefix(message.guild.id)), 30000);
         }
 
-        const chatChannelId = await gb.instance.database.getChatChannel(message.guild.id);
+        const chatChannelId = await this.database.getGuildColumn(message.guild.id, 'chat_channel');
+        if (!chatChannelId){
+            return;
+        }
+        if (message.channel.id === chatChannelId || cleverbotCall || message.isMentioned(this.client.user)) {
 
-        if (message.channel.id === chatChannelId || cleverbotCall || message.isMentioned(bot.user)) {
-
-            if (!gb.instance.database.ready) {
+            if (!this.database.ready) {
                 safeSendMessage(message.channel, `😰 give me some time to get set up first.`);
                 return void debug.info(`Got message from ${message.guild.name} but the DB hasn't finished caching.`);
             }
 
             // don't respond to messages not meant for me
-            if (message.mentions.users.size !== 0 && !message.isMentioned(bot.user))
+            if (message.mentions.users.size !== 0 && !message.isMentioned(this.client.user))
                 return;
-            else if (message.content.startsWith('-') || message.content.startsWith(await gb.instance.database.getPrefix(message.guild.id)))
+            else if (message.content.startsWith('-') || message.content.startsWith(await this.database.getPrefix(message.guild.id)))
                 return;
             else if (this.isRateLimited(message.member.id, message)){
                 return;
@@ -145,7 +149,7 @@ export class Cleverbot extends ICleverbot {
             parsedArg = phrase;
 
         return this.cleverbot.say(parsedArg, id).then((response: string) => {
-            gb.instance.database.incrementCleverbotCalls(message.guild.id);
+            this.database.incrementCleverbotCalls(message.guild.id);
             if (!response) {
                 debug.warning(`Couldn't get a response...`, `Cleverbot`);
                 return this.say(message, phrase, id, replaceKeyword);

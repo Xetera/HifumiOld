@@ -5,7 +5,6 @@ import {Attachment, Message, RichEmbed, TextChannel} from "discord.js";
 import getAnimeEmbed from "../embeds/commands/fun/anime/getAnimeEmbed";
 import animeNotFoundEmbed from "../embeds/commands/fun/anime/animeNotFoundEmbed";
 import nsfwAnimeWarningEmbed from "../embeds/commands/fun/anime/nsfwAnimeWarningEmbed";
-import gb from "../misc/Globals";
 import {Environments} from "../events/systemStartup";
 import {debug} from "../utility/Logging";
 import getCharacterEmbed from "../embeds/commands/fun/anime/getCharacterEmbed";
@@ -14,29 +13,41 @@ import {AnimeUtils} from "../utility/animeUtils";
 import {normalizeString, StringUtils} from "../utility/Util";
 import {fetchUrlAsBase64} from "./utils";
 import whatAnimeEmbed from "../embeds/commands/fun/anime/whatAnimeEmbed";
+import {Inject, Singleton} from "typescript-ioc";
+import {IClient} from "../interfaces/injectables/client.interface";
+import {IDatabase} from "../interfaces/injectables/datbase.interface";
+import {handleFatalErrorGracefully} from "../handlers/process/fatal";
+import {IAnime} from "../interfaces/injectables/anime.interface";
 
 const fs = require('fs');
 const readFile = promisify(fs.readFile);
 
-export default class Anime {
+@Singleton
+export default class Anime extends IAnime {
     private readonly endpoint = 'https://graphql.anilist.co/';
     private readonly MALEndpoint = 'https://myanimelist.net/search/prefix.json?type=all&keyword=';
-    private static _instance: Anime;
     private anilist: AxiosInstance;
     private readonly whatanimeKey: string;
+    @Inject client: IClient;
+    @Inject database: IDatabase;
 
     private constructor() {
-        if (gb.ENV === Environments.Development) {
-            const settings = require('../../config0.json');
-            this.whatanimeKey = settings.whatanime.API_KEY;
-        } else {
-            const client_id = process.env['ANILIST_CLIENT_ID'];
-            const client_secret = process.env['ANILIST_CLIENT_SECRET'];
-            const what_anime_key = process.env['WHAT_ANIME_KEY'];
-            if (!client_id || !client_secret || !what_anime_key) {
-                throw new Error("Required Anime environment variables were not set in production")
+        super();
+        const whatAnimeKey = process.env['WHATANIME_KEY'];
+        if (this.client.env === Environments.Development) {
+            if (!whatAnimeKey) {
+                debug.warning(`'WHATANIME_KEY' was not found, Whatanime module is disabled.`)
+            } else {
+                this.whatanimeKey = whatAnimeKey;
             }
-            this.whatanimeKey = what_anime_key;
+        } else if (this.client.env === Environments.Production) {
+            if (!whatAnimeKey) {
+                handleFatalErrorGracefully(new Error(
+                    "Required Anime environment variable 'WHATANIME_KEY' was not set in production mode."
+                ));
+                return this;
+            }
+            this.whatanimeKey = whatAnimeKey;
         }
         this.anilist = axios.create({
             baseURL: this.endpoint,
@@ -47,19 +58,13 @@ export default class Anime {
         });
     }
 
-    public static getInstance(): Anime {
-        if (!Anime._instance) {
-            Anime._instance = new this();
-        }
-        return Anime._instance;
-    }
-
     private static async getQuery(query: string): Promise<string> {
         return await readFile(`src/API/graphql/queries/${query}.graphql`, {encoding: 'utf8'})
     }
 
 
     public async getAnime(message: Message, anime: string): Promise<RichEmbed | string> {
+
         /**
          * Why do you do it like this you ask? As much as I love AniList it has a god
          * awful search system.
@@ -70,8 +75,8 @@ export default class Anime {
         if (!MALId) {
             return await animeNotFoundEmbed(message.guild.id, 'anime')
         }
-        let response: AxiosResponse<{ data: { Media: getAnimeQueryResponse } }> ;
-        try{
+        let response: AxiosResponse<{ data: { Media: getAnimeQueryResponse } }>;
+        try {
             response = await this.anilist.post(`/`,
                 JSON.stringify({
                     query: await Anime.getQuery('getAnimeByMalId'),
@@ -79,8 +84,8 @@ export default class Anime {
                         id: MALId
                     }
                 }));
-        } catch (err){
-            if (err.response.status === 404){
+        } catch (err) {
+            if (err.response.status === 404) {
                 return await animeNotFoundEmbed(message.guild.id, 'anime');
             }
             return `Something went wrong while looking up this anime.`
@@ -93,7 +98,7 @@ export default class Anime {
         return getAnimeEmbed(data);
     }
 
-    public async getAnimeByAnilistId(id: string) {
+    private async getAnimeByAnilistId(id: string) {
         const response: AxiosResponse<{ data: { Media: getAnimeQueryResponse } }> = await this.anilist.post(`/`,
             JSON.stringify({
                 query: await Anime.getQuery('getAnimeByAnilistId'),
@@ -163,7 +168,7 @@ export default class Anime {
             let buffer;
             try {
                 buffer = await fetchUrlAsBase64(picture, isGif);
-            } catch (err){
+            } catch (err) {
                 console.log(err);
                 return [err, undefined]
             }
@@ -184,31 +189,31 @@ export default class Anime {
                 {headers: {'Content-Type': 'application/x-www-form-urlencoded', 'charset': 'UTF-8'}});
 
         } catch (e) {
-            if (e.response.status === 413){
+            if (e.response.status === 413) {
                 return [
                     "That is a _pretty_ gigantic image. There's a 1MB upload limit for this, choose something smaller. " +
                     "I will be able to compress and resize images automatically in future updates.",
                     undefined
                 ]
             }
-            else if (e.response.status === 504){
+            else if (e.response.status === 504) {
                 return [
                     "Couldn't receive a valid response from the server, it's most likely overloaded.",
-                undefined]
+                    undefined]
             }
             return [`Huh? That's not supposed to happen!\n**Message: **${e.message || e.response.data}\n**Status Code:** ${e.response.status}`, undefined]
         }
 
         const data = response.data;
 
-        if (typeof data === 'string'){
+        if (typeof data === 'string') {
             return [data, undefined];
         }
 
 
         const result = data.docs[0];
 
-        if (!result){
+        if (!result) {
             return ["Could not receive a response from the server, either whatanime.ga API is down or " +
             "there's a problem somewhere else.", undefined]
         }

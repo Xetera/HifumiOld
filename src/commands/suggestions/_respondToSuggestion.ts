@@ -1,5 +1,4 @@
 import {Message, TextChannel} from "discord.js";
-import gb from "../../misc/Globals";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import suggestionEmbed from "../../embeds/commands/suggestions/suggestionEmbed";
 import resolveBooleanUncertainty from "../../resolvers/resolveBooleanUncertainty";
@@ -7,6 +6,8 @@ import areYouSureEmbed from "../../embeds/commands/areYouSureEmbed";
 import suggestionAcceptedDMEmbed from "../../embeds/commands/suggestions/suggestionAcceptedDMEmbed";
 import suggestionRejectionEmbed from "../../embeds/commands/suggestions/suggestionRejectedDMEmbed";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
+import {IDatabase} from "../../interfaces/injectables/datbase.interface";
+import {Container} from "typescript-ioc";
 
 export enum SuggestionResponse {
     PENDING,
@@ -18,7 +19,8 @@ export enum SuggestionResponse {
 export async function _respondToSuggestion(message: Message, input: [number, string], response: SuggestionResponse): Promise<any> {
     const [id, reason] = input;
 
-    const suggestion = await gb.instance.database.getSuggestion(message.guild.id, id.toString());
+    const database: IDatabase = Container.get(IDatabase)
+    const suggestion = await database.getSuggestion(message.guild.id, id.toString());
     if (!suggestion){
         return await handleFailedCommand(
             message.channel, `I can't respond to that suggestion because it doesn't exist.`
@@ -49,7 +51,7 @@ export async function _respondToSuggestion(message: Message, input: [number, str
 
     if (response === SuggestionResponse.ACCEPTED){
         let response = `Accepted suggestion #${suggestion.suggestion_id}`;
-        const updateResult = await gb.instance.database.acceptSuggestion(id.toString(), reason);
+        const updateResult = await database.acceptSuggestion(id.toString(), reason);
         const acceptedSuggestion = updateResult.raw[0];
         const acceptionEmbed = suggestionEmbed(message, acceptedSuggestion);
         if (user){
@@ -65,7 +67,7 @@ export async function _respondToSuggestion(message: Message, input: [number, str
     }
     else if (response === SuggestionResponse.REJECTED){
         let response = `Rejected suggestion #${suggestion.suggestion_id}`;
-        const updateResult = await gb.instance.database.rejectSuggestion(id.toString(), reason);
+        const updateResult = await database.rejectSuggestion(id.toString(), reason);
         const rejectedSuggestion = updateResult.raw[0];
         const rejectionEmbed = suggestionEmbed(message, rejectedSuggestion);
         if (user){

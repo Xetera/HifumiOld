@@ -1,5 +1,4 @@
 import {DiscordAPIError,  Message} from "discord.js";
-import gb from "../../misc/Globals";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {codeBlock} from "../../utility/Markdown";
 import safeMessageUser from "../../handlers/safe/SafeMessageUser";
@@ -7,13 +6,16 @@ import {debug} from "../../utility/Logging";
 import {Command} from "../../handlers/commands/Command";
 import {UserPermissions} from "../../interfaces/command.interface";
 import {ArgType} from "../../interfaces/arg.interface";
+import {IClient} from "../../interfaces/injectables/client.interface";
+import {Container} from "typescript-ioc";
+import {_eval} from "../../misc/eval";
 
 export default async function run(message: Message, input: [string]){
     let [req] = input;
-
+    const bot: IClient = Container.get(IClient);
     debug.silly(`Owner ${message.author.username} called Eval in ${message.guild.name}`);
 
-    if (message.author.id !== gb.ownerID)
+    if (message.author.id !== bot.owner)
         return;
 
     let isCodeBlock: boolean = true;
@@ -34,7 +36,7 @@ export default async function run(message: Message, input: [string]){
 
     let response;
     try {
-        response = gb.instance.eval(message, req);
+        response = _eval(message, req);
     }
     catch (err) {
         response = err.toString();

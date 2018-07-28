@@ -1,16 +1,18 @@
 import {Message} from "discord.js";
-import gb from "../../misc/Globals";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import approveSuggestion from "./_approveSuggestion";
 import {Suggestion} from "../../database/models/suggestion";
 import {LogManager} from "../../handlers/logging/logManager";
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../interfaces/arg.interface";
+import {IDatabase} from "../../interfaces/injectables/datbase.interface";
+import {Container} from "typescript-ioc";
 
 async function run(message: Message, input: [string]): Promise<any> {
     const [suggestion] = input;
 
-    const r: Partial<Suggestion> = await gb.instance.database.addSuggestion(message, suggestion);
+    const database: IDatabase = Container.get(IDatabase)
+    const r: Partial<Suggestion> = await database.addSuggestion(message, suggestion);
 
     if (message.member.hasPermission('BAN_MEMBERS')){
         safeSendMessage(message.channel, `Alright sir, I'll get that straight past the review stage for you.`);

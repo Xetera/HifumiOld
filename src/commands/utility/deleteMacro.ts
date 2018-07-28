@@ -1,5 +1,4 @@
 import {Message} from "discord.js";
-import gb from "../../misc/Globals";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import {debug} from "../../utility/Logging";
 import {Command} from "../../handlers/commands/Command";
@@ -8,10 +7,13 @@ import {UserPermissions} from "../../interfaces/command.interface";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {randomRuntimeError} from "../../interfaces/Replies";
 import successEmbed from "../../embeds/commands/successEmbed";
+import {IDatabase} from "../../interfaces/injectables/datbase.interface";
+import {Container} from "typescript-ioc";
 
 async function run(message: Message, input: [string]): Promise<any> {
     const [macroName] = input;
-    const existingMacro = await gb.instance.database.getMacro(message.guild.id, macroName);
+    const database: IDatabase = Container.get(IDatabase);
+    const existingMacro = await database.getMacro(message.guild.id, macroName);
     if (!existingMacro) {
         return void handleFailedCommand(
             message.channel, `Macro **${macroName}** was not found.`
@@ -19,8 +21,8 @@ async function run(message: Message, input: [string]): Promise<any> {
     }
 
     try {
-        const prefix = await gb.instance.database.getPrefix(message.guild.id);
-        await gb.instance.database.deleteMacro(message.guild, macroName);
+        const prefix = await database.getPrefix(message.guild.id);
+        await database.deleteMacro(message.guild, macroName);
         safeSendMessage(message.channel, successEmbed(message.member, `Macro **${prefix}${macroName}** removed.`));
     }
     catch (err){

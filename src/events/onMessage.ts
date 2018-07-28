@@ -1,9 +1,7 @@
 import * as Discord from'discord.js'
-import * as dbg from 'debug'
 import inviteListener from '../listeners/InviteListener'
 import * as moment from "moment";
 import {MessageType} from "../interfaces/identifiers";
-import {default as gb} from "../misc/Globals";
 import DMCommandHandler from "../handlers/commands/DMCommandHandler";
 import pingListener from "../listeners/pingListener";
 import memeListener from "../listeners/memeListener";
@@ -11,27 +9,25 @@ import hexListener from "../listeners/hexListener";
 import {ICleverbot} from "../interfaces/injectables/cleverbot.interface";
 import {Container} from "typescript-ioc";
 import {ICommandHandler} from "../interfaces/injectables/commandHandler.interface";
-
-export const debug = {
-    silly: dbg('Bot:onMessage:Silly'),
-    info: dbg('Bot:onMessage:Info'),
-    warning: dbg('Bot:onMessage:Warning'),
-    error: dbg('Bot:onMessage:Error')
-};
+import {IMessageQueue} from "../interfaces/injectables/messageQueue.interface";
+import {IDatabase} from "../interfaces/injectables/datbase.interface";
+import {IClient} from "../interfaces/injectables/client.interface";
+import {debug} from "../utility/Logging";
 
 interface Message extends Discord.Message {
     sent : Date;
 }
 
 function middleWare(msg: Discord.Message, ignored: boolean){
-    const {messageQueue, bot, database} = gb.instance;
+    const messageQueue: IMessageQueue = Container.get(IMessageQueue);
+
     const message = <Message> msg;
     message.sent = moment(new Date()).toDate();
     messageQueue.add(message);
     const hifumi: ICleverbot = Container.get(ICleverbot);
 
-    hifumi.checkMessage(message, bot);
-    pingListener(message, database);
+    hifumi.checkMessage(message);
+    pingListener(message);
     inviteListener(message);
     if (!ignored) {
 
@@ -41,16 +37,17 @@ function middleWare(msg: Discord.Message, ignored: boolean){
 }
 
 export default async function onMessage(message: Discord.Message){
+    const database: IDatabase = Container.get(IDatabase);
+    const bot: IClient = Container.get(IClient);
     // we don't want to look at bot messages at all
     if (message.author.bot
-        || gb.sleeping
-        || !gb.instance
-        || !gb.instance.database.ready
+        || bot.sleeping
+        || !database.ready
         || message.guild && !message.guild.available
-        || (message.guild && await gb.instance.database.getChannelIgnored(message.guild.id, message.channel.id))){
+        || (message.guild && await database.getChannelIgnored(message.guild.id, message.channel.id))){
         return;
     }
-    else if (!gb.instance || !gb.instance.database.ready) {
+    else if (!database.ready) {
         return void debug.info(`Got message from ${message.guild.name} but the DB hasn't finished caching.`);
     }
 
@@ -61,8 +58,8 @@ export default async function onMessage(message: Discord.Message){
     let guildEnabled;
     let userIgnored;
     if (messageType === MessageType.GuildMessage){
-        guildEnabled = await gb.instance.database.getGuildEnabled(message.guild.id);
-        userIgnored = await gb.instance.database.isUserIgnored(message.member);
+        guildEnabled = await database.getGuildColumn(message.guild.id, 'enabled');
+        userIgnored = await database.isUserIgnored(message.member);
         if (guildEnabled)
             middleWare(message, userIgnored);
     }
@@ -72,7 +69,7 @@ export default async function onMessage(message: Discord.Message){
     else if (messageType === MessageType.PrivateMessage)
         return DMCommandHandler(message);
 
-    const prefix = await gb.instance.database.getPrefix(message.guild.id)
+    const prefix = await database.getPrefix(message.guild.id);
 
     if (!message.content.startsWith(prefix))
         return;

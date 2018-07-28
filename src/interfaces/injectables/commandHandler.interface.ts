@@ -1,4 +1,4 @@
-import {Client, Message} from "discord.js";
+import {Client, GuildMember, Message} from "discord.js";
 import {Command} from "../../handlers/commands/Command";
 import {Instance} from "../../misc/Globals";
 import {ICleverbot} from "./cleverbot.interface";
@@ -6,6 +6,7 @@ import {MuteQueue} from "../../moderation/MuteQueue";
 import {MessageQueue} from "../../moderation/MessageQueue";
 import {Database} from "../../database/Database";
 import {ArgOptions} from "../arg.interface";
+import {UserPermissions} from "../command.interface";
 
 export interface CommandParameters extends Instance {
     message:Message;
@@ -36,5 +37,5 @@ export abstract class ICommandHandler {
     //*Private*/ abstract async _run(message: Message, command: Command, params: CommandParameters){
     //*Private*/ static checkBrokenFunction(command: Command);
     abstract findCommand(targetName: string, excludeOwner: boolean): Command | undefined;
-
+    abstract getMissingUserPermission(executor: GuildMember, command: Command): UserPermissions | false;
 }

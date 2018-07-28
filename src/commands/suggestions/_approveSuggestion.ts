@@ -1,14 +1,16 @@
 import {Message, TextChannel} from "discord.js";
-import gb from "../../misc/Globals";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {UpdateResult} from "typeorm";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import {debug} from "../../utility/Logging";
 import suggestionEmbed from "../../embeds/commands/suggestions/suggestionEmbed";
+import {IDatabase} from "../../interfaces/injectables/datbase.interface";
+import {Container} from "typescript-ioc";
 
 export default async function approveSuggestion(message: Message, input: [string]){
     const [id] = input;
-    const suggestionsChannel = await gb.instance.database.getSuggestionsChannel(message.guild.id);
+    const database: IDatabase = Container.get(IDatabase)
+    const suggestionsChannel = await database.getGuildColumn(message.guild.id, 'suggestions_channel');
 
     if (!suggestionsChannel){
         await handleFailedCommand(
@@ -25,7 +27,7 @@ export default async function approveSuggestion(message: Message, input: [string
         return Promise.reject(`Channel missing`);
     }
 
-    const response = await gb.instance.database.getSuggestion(message.guild.id, id)
+    const response = await database.getSuggestion(message.guild.id, id)
     if (!response){
         await handleFailedCommand(
             message.channel, `I couldn't find any suggestion with the id **${id}**`
@@ -33,7 +35,7 @@ export default async function approveSuggestion(message: Message, input: [string
         return Promise.reject(`Missing suggestion id`);
     }
 
-    gb.instance.database.approveSuggestion(id.toString()).then((r: UpdateResult) => {
+    database.approveSuggestion(id.toString()).then((r: UpdateResult) => {
         const embed = suggestionEmbed(message, r.raw[0]);
         return Promise.all([safeSendMessage(channel, embed), r.raw[0].suggestion_id]);
     }).then(async(response: [Message|Message[]|void, string]) => {
@@ -41,7 +43,7 @@ export default async function approveSuggestion(message: Message, input: [string
         if (r){
             await (<Message> r).react(`👍`);
             await (<Message> r).react(`👎`);
-            await gb.instance.database.setSuggestionMetadata(
+            await database.setSuggestionMetadata(
                 suggestion_id,
                 (<Message> r).channel.id,
                 (<Message> r).id

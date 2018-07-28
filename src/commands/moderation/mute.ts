@@ -1,5 +1,4 @@
 import {Message, GuildMember} from "discord.js";
-import gb from "../../misc/Globals";
 import moment = require("moment");
 import {formattedTimeString} from "../../utility/Util";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
@@ -8,10 +7,12 @@ import {ArgType} from "../../interfaces/arg.interface";
 import {UserPermissions} from "../../interfaces/command.interface";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import successEmbed from "../../embeds/commands/successEmbed";
+import {Container} from "typescript-ioc";
+import {IMuteQueue} from "../../interfaces/injectables/muteQueue.interface";
 
 async function run(message: Message, input: [GuildMember, number, string]): Promise<any> {
     const [member, duration, reason] = input;
-
+    const muteQueue: IMuteQueue = Container.get(IMuteQueue)
     // controlling for edge cases
     if (duration == 0 || typeof duration !== 'number' || isNaN(duration)) {
         return void await handleFailedCommand(
@@ -44,7 +45,7 @@ async function run(message: Message, input: [GuildMember, number, string]): Prom
 
     const unmuteDate = moment(new Date()).add(duration, 'm').toDate();
 
-    gb.instance.muteQueue.add(
+    muteQueue.add(
         member,
         message.member,
         unmuteDate,

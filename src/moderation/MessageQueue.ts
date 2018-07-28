@@ -1,33 +1,29 @@
-import * as Discord from "discord.js";
 import * as moment from "moment";
-
-import {MuteQueue} from "./MuteQueue";
 import {
      getMuteDate, getSpamTolerance,
 } from "../utility/Settings";
 import {debug} from '../utility/Logging'
-import {Database} from "../database/Database";
 import Tracklist from "./Tracklist";
-import gb from "../misc/Globals";
 import {Offense} from "./interfaces";
-import { GuildMember,} from "discord.js";
+import {Channel, Guild, GuildMember, TextChannel,} from "discord.js";
 import safeBulkDelete from "../handlers/safe/safeBulkDelete";
+import {Container, Inject, Singleton} from "typescript-ioc";
+import {CachedMessage, IMessageQueue} from "../interfaces/injectables/messageQueue.interface";
+import {IMuteQueue} from "../interfaces/injectables/muteQueue.interface";
+import {IDatabase} from "../interfaces/injectables/datbase.interface";
+import {ITracklist} from "../interfaces/injectables/tracklist.interface";
 
-interface CachedMessage extends Discord.Message {
-    sent : Date;
-}
+@Singleton
+export class MessageQueue extends IMessageQueue {
+    @Inject trackList: Tracklist;
+    @Inject muteQueue: IMuteQueue;
+    @Inject db: IDatabase;
 
-export class MessageQueue {
     queue : Map<string, CachedMessage[]>;
-    trackList: Tracklist;
-    bufferLength : number;
-    muteQueue : MuteQueue;
-    db : Database;
-    constructor(muteQueue : MuteQueue, database: Database, watchlist: Tracklist, size ?: number){
-        this.muteQueue = muteQueue;
-        this.db = database;
+    bufferLength: number;
+    constructor(size ?: number){
+        super();
         this.queue = new Map<string, CachedMessage[]>();
-        this.trackList = watchlist;
         this.bufferLength = size ? size : 200;
         debug.info('MessageQueue is ready.', "MessageQueue");
     }
@@ -58,7 +54,8 @@ export class MessageQueue {
     }
 
     //gets called every message
-    private async checkForSpam(member : Discord.GuildMember) {
+    private async checkForSpam(member: GuildMember) {
+        const db: IDatabase = Container.get(IDatabase);
         const spamMessages : CachedMessage[] | void = this.getRecentUserMessages(member);
         if (!spamMessages) return;
 
@@ -67,12 +64,12 @@ export class MessageQueue {
 
         if (isUserSpamming){
             // checking if the user is new before punishing
-            const spamFilter = await gb.instance.database.getSpamFilter(member.guild.id);
+            const spamFilter = await db.getGuildColumn(member.guild.id, 'spam_filter');
             if (!spamFilter){
                 return;
             }
-            const watchlist = gb.instance.trackList;
-            if (watchlist.isNewMember(member) && await gb.instance.database.getTrackNewMembers(member.guild.id)){
+            const watchlist: ITracklist = Container.get(ITracklist);
+            if (watchlist.isNewMember(member) && await db.getGuildColumn(member.guild.id, 'tracking_new_members')){
                 return watchlist.punishNewMember(member, Offense.Spam);
             }
 
@@ -109,13 +106,13 @@ export class MessageQueue {
         safeBulkDelete(messages[0].channel, messages);
     }
 
-    public checkLockdown(guild : Discord.Guild): boolean {
+    public checkLockdown(guild: Guild): boolean {
         //const lockdown : boolean =return true;
         return true;
     }
 
-    private getRecentUserMessages(member : Discord.GuildMember) : CachedMessage[] | void {
-        const guild : Discord.Guild = member.guild;
+    private getRecentUserMessages(member: GuildMember) : CachedMessage[] | void {
+        const guild: Guild = member.guild;
         const tolerance : Date = moment(new Date()).subtract(5, 's').toDate();
 
         const messages : CachedMessage[] | undefined = this.queue.get(guild.id);
@@ -131,9 +128,9 @@ export class MessageQueue {
         );
     }
 
-    public getQueue(channel : Discord.Channel){
+    public getQueue(channel: Channel){
         let output : string = "";
-        if (channel instanceof Discord.TextChannel){
+        if (channel instanceof TextChannel){
             const guild = channel.guild;
             const messages : CachedMessage[] | undefined = this.queue.get(guild.id);
             if (messages === undefined) return;

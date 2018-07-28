@@ -1,6 +1,5 @@
 import { Message, TextChannel} from "discord.js";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
-import gb from "../../misc/Globals";
 import setConfigChannelEmbed from "../../embeds/commands/configEmbed/setConfigChannelEmbed";
 import {random} from "../../utility/Util";
 import {runtimeErrorResponses} from "../../interfaces/Replies";
@@ -9,10 +8,13 @@ import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../interfaces/arg.interface";
 import {UserPermissions} from "../../interfaces/command.interface";
 import successEmbed from "../../embeds/commands/successEmbed";
+import {IDatabase} from "../../interfaces/injectables/datbase.interface";
+import {Container} from "typescript-ioc";
 
 async function setChatChannel(message: Message, channel: TextChannel) {
+    const database: IDatabase = Container.get(IDatabase);
     try {
-        await gb.instance.database.setChatChannel(message.guild.id, channel.id);
+        await database.setChatChannel(message.guild.id, channel.id);
         await message.channel.send(
             setConfigChannelEmbed(channel, 'chat')
         );
@@ -29,12 +31,13 @@ async function setChatChannel(message: Message, channel: TextChannel) {
 
 async function run(message: Message, input: [(TextChannel | boolean | undefined)]) {
     const [target] = input;
+    const database: IDatabase = Container.get(IDatabase);
     if (target instanceof TextChannel) {
         setChatChannel(message, target);
     }
     else if (target === false) {
         try {
-            await gb.instance.database.removeChatChannel(message.guild.id);
+            await database.setGuildColumn(message.guild.id, 'chat_channel', undefined);
             return safeSendMessage(message.channel, successEmbed(message.member, `Removed your chat channel.`));
         }
         catch (err) {

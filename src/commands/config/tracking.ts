@@ -1,15 +1,17 @@
 import {Message} from "discord.js";
-import gb from "../../misc/Globals";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {Command} from "../../handlers/commands/Command";
 import {UserPermissions} from "../../interfaces/command.interface";
 import {ArgType} from "../../interfaces/arg.interface";
 
+import {IDatabase} from "../../interfaces/injectables/datbase.interface";
+import {Container} from "typescript-ioc";
 export async function setMemberTracking(message: Message, input: [(boolean | undefined)]){
     const [choice] = input;
+    const database: IDatabase = Container.get(IDatabase);
     // could also be false, can't check with !
     if (choice === undefined){
-        const status = await gb.instance.database.getTrackNewMembers(message.guild.id);
+        const status = await database.getGuildColumn(message.guild.id, 'tracking_new_members');
         if (status){
             safeSendMessage(message.channel, `My tracking setting is currently on.`);
         } else {
@@ -18,7 +20,7 @@ export async function setMemberTracking(message: Message, input: [(boolean | und
         return;
     }
 
-    await gb.instance.database.setTrackNewMembers(message.guild.id, choice);
+    await database.setGuildColumn(message.guild.id,'tracking_new_members', choice);
     if (!choice)
         safeSendMessage(message.channel, `No longer tracking new members in this server.`);
     else

@@ -1,34 +1,28 @@
-import * as Discord from 'discord.js'
-import { getMemberTrackDuration, securityLevel, SecurityLevels} from "../utility/Settings";
-import {default as gb} from "../misc/Globals";
+import { getMemberTrackDuration, securityLevel} from "../utility/Settings";
 import {Guild, GuildMember, Message} from "discord.js";
 import {Offense} from "./interfaces";
 import banTrackedUserForInvite from "../actions/punishments/tracklist/BanTrackedUserForInvite";
 import banTrackedUserForSpam from "../actions/punishments/tracklist/banTrackedUserForSpam";
 import {debug} from '../utility/Logging';
+import {guildId, ITracklist, TrackedMember} from "../interfaces/injectables/tracklist.interface";
+import {IClient} from "../interfaces/injectables/client.interface";
+import {Inject} from "typescript-ioc";
+import {IDatabase} from "../interfaces/injectables/datbase.interface";
 
-type guildId = string;
-
-interface TrackedMember extends GuildMember {
-    security : SecurityLevels;
-    join_date: Date;
-    banned: boolean;
-}
-
-
-
-export default class Tracklist {
-    members : Map<guildId, TrackedMember[]>;
+export default class Tracklist extends ITracklist {
+    members: Map<guildId, TrackedMember[]>;
     trackedMessages: Map<guildId, Message[]>;
-
+    @Inject client: IClient;
+    @Inject database: IDatabase;
     constructor(){
+        super();
         this.trackedMessages = new Map<guildId, Message[]>();
         this.members = new Map<guildId, TrackedMember[]>();
     }
 
     // called on startup
     public initializeGuilds(){
-        const guildIds = gb.instance.bot.guilds.map(guild => guild.id);
+        const guildIds = this.client.guilds.map(guild => guild.id);
         for (let i in guildIds){
             this.members.set(guildIds[i], []);
         }
@@ -38,21 +32,13 @@ export default class Tracklist {
         this.members.set(guild.id, []);
     }
 
-    public getMember(member: Discord.GuildMember) : TrackedMember | undefined {
+    public getMember(member: GuildMember) : TrackedMember | undefined {
         const members = this.members.get(member.guild.id)!;
         return members.find(cached => cached.id === member.id);
     }
 
-    public getAllMembers(){
-        let out = '';
-        this.members.forEach((value, key) => {
-            out += `${gb.instance.bot.guilds.get(key)!.name}: ${value.join(', ')} \n`;
-        });
-        return out;
-    }
-
-    public async add(member: Discord.GuildMember){
-        if (!await gb.instance.database.getTrackNewMembers(member.guild.id)){
+    public async add(member: GuildMember){
+        if (!await this.database.getGuildColumn(member.guild.id, 'tracking_new_members')){
             return;
         }
 

@@ -1,10 +1,12 @@
 import {GuildMember, RichEmbed} from "discord.js";
 import {Infraction} from "../../database/models/infraction";
-import InfractionHandler from "../../handlers/internal/infractions/InfractionHandler";
+import {IInfractionHandler} from "../../interfaces/injectables/infractionHandler.interface";
+import {Container} from "typescript-ioc";
 
 export default function banByInfractionDMEmbed(member: GuildMember,lastInfraction: Infraction, previousStrikes: Infraction[]){
-    const banInfraction: string = InfractionHandler.formatInfraction(lastInfraction, true);
-    const infractions: string[] = previousStrikes.map(p => InfractionHandler.formatInfraction(p, true));
+    const infractionHandler: IInfractionHandler = Container.get(IInfractionHandler);
+    const banInfraction: string = infractionHandler.formatInfraction(lastInfraction, true);
+    const infractions: string[] = previousStrikes.map(p => infractionHandler.formatInfraction(p, true));
     const embed = new RichEmbed()
         .setTitle(`Banned ⛔`)
         .setColor(`#ff0000`)

@@ -5,26 +5,30 @@ import Timer = NodeJS.Timer;
 import { debug} from "../utility/Logging";
 import moment = require("moment");
 import muteUser from "../actions/punishments/MuteUser";
-import gb from "../misc/Globals";
 import {formattedTimeString} from "../utility/Util";
 import {Offense} from "./interfaces";
 import unmuteDMEmbed from "../embeds/moderation/unmuteDMEmbed";
-import {Container} from "typescript-ioc";
+import {Container, Inject, Singleton} from "typescript-ioc";
+import {IMutedMember, IMuteQueue} from "../interfaces/injectables/muteQueue.interface";
+import {IDatabase} from "../interfaces/injectables/datbase.interface";
+import {IMessageQueue} from "../interfaces/injectables/messageQueue.interface";
 
 
-class MutedMember  {
-    name : string;
-    muteDate : Date;
-    timeout ?: Timer;
-    muted : boolean;
+class MutedMember extends IMutedMember  {
+    name: string;
+    muteDate: Date;
+    timeout?: Timer;
+    muted: boolean;
 
-    constructor(public member : Discord.GuildMember,
-                public mutedBy: GuildMember,
-                public role : Discord.Role,
-                public unmuteDate : Date,
-                public reason: string,
-                public duration: number,
-                public muteQueue: MuteQueue){
+    constructor(
+        public member : Discord.GuildMember,
+        public mutedBy: GuildMember,
+        public role : Discord.Role,
+        public unmuteDate : Date,
+        public reason: string,
+        public duration: number,
+    ){
+        super();
         this.name = member.nickname || member.user.username; // this can change but we don't care
         this.muteDate = new Date();
 
@@ -50,11 +54,14 @@ class MutedMember  {
     }
 }
 
-export class MuteQueue {
+@Singleton
+export class MuteQueue extends IMuteQueue {
     queue : Map<string, MutedMember[]>;
     //  group of raiders, currently not functioning
     raiders : Map<string, MutedMember[]>;
-    constructor(){
+    @Inject public database: IDatabase;
+    constructor(public messageQueue: IMessageQueue){
+        super();
         this.queue = new Map<string, MutedMember[]>();
         this.raiders = new Map<string, MutedMember[]>();
         debug.info('MuteQueue is ready.', "MuteQueue");
@@ -90,7 +97,7 @@ export class MuteQueue {
         let guild : MutedMember[] | undefined = this.queue.get(member.guild.id);
 
         let role: Discord.Role | undefined;
-        const savedRoleId = await gb.instance.database.getMuteRole(member.guild.id);
+        const savedRoleId = await this.database.getMuteRole(member.guild.id);
         if (savedRoleId){
             role = member.guild.roles.get(savedRoleId);
         }
@@ -103,7 +110,7 @@ export class MuteQueue {
         }
 
         let mutedMember : MutedMember = new MutedMember(
-            member, mutedBy, role, unmuteDate, reason, duration ? duration : getMuteTime(), this
+            member, mutedBy, role, unmuteDate, reason, duration ? duration : getMuteTime()
         );
 
         if (guild !== undefined) {
@@ -133,8 +140,8 @@ export class MuteQueue {
             if (guild!.length > 1)
                 this.sortGuild(member.guild.id);
             if (result){
-                gb.instance.messageQueue.removeUsersRecentMessages(member);
-                gb.instance.database.addMutedUser(member.guild.id, member.id, unmuteDate);
+                this.messageQueue.removeUsersRecentMessages(member);
+                this.database.addMutedUser(member.guild.id, member.id, unmuteDate);
                 this.scheduleUnmute(member, reason, duration);
                 return true;
             }

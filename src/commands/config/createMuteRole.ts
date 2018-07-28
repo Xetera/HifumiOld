@@ -1,14 +1,16 @@
 import {Guild, Message, Role} from "discord.js";
 import {Command} from "../../handlers/commands/Command";
 import {UserPermissions} from "../../interfaces/command.interface";
-import gb from "../../misc/Globals";
 import resolveBooleanUncertainty from "../../resolvers/resolveBooleanUncertainty";
 import {APIErrors} from "../../interfaces/Errors";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import {debug} from "../../utility/Logging";
 import {ArgType} from "../../interfaces/arg.interface";
+import {Container} from "typescript-ioc";
+import {IDatabase} from "../../interfaces/injectables/datbase.interface";
 
 async function createMuteRole(guild: Guild, name: string = 'muted-by-hifumi'): Promise<Role> {
+    const database = Container.get(IDatabase);
     const role = await guild.createRole({
         name: name,
         color: '#7c6666',
@@ -19,13 +21,15 @@ async function createMuteRole(guild: Guild, name: string = 'muted-by-hifumi'): P
         return Promise.reject(new Error(APIErrors.MISSING_PERMISSIONS))
     });
 
-    await gb.instance.database.setMuteRole(guild.id, role.id);
+    await database.setMuteRole(guild.id, role.id);
     return role;
 }
 
 async function run(message: Message, input: [(string | undefined)]): Promise<any> {
     //const [name] = input;
-    let existingRole = await gb.instance.database.getMuteRole(message.guild.id);
+
+    const database = Container.get(IDatabase);
+    let existingRole = await database.getMuteRole(message.guild.id);
     if (!existingRole) {
         const prompt: string = `I could not find a mute role, would you like me to set one up automatically ` +
             `with the name ? '${input ? input : 'muted-by-hifumi'}' (you can set a custom role name by ` +

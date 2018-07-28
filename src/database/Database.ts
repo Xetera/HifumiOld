@@ -6,7 +6,6 @@ import {
     UpdateResult
 } from 'typeorm'
 import {IORMConfig} from "./ormconfig.interface";
-import gb from "../misc/Globals";
 import {Environments} from "../events/systemStartup";
 import {debug} from "../utility/Logging";
 import {User} from "./models/user";
@@ -20,42 +19,45 @@ import moment = require("moment");
 import {MutedUser} from "./models/mutedUser";
 import {Suggestion} from "./models/suggestion";
 import {IgnoredChannel} from "./models/ignoredChannel";
+import {IDatabase, IWelcomeMessage} from "../interfaces/injectables/datbase.interface";
+import {handleFatalErrorGracefully} from "../handlers/process/fatal";
+import {Inject, Singleton} from "typescript-ioc";
+import {IClient} from "../interfaces/injectables/client.interface";
 const rootConfig: IORMConfig = require('../../ormconfig.json');
 
-interface IWelcomeMessage {
-    message: Message;
-    userId: string;
-}
-
-export interface ORMUpdateResult<T> extends UpdateResult {
-    raw: T[];
-}
-
-export class Database {
-    env: Environments;
+@Singleton
+export class Database extends IDatabase {
     connectionString: string;
     conn: Connection;
+    @Inject client: IClient;
     /**
      * Tells when the database is ready for other instances to query
      * @type {boolean}
      */
     ready: boolean = false;
     welcomeMessages: {[id: string]: IWelcomeMessage[]} = {};
-    constructor(url: string) {
-        this.env = gb.ENV;
-        this.connectionString = url;
-        debug.info(`Logging into postgres in ${this.env === Environments.Development ? 'dev' : 'live'} mode.`, `Database`);
-        this.connect(url).then(conn => {
+    constructor() {
+        super();
+        const connString: string | undefined = process.env['POSTGRES_URL'] || process.env['DATABASE_URL'];
+        if (!connString){
+            const error: Error = new Error(
+                "Missing 'POSTGRES_URL' or 'DATABASE_URL' environment variable " +
+                "this bot cannot run without a postgres connection. Make sure you've properly " +
+                "configured your environment variables or set up a .env file with the required info."
+            );
+            handleFatalErrorGracefully(error);
+            return;
+        }
+        this.connectionString = connString;
+        debug.info(`Logging into postgres in ${this.client.env === Environments.Development ? 'dev' : 'live'} mode.`, `Database`);
+        this.connect(this.connectionString).then(conn => {
             debug.info(`Logged into postgres`, `Database`);
             this.conn = conn;
             return this.sync();
         }).then(() => {
             this.ready = true;
         }).catch(err => {
-            debug.error(`Could not connect to the database properly ...exiting application`);
-            debug.error(err);
-            gb.sleeping = true;
-            gb.instance.bot.user.setActivity('Sleeping...');
+            return handleFatalErrorGracefully(err);
         });
     }
 
@@ -65,7 +67,7 @@ export class Database {
      * @param {string} url
      * @returns {Promise<Connection>}
      */
-    public connect(url: string): Promise<Connection> {
+    private connect(url: string): Promise<Connection> {
         debug.silly(`Connecting to postgres on url ${url}`, `Database`);
         return this.ormConfig(url).then(() => {
             return createConnection({
@@ -76,10 +78,8 @@ export class Database {
                     // DO NOT TURN THESE ON FOR PRODUCTION
                     // I'M SERIOUS DON'T DO IT
 
-                    synchronize: this.env === Environments.Development,
-                    //dropSchema:  this.env === Environments.Development,
-
-                    // DUDE I'M 100% SERIOUSLY RN I'LL GET SUPER MAD OK
+                    synchronize: this.client.env === Environments.Development,
+                    //dropSchema:  this.env === Environments.Developmentclient.envclient.envclient.env DUDE I'M 100% SERIOUSLY RN I'LL GET SUPER MAD OK
                 cli: {
                     migrationsDir: 'migrations'
                 },
@@ -124,26 +124,22 @@ export class Database {
      * Syncs the database with currently
      * @returns {Promise<void>}
      */
-    public async sync(): Promise<void> {
+    private async sync(): Promise<void> {
         debug.silly(`Crosschecking database`, `Database`);
-        const guilds = gb.instance.bot.guilds.array();
-        for (let i in guilds) {
-            const guild = guilds[i];
+        for (const [,guild] of this.client.guilds) {
             // setting each server
-            this.welcomeMessages[guilds[i].id] = [];
+            this.welcomeMessages[guild.id] = [];
 
             await this.addGuild(guild);
 
             const g = await guild.fetchMembers();
             await this.addMembers(g.members.array());
         }
-        debug.silly(`Crosschecked db`,`Database`);
-        return Promise.resolve();
+        debug.silly(`Crosschecked database, bot fully online`,`Database`);
     }
 
-    public invalidateCache(table: string): Promise<void>{
+    private invalidateCache(table: string): Promise<void>{
         // always caching so we're force validating queryResultCache
-
         return this.conn.queryResultCache!.remove([table]);
     }
 
@@ -172,7 +168,18 @@ export class Database {
         });
 
     }
+    public async getGuildColumn<T extends keyof Guild>(guildId: string, column: T): Promise<Guild[T] | undefined>{
+        let result = await this.conn.manager.findOne(Guild, {id: guildId});
+        if (!result){
+            return;
+        }
+        return result[column];
+    }
 
+    public async setGuildColumn<T extends keyof Guild>(guildId: string | undefined, column: T, value: Guild[T]){
+        await this.invalidateCache('guilds');
+        return this.conn.manager.save(Guild, {id: guildId, [column]: value})
+    }
 
     public getGuilds(): Promise<Guild[]>{
         return this.conn.manager.find(Guild, {cache: true});
@@ -192,25 +199,6 @@ export class Database {
         return this.getMacros(guildId).then((r: Macro[]) => {
             return r.length;
         });
-    }
-
-    public getPremium(guildId: string){
-        return this.getGuild(guildId).then((r: Guild) => {
-            return r.premium;
-        });
-    }
-
-    public setPrefix(guildId: string, prefix: string) {
-        debug.silly('Setting prefix');
-        if (prefix.length > 1) {
-            return Promise.reject(`Prefix for ${guildId} must be a single character`);
-        }
-        return this.invalidateCache('guilds').then(() => {
-            return this.conn.manager.save(Guild, {id: guildId, prefix: prefix});
-        }).catch(err => {
-            debug.error(`Error getting guild`, `Database`);
-            return Promise.reject(err);
-        })
     }
 
     public getPrefix(guildId: string): Promise<string> {
@@ -337,22 +325,6 @@ export class Database {
         return out ? out.message : undefined;
     }
 
-    public setAllowGuildInvites(guildId: string, state: boolean): Promise<Partial<Guild>> {
-        return this.invalidateCache('guilds').then(() => {
-            return this.conn.manager.save(Guild, {id: guildId, allows_invites: state});
-        }).catch(err => {
-            return Promise.reject(err);
-        })
-    }
-
-    public getAllowGuildInvites(guildId: string): Promise<boolean> {
-        return this.getGuild(guildId).then((r: Guild) => {
-            return r.allows_invites;
-        }).catch(err => {
-            return Promise.reject(err);
-        })
-    }
-
     public setWelcomeChannel(guildId: string, channelId: string | undefined): Promise<Partial<Guild>> {
         return this.invalidateCache('guilds').then(() => {
             return this.conn.manager.save(Guild, {id: guildId, welcome_channel: channelId});
@@ -397,7 +369,6 @@ export class Database {
             .execute();
     }
 
-
     public setWarningsChannel(guildId: string, channelId: string | undefined): Promise<Partial<Guild>> {
         return this.invalidateCache('guilds').then(() => {
             return this.conn.manager.save(Guild, {id: guildId, warnings_channel: channelId});
@@ -406,63 +377,9 @@ export class Database {
         });
     }
 
-    public removeWarningsChannel(guildId: string){
-        return this.conn.createQueryBuilder()
-            .update(Guild)
-            .set({warnings_channel: null})
-            .where(`id = :id`, {id: guildId})
-            .returning('*')
-            .execute();
-    }
-
     public setChatChannel(guildId: string, channelId:string | undefined): Promise<Partial<Guild>> {
         return this.invalidateCache('guilds').then(() => {
             return this.conn.manager.save(Guild, {id: guildId, chat_channel: channelId});
-        }).catch(err => {
-            return Promise.reject(err);
-        })
-    }
-
-    public removeChatChannel(guildId: string){
-        return this.invalidateCache('guilds').then(() => {
-            return this.conn.manager.createQueryBuilder()
-                .update(Guild)
-                .set({chat_channel: null})
-                .where(`id = :id`, {id: guildId})
-                .returning('*')
-                .execute();
-        }).catch(err => {
-            return Promise.reject(err);
-        });
-    }
-
-    public getWelcomeChannel(guildId: string): Promise<string> {
-        return this.getGuild(guildId).then((r: Guild) => {
-            return r.welcome_channel;
-        }).catch(err => {
-            return Promise.reject(err);
-        });
-    }
-
-    public getLogsChannel(guildId: string): Promise<string> {
-        return this.getGuild(guildId).then((r: Guild) => {
-            return r.logs_channel;
-        }).catch(err => {
-            return Promise.reject(err);
-        });
-    }
-
-    public getWarningsChannel(guildId: string): Promise<string> {
-        return this.getGuild(guildId).then((r: Guild) => {
-            return r.warnings_channel;
-        }).catch(err => {
-            return Promise.reject(err);
-        });
-    }
-
-    public getChatChannel(guildId: string): Promise<string> {
-        return this.getGuild(guildId).then((r: Guild) => {
-            return r.chat_channel;
         }).catch(err => {
             return Promise.reject(err);
         })
@@ -495,27 +412,6 @@ export class Database {
             return r.filter(user => user.ignoring);
         });
     }
-    public setCommandHints(guildId: string, state: boolean): Promise<Partial<Guild>> {
-        return this.invalidateCache('guilds').then(() => {
-            return this.conn.manager.save(Guild, {id: guildId, hints: state});
-        });
-    }
-
-    public getCommandHints(guildId: string){
-        return this.getGuild(guildId).then((r: Guild) => {
-            return r.hints;
-        }).catch(err => {
-            return Promise.reject(err);
-        });
-    }
-
-    public getReactions(guildId: string){
-        return this.getGuild(guildId).then((r: Guild) => {
-            return r.reactions;
-        }).catch(err => {
-            return Promise.reject(err);
-        })
-    }
 
     public incrementInviteStrike(member: GuildMember){
         const memberIdentity = {
@@ -541,17 +437,6 @@ export class Database {
         })
     }
 
-    public setReactions(guildId: string, state: boolean){
-        return this.invalidateCache('guilds').then(() => {
-            return this.conn.manager.save(Guild, {
-                id: guildId,
-                reactions: state
-            });
-        }).catch(err => {
-            return Promise.reject(err);
-        });
-    }
-
     public incrementCleverbotCalls(guildId: string){
         return this.invalidateCache('guilds').then(() => {
             return this.conn.manager.increment(Guild, {id: guildId}, 'cleverbot_calls', 1);
@@ -574,22 +459,6 @@ export class Database {
             });
         }).catch(err => Promise.reject(err));
     }
-
-    public getInfractionLimit(guildId: string){
-        return this.getGuild(guildId).then((r: Guild) => {
-            return r.infraction_limit;
-        }).catch(err => Promise.reject(err));
-    }
-
-    public setInfractionLimit(guildId: string, limit: number){
-        return this.conn.createQueryBuilder()
-            .update(Guild)
-            .set({infraction_limit: limit})
-            .where(`id = :id`, {id: guildId})
-            .returning('*')
-            .execute();
-    }
-
 
     public getInfractions(guildId: string, targetId?: string): Promise<Infraction[]>{
         if (targetId){
@@ -626,56 +495,8 @@ export class Database {
         });
     }
 
-    public getTrackNewMembers(guildId: string){
-        return this.getGuild(guildId).then((r: Guild) => {
-            return r.tracking_new_members;
-        }).catch(err => Promise.reject(err));
-    }
-
-    public setTrackNewMembers(guildId: string, state: boolean){
-        return this.conn.manager.save(Guild, {
-            id: guildId,
-            tracking_new_members: state
-        }).catch(err => Promise.reject(err));
-    }
-
     public incrementBanCount(guildId: string){
         return this.conn.manager.increment(Guild, {id: guildId}, `users_banned`, 1);
-    }
-
-    public setWelcomeMessage(guildId: string, message: string): Promise<Partial<Guild>>{
-        return this.invalidateCache('guilds').then(() => {
-            this.conn.manager.save(Guild, {
-                id: guildId,
-                welcome_message: message
-            });
-        }).catch(err => {
-            debug.error(err, `Database:setWelcomeMessage`);
-            return err;
-        });
-    }
-
-    public getWelcomeMessage(guildId: string){
-        return this.getGuild(guildId).then((r: Guild) => {
-            return r.welcome_message;
-        }).catch( err => {
-            debug.error(err);
-            return err;
-        })
-    }
-
-    public getGuildEnabled(guildId: string){
-        return this.getGuild(guildId).then((r: Guild) => {
-            return r.enabled;
-        }).catch(err => {
-            return err;
-        });
-    }
-
-    public setGuildEnabled(guildId: string, state: boolean){
-        return this.invalidateCache('guilds').then(() => {
-            return this.conn.manager.save(Guild, {id: guildId, enabled: state});
-        }).catch(err => err);
     }
 
     public incrementHistoryCalls(guildId: string, userId: string){
@@ -699,18 +520,6 @@ export class Database {
                 end_date: muteAmount
             }).catch(err => Promise.reject(err))
         });
-    }
-
-    public getMutedUsers(guildId: string){
-        return this.conn.manager.find(MutedUser, {where: {guild_id: guildId}, cache: true}).then((r: MutedUser[]) => {
-            return r.filter(p => p.end_date > new Date());
-        }).catch(err => Promise.reject(err));
-    }
-
-    public getExpiredMutes(guildId: string){
-        return this.conn.manager.find(MutedUser, {where: {guild_id: guildId}, cache: true}).then((r: MutedUser[]) => {
-            return r.filter(p => p.end_date < new Date());
-        }).catch(err => Promise.reject(err));
     }
 
     public setMuteRole(guildId: string, role: string){
@@ -741,7 +550,7 @@ export class Database {
         });
     }
 
-    private changeSuggestionStatus(id: string, status: string, reason?: string){
+    public changeSuggestionStatus(id: string, status: string, reason?: string){
         return this.invalidateCache('suggestions').then(() => {
             const set: {[id: string]: string} = {
                 suggestion_status: status
@@ -785,30 +594,8 @@ export class Database {
         return this.changeSuggestionStatus(id, 'REJECTED', reason);
     }
 
-    public setSuggestionsChannel(guildId: string, channelId: string | undefined){
-        return this.invalidateCache('guilds').then(() => {
-            return this.conn.manager.save(Guild, {id: guildId, suggestions_channel: channelId});
-        })
-    }
-
-    public getSuggestionsChannel(guildId: string): Promise<string | undefined>{
-        return this.getGuild(guildId).then((r: Guild) => {
-            return r.suggestions_channel;
-        })
-    }
-
     public getSuggestion(guildId: string, suggestionId: string){
         return this.conn.manager.findOne(Suggestion, {where: {guild_id: guildId, suggestion_id: suggestionId}, cache: true});
-    }
-
-    public getSuggestions(guildId: string){
-        return this.invalidateCache('suggestions').then(() => {
-            return this.conn.getRepository(Suggestion)
-                .createQueryBuilder('suggestions')
-                .where(`guild_id = :id`, {id: guildId})
-                .orderBy('suggestions.suggestion_date')
-                .getMany();
-        });
     }
 
     public getPendingSuggestions(guildId: string){
@@ -853,41 +640,6 @@ export class Database {
         })
     }
 
-    public async getGuildProperty(guildId: string, property: keyof Guild): Promise<string | number | undefined | boolean> {
-        const r = await this.getGuild(guildId);
-        return r[property];
-    }
-
-    public async getInviteWarnThreshold(guildId: string){
-        const r = await this.getGuild(guildId);
-        return r.invite_warn_threshold;
-    }
-
-    public async setInviteWarnThreshold(guildId: string, value: number){
-        await this.invalidateCache('guilds');
-        return this.conn.createQueryBuilder()
-            .update(Guild)
-            .set({invite_warn_threshold: value})
-            .where(`id = :id`, {id: guildId})
-            .returning('*')
-            .execute();
-    }
-
-    public async getInviteBanThreshold(guildId: string): Promise<number> {
-        const r = await this.getGuild(guildId);
-        return r.invite_ban_threshold;
-    }
-
-    public async setInviteBanThreshold(guildId: string, value: number){
-        await this.invalidateCache('guilds');
-        return this.conn.createQueryBuilder()
-            .update(Guild)
-            .set({invite_ban_threshold: value})
-            .where(`id = :id`, {id: guildId})
-            .returning('*')
-            .execute();
-    }
-
     public async getChannelIgnored(guildId: string, channelId: string){
         return this.conn.manager.findOne(IgnoredChannel, {where: {guild_id: guildId, channel_id: channelId}, cache: true});
     }
@@ -919,20 +671,6 @@ export class Database {
                     {channel_id: channelId, guild_id: guildId})
                 .execute();
         });
-    }
-    public async getSpamFilter(guildId: string){
-        return this.getGuild(guildId).then(r => {
-            return r.spam_filter;
-        });
-    }
-
-    public async setSpamFilter(guildId: string, state: boolean){
-        return this.conn.createQueryBuilder()
-            .update(Guild)
-            .set({spam_filter: state})
-            .where(`id = :id`, {id: guildId})
-            .returning('*')
-            .execute();
     }
 }
 

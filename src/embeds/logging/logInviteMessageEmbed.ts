@@ -1,9 +1,11 @@
 import {Message, RichEmbed} from "discord.js";
-import gb from "../../misc/Globals";
+import {IDatabase} from "../../interfaces/injectables/datbase.interface";
+import {Container} from "typescript-ioc";
 
 export default async function logInviteMessageEmbed(message: Message) {
-    const currentStrikes = await gb.instance.database.getInviteStrikes(message.guild.id, message.author.id);
-    const strikeLimit = await gb.instance.database.getInviteBanThreshold(message.guild.id);
+    const database: IDatabase = Container.get(IDatabase)
+    const currentStrikes = await database.getInviteStrikes(message.guild.id, message.author.id);
+    const strikeLimit = await database.getGuildColumn(message.guild.id, 'invite_ban_threshold');
     return new RichEmbed()
         .setTitle(`Invite Deleted`)
         .setColor(`#ff4d4c`)

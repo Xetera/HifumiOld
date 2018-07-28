@@ -4,17 +4,20 @@ import {random} from "../../utility/Util";
 import {debug} from '../../utility/Logging'
 import setConfigChannelEmbed from "../../embeds/commands/configEmbed/setConfigChannelEmbed";
 import {Guild} from "../../database/models/guild";
-import gb from "../../misc/Globals";
 import setConfigChannelFailEmbed from "../../embeds/commands/configEmbed/setConfigChannelFailEmbed";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../interfaces/arg.interface";
 import {UserPermissions} from "../../interfaces/command.interface";
 import successEmbed from "../../embeds/commands/successEmbed";
+import {IDatabase} from "../../interfaces/injectables/datbase.interface";
+import {Container} from "typescript-ioc";
 
 async function setLogsChannel(message: Message, channel?: TextChannel){
+
+    const database: IDatabase = Container.get(IDatabase);
     try{
-        const r: Partial<Guild> = await gb.instance.database.setLogsChannel(
+        const r: Partial<Guild> = await database.setLogsChannel(
             message.guild.id , channel && channel.id || undefined
         );
         if (!channel){
@@ -39,12 +42,13 @@ async function setLogsChannel(message: Message, channel?: TextChannel){
 }
 async function run(message: Message, input: [(TextChannel | boolean | undefined)]): Promise<any> {
     const [channel] = input;
+    const database: IDatabase = Container.get(IDatabase);
     if (channel instanceof  TextChannel) {
-        await gb.instance.database.setLogsChannel(message.guild.id, undefined);
+        await database.setLogsChannel(message.guild.id, undefined);
         setLogsChannel(message, channel);
         return;
     } else if (channel === false) {
-        await gb.instance.database.removeLogsChannel(message.guild.id);
+        await database.removeLogsChannel(message.guild.id);
         setLogsChannel(message, undefined);
         return;
     }

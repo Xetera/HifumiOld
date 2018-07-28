@@ -3,21 +3,21 @@ import {Guild as DBGuild} from "../../../database/models/guild";
 
 
 export default function getSettingsEmbed(guild: DiscordGuild, settings: DBGuild) {
-    const joins = guild.channels.get(settings.joins_logging_channel);
-    const leaves = guild.channels.get(settings.leave_logging_channel);
-    const commands = guild.channels.get(settings.command_logging_channel);
-    const suggestionsLogs = guild.channels.get(settings.suggestion_logging_channel);
-    const mutes = guild.channels.get(settings.mute_logging_channel);
-    const invites = guild.channels.get(settings.invite_logging_channel);
-    const pings = guild.channels.get(settings.ping_logging_channel);
-    const spam = guild.channels.get(settings.spam_logging_channel);
-    const bans = guild.channels.get(settings.ban_logging_channel)
-    const unbans = guild.channels.get(settings.unban_logging_channel);
-    const channels = guild.channels.get(settings.channel_management_logging_channel);
+    const joins = guild.channels.get(settings.joins_logging_channel!);
+    const leaves = guild.channels.get(settings.leave_logging_channel!);
+    const commands = guild.channels.get(settings.command_logging_channel!);
+    const suggestionsLogs = guild.channels.get(settings.suggestion_logging_channel!);
+    const mutes = guild.channels.get(settings.mute_logging_channel!);
+    const invites = guild.channels.get(settings.invite_logging_channel!);
+    const pings = guild.channels.get(settings.ping_logging_channel!);
+    const spam = guild.channels.get(settings.spam_logging_channel!);
+    const bans = guild.channels.get(settings.ban_logging_channel!);
+    const unbans = guild.channels.get(settings.unban_logging_channel!);
+    const channels = guild.channels.get(settings.channel_management_logging_channel!);
 
-    const welcome = guild.channels.get(settings.welcome_channel);
-    const chat = guild.channels.get(settings.chat_channel);
-    const suggestions = guild.channels.get(settings.suggestions_channel);
+    const welcome = guild.channels.get(settings.welcome_channel!);
+    const chat = guild.channels.get(settings.chat_channel!);
+    const suggestions = guild.channels.get(settings.suggestions_channel!);
 
     return new RichEmbed()
         .setTitle(`${guild.name}'s Settings`)

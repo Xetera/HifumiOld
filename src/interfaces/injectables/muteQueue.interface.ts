@@ -25,8 +25,13 @@ export abstract class IMuteQueue {
     raiders: Map<string, IMutedMember[]>;
 
     abstract async add(member: GuildMember, mutedBy: GuildMember, unmuteDate: Date, reason: string | Offense, duration?: number): Promise<boolean>;
-    abstract getMutedUsers(guild: Guild): string;
-    abstract getMutedUserCount(guild: Guild): number;
+
+    abstract getMutedUsers(guild: Guild): string | undefined;
+
+    abstract getMutedUserCount(guild: Guild): number ;
+
+    abstract insertNewGuild(guild: Guild): void;
 }
+
 
 

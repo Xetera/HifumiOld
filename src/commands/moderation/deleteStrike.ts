@@ -1,5 +1,4 @@
 import {Message} from "discord.js";
-import gb from "../../misc/Globals";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {DeleteResult} from "typeorm";
 import {Infraction} from "../../database/models/infraction";
@@ -9,6 +8,8 @@ import deleteStrikeDMEmbed from "../../embeds/moderation/deleteStrikeDMEmbed";
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../interfaces/arg.interface";
 import {UserPermissions} from "../../interfaces/command.interface";
+import {IDatabase} from "../../interfaces/injectables/datbase.interface";
+import {Container} from "typescript-ioc";
 
 
 enum EStrikeRejections {
@@ -19,7 +20,8 @@ enum EStrikeRejections {
 
 async function run(message: Message, input: [number]): Promise<any> {
     const [id] = input;
-    return gb.instance.database.getInfractionById(id).then((r: Infraction|undefined) => {
+    const database: IDatabase = Container.get(IDatabase)
+    return database.getInfractionById(id).then((r: Infraction|undefined) => {
         if (!r){
             handleFailedCommand(
                 message.channel, `There's no such strike`
@@ -34,7 +36,7 @@ async function run(message: Message, input: [number]): Promise<any> {
         }
         return Promise.resolve(r);
     }).then((r: Infraction) => {
-        return Promise.all([gb.instance.database.deleteInfractionById(id, message.guild.id), r]);
+        return Promise.all([database.deleteInfractionById(id, message.guild.id), r]);
     }).then((r: [DeleteResult, Infraction]) => {
         const [, infraction] = r;
         return Promise.all([safeSendMessage(message.channel, `Strike #${id} has vanished.`), infraction]);

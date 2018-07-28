@@ -1,23 +1,26 @@
 import {GuildMember, Message} from "discord.js";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
-import gb from "../../misc/Globals";
-import InfractionHandler from "../../handlers/internal/infractions/InfractionHandler";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../interfaces/arg.interface";
 import {UserPermissions} from "../../interfaces/command.interface";
 import successEmbed from "../../embeds/commands/successEmbed";
 import {randomRuntimeError} from "../../interfaces/Replies";
+import {Container} from "typescript-ioc";
+import {IClient} from "../../interfaces/injectables/client.interface";
+import {IInfractionHandler} from "../../interfaces/injectables/infractionHandler.interface";
 
 export async function strike(message: Message, input: [GuildMember, number, string]) {
     const [target, weight, reason] = input;
+    const bot: IClient = Container.get(IClient);
+    const infractionHandler: IInfractionHandler = Container.get(IInfractionHandler);
 
     if (target.id === target.guild.me.id) {
         return safeSendMessage(
             message.channel, {file: 'assets/misc/counterspell.png'}
         );
     }
-    else if (target.id === gb.ownerID) {
+    else if (target.id === bot.owner) {
         return handleFailedCommand(
             message.channel, `${weight ? 'strike' : 'warn'} senpai? But I don't want him to spank me again...`
         );
@@ -25,7 +28,7 @@ export async function strike(message: Message, input: [GuildMember, number, stri
 
     let banned;
     try {
-        banned = await InfractionHandler.getInstance().addInfraction(message, message.member, target, reason, weight);
+        banned = await infractionHandler.addInfraction(message, message.member, target, reason, weight);
     } catch (err) {
         if (err.message === `TARGET_NOT_BANNABLE`){
             return handleFailedCommand(message.channel, `Striking this member would result in them getting banned but I can't ban that member.`);

@@ -1,17 +1,22 @@
 import {Channel, GuildMember, TextChannel} from "discord.js";
-import gb from "../../misc/Globals";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import {Message} from 'discord.js'
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../interfaces/arg.interface";
 import {UserPermissions} from "../../interfaces/command.interface";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
+import {IDatabase} from "../../interfaces/injectables/datbase.interface";
+import {Container} from "typescript-ioc";
+import {IClient} from "../../interfaces/injectables/client.interface";
 
 async function run(message: Message, input: [GuildMember | Channel]): Promise<any> {
     const [target] = input;
+    const database: IDatabase = Container.get(IDatabase);
+    const bot: IClient = Container.get(IClient);
+
     if (target instanceof GuildMember) {
-        if (target.id === gb.ownerID) {
-            return handleFailedCommand(message.channel, `${gb.emojis.get('hifumi_durr')} heY hiFuMi, PlEasE iGnOrE Xetera`);
+        if (target.id === bot.owner) {
+            return handleFailedCommand(message.channel, `${bot.getEmoji('hifumi_durr')} heY hiFuMi, PlEasE iGnOrE Xetera`);
         }
 
         else if (target.id === message.guild.me.id) {
@@ -30,9 +35,9 @@ async function run(message: Message, input: [GuildMember | Channel]): Promise<an
             return handleFailedCommand(message.channel, `I already ignore everything from bots.`);
         }
 
-        const status = await gb.instance.database.isUserIgnored(target);
+        const status = await database.isUserIgnored(target);
         try {
-            await gb.instance.database.setUserIgnore(target, !status);
+            await database.setUserIgnore(target, !status);
         }
         catch (err) {
             console.log(err);
@@ -49,9 +54,9 @@ async function run(message: Message, input: [GuildMember | Channel]): Promise<an
         if (!message.member.permissionsIn(target).has('SEND_MESSAGES')){
             return handleFailedCommand(message.channel, `I can't ignore a channel you can't send messages in.`);
         }
-        const status = await gb.instance.database.getChannelIgnored(message.guild.id, target.id);
+        const status = await database.getChannelIgnored(message.guild.id, target.id);
         try {
-            await gb.instance.database.setChannelIgnored(message.guild.id, target.id, message.member.user.username, !status);
+            await database.setChannelIgnored(message.guild.id, target.id, message.member.user.username, !status);
         }
         catch (err){
             console.log(err);

@@ -1,5 +1,4 @@
 import {Message, TextChannel} from "discord.js";
-import gb from "../../misc/Globals";
 import setConfigChannelEmbed from "../../embeds/commands/configEmbed/setConfigChannelEmbed";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {debug} from "../../utility/Logging";
@@ -7,10 +6,13 @@ import setConfigChannelFailEmbed from "../../embeds/commands/configEmbed/setConf
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../interfaces/arg.interface";
 import {UserPermissions} from "../../interfaces/command.interface";
+import {IDatabase} from "../../interfaces/injectables/datbase.interface";
+import {Container} from "typescript-ioc";
 
 async function setSuggestionsChannel(message: Message, channel: string | undefined){
+    const database: IDatabase = Container.get(IDatabase);
     try{
-        await gb.instance.database.setSuggestionsChannel(message.guild.id, channel);
+        await database.setGuildColumn(message.guild.id,'suggestions_channel', channel);
         const embed = setConfigChannelEmbed(message.channel, 'suggestions');
         safeSendMessage(message.channel, embed);
     }

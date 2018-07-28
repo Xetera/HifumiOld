@@ -1,9 +1,12 @@
  import {Channel, RichEmbed, TextChannel} from "discord.js";
-import gb from "../../misc/Globals";
 import {random} from "../../utility/Util";
-import ReactionManager from "../../handlers/internal/reactions/reactionManager";
+ import {IDatabase} from "../../interfaces/injectables/datbase.interface";
+ import {Container} from "typescript-ioc";
+ import {IReactionManager} from "../../interfaces/injectables/reactionManager.interface";
 
 export async function handleFailedCommand(channel: Channel, message: string, footer?: string){
+    const database: IDatabase = Container.get(IDatabase);
+    const rm: IReactionManager = Container.get(IReactionManager);
     // we don't want @everyone pings going off because of this
     const out = message.replace('@', '\`@\`');
 
@@ -18,9 +21,8 @@ export async function handleFailedCommand(channel: Channel, message: string, foo
     if (footer){
         embed.setFooter(footer);
     }
-    const rm = ReactionManager.getInstance()
     if (channel instanceof TextChannel){
-        if (await gb.instance.database.getReactions(channel.guild.id))
+        if (await database.getGuildColumn(channel.guild.id, 'reactions'))
             embed.setThumbnail(random(rm.shocked.concat(rm.shy)));
         channel.send(embed);
     }

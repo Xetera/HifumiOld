@@ -1,5 +1,4 @@
 import {Message} from "discord.js";
-import gb from "../../misc/Globals";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import {debug} from "../../utility/Logging";
@@ -10,9 +9,12 @@ import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../interfaces/arg.interface";
 import {UserPermissions} from "../../interfaces/command.interface";
 import parseTemplatePlaceholders from "../../parsers/parseTemplatePlaceholders";
+import {IDatabase} from "../../interfaces/injectables/datbase.interface";
+import {Container} from "typescript-ioc";
 
 async function run(message: Message, input: [string]): Promise<any> {
     // wtf is going on here though
+    const database: IDatabase = Container.get(IDatabase);
     const cleanContent = message.content.trim();
     const x = cleanContent.split(' ');
     if (x.length > 200) {
@@ -25,7 +27,7 @@ async function run(message: Message, input: [string]): Promise<any> {
         const [content] = input;
         await safeSendMessage(message.channel, parseTemplatePlaceholders(message.member, content));
         try {
-            await gb.instance.database.setWelcomeMessage(message.guild.id, content)
+            await database.setGuildColumn(message.guild.id, 'welcome_message', content)
         } catch (err){
             debug.error('STACK ERROR');
             debug.error(err.stack);
@@ -69,7 +71,7 @@ async function run(message: Message, input: [string]): Promise<any> {
     const image = fields['image'];
 
     return safeSendMessage(message.channel, guildMemberAddEmbed(message.member, description, title, footer, color, thumbnail, image)).then(() => {
-        gb.instance.database.setWelcomeMessage(message.guild.id, final).then(() => {
+        database.setGuildColumn(message.guild.id, 'welcome_message', final).then(() => {
         }).catch((err: any) => {
             console.log('STACK ERROR');
             debug.error(err, `setWelcomeMessage`);

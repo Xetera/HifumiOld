@@ -1,7 +1,6 @@
 import {Message} from 'discord.js'
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../interfaces/arg.interface";
-import Anime from "../../API/anime";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import { getUrlExtension, StringUtils} from "../../utility/Util";
 import {urlRegex} from "../../listeners/Regex";
@@ -10,6 +9,9 @@ import whatAnimePlaceholder from "../../embeds/commands/fun/anime/whatAnimePlace
 import isUrl = StringUtils.isUrl;
 import {AnimeUtils} from "../../utility/animeUtils";
 import isPicture = AnimeUtils.isPicture;
+import {IAnime} from "../../interfaces/injectables/anime.interface";
+import {Container} from "typescript-ioc";
+import {IClient} from "../../interfaces/injectables/client.interface";
 
 
 async function run(message: Message, input: [string]): Promise<any> {
@@ -59,7 +61,8 @@ async function run(message: Message, input: [string]): Promise<any> {
 
     const isGif = getUrlExtension(url) === 'gif';
     const placeholder = <Message> await safeSendMessage(message.channel, whatAnimePlaceholder(message.member, url, isGif));
-    const out = await Anime.getInstance().reverseSearch(url, isGif);
+    const animeInstance: IAnime = Container.get(IClient);
+    const out = await animeInstance.reverseSearch(url, isGif);
 
     if (typeof out[0] === 'string') {
         placeholder.delete();

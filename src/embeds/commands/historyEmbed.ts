@@ -1,20 +1,26 @@
 import {GuildMember, RichEmbed, User} from "discord.js";
 import moment = require("moment");
 import {Note} from "../../database/models/note";
-import gb from "../../misc/Globals";
 import {getMemberTrackDuration} from "../../utility/Settings";
 import {Infraction} from "../../database/models/infraction";
-import InfractionHandler from "../../handlers/internal/infractions/InfractionHandler";
+import {IDatabase} from "../../interfaces/injectables/datbase.interface";
+import {Container} from "typescript-ioc";
+import {ITracklist} from "../../interfaces/injectables/tracklist.interface";
+import {IInfractionHandler} from "../../interfaces/injectables/infractionHandler.interface";
 
 export default async function historyEmbed(member: GuildMember | User, notes: Note[], infractions: Infraction[], infractionLimit: number){
+    const database: IDatabase = Container.get(IDatabase);
+    const trackList: ITracklist = Container.get(ITracklist);
+    const infractionHandler: IInfractionHandler = Container.get(IInfractionHandler);
+
     const username     = member instanceof User ? member.username : member.user.username;
     const discrim      = member instanceof User ? member.discriminator : member.user.discriminator;
     const nickname     = member instanceof User ? undefined : member.nickname;
     const url          = member instanceof User ? member.avatarURL : member.user.avatarURL;
     const joinDate     = member instanceof User ? undefined : member.joinedAt;
     const creationDate = member instanceof User ? member.createdAt : member.user.createdAt;
-    const tracked      = member instanceof User ? undefined : gb.instance.trackList.getMember(member);
-    const history_calls= member instanceof User ? '?' : await gb.instance.database.getHistoryCalls(member.guild.id, member.id);
+    const tracked      = member instanceof User ? undefined : trackList.getMember(member);
+    const history_calls= member instanceof User ? '?' : await database.getHistoryCalls(member.guild.id, member.id);
 
     const embed = new RichEmbed()
         .setTitle(`${username}'s History`)
@@ -55,7 +61,7 @@ export default async function historyEmbed(member: GuildMember | User, notes: No
         return sum;
     }, 0);
     let infractionsValue = `**${infractions.length}** infractions on record.\nTotal active strikes: **${activeInfractions}/${infractionLimit}**\n\n`;
-    infractionsValue += infractions.map(i => InfractionHandler.formatInfraction(i))
+    infractionsValue += infractions.map(i => infractionHandler.formatInfraction(i))
         .join('\n');
 
     infractionsValue = infractions.length ? infractionsValue : 'Squeaky clean sir!';

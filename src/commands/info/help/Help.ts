@@ -2,25 +2,26 @@ import {Message, RichEmbed} from "discord.js";
 import commandNotFoundEmbed from "../../../embeds/commands/commandNotFoundEmbed";
 import { random} from "../../../utility/Util";
 import {commandEmbedColor} from "../../../utility/Settings";
-import gb from "../../../misc/Globals";
 import helpMacroEmbed from "../../../embeds/commands/info/helpMacroEmbed";
 import {Command} from "../../../handlers/commands/Command";
 import safeSendMessage from "../../../handlers/safe/SafeSendMessage";
 import commandHelpEmbed from "../../../embeds/commands/info/commandHelpEmbed";
-import CommandHandler from "../../../handlers/commands/CommandHandler";
 import {ArgType} from "../../../interfaces/arg.interface";
 import {ICommandHandler} from "../../../interfaces/injectables/commandHandler.interface";
 import {Container} from "typescript-ioc";
+import {IDatabase} from "../../../interfaces/injectables/datbase.interface";
+
 async function run(message: Message, input: [string | undefined]): Promise<any> {
     const [choice] = input;
-    const prefix: string = await gb.instance.database.getPrefix(message.guild.id);
+    const database: IDatabase = Container.get(IDatabase);
+    const commandHandler: ICommandHandler = Container.get(ICommandHandler);
+    const prefix: string = await database.getPrefix(message.guild.id);
 
     if (choice){
         return getSpecificHelp(message, choice, prefix);
     }
 
     let embed = new RichEmbed();
-    const commandHandler: ICommandHandler = Container.get(ICommandHandler);
     const commands = commandHandler.commands;
     let sortedCommands: {[type:string]: Command[]} = commands.reduce((obj: {[type:string]: Command[]}, command: Command) => {
         // we don't want to send ALL the settings commands in help
@@ -44,7 +45,7 @@ async function run(message: Message, input: [string | undefined]): Promise<any> 
         });
 
         const command = sortedCommands[key].map((cmd: Command) => {
-            if (!cmd.hasClientPermissions(message.guild) || CommandHandler.getMissingUserPermission(message.member, cmd)){
+            if (!cmd.hasClientPermissions(message.guild) || commandHandler.getMissingUserPermission(message.member, cmd)){
                 hasMissingCommands = true;
                 return `~~${prefix}${cmd.names[0]}~~`
             }
@@ -81,9 +82,10 @@ export const command: Command = new Command(
 
 async function getSpecificHelp(message: Message, arg: string, prefix: string){
     const commandHandler: ICommandHandler = Container.get(ICommandHandler);
+    const database: IDatabase = Container.get(IDatabase);
     const command: Command | undefined = commandHandler.commands.find(cmd => cmd.names.includes(arg));
     if (!command) {
-        const macro = await gb.instance.database.getMacro(message.guild.id, arg);
+        const macro = await database.getMacro(message.guild.id, arg);
         if (macro){
             return safeSendMessage(message.channel, helpMacroEmbed(message.guild, macro));
         }

@@ -29,6 +29,8 @@ import safeSendMessage from "../safe/SafeSendMessage";
 import logInviteMessageEmbed from "../../embeds/logging/logInviteMessageEmbed";
 import logEditedInviteMessageEmbed from "../../embeds/logging/logEditedInviteMessageEmbed";
 import logNewSuggestionEmbed from "../../embeds/logging/suggestions/logNewSuggestionEmbed";
+import {Inject, Singleton} from "typescript-ioc";
+import {IDatabase} from "../../interfaces/injectables/datbase.interface";
 
 enum LogAction {
     JOIN = 'join',
@@ -47,6 +49,7 @@ enum LogAction {
 }
 // static class
 export class LogManager {
+    @Inject database: IDatabase;
     private static waitForAuditLogs(guild: Guild, func: (logs: GuildAuditLogs) => any){
         setTimeout(() => {
             guild.fetchAuditLogs()
@@ -91,7 +94,7 @@ export class LogManager {
     }
 
     public static async logMutedUser(member: GuildMember, mutedBy: GuildMember, reason: string, duration: number){
-        const channel = await gb.instance.database.getGuildProperty(
+        const channel = await database.getGuildColumn(
             member.guild.id,
             'mute_logging_channel'
         );
@@ -101,7 +104,7 @@ export class LogManager {
     }
 
     public static async logMemberJoin(member: GuildMember){
-        const channel = await gb.instance.database.getGuildProperty(
+        const channel = await database.getGuildColumn(
             member.guild.id,
             'joins_logging_channel'
         );
@@ -111,7 +114,7 @@ export class LogManager {
     }
 
     public static async  logMemberLeave(member: GuildMember){
-        const channel = await gb.instance.database.getGuildProperty(
+        const channel = await database.getGuildColumn(
             member.guild.id,
             'leave_logging_channel'
         );
@@ -124,7 +127,7 @@ export class LogManager {
         if (recursion && recursion > 3){
             return debug.warning(`Could not find a ban log after an ban event was fired in ${guild.name}`);
         }
-        const channel = await gb.instance.database.getGuildProperty(
+        const channel = await database.getGuildColumn(
             guild.id,
             'ban_logging_channel'
         );
@@ -146,7 +149,7 @@ export class LogManager {
     }
 
     public static async logTrackedBan(guild: Guild, member: User, offense: Offense){
-        const channel = await gb.instance.database.getGuildProperty(
+        const channel = await database.getGuildColumn(
             guild.id,
             'ban_logging_channel'
         );
@@ -163,7 +166,7 @@ export class LogManager {
             return debug.warning(`Could not find an unban log after an unban event was fired in ${guild.name}`);
         }
 
-        const channel = await gb.instance.database.getGuildProperty(
+        const channel = await database.getGuildColumn(
             guild.id,
             'unban_logging_channel'
         );
@@ -201,7 +204,7 @@ export class LogManager {
             return debug.warning(`Could not find a channel create log after an channel create event was fired in ${target.guild.name}`);
         }
 
-        const channel = await gb.instance.database.getGuildProperty(
+        const channel = await database.getGuildColumn(
             target.guild.id,
             'channel_management_logging_channel'
         );
@@ -230,7 +233,7 @@ export class LogManager {
         if (!(target instanceof TextChannel) && !(target instanceof VoiceChannel))
             return;
 
-        const channel = await gb.instance.database.getGuildProperty(
+        const channel = await database.getGuildColumn(
             target.guild.id,
             'channel_management_logging_channel'
         );
@@ -253,7 +256,7 @@ export class LogManager {
         if (!(channel instanceof TextChannel) && !(channel instanceof VoiceChannel))
             return;
 
-        const target = await gb.instance.database.getGuildProperty(
+        const target = await database.getGuildColumn(
             channel.guild.id,
             'ping_logging_channel'
         );
@@ -263,7 +266,7 @@ export class LogManager {
     }
 
     public static async logMentionSpam(message: Message){
-        const target = await gb.instance.database.getGuildProperty(
+        const target = await database.getGuildColumn(
             message.guild.id,
             'ping_logging_channel'
         );
@@ -279,7 +282,7 @@ export class LogManager {
     }
 
     public static async logCommandExecution(message: Message, command: string){
-        const target = await gb.instance.database.getGuildProperty(
+        const target = await database.getGuildColumn(
             message.guild.id,
             'command_logging_channel'
         );
@@ -289,7 +292,7 @@ export class LogManager {
     }
 
     public static async logIllegalInvite(message: Message){
-        const target = await gb.instance.database.getGuildProperty(
+        const target = await database.getGuildColumn(
             message.guild.id,
             'invite_logging_channel'
         );
@@ -299,7 +302,7 @@ export class LogManager {
     }
 
     public static async logIllegalEditedInvited(oldM: Message, newM: Message){
-        const target = await gb.instance.database.getGuildProperty(
+        const target = await database.getGuildColumn(
             newM.guild.id,
             'invite_logging_channel'
         );
@@ -309,7 +312,7 @@ export class LogManager {
     }
 
     public static async logNewSuggestion(member: GuildMember) {
-        const target = await gb.instance.database.getGuildProperty(
+        const target = await database.getGuildColumn(
             member.guild.id,
             'suggestion_logging_channel'
         );

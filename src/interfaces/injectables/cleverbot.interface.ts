@@ -1,5 +1,5 @@
 import {Cleverbot as Clevertype} from "clevertype";
-import {Client, Message} from "discord.js";
+import {Message} from "discord.js";
 import {ITokenBucket} from "./tokenBucket.interface";
 
 export interface Ignores {
@@ -14,7 +14,7 @@ export abstract class ICleverbot {
     tokenBucket: ITokenBucket;
     available: boolean;
     abstract setEmotion(mood: number): void ;
-    abstract checkMessage(message : Message, bot: Client) : Promise<void>;
+    abstract checkMessage(message : Message) : Promise<void>;
     abstract isUserRepeating(message: Message): boolean;
     abstract say(message: Message, phrase: string, id: string, replaceKeyword: boolean) : Promise<string>;
     abstract isRateLimited(id: string, message: Message): boolean;

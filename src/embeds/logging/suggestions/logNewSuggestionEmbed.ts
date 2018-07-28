@@ -1,8 +1,10 @@
-import gb from "../../../misc/Globals";
+import {Container} from "typescript-ioc";
 import {GuildMember, RichEmbed} from "discord.js";
+import {IDatabase} from "../../../interfaces/injectables/datbase.interface";
 
 export default async function logNewSuggestionEmbed(member: GuildMember){
-    const prefix = await gb.instance.database.getPrefix(member.guild.id);
+    const database: IDatabase = Container.get(IDatabase)
+    const prefix = await database.getPrefix(member.guild.id);
 
     return new RichEmbed()
         .setTitle(`New Suggestion`)

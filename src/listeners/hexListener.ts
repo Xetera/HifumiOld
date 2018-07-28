@@ -14,7 +14,7 @@ export default async function hexListener(message: Message){
     if (!match)
         return;
     const hex = match[2];
-    const prefix = await gb.instance.database.getPrefix(message.guild.id);
+    const prefix = await database.getPrefix(message.guild.id);
 
     /**
      * idk if this might be a problem in the future

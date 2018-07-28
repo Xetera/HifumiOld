@@ -1,13 +1,14 @@
 import {Client, Message} from "discord.js";
 import {codeBlock} from "../../utility/Markdown";
-import gb from "../../misc/Globals";
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../interfaces/arg.interface";
 import {UserPermissions} from "../../interfaces/command.interface";
 import {Container} from "typescript-ioc";
+import {IDatabase} from "../../interfaces/injectables/datbase.interface";
 
 async function run(message: Message): Promise<any> {
-    const guilds = await gb.instance.database.getGuilds();
+    const database: IDatabase = Container.get(IDatabase)
+    const guilds = await database.getGuilds();
     const rows = guilds.map(g => {
         const bot: Client = Container.get(Client);
         const guild = bot.guilds.get(g.id);

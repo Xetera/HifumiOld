@@ -1,8 +1,10 @@
 import {Guild, RichEmbed} from "discord.js";
-import gb from "../../misc/Globals";
+import {IDatabase} from "../../interfaces/injectables/datbase.interface";
+import {Container} from "typescript-ioc";
 
 export default async function passivesEmbed(guild: Guild){
-    const prefix = await gb.instance.database.getPrefix(guild.id);
+    const database: IDatabase = Container.get(IDatabase);
+    const prefix = await database.getPrefix(guild.id);
     return new RichEmbed()
         .setTitle(`__**Passives**__`)
         .setDescription(`Here's everything I'm capable of without commands!`)

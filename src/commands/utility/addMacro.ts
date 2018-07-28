@@ -1,6 +1,5 @@
 import {Message} from "discord.js";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
-import gb from "../../misc/Globals";
 import {Help} from "../info/help/help.interface";
 import {debug} from "../../utility/Logging";
 import {Macro} from "../../database/models/macro";
@@ -12,13 +11,18 @@ import {ArgType} from "../../interfaces/arg.interface";
 import {UserPermissions} from "../../interfaces/command.interface";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import successEmbed from "../../embeds/commands/successEmbed";
+import {IDatabase} from "../../interfaces/injectables/datbase.interface";
+import {Container} from "typescript-ioc";
+import {IClient} from "../../interfaces/injectables/client.interface";
 
 async function run(message: Message, input: [string, string]): Promise<any> {
     const [macroName, macroContent] = input;
+    const database: IDatabase = Container.get(IDatabase);
+    const bot: IClient = Container.get(IClient);
     // Urls shouldn't be counting as messages
     if (macroContent.replace(urlRegex, '').length > 2000) {
         return void handleFailedCommand(
-            message.channel, `${gb.emojis.get('hifumi_boi')} How do you expect me to remember all that? Try something shorter.`
+            message.channel, `${bot.getEmoji('hifumi_boi')} How do you expect me to remember all that? Try something shorter.`
         );
     }
     else if (help.commands.map(command => command.name).includes(macroName)) {
@@ -34,15 +38,15 @@ async function run(message: Message, input: [string, string]): Promise<any> {
     }
 
     try {
-        const count = await gb.instance.database.getMacroCount(message.guild.id);
+        const count = await database.getMacroCount(message.guild.id);
 
-        if (count >= 50 && !await gb.instance.database.getPremium(message.guild.id)) {
+        if (count >= 50 && !await database.getGuildColumn(message.guild.id, 'premium')) {
             return void handleFailedCommand(
                 message.channel, "Whoa, you already have 50 macros saved, time to delete some"
             );
         }
 
-        const found: Macro | undefined = await gb.instance.database.getMacro(message.guild.id, macroName);
+        const found: Macro | undefined = await database.getMacro(message.guild.id, macroName);
         if (found) {
             return void handleFailedCommand(
                 message.channel, `A macro with the name **${macroName}** already exists in this server.`
@@ -53,9 +57,9 @@ async function run(message: Message, input: [string, string]): Promise<any> {
         if (!content && !links){
             return;
         }
-        const prefix = await gb.instance.database.getPrefix(message.guild.id);
+        const prefix = await database.getPrefix(message.guild.id);
 
-        const macro: Partial<Macro>|undefined = await gb.instance.database.addMacro(message, macroName, content, links);
+        const macro: Partial<Macro>|undefined = await database.addMacro(message, macroName, content, links);
         if (macro){
             return safeSendMessage(message.channel, successEmbed(message.member, `Macro **${prefix}${macroName}** saved.`));
         }
