@@ -14,7 +14,6 @@ import onGuildUpdate from "./events/onGuildUpdate";
 import {LogManager} from "./handlers/logging/logManager";
 import onChannelCreate from "./events/onChannelCreate";
 import onChannelDelete from "./events/onChannelDelete";
-import {Client} from "discord.js";
 import websocketErrorHandler from "./handlers/process/websocketErrorHandler";
 import websocketWarningHandler from "./handlers/process/websocketWarningHandler";
 import * as dotenv from 'dotenv';
