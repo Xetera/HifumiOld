@@ -15,7 +15,7 @@ export class Command implements ICommand {
     userPermissions?: UserPermissions;
     clientPermissions?: PermissionResolvable[];
     hidden: boolean = false;
-
+    dependsOn?: string | string[];
     constructor(public command: ICommand){
         this.names = command.names;
         this.info = command.info;
@@ -29,6 +29,7 @@ export class Command implements ICommand {
         if (command.hidden !== undefined){
             this.hidden = command.hidden;
         }
+        this.dependsOn = command.dependsOn;
     }
 
     /**

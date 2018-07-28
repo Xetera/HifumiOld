@@ -51,6 +51,10 @@ export interface ICommand {
      * @description Whether the command should show up in $help
      */
     hidden?: boolean;
+    /**
+     * @description the environment variables that must be available to load this command
+     */
+    dependsOn?: string | string[];
 }
 
 export enum UserPermissions {
