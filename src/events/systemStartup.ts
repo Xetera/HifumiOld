@@ -18,21 +18,10 @@ export enum Environments {
     Production
 }
 
-declare let process: {
-    env: {
-        BOT_TOKEN: string,
-        CLEVERBOT_TOKEN: string
-        ENV: string;
-        DATABASE_URL: string;
-        HEROKU_API_TOKEN: string;
-        REDISCLOUD_URL: string;
-    }
-};
-
 export function setupEnvironment() {
     let env;
 
-    if (['live', 'production'].includes(process.env.ENV.toLowerCase())) {
+    if (['live', 'production'].includes(process.env['ENV']!.toLowerCase())) {
         debug.info('Current environment is Production.', "Startup");
         env = Environments.Production;
     }
@@ -47,22 +36,6 @@ export function setupEnvironment() {
     gb.ENV = env;
 }
 
-export function getTokens() {
-    debug.info('Getting Tokens', 'Startup');
-    const BOT_TOKEN = process.env['BOT_TOKEN'];
-    return [BOT_TOKEN];
-}
-
-
-export function getDatabaseConnection(env: Environments): string {
-    if (env === Environments.Development && !process.env.DATABASE_URL) {
-        debug.info("No database url ENV found, setting it to 'discord_test'", 'Startup');
-        return 'postgresql:///discord_test';
-    }
-    else if (env === Environments.Development && process.env.DATABASE_URL)
-        return process.env.DATABASE_URL;
-    return process.env.DATABASE_URL;
-}
 
 // instances
 export async function createInstance(bot: Client): Promise<Instance> {
@@ -105,7 +78,8 @@ export function getClient(): Client {
             `MISSING 'BOT_TOKEN' environment variable, ` +
             `use the .env file to fill it in.`
 
-        )
+        );
+        process.exit(1);
     }
    return new Client();
 }
