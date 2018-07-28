@@ -10,6 +10,7 @@ import {MuteQueue} from "../moderation/MuteQueue";
 import {default as catchUncaughtExceptions} from '../handlers/process/uncaughtException'
 import {catchSigterm} from '../handlers/process/sigterm'
 import {default as catchUnhandledRejections} from '../handlers/process/unhandledRejection'
+import {StatsD} from 'hot-shots'
 
 const Heroku = require('heroku-client');
 
@@ -58,6 +59,7 @@ export async function createInstance(bot: Client): Promise<Instance> {
         messageQueue: messageQueue,
         commandHandler: commandHandler,
         trackList: tracklist,
+        stats: new StatsD(),
         heroku: new Heroku({token: process.env.HEROKU_API_TOKEN}),
         // this is to be able to eval through the context of all the instances
         eval: (message: Message, x: any) => {

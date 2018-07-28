@@ -7,6 +7,7 @@ import {Environments} from "../events/systemStartup";
 import CommandHandler  from "../handlers/commands/CommandHandler";
 import {Message} from "discord.js";
 import Tracklist from "../moderation/Tracklist";
+import {StatsD} from 'hot-shots'
 
 export type emojiName = string;
 interface Globals extends Instance {
@@ -33,7 +34,8 @@ export interface Instance {
     database : Database,
     commandHandler:CommandHandler,
     trackList: Tracklist,
-    heroku: any
+    heroku: any,
+    stats: StatsD;
     eval(message: Message, x : any): any
 }
 
