@@ -20,10 +20,19 @@ export class Cleverbot {
     identifier : RegExp = /hifumi/i;
     users: {[id: string]: {warnings: number, ignores: Ignores}} = {};
     tokenBucket: TokenBucket;
-    constructor(apiKey : string){
+    available: boolean = false;
+    constructor(){
         this.tokenBucket = new TokenBucket();
+        let apiKey;
+        if (process.env['CLEVERBOT_TOKEN']){
+            apiKey = process.env['CLEVERBOT_TOKEN'];
+        } else {
+            this.available = false;
+            debug.warning(`CLEVERBOT_TOKEN environment variable not found, Cleverbot module is OFF`);
+            return;
+        }
         const configuration: Config = {
-            apiKey: apiKey,
+            apiKey: apiKey!,
             mood: {
                 regard: 30,
                 emotion: 70,
@@ -32,23 +41,11 @@ export class Cleverbot {
         };
         this.cleverbot = new Clevertype(configuration, true);
         debug.info('Cleverbot module is ready', "Cleverbot");
+        this.available = true;
     }
 
     private replaceKeyword(phrase : string) : string {
         return phrase.replace(this.identifier, 'cleverbot');
-    }
-
-    public setEmotion(mood : number){
-
-        this.cleverbot.setEmotion(mood);
-    }
-
-    public setEngagement(mood : number ) : void {
-        this.cleverbot.setEngagement(mood);
-    }
-
-    public setRegard(mood : number ) : void {
-        this.cleverbot.setRegard(mood);
     }
 
     public async checkMessage(message : Message, bot :Discord.Client) : Promise<void> {
