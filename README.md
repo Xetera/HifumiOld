@@ -14,8 +14,11 @@
   </tr>
 </table>
 
+### [To Features](#features)
+### [To Program Structure and Architecture](#program-structure-and-architecture)
+### [To Setup](#setting-up-hifumi)
 
-## Features:
+## Features
 
 * Moderation: 🚫 Get all your moderators on the same page 
     * _**Anti-Spam**_ Hifumi automatically removes messages and mutes people when she detects spamming.
@@ -59,6 +62,82 @@
     * `$doggo` - Sends a cute 🐶 and its breed
     * `$randomquote` - A quote... that is random
     * `$ch` - Random cyanide and happiness comic
-#### Inspired by [HotBot](https://github.com/AberrantFox/hotbot) in [The Programmer's Hangout](https://discord.gg/programming)
+    
+## Program Structure and Architecture
 
-#### This repo is not really meant to be self-hosted, there's quite a significant chunk of code that's either hardcoded or made to be very convenient for Hifumi in specific. You're probably going to have a hard time trying to fork or self-host it anytime in the near future.
+<div align="center">
+    <img height="64" src="https://rynop.files.wordpress.com/2016/09/ts.png?w=816" title="Typescript">
+    <img height="64" src="https://dashboard.snapcraft.io/site_media/appmedia/2016/11/postgresql-icon-256x256.jpg.png" title="Postgres">
+    <img height="64" src="https://cdn.iconscout.com/public/images/icon/free/png-256/redis-open-source-logo-data-structure-399889f24f4505b1-256x256.png" title="Redis">
+    <img height="64" src="https://camo.githubusercontent.com/e8293376c6ea1d2181eb2fa6f878acd806cf0114/68747470733a2f2f64317136663061656c7830706f722e636c6f756466726f6e742e6e65742f70726f647563742d6c6f676f732f36343464326631352d633564622d343733312d613335332d6163653632333538343166612d72656769737472792e706e67" title="Docker">
+    <img height="64" src="https://cdn.iconscout.com/public/images/icon/free/png-128/travis-ci-company-brand-logo-3ea4b6108b6d19db-128x128.png" title="Travis CI">
+    <img height="64" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/GraphQL_Logo.svg/2000px-GraphQL_Logo.svg.png" title="GraphQL">
+</div>
+
+### Commands
+#### Declaration
+Commands are all declared under `src/commands/**/*.ts` and are globbed in `src/handlers/commands/CommandHandler.ts`.
+
+The addition of a new command _only_ requires that a variable called `command` is exported somewhere inside `src/commands` 
+
+#### Parsing
+Before commands are called, information is parsed in `src/parsers/argParse.ts`. 
+
+All command requirements like arguments and user/client permissions are declared in the **Command** object that is exported and parsed before calling the command.
+
+A command is only called if these requirements are met.
+
+All necessary arguments are passed into the `run` function's second parameter as a tuple. 
+
+[More info...](https://github.com/Xetera/Hifumi/blob/master/src/commands/README.md)
+
+### Database
+[TypeORM](https://github.com/typeorm/typeorm) is used for all database transactions.
+
+A Redis cache layer is used to speed up common actions like fetching guild prefixes. 
+
+Database information is stored in `src/database` including
+* Models
+* Functions
+* Migrations
+
+For now, migrations are created manually for production are handled by TypeORM's CLI.
+
+#### Backups
+For database backups, python scripts are used to dump the current production db into Amazon S3 bucket.
+
+This script is set on a cron job of regular intervals, and an X amount of backups are rotated inside the bucket, deleting the oldest version on every backup once X is reached to preserve limited bucket space.
+
+A backup-restoration script is available to restore the latest backup if necessary.
+
+### Inversion of Control
+All objects that are required in the global scope or inside other classes are handled by [typescript-ioc](https://github.com/thiagobustamante/typescript-ioc) to avoid the usage of global singletons.
+
+Classes that depend on other classes, such as `Cleverbot -> TokenBucket` get their dependencies declared as such
+```ts
+@Singleton
+export class Cleverbot extends ICleverbot {
+    readonly identifier : RegExp = /hifumi/i;
+    cleverbot : Clevertype;
+    @Inject tokenBucket: ITokenBucket;
+    // implementation...
+}
+```
+
+In order to not depend on classes themselves but rather an "interface" are declared as `abstract` classes instead inside `src/interfaces/injectables`.
+
+These classes are extended to provide functionality and are injected as necessary or fetched from the container. The abstract class itself is relied upon for type inference rather than the class implementation which prevents circular dependencies.
+```ts
+export abstract class ICleverbot {
+    identifier: RegExp;
+    cleverbot: Clevertype;
+    tokenBucket: ITokenBucket;
+    abstract isRateLimited(id: string, message: Message): boolean;
+}
+```
+## Setting Up Hifumi
+Coming soon...
+
+#### Inspired by [HotBot](https://gitlab.com/Aberrantfox/hotbot) in [The Programmer's Hangout](https://discord.gg/programming)
+
+#### This repo was not originally meant to be self-hosted or contributed to, so there's quite a significant chunk of code that's either hardcoded or made to be very convenient for Hifumi in specific. Although it will be made easier in the future, you're probably going to have a hard time trying to fork or self-host this repo as of now.
