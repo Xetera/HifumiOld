@@ -24,7 +24,7 @@ async function run(message: Message, input: [string]): Promise<any> {
         safeSendMessage(message.channel, successEmbed(message.member, `Macro **${prefix}${macroName}** removed.`));
     }
     catch (err){
-        debug.error(err, 'deleteMacro');
+        debug.error(err);
         safeSendMessage(message.channel, randomRuntimeError());
     }
 }

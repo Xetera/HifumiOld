@@ -18,7 +18,7 @@ export default async function setPrefix(message: Message, input: [string]){
         safeSendMessage(message.channel, 'Prefix changed to ' + res.prefix);
     }
     catch(err) {
-        debug.error(err, `setPrefix`);
+        debug.error(err);
     }
 }
 

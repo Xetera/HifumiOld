@@ -14,7 +14,7 @@ async function run(message : Discord.Message, input: [string]): Promise<any> {
         return safeSendMessage(message.channel, `Changed my name from ${oldName} to ${response.username}.`)
     }).catch (err => {
         if (err instanceof Discord.DiscordAPIError) {
-            return debug.error("API error when trying to change my own username.", err.stack);
+            return void debug.error("API error when trying to change my own username.", err.stack);
         }
     })
 }

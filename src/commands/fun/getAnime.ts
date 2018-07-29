@@ -27,7 +27,7 @@ async function run(message: Message, input: [string]): Promise<any> {
     Anime.getInstance().getAnime(message, anime).then((embed: string | RichEmbed) => {
         placeholder.edit(embed);
     }).catch((err: Error)=>{
-        debug.error(err, `Anime`);
+        debug.error(err);
         placeholder.edit(randomRuntimeError());
     })
 }

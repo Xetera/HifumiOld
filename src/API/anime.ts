@@ -133,7 +133,7 @@ export default class Anime {
             return getCharacterEmbed(data, VA);
         }
         catch (err) {
-            debug.error(err, `getCharacter`);
+            debug.error(err);
             if (!err.response) {
                 return Promise.reject(err);
             }
@@ -156,7 +156,7 @@ export default class Anime {
             return response.data.data.Staff;
         }
         catch (err) {
-            debug.error(err, `Anime`);
+            debug.error(err);
             return undefined;
         }
     }

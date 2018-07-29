@@ -29,7 +29,7 @@ async function run(message: Message, input: [string]): Promise<any> {
         } catch (err){
             debug.error('STACK ERROR');
             debug.error(err.stack);
-            debug.error(err, `setWelcomeMessage`);
+            debug.error(err);
         }
         return;
     }
@@ -72,7 +72,7 @@ async function run(message: Message, input: [string]): Promise<any> {
         gb.database.setWelcomeMessage(message.guild.id, final).then(() => {
         }).catch((err: any) => {
             console.log('STACK ERROR');
-            debug.error(err, `setWelcomeMessage`);
+            debug.error(err);
         })
     })
 }

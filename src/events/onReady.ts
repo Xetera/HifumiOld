@@ -57,7 +57,7 @@ function setGlobals(bot: Discord.Client) {
     }
     else {
         if (!process.env['EMOJI_GUILD']) {
-            return debug.warning(
+            return void debug.warning(
                 `The env variable 'EMOJI_GUILD was not set, Hifumi will be omitting custom emojis.`
             );
         }
@@ -67,7 +67,7 @@ function setGlobals(bot: Discord.Client) {
         debug.error(`Could not find the emoji guild ${process.env['EMOJI_GUILD']}!`);
         return process.exit(1)
     } else if (!guild && gb.ENV === Environments.Production){
-        return debug.warning(`Emoji guild ${process.env['EMOJI_GUILD']} could not be found, skipping custom emojis`);
+        return void debug.warning(`Emoji guild ${process.env['EMOJI_GUILD']} could not be found, skipping custom emojis`);
     }
     gb.emojiGuild = guild;
     setEmojis();

@@ -19,7 +19,7 @@ async function run(message: Message, input: [string]): Promise<any> {
     try {
         message.channel.send(out, {disableEveryone: true});
     } catch (e) {
-        debug.error(e, `Clapify`);
+        debug.error(e);
         handleFailedCommand(message.channel,
              `Couldn't send that message`
         );

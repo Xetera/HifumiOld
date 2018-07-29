@@ -38,7 +38,7 @@ async function run(message: Message, input: [number | undefined]): Promise<any> 
             coll = await channel.bulkDelete(userMessages)
         } catch (err) {
             await channel.send(randomRuntimeError());
-            return debug.error("Error bulk deleting:\n", err);
+            return void debug.error("Error bulk deleting:\n", err);
         }
         const embed = successEmbed(message.member, `Deleted the last ${coll.size - 1} messages.`);
         await safeSendMessage(channel, embed, 15)

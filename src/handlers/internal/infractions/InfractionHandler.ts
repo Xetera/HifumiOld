@@ -128,7 +128,7 @@ export default class InfractionHandler {
                 target.send(embed);
 
                 await safeBanUser(target, banReason).catch((err) => {
-                    debug.error(err, 'InfractionHandler');
+                    debug.error(err);
                     throw new Error(err);
                 });
                 return true;

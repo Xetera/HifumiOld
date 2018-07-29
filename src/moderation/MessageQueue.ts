@@ -84,7 +84,7 @@ export class MessageQueue {
 
     private removeUserMessages(messages: CachedMessage[]): void {
         if (!messages.length){
-            return debug.error(`Tried to remove messages by a person who has no messages in the MessageQueue`, `MessageQueue`)
+            return void debug.error(`Tried to remove messages by a person who has no messages in the MessageQueue`, `MessageQueue`)
         }
         const channel = messages[messages.length - 1].channel;
         safeBulkDelete(channel, messages.filter(message => message.channel.id === channel.id));

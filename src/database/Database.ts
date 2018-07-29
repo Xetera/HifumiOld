@@ -22,6 +22,7 @@ import {MutedUser} from "./models/mutedUser";
 import {Suggestion} from "./models/suggestion";
 import {IgnoredChannel} from "./models/ignoredChannel";
 import {handleFatalErrorGracefully} from "../handlers/process/fatal";
+
 const rootConfig: IORMConfig = require('../../ormconfig.json');
 
 interface IWelcomeMessage {
@@ -41,12 +42,13 @@ export class Database {
      * @type {boolean}
      */
     ready: boolean = false;
-    welcomeMessages: {[id: string]: IWelcomeMessage[]} = {};
+    welcomeMessages: { [id: string]: IWelcomeMessage[] } = {};
+
     constructor() {
         this.env = gb.ENV;
         debug.info(`Logging into postgres in ${this.env === Environments.Development ? 'dev' : 'live'} mode.`, `Database`);
         const connString: string | undefined = process.env['DATABASE_URL'] || process.env['POSTGRES_URL'];
-        if (!connString){
+        if (!connString) {
             const error: Error = new Error(
                 "Missing 'POSTGRES_URL' or 'DATABASE_URL' environment variable, " +
                 "this bot cannot run without a postgres connection. Make sure you've properly " +
@@ -55,7 +57,8 @@ export class Database {
             debug.error(error);
             return process.exit(1);
         }
-        this.connect(connString).then(conn => {
+        let cache = this.getCache();
+        this.connect(connString, cache).then(conn => {
             debug.info(`Logged into postgres`, `Database`);
             this.conn = conn;
             return this.sync();
@@ -67,13 +70,37 @@ export class Database {
         });
     }
 
+    public getCache(){
+        const redisString: string | undefined = process.env['REDISCLOUS_URL'] || process.env['REDIS_URL'];
+        if (redisString) {
+             return  {
+                type: 'redis',
+                duration: 1000000,
+                options: {
+                    // setting via gb.ENV creates problems with docker
+                    url: redisString
+                }
+            }
+        }
+        debug.warning(
+            `'REDIS_URL' environment variable was not found, caching will be done (sub-optimally) in postgres instead`
+        );
+        return {
+            type: 'postgres',
+            duration: 1000000,
+            options: {
+                url: process.env['DATABASE_URL'] || process.env['POSTGRES_URL']
+            }
+        }
+    }
 
     /**
      * Connects to postgres, returns connection on successful connections
      * @param {string} url
+     * @param {Object} cache
      * @returns {Promise<Connection>}
      */
-    public connect(url: string): Promise<Connection> {
+    public connect(url: string, cache: Object): Promise<Connection> {
         debug.silly(`Connecting to postgres on url ${url}`, `Database`);
         return this.ormConfig(url).then(() => {
             return createConnection({
@@ -81,32 +108,18 @@ export class Database {
                 url: url,
                 entities: ['src/database/models/**/*.js'],
                 migrations: ['src/database/migrations/**/*.js'],
-                    // DO NOT TURN THESE ON FOR PRODUCTION
-                    // I'M SERIOUS DON'T DO IT
+                // DO NOT TURN THESE ON FOR PRODUCTION
+                // I'M SERIOUS DON'T DO IT
 
-                    synchronize: this.env === Environments.Development,
-                    //dropSchema:  this.env === Environments.Development,
+                synchronize: this.env === Environments.Development,
+                //dropSchema:  this.env === Environments.Development,
 
-                    // DUDE I'M 100% SERIOUSLY RN I'LL GET SUPER MAD OK
+                // DUDE I'M 100% SERIOUSLY RN I'LL GET SUPER MAD OK
                 cli: {
                     migrationsDir: 'migrations'
                 },
-                cache: {
-                    type: 'redis',
-                    duration: Infinity,
-                    options: {
-                        // setting via gb.ENV creates problems with docker
-                        url: process.env.REDISCLOUD_URL ? process.env.REDISCLOUD_URL  : 'redis://localhost:6379'
-                    }
-                }
-            }).catch(err => {
-                debug.error(err, `Database`);
-                return Promise.reject(err);
+                cache
             });
-
-        }).catch(err => {
-            debug.error(err, `Database`);
-            return Promise.reject(err);
         });
     }
 
@@ -145,11 +158,11 @@ export class Database {
             const g = await guild.fetchMembers();
             await this.addMembers(g.members.array());
         }
-        debug.silly(`Crosschecked db`,`Database`);
+        debug.silly(`Crosschecked db`, `Database`);
         return Promise.resolve();
     }
 
-    public invalidateCache(table: string): Promise<void>{
+    public invalidateCache(table: string): Promise<void> {
         // always caching so we're force validating queryResultCache
 
         return this.conn.queryResultCache!.remove([table]);
@@ -159,13 +172,13 @@ export class Database {
         return this.conn.manager.find(User, {where: {guild_id: guildId}, cache: true});
     }
 
-    public getUser(guildId: string, userId: string): Promise<User>  {
+    public getUser(guildId: string, userId: string): Promise<User> {
         return this.conn.manager.find(User, {where: {guild_id: guildId, id: userId}, cache: true}).then((r: User[]) => {
             if (r.length > 1) {
                 debug.error(`Multiple instances of user ${userId} exists in the db.`, `Database`);
             }
             return r[0];
-        }).catch((err: Error)=> {
+        }).catch((err: Error) => {
             return Promise.reject(err);
         })
     }
@@ -175,14 +188,14 @@ export class Database {
             if (!r)
                 return Promise.reject('Guild not found');
             return Promise.resolve(r);
-        }).catch((err: Error)=> {
+        }).catch((err: Error) => {
             return Promise.reject(err);
         });
 
     }
 
 
-    public getGuilds(): Promise<Guild[]>{
+    public getGuilds(): Promise<Guild[]> {
         return this.conn.manager.find(Guild, {cache: true});
     }
 
@@ -192,7 +205,7 @@ export class Database {
         });
     }
 
-    public getMacro(guildId: string, name: string): Promise<Macro|undefined> {
+    public getMacro(guildId: string, name: string): Promise<Macro | undefined> {
         return this.conn.manager.findOne(Macro, {where: {guild_id: guildId, macro_name: name}, cache: true});
     }
 
@@ -202,7 +215,7 @@ export class Database {
         });
     }
 
-    public getPremium(guildId: string){
+    public getPremium(guildId: string) {
         return this.getGuild(guildId).then((r: Guild) => {
             return r.premium;
         });
@@ -235,8 +248,8 @@ export class Database {
                 id: target.id,
                 guild_id: target.guild.id
             });
-        }).catch(async(err: Error)=> {
-            if (err.message.indexOf('duplicate key') >= 0){
+        }).catch(async (err: Error) => {
+            if (err.message.indexOf('duplicate key') >= 0) {
                 await this.conn.manager.createQueryBuilder()
                     .update(User)
                     .set({invite_strikes: 0})
@@ -268,7 +281,7 @@ export class Database {
         })
     }
 
-    public addGuild(guild: DiscordGuild): Promise<Partial<Guild>>{
+    public addGuild(guild: DiscordGuild): Promise<Partial<Guild>> {
         // setting welcome messages to empty array
         this.welcomeMessages[guild.id] = [];
         return this.invalidateCache('guilds').then(() => {
@@ -282,7 +295,7 @@ export class Database {
     }
 
     public addMacro(message: Message, macroName: string, macroContent?: string, macroLinks?: string[]): Promise<Partial<Macro>> {
-        if (!macroContent && !macroLinks){
+        if (!macroContent && !macroLinks) {
             return Promise.reject('Macro to be saved missing both content and links')
         }
         return this.invalidateCache('macros').then(() => {
@@ -299,7 +312,7 @@ export class Database {
         });
     }
 
-    public deleteMacro(guild: DiscordGuild, macroName: string): Promise<DeleteResult>{
+    public deleteMacro(guild: DiscordGuild, macroName: string): Promise<DeleteResult> {
         return this.conn.manager.delete(Macro, {macro_name: macroName, guild_id: guild.id});
     }
 
@@ -327,19 +340,19 @@ export class Database {
         })
     }
 
-    public getNotes(memberId: string, guildId: string){
+    public getNotes(memberId: string, guildId: string) {
         return this.conn.manager.find(Note, {where: {target_id: memberId, guild_id: guildId}, cache: true});
     }
 
-    public cacheWelcomeMessage(member: GuildMember, welcomeMessage: Message)    {
+    public cacheWelcomeMessage(member: GuildMember, welcomeMessage: Message) {
         this.welcomeMessages[member.guild.id].push({userId: member.id, message: welcomeMessage});
     }
 
     public unCacheWelcomeMessage(member: GuildMember): Message | undefined {
         const target = this.welcomeMessages[member.guild.id];
-        if(!target || !target.length){
+        if (!target || !target.length) {
             const err = `A welcome message in ${member.guild.id} could not be removed because the list is empty`
-            return void debug.error(err, `Database`);
+            return void debug.error(err);
         }
         const out = target.find(t => t.userId === member.id);
         return out ? out.message : undefined;
@@ -369,7 +382,7 @@ export class Database {
         })
     }
 
-    public removeWelcomeChannel(guildId: string){
+    public removeWelcomeChannel(guildId: string) {
         return this.invalidateCache('guilds').then(() => {
             return this.conn.manager.createQueryBuilder()
                 .update(Guild)
@@ -396,7 +409,7 @@ export class Database {
         });
     }
 
-    public removeLogsChannel(guildId: string){
+    public removeLogsChannel(guildId: string) {
         return this.conn.createQueryBuilder()
             .update(Guild)
             .set({logs_channel: null})
@@ -414,7 +427,7 @@ export class Database {
         });
     }
 
-    public removeWarningsChannel(guildId: string){
+    public removeWarningsChannel(guildId: string) {
         return this.conn.createQueryBuilder()
             .update(Guild)
             .set({warnings_channel: null})
@@ -423,7 +436,7 @@ export class Database {
             .execute();
     }
 
-    public setChatChannel(guildId: string, channelId:string | undefined): Promise<Partial<Guild>> {
+    public setChatChannel(guildId: string, channelId: string | undefined): Promise<Partial<Guild>> {
         return this.invalidateCache('guilds').then(() => {
             return this.conn.manager.save(Guild, {id: guildId, chat_channel: channelId});
         }).catch(err => {
@@ -431,7 +444,7 @@ export class Database {
         })
     }
 
-    public removeChatChannel(guildId: string){
+    public removeChatChannel(guildId: string) {
         return this.invalidateCache('guilds').then(() => {
             return this.conn.manager.createQueryBuilder()
                 .update(Guild)
@@ -498,18 +511,19 @@ export class Database {
         });
     }
 
-    public getIgnoredUsers(guildId: string): Promise<User[]>{
+    public getIgnoredUsers(guildId: string): Promise<User[]> {
         return this.getUsers(guildId).then((r: User[]) => {
             return r.filter(user => user.ignoring);
         });
     }
+
     public setCommandHints(guildId: string, state: boolean): Promise<Partial<Guild>> {
         return this.invalidateCache('guilds').then(() => {
             return this.conn.manager.save(Guild, {id: guildId, hints: state});
         });
     }
 
-    public getCommandHints(guildId: string){
+    public getCommandHints(guildId: string) {
         return this.getGuild(guildId).then((r: Guild) => {
             return r.hints;
         }).catch(err => {
@@ -517,7 +531,7 @@ export class Database {
         });
     }
 
-    public getReactions(guildId: string){
+    public getReactions(guildId: string) {
         return this.getGuild(guildId).then((r: Guild) => {
             return r.reactions;
         }).catch(err => {
@@ -525,7 +539,7 @@ export class Database {
         })
     }
 
-    public incrementInviteStrike(member: GuildMember){
+    public incrementInviteStrike(member: GuildMember) {
         const memberIdentity = {
             id: member.id,
             guild_id: member.guild.id
@@ -535,21 +549,21 @@ export class Database {
             .catch(err => Promise.reject(err))
             .then(() => {
                 return this.conn.manager.findOne(User, memberIdentity)
-            }).then((r: User|undefined) => {
-                if (!r){
+            }).then((r: User | undefined) => {
+                if (!r) {
                     return Promise.reject(`Invite strike of user with ID ${member.id} could not be incremented, user not found.`);
                 }
                 return Promise.resolve(r.invite_strikes);
-            }).catch(err =>  Promise.reject(err));
+            }).catch(err => Promise.reject(err));
     }
 
-    public getInviteStrikes(guildId: string, userId: string){
+    public getInviteStrikes(guildId: string, userId: string) {
         return this.getUser(guildId, userId).then((r: User) => {
             return r.invite_strikes;
         })
     }
 
-    public setReactions(guildId: string, state: boolean){
+    public setReactions(guildId: string, state: boolean) {
         return this.invalidateCache('guilds').then(() => {
             return this.conn.manager.save(Guild, {
                 id: guildId,
@@ -560,7 +574,7 @@ export class Database {
         });
     }
 
-    public incrementCleverbotCalls(guildId: string){
+    public incrementCleverbotCalls(guildId: string) {
         return this.invalidateCache('guilds').then(() => {
             return this.conn.manager.increment(Guild, {id: guildId}, 'cleverbot_calls', 1);
         });
@@ -583,13 +597,13 @@ export class Database {
         }).catch(err => Promise.reject(err));
     }
 
-    public getInfractionLimit(guildId: string){
+    public getInfractionLimit(guildId: string) {
         return this.getGuild(guildId).then((r: Guild) => {
             return r.infraction_limit;
         }).catch(err => Promise.reject(err));
     }
 
-    public setInfractionLimit(guildId: string, limit: number){
+    public setInfractionLimit(guildId: string, limit: number) {
         return this.conn.createQueryBuilder()
             .update(Guild)
             .set({infraction_limit: limit})
@@ -599,21 +613,23 @@ export class Database {
     }
 
 
-    public getInfractions(guildId: string, targetId?: string): Promise<Infraction[]>{
-        if (targetId){
-            return this.conn.manager.find(Infraction, {where: {
+    public getInfractions(guildId: string, targetId?: string): Promise<Infraction[]> {
+        if (targetId) {
+            return this.conn.manager.find(Infraction, {
+                where: {
                     guild_id: guildId,
                     target_id: targetId
-                }, cache: true});
+                }, cache: true
+            });
         }
         return this.conn.manager.find(Infraction, {where: {guild_id: guildId}, cache: true});
     }
 
-    public getInfractionById(id: number){
-        return this.conn.manager.findOne(Infraction, {where: {infraction_id: id},  cache: true});
+    public getInfractionById(id: number) {
+        return this.conn.manager.findOne(Infraction, {where: {infraction_id: id}, cache: true});
     }
 
-    public deleteInfractionById(id: number, guildId: string){
+    public deleteInfractionById(id: number, guildId: string) {
         return this.conn.createQueryBuilder()
             .delete()
             .from(Infraction)
@@ -621,7 +637,7 @@ export class Database {
             .execute();
     }
 
-    public deleteAllInfractions(guildId: string, target_id: string){
+    public deleteAllInfractions(guildId: string, target_id: string) {
         return this.invalidateCache('infractions').then(() => {
             return this.conn.manager
                 .createQueryBuilder()
@@ -634,45 +650,45 @@ export class Database {
         });
     }
 
-    public getTrackNewMembers(guildId: string){
+    public getTrackNewMembers(guildId: string) {
         return this.getGuild(guildId).then((r: Guild) => {
             return r.tracking_new_members;
         }).catch(err => Promise.reject(err));
     }
 
-    public setTrackNewMembers(guildId: string, state: boolean){
+    public setTrackNewMembers(guildId: string, state: boolean) {
         return this.conn.manager.save(Guild, {
             id: guildId,
             tracking_new_members: state
         }).catch(err => Promise.reject(err));
     }
 
-    public incrementBanCount(guildId: string){
+    public incrementBanCount(guildId: string) {
         return this.conn.manager.increment(Guild, {id: guildId}, `users_banned`, 1);
     }
 
-    public setWelcomeMessage(guildId: string, message: string): Promise<Partial<Guild>>{
+    public setWelcomeMessage(guildId: string, message: string): Promise<Partial<Guild>> {
         return this.invalidateCache('guilds').then(() => {
             this.conn.manager.save(Guild, {
                 id: guildId,
                 welcome_message: message
             });
         }).catch(err => {
-            debug.error(err, `Database:setWelcomeMessage`);
+            debug.error(err);
             return err;
         });
     }
 
-    public getWelcomeMessage(guildId: string){
+    public getWelcomeMessage(guildId: string) {
         return this.getGuild(guildId).then((r: Guild) => {
             return r.welcome_message;
-        }).catch( err => {
+        }).catch(err => {
             debug.error(err);
             return err;
         })
     }
 
-    public getGuildEnabled(guildId: string){
+    public getGuildEnabled(guildId: string) {
         return this.getGuild(guildId).then((r: Guild) => {
             return r.enabled;
         }).catch(err => {
@@ -680,25 +696,25 @@ export class Database {
         });
     }
 
-    public setGuildEnabled(guildId: string, state: boolean){
+    public setGuildEnabled(guildId: string, state: boolean) {
         return this.invalidateCache('guilds').then(() => {
             return this.conn.manager.save(Guild, {id: guildId, enabled: state});
         }).catch(err => err);
     }
 
-    public incrementHistoryCalls(guildId: string, userId: string){
+    public incrementHistoryCalls(guildId: string, userId: string) {
         return this.invalidateCache('users').then(() => {
             return this.conn.manager.increment(User, {id: userId, guild_id: guildId}, `history_calls`, 1);
         });
     }
 
-    public getHistoryCalls(guildId: string, userId: string){
+    public getHistoryCalls(guildId: string, userId: string) {
         return this.getUser(guildId, userId).then((r: User) => {
             return r.history_calls;
         })
     }
 
-    public addMutedUser(guildId: string, userId: string, muteAmount: Date){
+    public addMutedUser(guildId: string, userId: string, muteAmount: Date) {
         return this.invalidateCache('muted_users').then(() => {
             return this.conn.manager.save(MutedUser, {
                 user_id: userId,
@@ -709,19 +725,19 @@ export class Database {
         });
     }
 
-    public getMutedUsers(guildId: string){
+    public getMutedUsers(guildId: string) {
         return this.conn.manager.find(MutedUser, {where: {guild_id: guildId}, cache: true}).then((r: MutedUser[]) => {
             return r.filter(p => p.end_date > new Date());
         }).catch(err => Promise.reject(err));
     }
 
-    public getExpiredMutes(guildId: string){
+    public getExpiredMutes(guildId: string) {
         return this.conn.manager.find(MutedUser, {where: {guild_id: guildId}, cache: true}).then((r: MutedUser[]) => {
             return r.filter(p => p.end_date < new Date());
         }).catch(err => Promise.reject(err));
     }
 
-    public setMuteRole(guildId: string, role: string){
+    public setMuteRole(guildId: string, role: string) {
         return this.invalidateCache('guilds').then(() => {
             this.conn.manager.save(Guild, {
                 id: guildId,
@@ -730,13 +746,13 @@ export class Database {
         }).catch(err => Promise.reject(err));
     }
 
-    public getMuteRole(guildId: string){
-        return this.getGuild(guildId).then((r:Guild) => {
+    public getMuteRole(guildId: string) {
+        return this.getGuild(guildId).then((r: Guild) => {
             return r.mute_role;
         }).catch(err => Promise.reject(err));
     }
 
-    public addSuggestion(message: Message, suggestion: string){
+    public addSuggestion(message: Message, suggestion: string) {
         return this.invalidateCache('suggestions').then(() => {
             return this.conn.manager.save(Suggestion, {
                 guild_id: message.guild.id,
@@ -749,13 +765,13 @@ export class Database {
         });
     }
 
-    private changeSuggestionStatus(id: string, status: string, reason?: string){
+    private changeSuggestionStatus(id: string, status: string, reason?: string) {
         return this.invalidateCache('suggestions').then(() => {
-            const set: {[id: string]: string} = {
+            const set: { [id: string]: string } = {
                 suggestion_status: status
             };
 
-            if (reason){
+            if (reason) {
                 set['status_reason'] = reason;
             }
 
@@ -768,7 +784,7 @@ export class Database {
         });
     }
 
-    public setSuggestionMetadata(suggestionId: string, channelId: string, embedId: string){
+    public setSuggestionMetadata(suggestionId: string, channelId: string, embedId: string) {
         return this.conn.manager.createQueryBuilder()
             .update(Suggestion)
             .set({channel_id: channelId, message_id: embedId})
@@ -785,31 +801,34 @@ export class Database {
         return this.changeSuggestionStatus(id, 'DENIED');
     }
 
-    public acceptSuggestion(id: string, reason: string){
+    public acceptSuggestion(id: string, reason: string) {
         return this.changeSuggestionStatus(id, 'ACCEPTED', reason);
     }
 
-    public rejectSuggestion(id: string, reason: string){
+    public rejectSuggestion(id: string, reason: string) {
         return this.changeSuggestionStatus(id, 'REJECTED', reason);
     }
 
-    public setSuggestionsChannel(guildId: string, channelId: string | undefined){
+    public setSuggestionsChannel(guildId: string, channelId: string | undefined) {
         return this.invalidateCache('guilds').then(() => {
             return this.conn.manager.save(Guild, {id: guildId, suggestions_channel: channelId});
         })
     }
 
-    public getSuggestionsChannel(guildId: string): Promise<string | undefined>{
+    public getSuggestionsChannel(guildId: string): Promise<string | undefined> {
         return this.getGuild(guildId).then((r: Guild) => {
             return r.suggestions_channel;
         })
     }
 
-    public getSuggestion(guildId: string, suggestionId: string){
-        return this.conn.manager.findOne(Suggestion, {where: {guild_id: guildId, suggestion_id: suggestionId}, cache: true});
+    public getSuggestion(guildId: string, suggestionId: string) {
+        return this.conn.manager.findOne(Suggestion, {
+            where: {guild_id: guildId, suggestion_id: suggestionId},
+            cache: true
+        });
     }
 
-    public getSuggestions(guildId: string){
+    public getSuggestions(guildId: string) {
         return this.invalidateCache('suggestions').then(() => {
             return this.conn.getRepository(Suggestion)
                 .createQueryBuilder('suggestions')
@@ -819,7 +838,7 @@ export class Database {
         });
     }
 
-    public getPendingSuggestions(guildId: string){
+    public getPendingSuggestions(guildId: string) {
         return this.conn.getRepository(Suggestion)
             .createQueryBuilder('suggestions')
             .where(`guild_id = :id AND suggestion_status = 'AWAITING_APPROVAL'`, {id: guildId})
@@ -827,26 +846,26 @@ export class Database {
             .getMany();
     }
 
-    public incrementCommandCalls(guildId: string, userId: string){
+    public incrementCommandCalls(guildId: string, userId: string) {
         return this.invalidateCache('users').then(() => {
             return this.conn.manager.increment(User, {id: userId, guild_id: guildId}, 'commands_used', 1);
         });
     }
 
-    public incrementMacroCalls(guildId: string, userId: string){
+    public incrementMacroCalls(guildId: string, userId: string) {
         return this.invalidateCache('users').then(() => {
             return this.conn.manager.increment(User, {id: userId, guild_id: guildId}, 'macros_used', 1);
         });
     }
 
-    public async changeSpecificLoggingChannel(guild: DiscordGuild, type: LoggingChannelType | LoggingChannelType[], channelId: string | undefined){
+    public async changeSpecificLoggingChannel(guild: DiscordGuild, type: LoggingChannelType | LoggingChannelType[], channelId: string | undefined) {
         await this.invalidateCache('guilds');
 
-        if (Array.isArray(type)){
-            const o = type.reduce((obj: {[t: string]: string | null}, item: LoggingChannelType) => {
+        if (Array.isArray(type)) {
+            const o = type.reduce((obj: { [t: string]: string | null }, item: LoggingChannelType) => {
                 obj[item] = channelId ? channelId : null;
                 return obj;
-            }, <{[t: string]: string}>{});
+            }, <{ [t: string]: string }>{});
 
             return this.conn.manager.save(Guild, {
                 id: guild.id,
@@ -866,12 +885,12 @@ export class Database {
         return r[property];
     }
 
-    public async getInviteWarnThreshold(guildId: string){
+    public async getInviteWarnThreshold(guildId: string) {
         const r = await this.getGuild(guildId);
         return r.invite_warn_threshold;
     }
 
-    public async setInviteWarnThreshold(guildId: string, value: number){
+    public async setInviteWarnThreshold(guildId: string, value: number) {
         await this.invalidateCache('guilds');
         return this.conn.createQueryBuilder()
             .update(Guild)
@@ -886,7 +905,7 @@ export class Database {
         return r.invite_ban_threshold;
     }
 
-    public async setInviteBanThreshold(guildId: string, value: number){
+    public async setInviteBanThreshold(guildId: string, value: number) {
         await this.invalidateCache('guilds');
         return this.conn.createQueryBuilder()
             .update(Guild)
@@ -896,17 +915,20 @@ export class Database {
             .execute();
     }
 
-    public async getChannelIgnored(guildId: string, channelId: string){
-        return this.conn.manager.findOne(IgnoredChannel, {where: {guild_id: guildId, channel_id: channelId}, cache: true});
+    public async getChannelIgnored(guildId: string, channelId: string) {
+        return this.conn.manager.findOne(IgnoredChannel, {
+            where: {guild_id: guildId, channel_id: channelId},
+            cache: true
+        });
     }
 
-    public async getIgnoredChannels(guildId: string){
+    public async getIgnoredChannels(guildId: string) {
         return this.conn.manager.find(IgnoredChannel, {where: {guild_id: guildId}, cache: true});
     }
 
-    public async setChannelIgnored(guildId: string, channelId: string, ignorer: string, status: boolean){
+    public async setChannelIgnored(guildId: string, channelId: string, ignorer: string, status: boolean) {
         return this.invalidateCache('ignored_channels').then(() => {
-            if (status){
+            if (status) {
                 return this.conn.createQueryBuilder()
                     .insert()
                     .into(IgnoredChannel)
@@ -928,13 +950,14 @@ export class Database {
                 .execute();
         });
     }
-    public async getSpamFilter(guildId: string){
+
+    public async getSpamFilter(guildId: string) {
         return this.getGuild(guildId).then(r => {
             return r.spam_filter;
         });
     }
 
-    public async setSpamFilter(guildId: string, state: boolean){
+    public async setSpamFilter(guildId: string, state: boolean) {
         return this.conn.createQueryBuilder()
             .update(Guild)
             .set({spam_filter: state})

@@ -44,7 +44,7 @@ class MutedMember  {
     }
     public cancelUnmute(){
         if (this.timeout === undefined)
-            return debug.error(`Could not cancel scheduled unmute for ${this.name}, user has no scheduled unmute date`, "MuteQueue");
+            return void debug.error(`Could not cancel scheduled unmute for ${this.name}, user has no scheduled unmute date`, "MuteQueue");
         clearTimeout(this.timeout);
     }
 }
@@ -209,12 +209,12 @@ export class MuteQueue {
         const members : MutedMember[] | undefined  =this.queue.get(member.guild.id);
 
         if (members === undefined)
-            return debug.warning(`Guild for ${member.nickname} was not found`, 'MuteQueue');
+            return void debug.warning(`Guild for ${member.nickname} was not found`, 'MuteQueue');
 
         const mutedGuildMember: MutedMember | undefined = members.pop();
 
         if (!mutedGuildMember)
-            return debug.error(`Tried fetching a member from the empty muteQueue of ${member.guild.name}`, 'muteQueue');
+            return void debug.error(`Tried fetching a member from the empty muteQueue of ${member.guild.name}`, 'muteQueue');
 
         // in seconds
         let timeDelta : number = duration ? duration : getMuteTime();
@@ -252,12 +252,12 @@ export class MuteQueue {
     //     const guild = message.guild;
     //     const raidGuild: MutedMember[] | undefined= this.queue.get(guild.id);
     //     if (!raidGuild)
-    //         return debug.error(`No guild found for ${message.guild.name}`, 'muteQueue');
+    //         return void debug.error(`No guild found for ${message.guild.name}`, 'muteQueue');
     //     const youTried = gb.emojis.get('hifumi_you_tried');
     //     const raiderCount = raidGuild.length;
     //
     //     if (!raidGuild)
-    //         return debug.error(`Tried clearing raiders in an non - existent guild ${guild.name}.`);
+    //         return void debug.error(`Tried clearing raiders in an non - existent guild ${guild.name}.`);
     //
     //     for (let i = raidGuild.length; i > 0; --i){
     //         const raider = raidGuild[i];

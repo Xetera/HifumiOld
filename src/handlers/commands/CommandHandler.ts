@@ -160,7 +160,7 @@ export default class CommandHandler implements indexSignature {
         if (message.channel instanceof TextChannel)
             debug.info(`[${message.guild.name}]::${message.channel.name}::<${message.author.username}>: ${message.content}`, 'CommandHandler');
         else
-            return debug.error(`A non text channel command was forwarded to CommandHandler`, 'CommandHandler');
+            return void debug.error(`A non text channel command was forwarded to CommandHandler`, 'CommandHandler');
 
         const params = <CommandParameters> {};
         params.args = inputData.args;

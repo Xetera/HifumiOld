@@ -104,7 +104,7 @@ async function run(message: Message): Promise<any> {
             if (e.message === 'Unknown Message') {
                 return;
             }
-            debug.error(e, `getSuggestions`);
+            debug.error(e);
         }
     });
 
@@ -126,7 +126,7 @@ async function run(message: Message): Promise<any> {
         if (e.message === 'Unknown Message') {
             return;
         }
-        debug.error(e, `getSuggestions`);
+        debug.error(e);
     }
 }
 

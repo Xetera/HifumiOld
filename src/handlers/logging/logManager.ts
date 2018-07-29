@@ -122,7 +122,7 @@ export class LogManager {
 
     public static async logBan(guild:Guild, member: User, banningUser?: GuildMember, recursion?: number){
         if (recursion && recursion > 3){
-            return debug.warning(`Could not find a ban log after an ban event was fired in ${guild.name}`);
+            return void debug.warning(`Could not find a ban log after an ban event was fired in ${guild.name}`);
         }
         const channel = await gb.database.getGuildProperty(
             guild.id,
@@ -160,7 +160,7 @@ export class LogManager {
 
     public static async logUnban(guild:Guild, user: User, recursion?: number){
         if (recursion && recursion > 3){
-            return debug.warning(`Could not find an unban log after an unban event was fired in ${guild.name}`);
+            return void debug.warning(`Could not find an unban log after an unban event was fired in ${guild.name}`);
         }
 
         const channel = await gb.database.getGuildProperty(
@@ -198,7 +198,7 @@ export class LogManager {
             return void debug.warning(`A new DM channel was created with a user.`, `onChannelCreate`);
 
         if (recursion && recursion > 3){
-            return debug.warning(`Could not find a channel create log after an channel create event was fired in ${target.guild.name}`);
+            return void debug.warning(`Could not find a channel create log after an channel create event was fired in ${target.guild.name}`);
         }
 
         const channel = await gb.database.getGuildProperty(
@@ -224,7 +224,7 @@ export class LogManager {
     public static async logChannelDelete(target: Channel, recursion?: number){
 
         if (recursion && recursion > 3){
-            return debug.warning(`Could not find a channel create log after an channel create event was fired in ${(<TextChannel> target).guild.name}`);
+            return void debug.warning(`Could not find a channel create log after an channel create event was fired in ${(<TextChannel> target).guild.name}`);
         }
 
         if (!(target instanceof TextChannel) && !(target instanceof VoiceChannel))

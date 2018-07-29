@@ -21,7 +21,7 @@ export default function safeMessageUser(member: GuildMember, message : string | 
                 debug.info(`Tried to message ${member.user.username} but couldn't.`, 'safeMessageUser')
             }
             else {
-                debug.error(error, 'SafeDeleteMessage');
+                debug.error(error);
             }
         }
         else {

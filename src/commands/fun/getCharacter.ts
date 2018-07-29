@@ -12,7 +12,7 @@ async function run(message: Message, input: [string]): Promise<any> {
     Anime.getInstance().getCharacter(message, character).then((embed: RichEmbed) => {
         placeholder.edit(embed);
     }).catch(err => {
-        debug.error(err, `getCharacter`);
+        debug.error(err);
         placeholder.edit(randomRuntimeError());
     })
 }
