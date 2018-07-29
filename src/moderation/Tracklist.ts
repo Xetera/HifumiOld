@@ -88,11 +88,11 @@ export default class Tracklist {
         const trackedMember: number = guild.findIndex(tracked => tracked.id === member.id);
 
         if (trackedMember === -1){
-            return void debug.error(`Tried to remove ${member.user.username} from the tracklist but they were not found`, 'Tracklist');
+            return void debug.error(`Tried to remove ${member.user.username} from the tracklist but they were not found`);
         }
 
         guild.splice(trackedMember, 1);
-        debug.info(`Member ${member.user.username} in guild ${member.guild.name} was removed from the tracklist.`, 'Tracklist');
+        debug.info(`Member ${member.user.username} in guild ${member.guild.name} was removed from the tracklist.`);
     }
 
     public isNewMember(member: TrackedMember|GuildMember): boolean {

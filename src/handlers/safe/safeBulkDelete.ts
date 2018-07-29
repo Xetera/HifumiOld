@@ -15,12 +15,12 @@ export default async function safeBulkDelete(channel: Channel, messages?:  Messa
     try {
         if (messages && messages.length){
             const deletedMessages = await channel.bulkDelete(messages, true);
-            debug.info(`Bulk deleted ${deletedMessages.size} messages from chanel '${channel.name}' in guild ${channel.guild.name}`, `SafeBulkDelete`);
+            debug.info(`Bulk deleted ${deletedMessages.size} messages from chanel '${channel.name}' in guild ${channel.guild.name}`);
             return deletedMessages.size
         }
         const fetched : Collection<Snowflake, Message> = await channel.fetchMessages({limit: getBulkDeleteCount()});
         const deletedMessages = await channel.bulkDelete(fetched, true);
-        debug.info(`Bulk deleted the last ${deletedMessages.size} messages from channel '${channel.name}' in guild ${channel.guild.name}`, `SafeBulkDelete`);
+        debug.info(`Bulk deleted the last ${deletedMessages.size} messages from channel '${channel.name}' in guild ${channel.guild.name}`);
         return deletedMessages.size;
     }
 

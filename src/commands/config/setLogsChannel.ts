@@ -22,7 +22,7 @@ async function setLogsChannel(message: Message, channel?: TextChannel){
         }
         const targetChannel = message.client.channels.get(r.logs_channel!);
         if (!targetChannel){
-            debug.error(`Could not find channel ${r.logs_channel} in ${message.guild}`, 'SetWarnings');
+            debug.error(`Could not find channel ${r.logs_channel} in ${message.guild}`);
             return void safeSendMessage(message.channel,
                 setConfigChannelFailEmbed(message.channel, 'logs')
             );

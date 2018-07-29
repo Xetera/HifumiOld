@@ -40,7 +40,7 @@ export class Cleverbot {
             }
         };
         this.cleverbot = new Clevertype(configuration, true);
-        debug.info('Cleverbot module is ready', "Cleverbot");
+        debug.info(`Cleverbot module is ready`);
         this.available = true;
     }
 
@@ -91,7 +91,7 @@ export class Cleverbot {
                 return;
             }
 
-            debug.info(`[${message.member.guild}]::${message.channel.name}::<${message.author.username}> cleverbot call`, "Cleverbot");
+            debug.info(`[${message.member.guild}]::${message.channel.name}::<${message.author.username}> cleverbot call`);
 
             this.say(message, message.content, message.member.id).then(async(resp : string) => {
                 // sometimes randomly the messages are empty for no reason
@@ -139,7 +139,7 @@ export class Cleverbot {
         return this.cleverbot.say(parsedArg, id).then((response: string) => {
             gb.database.incrementCleverbotCalls(message.guild.id);
             if (!response) {
-                debug.warning(`Couldn't get a response...`, `Cleverbot`);
+                debug.warning(`Couldn't get a response...`);
                 return this.say(message, phrase, id, replaceKeyword);
             }
             return response;
@@ -182,11 +182,11 @@ export class Cleverbot {
                 this.users[id].ignores.ignoring = true;
                 this.users[id].ignores.ignoreUntil = moment(new Date()).add(30 * this.users[id].warnings, 'm').toDate();
                 safeSendMessage(message.channel, `Ignoring ${message.member} for ${formattedTimeString(user.warnings * 30 * 60)}`);
-                debug.warning(`Rate limited ${message.author.username} in ${message.guild.name}`, `Cleverbot`)
+                debug.warning(`Rate limited ${message.author.username} in ${message.guild.name}`);
             }
 
             else {
-                debug.info(`Warned a user in ${message.guild.name} about rate limiting`, `Cleverbot`);
+                debug.info(`Warned a user in ${message.guild.name} about rate limiting`);
                 handleFailedCommand(
                     message.channel, `You are rate limited, please stop spamming me.`, `Warning #${this.users[id].warnings}/3`                );
             }

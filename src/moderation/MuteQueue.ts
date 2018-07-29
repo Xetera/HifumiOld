@@ -44,7 +44,7 @@ class MutedMember  {
     }
     public cancelUnmute(){
         if (this.timeout === undefined)
-            return void debug.error(`Could not cancel scheduled unmute for ${this.name}, user has no scheduled unmute date`, "MuteQueue");
+            return void debug.error(`Could not cancel scheduled unmute for ${this.name}, user has no scheduled unmute date`);
         clearTimeout(this.timeout);
     }
 }
@@ -56,7 +56,7 @@ export class MuteQueue {
     constructor(){
         this.queue = new Map<string, MutedMember[]>();
         this.raiders = new Map<string, MutedMember[]>();
-        debug.info('MuteQueue is ready.', "MuteQueue");
+        debug.info(`MuteQueue is ready.`);
     }
 
     private sortGuild(guildId: string){
@@ -209,12 +209,12 @@ export class MuteQueue {
         const members : MutedMember[] | undefined  =this.queue.get(member.guild.id);
 
         if (members === undefined)
-            return void debug.warning(`Guild for ${member.nickname} was not found`, 'MuteQueue');
+            return void debug.warning(`Guild for ${member.nickname} was not found`);
 
         const mutedGuildMember: MutedMember | undefined = members.pop();
 
         if (!mutedGuildMember)
-            return void debug.error(`Tried fetching a member from the empty muteQueue of ${member.guild.name}`, 'muteQueue');
+            return void debug.error(`Tried fetching a member from the empty muteQueue of ${member.guild.name}`);
 
         // in seconds
         let timeDelta : number = duration ? duration : getMuteTime();
@@ -229,12 +229,12 @@ export class MuteQueue {
             if (!timeoutMembers)
                 return;
             else if (!mutedGuildMember.role || !mutedGuildMember.member.roles.has(mutedGuildMember.role.id)) {
-                return void debug.warning(`Tried to unmute ${mutedGuildMember.name} but they were already unmuted.\n`, "MuteQueue");
+                return void debug.warning(`Tried to unmute ${mutedGuildMember.name} but they were already unmuted.\n`);
             }
             const target = mutedGuildMember.member;
             target.removeRole(mutedGuildMember.role, `End of ${timeFormat} mute.`)
                 .then(() => {
-                    debug.info(`${mutedGuildMember.name} in ${mutedGuildMember.member.guild.name} was unmuted after ${timeFormat}.`, "MuteQueue");
+                    debug.info(`${mutedGuildMember.name} in ${mutedGuildMember.member.guild.name} was unmuted after ${timeFormat}.`);
                     target.send(unmuteDMEmbed(target, reason, timeFormat));
                 })
                 .catch((error: Error) => {
@@ -252,7 +252,7 @@ export class MuteQueue {
     //     const guild = message.guild;
     //     const raidGuild: MutedMember[] | undefined= this.queue.get(guild.id);
     //     if (!raidGuild)
-    //         return void debug.error(`No guild found for ${message.guild.name}`, 'muteQueue');
+    //         return void debug.error(`No guild found for ${message.guild.name}`);
     //     const youTried = gb.emojis.get('hifumi_you_tried');
     //     const raiderCount = raidGuild.length;
     //

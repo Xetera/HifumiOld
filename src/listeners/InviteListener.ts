@@ -35,7 +35,7 @@ export default async function inviteListener(message: Message){
     if (valid)
         return;
 
-    debug.warning(`${message.author.username} in ${message.guild} sent an invite link.`, `InviteListener`);
+    debug.warning(`${message.author.username} in ${message.guild} sent an invite link.`);
 
     return deleteInvite(message)
 }

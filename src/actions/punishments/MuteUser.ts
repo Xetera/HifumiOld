@@ -19,7 +19,7 @@ import {formattedTimeString} from "../../utility/Util";
  */
 export default function muteUser(member: GuildMember, mutedBy: GuildMember, role: Role, reason: string | Offense, duration: number): Promise<boolean> {
     if (member.hasPermission("ADMINISTRATOR")) {
-        debug.warning(`Tried to mute ${member.displayName} for ${formattedTimeString(getMuteTime())} but they are an administrator.`, "MuteQueue");
+        debug.warning(`Tried to mute ${member.displayName} for ${formattedTimeString(getMuteTime())} but they are an administrator.`);
         return Promise.resolve(false);
     }
 
@@ -40,7 +40,7 @@ export default function muteUser(member: GuildMember, mutedBy: GuildMember, role
     }).catch(err =>{
         if (err instanceof DiscordAPIError){
             //TODO: add missing permission embed
-            debug.warning(`Could not mute user ${member.displayName}, missing permissions.`, "MuteQueue");
+            debug.warning(`Could not mute user ${member.displayName}, missing permissions.`);
         }
         else {
             debug.error(`Unexpected error while muting user ${member.displayName}\n` + err.stack, "MuteQueue");

@@ -31,7 +31,7 @@ export default async function onGuildMemberAdd(member : Discord.GuildMember): Pr
     if (welcomeChannelId) {
         const welcomeChannel: Channel | undefined = member.guild.channels.get(welcomeChannelId);
         if (!welcomeChannel) {
-            debug.error(`Welcome channel saved in the database for guild ${member.guild.name} no longer exists`, 'GuildMemberAdd')
+            debug.error(`Welcome channel saved in the database for guild ${member.guild.name} no longer exists`);
         }
 
         else if (welcomeChannel instanceof Discord.TextChannel) {

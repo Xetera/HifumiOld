@@ -45,10 +45,12 @@ export default async function onMessage(message: Discord.Message){
         || (message.guild && await gb.database.getChannelIgnored(message.guild.id, message.channel.id))){
         return;
     }
+
     else if (!gb || !gb.database.ready) {
         return void debug.info(`Got message from ${message.guild.name} but the DB hasn't finished caching.`);
     }
 
+    gb.stats.increment('hifumi.messages');
 
     const messageType: MessageType = message.guild ? MessageType.GuildMessage : MessageType.PrivateMessage;
 

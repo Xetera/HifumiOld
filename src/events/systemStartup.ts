@@ -23,15 +23,16 @@ export function setupEnvironment() {
     let env;
 
     if (['live', 'production'].includes(process.env['ENV']!.toLowerCase())) {
-        debug.info('Current environment is Production.', "Startup");
+        debug.info('Current environment is Production.');
         env = Environments.Production;
     }
     else if (process.env.ENV === "DEVELOPMENT") {
-        debug.info('Current environment is Development', "Startup");
+        debug.info('Current environment is Development');
+        debug.info('Datadog stat logging is NOT enabled in dev mode!');
         env = Environments.Development;
     }
     else {
-        debug.error(`Unexpected environment: ${process.env.ENV}, setting environment to DEVELOPMENT.`, "Startup");
+        debug.error(`Unexpected environment: ${process.env.ENV}, setting environment to DEVELOPMENT.`);
         env = Environments.Development;
     }
     gb.ENV = env;

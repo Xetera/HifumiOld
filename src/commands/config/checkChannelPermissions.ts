@@ -36,7 +36,7 @@ export default function identifyMuteRole(message: Message){
         for ( let permission of overriddenPerms){
             const role: Role | undefined = channel.guild.roles.get(permission.id);
             if (!role) {
-                debug.error(`Cannot find role with id ${permission.id} in guild ${channel.guild.name}`, 'checkChannelPerms');
+                debug.error(`Cannot find role with id ${permission.id} in guild ${channel.guild.name}`);
                 return obj;
             }
             let tally = obj.override.get(role);
@@ -90,7 +90,7 @@ export function checkMuteRoleExisting(target: Message | Guild){
         for ( let permission of overriddenPerms){
             const role: Role | undefined = channel.guild.roles.get(permission.id);
             if (!role) {
-                debug.error(`Cannot find role with id ${permission.id} in guild ${channel.guild.name}`, 'checkChannelPerms');
+                debug.error(`Cannot find role with id ${permission.id} in guild ${channel.guild.name}`);
                 return obj;
             }
             let tally = obj.override.get(role);
@@ -155,7 +155,7 @@ export async function muteCoverage(message: Message){
         for ( let permission of overriddenPerms){
             const role: Role | undefined = channel.guild.roles.get(permission.id);
             if (!role) {
-                debug.error(`Cannot find role with id ${permission.id} in guild ${channel.guild.name}`, 'checkChannelPerms');
+                debug.error(`Cannot find role with id ${permission.id} in guild ${channel.guild.name}`);
                 return obj;
             }
             let tally = obj.override.get(role);

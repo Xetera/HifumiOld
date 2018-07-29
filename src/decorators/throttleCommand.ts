@@ -26,7 +26,7 @@ export function throttle(duration: number) {
                 }
 
                 else if (moment(date).add(duration ,'s').toDate() > new Date() && params.message.author.id !== gb.ownerID){
-                    debug.info(`User ${params.message.author.username} was throttled`, `ThrottleCommand`);
+                    debug.info(`User ${params.message.author.username} was throttled`);
                     params.message.channel.send(commandThrottleEmbed(duration));
                     return;
                 }

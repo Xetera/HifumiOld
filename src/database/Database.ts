@@ -46,7 +46,7 @@ export class Database {
 
     constructor() {
         this.env = gb.ENV;
-        debug.info(`Logging into postgres in ${this.env === Environments.Development ? 'dev' : 'live'} mode.`, `Database`);
+        debug.info(`Logging into postgres in ${this.env === Environments.Development ? 'dev' : 'live'} mode.`);
         const connString: string | undefined = process.env['DATABASE_URL'] || process.env['POSTGRES_URL'];
         if (!connString) {
             const error: Error = new Error(
@@ -59,7 +59,7 @@ export class Database {
         }
         let cache = this.getCache();
         this.connect(connString, cache).then(conn => {
-            debug.info(`Logged into postgres`, `Database`);
+            debug.info(`Logged into postgres`);
             this.conn = conn;
             return this.sync();
         }).then(() => {
@@ -101,7 +101,7 @@ export class Database {
      * @returns {Promise<Connection>}
      */
     public connect(url: string, cache: Object): Promise<Connection> {
-        debug.silly(`Connecting to postgres on url ${url}`, `Database`);
+        debug.silly(`Connecting to postgres on url ${url}`);
         return this.ormConfig(url).then(() => {
             return createConnection({
                 type: 'postgres',
@@ -146,7 +146,7 @@ export class Database {
      * @returns {Promise<void>}
      */
     public async sync(): Promise<void> {
-        debug.silly(`Crosschecking database`, `Database`);
+        debug.silly(`Crosschecking database`);
         const guilds = gb.bot.guilds.array();
         for (let i in guilds) {
             const guild = guilds[i];
@@ -158,7 +158,7 @@ export class Database {
             const g = await guild.fetchMembers();
             await this.addMembers(g.members.array());
         }
-        debug.silly(`Crosschecked db`, `Database`);
+        debug.silly(`Crosschecked db`);
         return Promise.resolve();
     }
 
@@ -175,7 +175,7 @@ export class Database {
     public getUser(guildId: string, userId: string): Promise<User> {
         return this.conn.manager.find(User, {where: {guild_id: guildId, id: userId}, cache: true}).then((r: User[]) => {
             if (r.length > 1) {
-                debug.error(`Multiple instances of user ${userId} exists in the db.`, `Database`);
+                debug.error(`Multiple instances of user ${userId} exists in the db.`);
             }
             return r[0];
         }).catch((err: Error) => {
@@ -229,7 +229,7 @@ export class Database {
         return this.invalidateCache('guilds').then(() => {
             return this.conn.manager.save(Guild, {id: guildId, prefix: prefix});
         }).catch(err => {
-            debug.error(`Error getting guild`, `Database`);
+            debug.error(`Error getting guild`);
             return Promise.reject(err);
         })
     }
@@ -506,7 +506,7 @@ export class Database {
         return this.getUser(member.guild.id, member.id).then((r: User) => {
             return r.ignoring;
         }).catch(err => {
-            debug.error(`User ${member.user.username} in guild ${member.guild.id} isn't saved in the Database`, `Database`);
+            debug.error(`User ${member.user.username} in guild ${member.guild.id} isn't saved in the Database`);
             return Promise.reject(err);
         });
     }

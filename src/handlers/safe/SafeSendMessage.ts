@@ -44,7 +44,7 @@ export default function safeSendMessage
                     debug.error(`Tried to send an empty message to ${channel.name}\n` + err.stack, 'safeSendMessage');
                 }
                 else if (err.message === APIErrors.INVALID_THUMBNAIL){
-                    debug.error('Invalid thumbnail for embed', 'safeSendMessage');
+                    debug.error(`Invalid thumbnail for embed`);
                     //return Promise.reject(APIErrors.INVALID_THUMBNAIL)
                 }
                 debug.error(`Unexpected Discord API error while sending message to channel ${channel.name}\n` + err.stack,

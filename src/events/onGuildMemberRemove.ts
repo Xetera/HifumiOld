@@ -21,7 +21,7 @@ export default async function onGuildMemberRemove(member : Discord.GuildMember) 
         logs =  await member.guild.fetchAuditLogs();
     }
     catch (e) {
-        debug.error(`Error while fetching audit logs on member leave`, `onGuildMemberRemove`);
+        debug.error(`Error while fetching audit logs on member leave`);
 
     }
 

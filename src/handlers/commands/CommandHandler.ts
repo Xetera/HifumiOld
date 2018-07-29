@@ -132,7 +132,7 @@ export default class CommandHandler implements indexSignature {
         }
 
         else if (input.substring(0, 2) === prefix + prefix) {
-            debug.silly(`[${message.guild.name}]<${message.author}> Entered a stealth command`, 'CommandHandler');
+            debug.silly(`[${message.guild.name}]<${message.author}> Entered a stealth command`);
             out.stealth = true;
             out.command = input.substring(2);
             return out;
@@ -158,9 +158,9 @@ export default class CommandHandler implements indexSignature {
         }
 
         if (message.channel instanceof TextChannel)
-            debug.info(`[${message.guild.name}]::${message.channel.name}::<${message.author.username}>: ${message.content}`, 'CommandHandler');
+            debug.info(`[${message.guild.name}]::${message.channel.name}::<${message.author.username}>: ${message.content}`);
         else
-            return void debug.error(`A non text channel command was forwarded to CommandHandler`, 'CommandHandler');
+            return void debug.error(`A non text channel command was forwarded to CommandHandler`);
 
         const params = <CommandParameters> {};
         params.args = inputData.args;

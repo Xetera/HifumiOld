@@ -13,11 +13,11 @@ export async function handleInvalidParameters(channel : Channel, commandName: st
     }
     const prefix = await gb.database.getPrefix(channel.guild.id);
     if (!command){
-        debug.error(`Could not find command ${commandName}`, 'handleInvalidParameters');
+        debug.error(`Could not find command ${commandName}`);
         return;
     }
     else if (!command.argLength) {
-        debug.error(`An uncallable command was referenced`, 'handleInvalidParameters');
+        debug.error(`An uncallable command was referenced`);
         return;
     }
 

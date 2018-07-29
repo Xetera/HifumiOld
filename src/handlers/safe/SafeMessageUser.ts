@@ -14,11 +14,11 @@ export default function safeMessageUser(member: GuildMember, message : string | 
     return member.createDM().then((channel: DMChannel) => {
         return channel.send(message);
     }).then(() => {
-        return void debug.info(`Messaged user ${member.user.username} because:\n${messageReason}`, 'safeMessageUser');
+        return void debug.info(`Messaged user ${member.user.username} because:\n${messageReason}`);
     }).catch(error => {
         if (error instanceof DiscordAPIError) {
             if (error.message === APIErrors.CANNOT_MESSAGE_USER) {
-                debug.info(`Tried to message ${member.user.username} but couldn't.`, 'safeMessageUser')
+                debug.info(`Tried to message ${member.user.username} but couldn't.`);
             }
             else {
                 debug.error(error);

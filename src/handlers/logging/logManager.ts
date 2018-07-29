@@ -52,7 +52,7 @@ export class LogManager {
             guild.fetchAuditLogs()
                 .then((logs: GuildAuditLogs) => func(logs))
                 .catch(err => {
-                    debug.error(`Could not fetch audit logs for server ${guild.name}, missing permissions`,`LogManager`)
+                    debug.error(`Could not fetch audit logs for server ${guild.name}, missing permissions`);
                 });
         }, 1000);
     }
@@ -66,28 +66,28 @@ export class LogManager {
         const warningsChannel = guild.channels.get(channelId);
         if (!warningsChannel){
             // User probably deleted the channel and didn't update their log setting
-            return void debug.error(`Could not resolve a warnings channel saved in the database`, `LogManager`);
+            return void debug.error(`Could not resolve a warnings channel saved in the database`);
         }
         if (warningsChannel instanceof TextChannel){
             warningsChannel.send(embed);
-            debug.silly(`Logged a ${action ? action + ' action' : 'warning'} in ${guild.name}`, 'LogManager');
+            debug.silly(`Logged a ${action ? action + ' action' : 'warning'} in ${guild.name}`);
             return;
         }
-        return void debug.error(`Warning channel for ${guild.name} was not recorded as TextChanel.`, 'LogManager');
+        return void debug.error(`Warning channel for ${guild.name} was not recorded as TextChanel.`);
     }
 
     public static async logMessage(guild: Guild, channelId: string, embed: RichEmbed|string, action: LogAction){
         const logsChannel = guild.channels.get(channelId);
         if (!logsChannel){
             // User probably deleted the channel and didn't update their log setting
-            return void debug.error(`Could not resolve a channel saved in the database`, `LogManager`);
+            return void debug.error(`Could not resolve a channel saved in the database`);
         }
         if (logsChannel instanceof TextChannel){
             safeSendMessage(logsChannel, embed);
-            debug.silly(`Logged a ${action ? action + ' action' : 'message'} in ${guild.name}`, 'LogManager');
+            debug.silly(`Logged a ${action ? action + ' action' : 'message'} in ${guild.name}`);
             return;
         }
-        return void debug.error(`Log channel for ${guild.name} was not recorded as TextChanel.`, 'LogManager');
+        return void debug.error(`Log channel for ${guild.name} was not recorded as TextChanel.`);
     }
 
     public static async logMutedUser(member: GuildMember, mutedBy: GuildMember, reason: string, duration: number){
@@ -195,7 +195,7 @@ export class LogManager {
 
     public static async logChannelCreate(target: Channel, recursion?: number){
         if (!(target instanceof TextChannel) && !(target instanceof VoiceChannel))
-            return void debug.warning(`A new DM channel was created with a user.`, `onChannelCreate`);
+            return void debug.warning(`A new DM channel was created with a user.`);
 
         if (recursion && recursion > 3){
             return void debug.warning(`Could not find a channel create log after an channel create event was fired in ${target.guild.name}`);

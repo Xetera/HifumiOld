@@ -27,7 +27,7 @@ export default async function onReady(bot: Client): Promise<void> {
     setGlobals(bot);
     updatePresence(bot);
     bot.fetchApplication().then((app: Discord.OAuth2Application) => {
-        debug.info(`${bot.user.username} is fully online.`, "Ready");
+        debug.info(`${bot.user.username} is fully online.`);
         gb.ownerID = app.owner.id;
     });
 
@@ -40,6 +40,7 @@ export default async function onReady(bot: Client): Promise<void> {
     gb.muteQueue = instances.muteQueue;
     gb.commandHandler = instances.commandHandler;
     gb.trackList = instances.trackList;
+    gb.stats = instances.stats;
     gb.trackList.initializeGuilds();
     setInterval(() => {
         updatePresence(bot);

@@ -27,7 +27,7 @@ export default async function settings(message : Message, input: [(string | unde
     const cache: Guild = await gb.database.getGuild(guild.id);
 
     if (!cache) {
-        debug.error(`Guild ${guild.name} was not found in cache.`, `getConfig`);
+        debug.error(`Guild ${guild.name} was not found in cache.`);
         return void safeSendMessage(message.channel,
             `Uhh... for some reason I wasn't able to cache your server properly...\n` +
             `This should never happen, go bother Xetera#9596 about it.`);

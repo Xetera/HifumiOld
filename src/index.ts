@@ -26,7 +26,7 @@ import {debug} from "./utility/Logging";
 
     const bot = getClient();
 
-    debug.info('Logging in...', 'Startup');
+    debug.info(`Logging in...`);
     bot.login(process.env['BOT_TOKEN']);
 
     bot.on('ready',() =>  onReady(bot));

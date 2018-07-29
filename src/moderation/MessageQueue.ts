@@ -29,7 +29,7 @@ export class MessageQueue {
         this.queue = new Map<string, CachedMessage[]>();
         this.trackList = watchlist;
         this.bufferLength = size ? size : 200;
-        debug.info('MessageQueue is ready.', "MessageQueue");
+        debug.info(`MessageQueue is ready.`);
     }
 
     public add(msg: CachedMessage) : void {
@@ -84,7 +84,7 @@ export class MessageQueue {
 
     private removeUserMessages(messages: CachedMessage[]): void {
         if (!messages.length){
-            return void debug.error(`Tried to remove messages by a person who has no messages in the MessageQueue`, `MessageQueue`)
+            return void debug.error("Tried to remove messages by a person who has no messages in the MessageQueue");
         }
         const channel = messages[messages.length - 1].channel;
         safeBulkDelete(channel, messages.filter(message => message.channel.id === channel.id));
@@ -93,7 +93,7 @@ export class MessageQueue {
     public removeUsersRecentMessages(member: GuildMember){
         const guild = this.queue.get(member.guild.id);
         if (!guild){
-            return void debug.error(`Cannot bulk delete messages, no guild associated with ${member} in the queue`, 'MessageQueue');
+            return void debug.error(`Cannot bulk delete messages, no guild associated with ${member} in the queue`);
         }
         let messages = [];
         for (let i=guild.length -1 ; i > 0; i--){
@@ -103,7 +103,7 @@ export class MessageQueue {
         }
 
         if (!messages.length){
-            return void debug.error(`Could not find a message from the user ${member} in the queue`, 'MessageQueue');
+            return void debug.error(`Could not find a message from the user ${member} in the queue`);
         }
 
         safeBulkDelete(messages[0].channel, messages);
@@ -121,7 +121,7 @@ export class MessageQueue {
         const messages : CachedMessage[] | undefined = this.queue.get(guild.id);
 
         if (messages === undefined) {
-            debug.error(`Tried fetching recent messages in a nonexistent server`, "MessageQueue");
+            debug.error(`Tried fetching recent messages in a nonexistent server`);
             return;
         }
         return messages.filter(message => {

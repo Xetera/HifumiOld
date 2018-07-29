@@ -19,13 +19,13 @@ export default function deleteInvite(message: Message, editedMessage: boolean = 
         debug.info(`Deleted invite link from ${sender}`);
         return gb.database.incrementInviteStrike(message.member)
     }).then(async(strikeCount : number) => {
-        debug.silly(`${message.member.displayName} has ` + strikeCount + " strikes on record", `InviteListener`);
+        debug.silly(`${message.member.displayName} has ` + strikeCount + " strikes on record`);
 
         if (trackList.isNewMember(message.member)
             && await gb.database.getTrackNewMembers(message.guild.id)
             && strikeCount > 2){
 
-            debug.info(`Advertiser ${message.author.username} was a tracked member, attempting to ban...`, `InviteListener`);
+            debug.info(`Advertiser ${message.author.username} was a tracked member, attempting to ban...`);
             trackList.punishNewMember(message.member, Offense.InviteLink);
         }
         else if (strikeCount >= await gb.database.getInviteBanThreshold(message.guild.id)){

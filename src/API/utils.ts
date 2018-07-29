@@ -57,7 +57,7 @@ export async function fetchUrlAsBase64(url: string, isGif: boolean): Promise<str
         }
         else {
             debug.error('something 12')
-            debug.error("Error getting file from request", "APIUtils|FetchUrlAsBase64");
+            debug.error(`Error getting file from request`);
             debug.error(err);
             return Promise.reject(err.message);
         }
