@@ -14,7 +14,7 @@ const options = {
         colorize: false,
     },
     console: {
-        level: 'debug',
+        level: 'silly',
         handleExceptions: true,
         json: false,
         colorize: true,
@@ -24,11 +24,11 @@ const options = {
             winston.format.timestamp(),
             winston.format.printf((info) => {
                 const {
-                    timestamp, level, message, ...args
+                    timestamp, level, message
                 } = info;
 
                 const ts = timestamp.slice(0, 19).replace('T', ' ');
-                return `${ts} [${level}]: ${message} ${Object.keys(args).length ? JSON.stringify(args, null, 2) : ''}`;
+                return `${ts} [${level}]: ${message}`;
             }),
         )
     },
