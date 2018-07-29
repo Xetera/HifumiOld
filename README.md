@@ -110,30 +110,6 @@ This script is set on a cron job of regular intervals, and an X amount of backup
 
 A backup-restoration script is available to restore the latest backup if necessary.
 
-### Inversion of Control
-All objects that are required in the global scope or inside other classes are handled by [typescript-ioc](https://github.com/thiagobustamante/typescript-ioc) to avoid the usage of global singletons.
-
-Classes that depend on other classes, such as `Cleverbot -> TokenBucket` get their dependencies declared as such
-```ts
-@Singleton
-export class Cleverbot extends ICleverbot {
-    readonly identifier : RegExp = /hifumi/i;
-    cleverbot : Clevertype;
-    @Inject tokenBucket: ITokenBucket;
-    // implementation...
-}
-```
-
-In order to not depend on classes themselves but rather an "interface" are declared as `abstract` classes instead inside `src/interfaces/injectables`.
-
-These classes are extended to provide functionality and are injected as necessary or fetched from the container. The abstract class itself is relied upon for type inference rather than the class implementation which prevents circular dependencies.
-```ts
-export abstract class ICleverbot {
-    identifier: RegExp;
-    cleverbot: Clevertype;
-    tokenBucket: ITokenBucket;
-    abstract isRateLimited(id: string, message: Message): boolean;
-}
 ```
 ## Setting Up Hifumi
 Coming soon...
