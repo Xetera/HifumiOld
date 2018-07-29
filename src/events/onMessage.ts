@@ -1,5 +1,4 @@
 import * as Discord from'discord.js'
-import * as dbg from 'debug'
 import inviteListener from '../listeners/InviteListener'
 import * as moment from "moment";
 import {MessageType} from "../interfaces/identifiers";
@@ -8,13 +7,8 @@ import DMCommandHandler from "../handlers/commands/DMCommandHandler";
 import pingListener from "../listeners/pingListener";
 import memeListener from "../listeners/memeListener";
 import hexListener from "../listeners/hexListener";
-
-export const debug = {
-    silly: dbg('Bot:onMessage:Silly'),
-    info: dbg('Bot:onMessage:Info'),
-    warning: dbg('Bot:onMessage:Warning'),
-    error: dbg('Bot:onMessage:Error')
-};
+import {debug} from "../utility/Logging";
+import {incrementStat} from "../handlers/logging/datadog";
 
 interface Message extends Discord.Message {
     sent : Date;
@@ -50,7 +44,7 @@ export default async function onMessage(message: Discord.Message){
         return void debug.info(`Got message from ${message.guild.name} but the DB hasn't finished caching.`);
     }
 
-    gb.stats.increment('hifumi.messages');
+    gb.stats.set('hifumi.messages.seen', message.client.guilds.size);
 
     const messageType: MessageType = message.guild ? MessageType.GuildMessage : MessageType.PrivateMessage;
 
@@ -66,16 +60,20 @@ export default async function onMessage(message: Discord.Message){
 
     // we want to serve the help page to the user even if they have the wrong
     // prefix in case they don't know what the prefix is
-    else if (messageType === MessageType.PrivateMessage)
+    else if (messageType === MessageType.PrivateMessage){
+        incrementStat(`hifumi.messages.dm`);
         return DMCommandHandler(message);
+    }
 
-    const prefix = await gb.database.getPrefix(message.guild.id)
+    const prefix = await gb.database.getPrefix(message.guild.id);
 
-    if (!message.content.startsWith(prefix))
+    if (!message.content.startsWith(prefix)){
         return;
+    }
 
     // right now this only supports 1 char length prefix but we can change that later
     if (guildEnabled && !userIgnored){
+        incrementStat(`hifumi.messages.guilds`);
         return gb.commandHandler.handler(message);
     }
 }

@@ -4,6 +4,7 @@ import {gb, emojiName} from "../misc/Globals";
 import {createInstance, Environments} from "./systemStartup";
 import {Client, Emoji} from "discord.js";
 import updatePresence from "../actions/UpdatePresence";
+import {incrementStat} from "../handlers/logging/datadog";
 
 
 // returning owner id at the end
@@ -42,7 +43,9 @@ export default async function onReady(bot: Client): Promise<void> {
     gb.trackList = instances.trackList;
     gb.stats = instances.stats;
     gb.trackList.initializeGuilds();
+    incrementStat(`hifumi.client.logins`);
     setInterval(() => {
+        incrementStat(`hifumi.client.presence_updates`);
         updatePresence(bot);
     }, 1000 * 60 * 10);
 }

@@ -6,6 +6,7 @@ import {Offense} from "./interfaces";
 import banTrackedUserForInvite from "../actions/punishments/tracklist/BanTrackedUserForInvite";
 import banTrackedUserForSpam from "../actions/punishments/tracklist/banTrackedUserForSpam";
 import {debug} from '../utility/Logging';
+import {incrementStat} from "../handlers/logging/datadog";
 
 type guildId = string;
 
@@ -114,11 +115,11 @@ export default class Tracklist {
         tracked.banned = true;
         if (offense === Offense.Spam){
             banTrackedUserForSpam(member);
+            incrementStat(`hifumi.moderation.tracked_bans`)
         }
         else if (offense === Offense.InviteLink){
             banTrackedUserForInvite(member);
+            incrementStat(`hifumi.moderation.tracked_bans`)
         }
     }
-
-    // Placeholder, fixed in earlier merges
 }

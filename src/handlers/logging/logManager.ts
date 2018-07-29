@@ -29,6 +29,7 @@ import safeSendMessage from "../safe/SafeSendMessage";
 import logInviteMessageEmbed from "../../embeds/logging/logInviteMessageEmbed";
 import logEditedInviteMessageEmbed from "../../embeds/logging/logEditedInviteMessageEmbed";
 import logNewSuggestionEmbed from "../../embeds/logging/suggestions/logNewSuggestionEmbed";
+import {incrementStat} from "./datadog";
 
 enum LogAction {
     JOIN = 'join',
@@ -98,6 +99,7 @@ export class LogManager {
         if (!channel)
             return;
         LogManager.logWarning(member.guild, <string> channel, logMutedEmbed(member, mutedBy, reason, duration), LogAction.MUTE);
+        incrementStat(`hifumi.logs.mutes`)
     }
 
     public static async logMemberJoin(member: GuildMember){
@@ -108,6 +110,7 @@ export class LogManager {
         if (!member.guild.available || !channel)
             return;
         LogManager.logMessage(member.guild, <string> channel, logMemberJoinEmbed(member), LogAction.JOIN);
+        incrementStat(`hifumi.logs.joins`)
     }
 
     public static async  logMemberLeave(member: GuildMember){
@@ -118,6 +121,7 @@ export class LogManager {
         if (!member.guild.available || !channel)
             return;
         LogManager.logMessage(member.guild, <string> channel, logMemberLeaveEmbed(member), LogAction.LEAVE);
+        incrementStat(`hifumi.logs.leaves`)
     }
 
     public static async logBan(guild:Guild, member: User, banningUser?: GuildMember, recursion?: number){
@@ -190,6 +194,7 @@ export class LogManager {
                 ),
                 LogAction.UNBAN
             );
+            incrementStat(`hifumi.logs.unbans`)
         });
     }
 
@@ -218,6 +223,7 @@ export class LogManager {
 
             const creator = entry.executor;
             LogManager.logMessage(target.guild, <string> channel, logChannelCreateEmbed(target, creator, target.name), LogAction.CHANNEL_CREATE);
+            incrementStat(`hifumi.logs.channel_create`)
         });
     }
 
@@ -246,6 +252,7 @@ export class LogManager {
 
             const creator = entry.executor;
             LogManager.logMessage(target.guild, <string> channel,  logChannelDeleteEmbed(target, creator, target.name), LogAction.CHANNEL_DELETE);
+            incrementStat(`hifumi.logs.channel_delete`)
         });
     }
 
@@ -276,6 +283,7 @@ export class LogManager {
             message.content,
             message.mentions.members.array()
         ), LogAction.PING)
+        incrementStat(`hifumi.logs.everyone_pings`)
     }
 
     public static async logCommandExecution(message: Message, command: string){

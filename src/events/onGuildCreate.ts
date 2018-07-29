@@ -17,6 +17,7 @@ export default async function onGuildCreate(guild : Discord.Guild) {
         return;
     }
 
+
     await gb.database.addGuild(guild);
     await gb.database.addMembers(guild.members.array());
 

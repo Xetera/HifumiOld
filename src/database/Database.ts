@@ -164,7 +164,6 @@ export class Database {
 
     public invalidateCache(table: string): Promise<void> {
         // always caching so we're force validating queryResultCache
-
         return this.conn.queryResultCache!.remove([table]);
     }
 
@@ -200,9 +199,7 @@ export class Database {
     }
 
     public getMacros(guildId: string): Promise<Macro[]> {
-        return this.conn.manager.find(Macro, {where: {guild_id: guildId}, cache: true}).then((r: Macro[]) => {
-            return r;
-        });
+        return this.conn.manager.find(Macro, {where: {guild_id: guildId}, cache: true});
     }
 
     public getMacro(guildId: string, name: string): Promise<Macro | undefined> {
@@ -312,7 +309,8 @@ export class Database {
         });
     }
 
-    public deleteMacro(guild: DiscordGuild, macroName: string): Promise<DeleteResult> {
+    public async deleteMacro(guild: DiscordGuild, macroName: string): Promise<DeleteResult> {
+        await this.invalidateCache('macros');
         return this.conn.manager.delete(Macro, {macro_name: macroName, guild_id: guild.id});
     }
 

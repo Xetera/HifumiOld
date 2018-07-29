@@ -2,12 +2,13 @@ import {gb} from "../misc/Globals";
 import safeMessageUser from "../handlers/safe/SafeMessageUser";
 import {Offense} from "./interfaces";
 import safeDeleteMessage from "../handlers/safe/SafeDeleteMessage";
-import {debug} from "../events/onMessage";
 import banForInviteSpam from "../actions/punishments/BanForInviteSpam";
 import { Message} from "discord.js";
 import {LogManager} from "../handlers/logging/logManager";
 import inviteWarningDMEmbed from "../embeds/moderation/inviteWarningDM";
 import {APIErrors} from "../interfaces/Errors";
+import {incrementStat} from "../handlers/logging/datadog";
+import {debug} from "../utility/Logging";
 
 export default function deleteInvite(message: Message, editedMessage: boolean = false): Promise<number> {
     const sender = message.author.username;
@@ -17,9 +18,10 @@ export default function deleteInvite(message: Message, editedMessage: boolean = 
     }
     return safeDeleteMessage(message).then(()=> {
         debug.info(`Deleted invite link from ${sender}`);
+        incrementStat(`hifumi.moderation.invites.removed`);
         return gb.database.incrementInviteStrike(message.member)
     }).then(async(strikeCount : number) => {
-        debug.silly(`${message.member.displayName} has ` + strikeCount + " strikes on record`);
+        debug.silly(`${message.member.displayName} has ${strikeCount} strikes on record`);
 
         if (trackList.isNewMember(message.member)
             && await gb.database.getTrackNewMembers(message.guild.id)

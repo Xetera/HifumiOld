@@ -1,9 +1,10 @@
 import {Message} from 'discord.js'
 import {discordInviteRegex} from "./Regex";
-import {debug} from '../events/onMessage'
 import {securityLevel, SecurityLevels} from "../utility/Settings";
 import {gb} from "../misc/Globals";
 import deleteInvite from "../moderation/InviteRemover";
+import {debug} from "../utility/Logging";
+import {incrementStat} from "../handlers/logging/datadog";
 
 export default async function inviteListener(message: Message){
     const sentInvites: RegExpMatchArray | null = message.content.match(discordInviteRegex);
@@ -36,7 +37,7 @@ export default async function inviteListener(message: Message){
         return;
 
     debug.warning(`${message.author.username} in ${message.guild} sent an invite link.`);
-
+    incrementStat(`hifumi.moderation.invites.seen`)
     return deleteInvite(message)
 }
 

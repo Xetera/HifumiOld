@@ -24,6 +24,7 @@ import {debug} from "../../utility/Logging";
 import {GuildMember, Message, PermissionResolvable, TextChannel} from "discord.js";
 import {Environments} from "../../events/systemStartup";
 import {handleFatalErrorGracefully} from "../process/fatal";
+import {incrementStat, timedStat} from "../logging/datadog";
 
 export interface CommandParameters extends Instance {
     message: Discord.Message;
@@ -153,14 +154,14 @@ export default class CommandHandler implements indexSignature {
         const inputData: UserInputData | undefined = await CommandHandler.parseInput(message);
         if (inputData === undefined)
             return;
-        else if (inputData.stealth) {
+        const startTime = Date.now();
+
+        if (inputData.stealth) {
             safeDeleteMessage(message);
         }
 
         if (message.channel instanceof TextChannel)
             debug.info(`[${message.guild.name}]::${message.channel.name}::<${message.author.username}>: ${message.content}`);
-        else
-            return void debug.error(`A non text channel command was forwarded to CommandHandler`);
 
         const params = <CommandParameters> {};
         params.args = inputData.args;
@@ -174,7 +175,7 @@ export default class CommandHandler implements indexSignature {
             const execution = this.commands[i];
 
             try {
-                this._run(message, execution, params);
+                this._run(message, execution, params, inputData.stealth, startTime);
             }
             catch (error) {
                 debug.error(`Unexpected error while executing ${inputData.command}\n` + error.stack)
@@ -205,6 +206,7 @@ export default class CommandHandler implements indexSignature {
                 }
                 await message.channel.startTyping();
                 message.channel.send(...content).catch(debug.error);
+                incrementStat(`hifumi.macros.call`);
                 return await message.channel.stopTyping();
             }
         }
@@ -219,7 +221,7 @@ export default class CommandHandler implements indexSignature {
         message.channel.stopTyping();
     }
 
-    private async _run(message: Message, command: Command, params: CommandParameters) {
+    private async _run(message: Message, command: Command, params: CommandParameters, stealth: boolean, startTime: number) {
         params.expect = command.expects;
         const [name] = command.names;
         params.name = name;
@@ -237,19 +239,23 @@ export default class CommandHandler implements indexSignature {
             // checking permissions first
             const missingC = CommandHandler.getMissingClientPermissions(message.member, command);
             if (missingC.length) {
+                incrementStat(`hifumi.commands.failed.${name}`);
                 return safeSendMessage(message.channel, await missingSelfPermission(message.guild, missingC));
             }
 
             const missingP = CommandHandler.getMissingUserPermission(message.member, command);
 
             if (missingP === UserPermissions.Administrator && !message.member.hasPermission('ADMINISTRATOR')) {
+                incrementStat(`hifumi.commands.failed.${name}`);
                 return safeSendMessage(message.channel, await missingAdminEmbed(message.guild));
             }
 
             else if (missingP === UserPermissions.Moderator && !message.member.hasPermission('BAN_MEMBERS')) {
+                incrementStat(`hifumi.commands.failed.${name}`);
                 return safeSendMessage(message.channel, await missingModEmbed(message.guild));
             }
             else if (missingP === UserPermissions.GuildOwner && message.member.id !== message.member.guild.ownerID) {
+                incrementStat(`hifumi.commands.failed.${name}`);
                 return safeSendMessage(message.channel, missingGuildOwnerEmbed(message.guild));
             }
 
@@ -257,7 +263,13 @@ export default class CommandHandler implements indexSignature {
             if (!legal)
                 return;
 
-            command.run(params.message, <any> params.input);
+            await command.run(params.message, <any> params.input);
+            incrementStat(`hifumi.commands.successful.${name}`);
+            timedStat(`hifumi.commands.response_time`, Date.now() - startTime);
+            if (stealth){
+                incrementStat(`hifumi.commands.stealth`);
+            }
+
             gb.database.incrementCommandCalls(message.guild.id, message.author.id);
         }
         catch (error) {
