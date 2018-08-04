@@ -83,7 +83,8 @@ The addition of a new command _only_ requires that a variable called `command` i
 #### Parsing
 Before commands are called, information is parsed in `src/parsers/argParse.ts`. 
 
-All command requirements like arguments and user/client permissions are declared in the **Command** object that is exported and parsed before calling the command.
+All command requirements like arguments and user/client permissions are declared in the **Command** object that is exported and parsed 
+before calling the command.
 
 A command is only called if these requirements are met.
 
@@ -91,7 +92,37 @@ All necessary arguments are passed into the `run` function's second parameter as
 
 [More info...](https://github.com/Xetera/Hifumi/blob/master/src/commands/README.md)
 
+#### API
+
+##### Anime 
+Anime information is all taken from [AniList](https://anilist.co/) using graphql.
+
+**"Wait a minute, anilist? How are you getting such accurate anime search results?!"**
+
+Heh, as much as I love anilist and their API, unfortunately their search engine <sup>soon to be changed™</sup> is really bad.
+To get around this we use MAL instead... except not really. MAL's API is still either down or not working properly, also their API is  
+from the stone ages so instead we only use the search hinting endpoint.
+
+<img src="https://i.imgur.com/QFRs0Gu.png" height="200">
+
+This search function for MAL seems to be operating independently from the rest of their API, you don't need any sort of authorization to 
+make a request to the endpoint AND there's virtually no rate limiting. Plus, due to the nature of the search 
+function, the responses are usually blazing fast.
+
+`https://myanimelist.net/search/prefix.json?type=[all|manga|anime]&keyword=[url encoded query here]`
+
+<img src="https://i.imgur.com/kBTCwhm.png" height="300">
+
+The information that's returned is mostly irrelevant except for the order of the `items` array which represents the closest match
+and the `id` property. Because AniList is so awesome, almost all of their entries also contain the MAL id of anime entries, meaning 
+that all that's left to do is query AniList using the mal_id and that's it!
+
+The only caveat is that sometimesMAL will return results based on popularity and not search match so it's necessary to go through all 
+the results and look for a perfect case-insensitive match before we pull the first result in case a user searches for 
+**Sword Art Online** or **New Game!!**.
+
 ### Database
+
 [TypeORM](https://github.com/typeorm/typeorm) is used for all database transactions.
 
 A Redis cache layer is used to speed up common actions like fetching guild prefixes. 
