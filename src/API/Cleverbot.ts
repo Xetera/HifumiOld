@@ -58,6 +58,7 @@ export class Cleverbot {
             || await gb.database.isUserIgnored(message.member)){
             return;
         }
+        return;
 
         let cleverbotCall = message.isMentioned(bot.user);
         if (cleverbotCall && !message.content.replace(MessageMentions.USERS_PATTERN, '')){
