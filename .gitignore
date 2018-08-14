@@ -1,10 +1,9 @@
-config0.json
-/node_modules
-refactor.json
-/.idea
 *.js
-/dist
-src/commands/Help.json
 .env
 *.js.map
-coverage/
+yarn-error.log
+
+/coverage
+/.idea
+/dist
+/node_modules
