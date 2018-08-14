@@ -23,7 +23,7 @@ export async function parseMacro(content: string): Promise<[(string | undefined)
     }
     let requests;
 
-        requests = urls.map(url => axios.head(url));
+    requests = urls.map(url => axios.head(url));
     const responses: AxiosResponse[] = [];
     for (let url of requests){
         try {

@@ -34,7 +34,6 @@ export interface Instance {
     database : Database,
     commandHandler:CommandHandler,
     trackList: Tracklist,
-    heroku: any,
     stats: StatsD;
     eval(message: Message, x : any): any
 }

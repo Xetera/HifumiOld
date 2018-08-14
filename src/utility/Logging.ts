@@ -1,7 +1,6 @@
 import * as Discord from'discord.js'
 import {gb} from "../misc/Globals";
 import * as winston from "winston";
-const cli = require('heroku-cli-util');
 
 const options = {
     file: {
@@ -48,15 +47,51 @@ interface GuildStats {
     channels: number;
 }
 
-export function startupTable(guilds : GuildStats[]){
-    cli.styledHeader(`${guilds.length} guilds total.`);
-    cli.table(guilds, {
-        columns: [
-            {key: 'name', label: 'Name' ,format: (name :string ) => cli.color.red(name)},
-            {key: 'members', label:'Members', format: (members: string )=> cli.color.yellow(members)},
-            {key: 'channels', label:'Channels',format: (channels: string )=> cli.color.blue(channels)},
-        ]
+function fetchStatByProperty<T>(array: T[], prop: (_:T) => T[keyof T], func: (..._:number[]) => number) {
+    const propertyLength: number[] = array.map(item => {
+        return prop(item).toString().length;
     });
+    /**
+     * unfortunately typescript can't infer rest types
+     */
+    // @ts-ignore
+    return func(...propertyLength);
+}
+
+
+export function forceLength(str: string, length: number): string {
+    const sliced = str.slice(0, length);
+    return sliced + ' '.repeat(length - str.length);
+}
+
+export function startupTable(stats: GuildStats[]) {
+    const padding = 7;
+    const maxName = fetchStatByProperty(
+        stats, (stat: GuildStats) => stat.name, Math.max
+    );
+    const maxMembers = fetchStatByProperty(
+        stats, (stat: GuildStats) => stat.members.toString(), Math.max
+    );
+    const maxChannels = fetchStatByProperty(
+        stats, (stat: GuildStats) => stat.channels.toString(), Math.max
+    );
+
+    const nameHeader = forceLength('Name', maxName + padding);
+    const usersHeader = forceLength('Users', maxMembers + padding);
+    const channelsHeader = forceLength('Channels', maxChannels + padding);
+
+    debug.silly(
+        `${nameHeader}|${usersHeader}|${channelsHeader}`
+    );
+    // because of the separator columns
+    debug.silly('-'.repeat(nameHeader.length + usersHeader.length + channelsHeader.length + 2));
+    for (const guild of stats) {
+        const name     = forceLength(guild.name, maxName + padding);
+        const members  = forceLength(guild.members.toString(), maxMembers + padding);
+        const channels = forceLength(guild.channels.toString(), maxChannels + padding);
+        debug.silly(`${name}|${members}|${channels}`)
+    }
+
 }
 
 

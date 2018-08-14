@@ -12,8 +12,6 @@ import {catchSigterm} from '../handlers/process/sigterm'
 import {default as catchUnhandledRejections} from '../handlers/process/unhandledRejection'
 import {StatsD} from 'hot-shots'
 
-const Heroku = require('heroku-client');
-
 export enum Environments {
     Development,
     Production
@@ -61,7 +59,6 @@ export async function createInstance(bot: Client): Promise<Instance> {
         commandHandler: commandHandler,
         trackList: tracklist,
         stats: new StatsD(),
-        heroku: new Heroku({token: process.env.HEROKU_API_TOKEN}),
         // this is to be able to eval through the context of all the instances
         eval: (message: Message, x: any) => {
             try {
