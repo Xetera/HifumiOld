@@ -8,6 +8,7 @@
     "build": "tsc & ",
     "build-watch": "tsc --watch",
     "test": "jest --notify --config=jest.config.js",
+    "coverage": "codecov",
     "start": "nodemon src/index.js",
     "postinstall": "tsc",
     "heroku-prebuild": "echo Heroku is installing dependencies.",
@@ -53,6 +54,7 @@
     "@types/redis": "^2.8.6",
     "@types/stream-to-array": "^2.3.0",
     "chai": "^4.1.2",
+    "codecov": "^3.0.4",
     "jest": "^23.5.0"
   }
 }
