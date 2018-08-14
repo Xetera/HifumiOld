@@ -6,3 +6,5 @@ refactor.json
 /dist
 src/commands/Help.json
 .env
+*.js.map
+coverage/
