@@ -28,7 +28,6 @@ export default async function onReady(bot: Client): Promise<void> {
     setGlobals(bot);
     updatePresence(bot);
     bot.fetchApplication().then((app: Discord.OAuth2Application) => {
-        debug.info(`${bot.user.username} is fully online.`);
         gb.ownerID = app.owner.id;
     });
 

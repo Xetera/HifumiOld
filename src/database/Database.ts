@@ -64,6 +64,7 @@ export class Database {
             return this.sync();
         }).then(() => {
             this.ready = true;
+            debug.info(`${gb.bot.user.username} is fully online.`);
         }).catch(err => {
             debug.error(`Could not connect to the database properly ...exiting application`);
             handleFatalErrorGracefully(err);
