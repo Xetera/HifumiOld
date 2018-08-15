@@ -42,7 +42,7 @@ export default function logs(message: Message, input: [string, (TextChannel | bo
         LoggingChannelType.CHANNEL_MANAGENT
     ];
 
-    const args = [];
+    const args: any[] = [];
     args.push(message.guild);
     if (setting === 'warnings'){
         args.push(warnings);

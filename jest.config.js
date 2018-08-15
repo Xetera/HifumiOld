@@ -3,19 +3,24 @@ module.exports = {
     verbose: true,
     testEnvironment: "node",
     collectCoverage: true,
+    rootDir: 'dist',
     coverageDirectory: "./coverage",
+    testRegex: '(.+).spec.js',
     collectCoverageFrom: [
         "dist/**/*.js",
     ],
     coveragePathIgnorePatterns: [
-        "/node_modules/",
-        "dist/database/"
+        "**/node_modules/**",
+        "dist/database/",
+        "src/.*",
     ],
-    testMatch: [
-        "dist/__tests__/**/*.spec.js"
+    testPathIgnorePatterns: [
+        "node_modules/",
+        "src/.*"
     ],
     moduleFileExtensions: [
         "js",
+        "spec.js",
         "json",
         "node"
     ]
