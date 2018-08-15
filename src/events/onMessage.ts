@@ -34,6 +34,7 @@ export default async function onMessage(message: Discord.Message){
     if (message.author.bot
         || gb.sleeping
         || !gb
+        || !gb.database
         || !gb.database.ready
         || message.guild && !message.guild.available
         || (message.guild && await gb.database.getChannelIgnored(message.guild.id, message.channel.id))){

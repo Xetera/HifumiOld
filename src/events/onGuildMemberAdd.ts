@@ -10,7 +10,8 @@ import {TemplatedMessage} from "../parsers/parsers.interface";
 import templateParser from "../parsers/templateParser";
 
 export default async function onGuildMemberAdd(member : Discord.GuildMember): Promise<void> {
-    if (!gb.database.ready
+    if (!gb.database
+        || !gb.database.ready
         || gb.sleeping
         || member.user.bot
         || !await gb.database.getGuildEnabled(member.guild.id)

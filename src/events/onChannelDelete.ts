@@ -9,6 +9,7 @@ export default async function onChannelDelete(channel: Channel){
 
     if (!channel.guild.available
         || gb.sleeping
+        || !gb.database
         || !gb.database.ready
         ||!await gb.database.getGuildEnabled(channel.guild.id)){
         return;

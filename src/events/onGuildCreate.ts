@@ -10,7 +10,8 @@ export default async function onGuildCreate(guild : Discord.Guild) {
      * we need to be adding it to the database regardless. Even if it's
      * an outage it's fine because we're just upserting anyways
      */
-    if (!database.ready
+    if (!database
+        || !database.ready
         || gb.sleeping
         || !gb
         || !await gb.database.getGuildEnabled(guild.id) || !guild.available) {

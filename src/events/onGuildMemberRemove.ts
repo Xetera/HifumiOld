@@ -11,6 +11,7 @@ export default async function onGuildMemberRemove(member : Discord.GuildMember) 
 
     if (!member.guild.available
         || gb.sleeping
+        || !gb.database
         || !gb.database.ready
         || !await gb.database.getGuildEnabled(member.guild.id)){
         return;

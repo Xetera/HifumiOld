@@ -9,6 +9,7 @@ export default async function onMessageUpdate(oldMessage : Discord.Message, newM
     if (!newMessage.guild
         || gb.sleeping
         || !newMessage.guild.available
+        || !gb.database
         || !gb.database.ready
         ||(newMessage.guild && !await gb.database.getGuildEnabled(newMessage.guild.id))){
         return
