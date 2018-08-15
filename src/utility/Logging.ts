@@ -44,7 +44,7 @@ export const debug = winston.createLogger({
     exitOnError: false,
 });
 
-interface GuildStats {
+export interface GuildStats {
     name: string;
     members:number;
     channels: number;

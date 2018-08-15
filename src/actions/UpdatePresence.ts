@@ -13,7 +13,7 @@ if (gb.ENV === Environments.Production) {
             `No dbl token found in production mode!`
         );
     } else {
-        dbl = new DBLAPI(process.env.DBL_TOKEN, gb.bot);
+        dbl = new DBLAPI(process.env.DBL_TOKEN!, gb.bot);
     }
 }
 

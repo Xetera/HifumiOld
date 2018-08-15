@@ -1,5 +1,5 @@
 import * as Discord from 'discord.js'
-import {debug, startupTable} from '../utility/Logging'
+import {debug, GuildStats, startupTable} from '../utility/Logging'
 import {gb, emojiName} from "../misc/Globals";
 import {createInstance, Environments} from "./systemStartup";
 import {Client, Emoji} from "discord.js";
@@ -13,7 +13,7 @@ export default async function onReady(bot: Client): Promise<void> {
     debug.info(`Invite link: https://discordapp.com/oauth2/authorize?client_id=372615866652557312&scope=bot&permissions=268463300`);
 
     let guilds = bot.guilds.array();
-    let startupGuild = [];
+    let startupGuild: GuildStats[] = [];
 
     for (let guild of guilds) {
         gb.allMembers += guild.members.size;

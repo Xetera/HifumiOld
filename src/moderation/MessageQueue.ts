@@ -10,7 +10,7 @@ import {Database} from "../database/Database";
 import Tracklist from "./Tracklist";
 import {gb} from "../misc/Globals";
 import {Offense} from "./interfaces";
-import { GuildMember,} from "discord.js";
+import {GuildMember,} from "discord.js";
 import safeBulkDelete from "../handlers/safe/safeBulkDelete";
 
 interface CachedMessage extends Discord.Message {
@@ -95,7 +95,7 @@ export class MessageQueue {
         if (!guild){
             return void debug.error(`Cannot bulk delete messages, no guild associated with ${member} in the queue`);
         }
-        let messages = [];
+        let messages: CachedMessage[] = [];
         for (let i=guild.length -1 ; i > 0; i--){
             if (guild[i].member.id === member.id){
                 messages.push(guild[i]);

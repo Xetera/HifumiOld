@@ -19,7 +19,7 @@ export default class EmbedBuilder {
         return EmbedBuilder._instance;
     }
     fields = () => {
-        const fields = [];
+        const fields: string[] = [];
         for (let i=1; i <= 9; ++i){
             fields.push('field' + i);
         }
@@ -27,7 +27,7 @@ export default class EmbedBuilder {
     };
 
     values = () => {
-        const values = [];
+        const values: string[] = [];
         for (let i=1; i <= 9; ++i){
             values.push('value' + i);
         }

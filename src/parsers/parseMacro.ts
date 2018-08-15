@@ -84,7 +84,7 @@ export function buildMacro(macro: Macro) {
                 return {attachment: link}
             }
         });
-        const out = [];
+        const out: any[] = [];
         const hasValidLinks = files.filter(file => file !== undefined).length;
         if (hasValidLinks){
             out.push({files: files})

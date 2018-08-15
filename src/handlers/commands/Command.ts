@@ -60,7 +60,7 @@ export class Command implements ICommand {
     }
 
     public hasClientPermissions(guild: Guild){
-        if (!this.clientPermissions){
+        if (!this.clientPermissions || !this.clientPermissions.length){
             return true;
         }
         return guild.me.hasPermission(this.clientPermissions);

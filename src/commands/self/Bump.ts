@@ -5,7 +5,7 @@ import {ArgType} from "../../decorators/expects";
 
 async function run(message: Message): Promise<any> {
     const members = message.guild.members;
-    const bots = [];
+    const bots: string[] = [];
     if (members.get('222853335877812224')){
         bots.push('ServerHound');
         safeSendMessage(message.channel, '=bump', 5);
