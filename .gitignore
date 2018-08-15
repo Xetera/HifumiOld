@@ -1,4 +1,6 @@
 *.js
+!ecosystem.config.js
+!jest.config.js
 .env
 *.js.map
 yarn-error.log
@@ -7,3 +9,5 @@ yarn-error.log
 /.idea
 /dist
 /node_modules
+
+logs/

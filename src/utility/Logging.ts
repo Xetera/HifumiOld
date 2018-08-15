@@ -1,12 +1,15 @@
 import * as Discord from'discord.js'
 import {gb} from "../misc/Globals";
 import * as winston from "winston";
+import * as path from 'path'
 
 const options = {
     file: {
-        level: 'info',
-        filename: `/logs/app.log`,
+        level: 'silly',
+        // TODO: Switch this entire portion to Logstash later
+        filename: path.join((process.env.LOGGING_DIR || './logs/'), `${new Date().toISOString().split('T').shift()}.log`),
         handleExceptions: true,
+        timestamp: true,
         json: true,
         maxsize: 5242880, // 5MB
         maxFiles: 5,

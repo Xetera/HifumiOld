@@ -4,7 +4,13 @@
   ],
   "ext": "ts",
   "ignore": [
-    "src/**/*.spec.ts"
+    "dist/__tests__/**/*.ts",
+    "dist/__tests__/**/*.js",
+    "dist/database/migrations/*",
+    "dist/**/*.js.map",
+    "dist/**/*.js",
+    "logs",
+    "assets"
   ],
-  "exec": "tsc & node src/index.js"
+  "exec": "tsc & node dist/index.js --stack-trace-limit=1000 --stack-size=1024 --inspect"
 }

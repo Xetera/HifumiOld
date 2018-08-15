@@ -5,18 +5,18 @@
 	"logging": true,
 	"dropSchema": true,
 	"entities": [
-		"src/database/models/**/*.js"
+		"dist/database/models/**/*.js"
 	],
 	"migrations": [
-		"src/database/migrations/**/*.js"
+		"dist/database/migrations/**/*.js"
 	],
 	"subscribers": [
-		"src/database/subscribers/**/*.js"
+		"dist/database/subscribers/**/*.js"
 	],
 	"cli": {
-		"entitiesDir": "src/database/models",
-		"migrationsDir": "src/database/migrations",
-		"subscribersDir": "src/database/subscribers"
+		"entitiesDir": "dist/database/models",
+		"migrationsDir": "dist/database/migrations",
+		"subscribersDir": "dist/database/subscribers"
 	},
 	"cache": {
 		"duration": "0"

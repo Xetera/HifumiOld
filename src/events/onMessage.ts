@@ -3,7 +3,6 @@ import inviteListener from '../listeners/InviteListener'
 import * as moment from "moment";
 import {MessageType} from "../interfaces/identifiers";
 import {gb} from "../misc/Globals";
-import DMCommandHandler from "../handlers/commands/DMCommandHandler";
 import pingListener from "../listeners/pingListener";
 import memeListener from "../listeners/memeListener";
 import hexListener from "../listeners/hexListener";
@@ -62,7 +61,10 @@ export default async function onMessage(message: Discord.Message){
     // prefix in case they don't know what the prefix is
     else if (messageType === MessageType.PrivateMessage){
         incrementStat(`hifumi.messages_seen`, ['dm']);
-        return DMCommandHandler(message);
+        /**
+         * TODO: Redirect commands to regular command handler but add an option to exclude commands
+         */
+        return;
     }
 
     const prefix = await gb.database.getPrefix(message.guild.id);

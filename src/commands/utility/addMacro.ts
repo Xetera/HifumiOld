@@ -1,12 +1,10 @@
 import {Message} from "discord.js";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import {gb} from "../../misc/Globals";
-import {Help} from "../info/help/help.interface";
 import {debug} from "../../utility/Logging";
 import {Macro} from "../../database/models/macro";
 import { parseMacro} from "../../parsers/parseMacro";
 import {urlRegex} from "../../listeners/Regex";
-const help: Help = require('../../commands/help.json');
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../decorators/expects";
 import {UserPermissions} from "../../handlers/commands/command.interface";
@@ -21,7 +19,7 @@ async function run(message: Message, input: [string, string]): Promise<any> {
             message.channel, `${gb.emojis.get('hifumi_boi')} How do you expect me to remember all that? Try something shorter.`
         );
     }
-    else if (help.commands.map(command => command.name).includes(macroName)) {
+    else if (gb.commandHandler.commands.some(command => command.names.includes(macroName))) {
         return void handleFailedCommand(
             message.channel, "That macro is already a command name, try to pick something else."
         );

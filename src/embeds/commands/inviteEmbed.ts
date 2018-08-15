@@ -1,6 +1,6 @@
 import {RichEmbed} from "discord.js";
 import {IHifumi} from "../../misc/hifumi.interface";
-const hifumi: IHifumi = require('../../misc/bot.json');
+const hifumi: IHifumi = require('./../../../bot.json');
 
 
 export default function inviteEmbed(){
