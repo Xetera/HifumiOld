@@ -60,7 +60,7 @@ export async function createInstance(bot: Client): Promise<Instance> {
         trackList: tracklist,
         stats: new StatsD(),
         // this is to be able to eval through the context of all the instances
-        eval: (message: Message, x: any) => {
+        debugEval: (message: Message, x: any) => {
             try {
                 return eval(x);
             }

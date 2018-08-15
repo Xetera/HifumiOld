@@ -35,7 +35,7 @@ export interface Instance {
     commandHandler:CommandHandler,
     trackList: Tracklist,
     stats: StatsD;
-    eval(message: Message, x : any): any
+    debugEval(message: Message, x : any): any
 }
 
 export let gb : Globals = <Globals>{

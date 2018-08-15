@@ -18,7 +18,7 @@ export async function parseMacro(content: string): Promise<[(string | undefined)
     const words = content.split(' ');
     // only the first url should be counted
     const urls: string[] = words.filter(word => StringUtils.isUrl(word));
-    if (!urls.length) {
+    if (!urls.length && words.length) {
         return [words.join(' ').trim(), undefined];
     }
     let requests;

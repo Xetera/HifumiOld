@@ -29,9 +29,10 @@ export default async function argParse(params: CommandParameters){
     }, <(ArgOptions | ArgOptions[])[]> []);
 
     if (params.args.length < nonOptionalArgs.length){
-        return void handleInvalidParameters(
+        handleInvalidParameters(
             params.message.channel, params.name
         );
+        return false;
     }
     else if (!nonOptionalArgs.length && !params.args.length){
         return true;
@@ -107,9 +108,10 @@ export default async function argParse(params: CommandParameters){
             if (buffer.length)
                 params.input.push(...buffer);
             else {
-                return void handleFailedCommand(
+                handleFailedCommand(
                     params.message.channel, `I was expecting **${input}** to be a ${decorator.map(d => d.type).join(' or ')}`
-                )
+                );
+                return false;
             }
         }
         else {

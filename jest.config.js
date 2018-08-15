@@ -23,5 +23,8 @@ module.exports = {
         "spec.js",
         "json",
         "node"
+    ],
+    moduleDirectories: [
+        "node_modules"
     ]
 };

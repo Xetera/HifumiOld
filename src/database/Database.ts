@@ -220,7 +220,6 @@ export class Database {
     }
 
     public setPrefix(guildId: string, prefix: string) {
-        debug.silly('Setting prefix');
         if (prefix.length > 1) {
             return Promise.reject(`Prefix for ${guildId} must be a single character`);
         }
@@ -235,9 +234,7 @@ export class Database {
     public getPrefix(guildId: string): Promise<string> {
         return this.getGuild(guildId).then((guild: Guild) => {
             return guild.prefix;
-        }).catch(err => {
-            return Promise.reject(err);
-        });
+        })
     }
 
     public addMember(target: GuildMember): Promise<Partial<User>> {
