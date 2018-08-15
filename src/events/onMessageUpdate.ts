@@ -20,7 +20,7 @@ export default async function onMessageUpdate(oldMessage : Discord.Message, newM
 
         deleteInvite(newMessage, true).then((message : number) => {
             if (message) {
-                debug.warning(`Deleted an edited invite from ${oldMessage.author.username}\n` +  newMessage.content, 'onMessageUpdate');
+                debug.warn(`Deleted an edited invite from ${oldMessage.author.username}\n` +  newMessage.content, 'onMessageUpdate');
                 LogManager.logIllegalEditedInvited(oldMessage, newMessage);
             }
         });

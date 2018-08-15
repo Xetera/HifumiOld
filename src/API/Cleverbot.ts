@@ -27,7 +27,7 @@ export class Cleverbot {
             apiKey = process.env['CLEVERBOT_TOKEN'];
         } else {
             this.available = false;
-            debug.warning(`CLEVERBOT_TOKEN environment variable not found, Cleverbot module is OFF`);
+            debug.warn(`CLEVERBOT_TOKEN environment variable not found, Cleverbot module is OFF`);
             return;
         }
         const configuration: Config = {
@@ -140,7 +140,7 @@ export class Cleverbot {
         return this.cleverbot.say(parsedArg, id).then((response: string) => {
             gb.database.incrementCleverbotCalls(message.guild.id);
             if (!response) {
-                debug.warning(`Couldn't get a response...`);
+                debug.warn(`Couldn't get a response...`);
                 return this.say(message, phrase, id, replaceKeyword);
             }
             return response;
@@ -183,7 +183,7 @@ export class Cleverbot {
                 this.users[id].ignores.ignoring = true;
                 this.users[id].ignores.ignoreUntil = moment(new Date()).add(30 * this.users[id].warnings, 'm').toDate();
                 safeSendMessage(message.channel, `Ignoring ${message.member} for ${formattedTimeString(user.warnings * 30 * 60)}`);
-                debug.warning(`Rate limited ${message.author.username} in ${message.guild.name}`);
+                debug.warn(`Rate limited ${message.author.username} in ${message.guild.name}`);
             }
 
             else {

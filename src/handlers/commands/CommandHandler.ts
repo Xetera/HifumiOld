@@ -94,7 +94,7 @@ export default class CommandHandler implements indexSignature {
                 const command: Command = file.command;
                 const missing = this.isCommandMissingDependency(file.command);
                 if (missing && gb.ENV === Environments.Development) {
-                    debug.warning(
+                    debug.warn(
                         `The command $${command.names[0]} will not be loaded because the ` +
                         `environment variable '${missing}' is missing.`
                     );

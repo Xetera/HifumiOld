@@ -112,14 +112,14 @@ export class MuteQueue {
             }
             // is false when we couldn't mute the user
             if (!mutedMember.muted) {
-                debug.warning(`Could not mute user ${member.user.username}`);
+                debug.warn(`Could not mute user ${member.user.username}`);
                 return Promise.resolve(false);
             }
             guild.push(mutedMember);
         }
         else {
             if (!mutedMember.muted){
-                debug.warning(`Could not mute user ${member.user.username}`);
+                debug.warn(`Could not mute user ${member.user.username}`);
                 return Promise.resolve(false);
             }
 
@@ -209,7 +209,7 @@ export class MuteQueue {
         const members : MutedMember[] | undefined  =this.queue.get(member.guild.id);
 
         if (members === undefined)
-            return void debug.warning(`Guild for ${member.nickname} was not found`);
+            return void debug.warn(`Guild for ${member.nickname} was not found`);
 
         const mutedGuildMember: MutedMember | undefined = members.pop();
 
@@ -229,7 +229,7 @@ export class MuteQueue {
             if (!timeoutMembers)
                 return;
             else if (!mutedGuildMember.role || !mutedGuildMember.member.roles.has(mutedGuildMember.role.id)) {
-                return void debug.warning(`Tried to unmute ${mutedGuildMember.name} but they were already unmuted.\n`);
+                return void debug.warn(`Tried to unmute ${mutedGuildMember.name} but they were already unmuted.\n`);
             }
             const target = mutedGuildMember.member;
             target.removeRole(mutedGuildMember.role, `End of ${timeFormat} mute.`)
@@ -262,7 +262,7 @@ export class MuteQueue {
     //     for (let i = raidGuild.length; i > 0; --i){
     //         const raider = raidGuild[i];
     //         if (raider.member.hasPermission('ADMINISTRATOR')){
-    //             debug.warning(`Tried to autoban an admin for raiding in ${guild.name}`);
+    //             debug.warn(`Tried to autoban an admin for raiding in ${guild.name}`);
     //             continue;
     //             // TODO: Post a warning in the warning channel for this later
     //         }
