@@ -43,10 +43,7 @@ export default async function onReady(bot: Client): Promise<void> {
     gb.stats = instances.stats;
     gb.trackList.initializeGuilds();
     incrementStat(`hifumi.client.logins`);
-    setInterval(() => {
-        incrementStat(`hifumi.client.presence_updates`);
-        updatePresence(bot);
-    }, 1000 * 60 * 10);
+    setInterval(() => updatePresence(bot), 1000 * 60 * 10);
 }
 
 function setGlobals(bot: Discord.Client) {
