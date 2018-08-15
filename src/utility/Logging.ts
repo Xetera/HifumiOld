@@ -20,7 +20,7 @@ const options = {
         format: winston.format.combine(
             winston.format.colorize(),
             winston.format.align(),
-            winston.format.timestamp(),
+            winston.format.timestamp(() => new Date()),
             winston.format.printf((info) => {
                 const {
                     timestamp, level, message
@@ -47,7 +47,7 @@ interface GuildStats {
     channels: number;
 }
 
-function fetchStatByProperty<T>(array: T[], prop: (_:T) => T[keyof T], func: (..._:number[]) => number) {
+function fetchMaxPropertyLength<T>(array: T[], prop: (_:T) => T[keyof T], func: (..._:number[]) => number) {
     const propertyLength: number[] = array.map(item => {
         return prop(item).toString().length;
     });
@@ -66,32 +66,47 @@ export function forceLength(str: string, length: number): string {
 
 export function startupTable(stats: GuildStats[]) {
     const padding = 7;
-    const maxName = fetchStatByProperty(
+    const maxName = fetchMaxPropertyLength(
         stats, (stat: GuildStats) => stat.name, Math.max
     );
-    const maxMembers = fetchStatByProperty(
+    const maxMembers = fetchMaxPropertyLength(
         stats, (stat: GuildStats) => stat.members.toString(), Math.max
     );
-    const maxChannels = fetchStatByProperty(
+    const maxChannels = fetchMaxPropertyLength(
         stats, (stat: GuildStats) => stat.channels.toString(), Math.max
     );
 
-    const nameHeader = forceLength('Name', maxName + padding);
+    const nameHeader = forceLength('Name', maxName + padding - 3);
     const usersHeader = forceLength('Users', maxMembers + padding);
     const channelsHeader = forceLength('Channels', maxChannels + padding);
 
-    debug.silly(
-        `${nameHeader}|${usersHeader}|${channelsHeader}`
+    debug.info('|' + '-'.repeat(nameHeader.length + usersHeader.length + channelsHeader.length + 2) + '|');
+    debug.info(
+        `|${nameHeader}|${usersHeader}|${channelsHeader}|`
     );
     // because of the separator columns
-    debug.silly('-'.repeat(nameHeader.length + usersHeader.length + channelsHeader.length + 2));
-    for (const guild of stats) {
-        const name     = forceLength(guild.name, maxName + padding);
+    debug.info('|' + '-'.repeat(nameHeader.length + usersHeader.length + channelsHeader.length + 2) + '|');
+
+    for (const [index, guild] of stats.entries()) {
+        const name     = forceLength(guild.name, maxName + padding - 3);
         const members  = forceLength(guild.members.toString(), maxMembers + padding);
         const channels = forceLength(guild.channels.toString(), maxChannels + padding);
-        debug.silly(`${name}|${members}|${channels}`)
+        debug.info(`|${name}|${members}|${channels}|`);
+        if (index > 50) {
+            break;
+        }
     }
+    debug.info('|' + '-'.repeat(nameHeader.length + usersHeader.length + channelsHeader.length + 2) + '|');
+    const totals: [number, number] = stats.reduce((total, stat) => {
+        total[0] += stat.members;
+        total[1] += stat.channels;
+        return total;
+    }, <[number, number]> [0, 0]);
 
+    const totalMembers = forceLength(totals[0].toString(), maxMembers + padding);
+    const totalChannels = forceLength(totals[1].toString(), maxChannels + padding);
+    debug.info(`|Total${' '.repeat(nameHeader.length - 5)}|${totalMembers}|${totalChannels}|`)
+    debug.info('|' + '-'.repeat(nameHeader.length + usersHeader.length + channelsHeader.length + 2) + '|');
 }
 
 
