@@ -1,3 +1,11 @@
+<div align="center">
+    <img src="https://img.shields.io/travis/Xetera/Hifumi.svg?label=Travis%20CI"> 
+    <img src="https://img.shields.io/website/http/hifumi.io/home.svg?label=hifumi.io">
+    <a href="https://discordbots.org/bot/372615866652557312" >
+        <img src="https://discordbots.org/api/widget/status/372615866652557312.svg" alt="Hifumi" />
+    </a>
+    <img src="https://img.shields.io/discord/414334929002823680.svg?label=Support%20Server">
+</div>
 <a href="https://discordapp.com/oauth2/authorize?client_id=372615866652557312&scope=bot&permissions=268463300">
     <img src="assets/banners/hifumi_new.png">
 </a>
