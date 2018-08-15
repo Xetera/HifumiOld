@@ -107,8 +107,8 @@ export class Database {
             return createConnection({
                 type: 'postgres',
                 url: url,
-                entities: ['src/database/models/**/*.js'],
-                migrations: ['src/database/migrations/**/*.js'],
+                entities: ['dist/database/models/**/*.js'],
+                migrations: ['dist/database/migrations/**/*.js'],
                 // DO NOT TURN THESE ON FOR PRODUCTION
                 // I'M SERIOUS DON'T DO IT
 
