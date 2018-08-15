@@ -34,7 +34,7 @@ export default function getAnimeEmbed(input: getAnimeQueryResponse){
     if (input.nextAiringEpisode){
         embed.setFooter(
             `Episode ${input.nextAiringEpisode.episode} releases in ${formattedTimeString(input.nextAiringEpisode.timeUntilAiring)} | Powered by AniList`,
-            `https://cdn.hifumi.io/assets/anilist.png`
+            `https://anilist.co/img/icons/android-chrome-512x512.png`
         );
     }
     else {

@@ -8,7 +8,7 @@ export default function getCharacterEmbed(character: ICharacter, VA?: IVoiceActo
     let embed = new RichEmbed()
         .setTitle(name)
         .setFooter(`Not quite right? Full names give better results. | Powered by AniList`,
-            `https://cdn.hifumi.io/assets/anilist.png`)
+            `https://anilist.co/img/icons/android-chrome-512x512.png`)
         .setColor(`#f57d7d`);
 
     if (character.description){
