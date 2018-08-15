@@ -133,7 +133,6 @@ export default class CommandHandler implements indexSignature {
         }
 
         else if (input.substring(0, 2) === prefix + prefix) {
-            debug.silly(`[${message.guild.name}]<${message.author}> Entered a stealth command`);
             out.stealth = true;
             out.command = input.substring(2);
             return out;
@@ -206,7 +205,7 @@ export default class CommandHandler implements indexSignature {
                 }
                 await message.channel.startTyping();
                 message.channel.send(...content).catch(debug.error);
-                incrementStat(`hifumi.macros.call`);
+                incrementStat(`hifumi.macros.calls`);
                 return await message.channel.stopTyping();
             }
         }
@@ -222,11 +221,13 @@ export default class CommandHandler implements indexSignature {
     }
 
     private async _run(message: Message, command: Command, params: CommandParameters, stealth: boolean, startTime: number) {
+        const tags: string[] = [];
         params.expect = command.expects;
         const [name] = command.names;
         params.name = name;
         try {
             if (CommandHandler.checkBrokenFunction(command)) {
+                incrementStat(`hifumi.commands.${name}`, ['stupid'])
                 return void handleFailedCommand(
                     message.channel,
                     "**Ding!** You've just been struck by the magic of spaghetti code!\n" +
@@ -239,41 +240,45 @@ export default class CommandHandler implements indexSignature {
             // checking permissions first
             const missingC = CommandHandler.getMissingClientPermissions(message.member, command);
             if (missingC.length) {
-                incrementStat(`hifumi.commands.failed.${name}`);
+                incrementStat(`hifumi.commands.${name}`, ['failed']);
                 return safeSendMessage(message.channel, await missingSelfPermission(message.guild, missingC));
             }
 
             const missingP = CommandHandler.getMissingUserPermission(message.member, command);
 
-            if (missingP === UserPermissions.Administrator && !message.member.hasPermission('ADMINISTRATOR')) {
-                incrementStat(`hifumi.commands.failed.${name}`);
-                return safeSendMessage(message.channel, await missingAdminEmbed(message.guild));
-            }
-
-            else if (missingP === UserPermissions.Moderator && !message.member.hasPermission('BAN_MEMBERS')) {
-                incrementStat(`hifumi.commands.failed.${name}`);
-                return safeSendMessage(message.channel, await missingModEmbed(message.guild));
-            }
-            else if (missingP === UserPermissions.GuildOwner && message.member.id !== message.member.guild.ownerID) {
-                incrementStat(`hifumi.commands.failed.${name}`);
-                return safeSendMessage(message.channel, missingGuildOwnerEmbed(message.guild));
+            if (missingP !== false) {
+                tags.push('failed');
+                incrementStat(`hifumi.commands.${name}`, tags);
+                if (missingP === UserPermissions.Administrator && !message.member.hasPermission('ADMINISTRATOR')) {
+                    return safeSendMessage(message.channel, await missingAdminEmbed(message.guild));
+                }
+                else if (missingP === UserPermissions.Moderator && !message.member.hasPermission('BAN_MEMBERS')) {
+                    return safeSendMessage(message.channel, await missingModEmbed(message.guild));
+                }
+                else if (missingP === UserPermissions.GuildOwner && message.member.id !== message.member.guild.ownerID) {
+                    return safeSendMessage(message.channel, missingGuildOwnerEmbed(message.guild));
+                }
             }
 
             const legal = await argParse(params);
+
             if (!legal)
                 return;
 
             await command.run(params.message, <any> params.input);
-            incrementStat(`hifumi.commands.successful.${name}`);
-            timedStat(`hifumi.commands.response_time`, Date.now() - startTime);
-            if (stealth){
-                incrementStat(`hifumi.commands.stealth`);
+            if (stealth) {
+                tags.push('stealth');
             }
+            tags.push('successful');
+            incrementStat(`hifumi.commands.${name}`, tags);
+            timedStat(`hifumi.commands.response_time`, Date.now() - startTime);
 
             gb.database.incrementCommandCalls(message.guild.id, message.author.id);
         }
         catch (error) {
-            debug.error(`Unexpected error while executing ${command}\n` + error.stack)
+            debug.error(`Unexpected error while executing ${command}\n` + error.stack);
+            tags.push('errored');
+            incrementStat(`hifumi.commands.${name}`, tags);
         }
     }
 

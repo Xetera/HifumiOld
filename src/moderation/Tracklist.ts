@@ -113,13 +113,12 @@ export default class Tracklist {
             return void debug.silly(`User ${member.user.username} is already banned`);
 
         tracked.banned = true;
+        incrementStat(`hifumi.moderation.bans`, ['tracked']);
         if (offense === Offense.Spam){
             banTrackedUserForSpam(member);
-            incrementStat(`hifumi.moderation.tracked_bans`)
         }
         else if (offense === Offense.InviteLink){
             banTrackedUserForInvite(member);
-            incrementStat(`hifumi.moderation.tracked_bans`)
         }
     }
 }

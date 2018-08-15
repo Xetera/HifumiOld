@@ -44,7 +44,6 @@ export default async function onMessage(message: Discord.Message){
         return void debug.info(`Got message from ${message.guild.name} but the DB hasn't finished caching.`);
     }
 
-    gb.stats.set('hifumi.messages.seen', message.client.guilds.size);
 
     const messageType: MessageType = message.guild ? MessageType.GuildMessage : MessageType.PrivateMessage;
 
@@ -61,7 +60,7 @@ export default async function onMessage(message: Discord.Message){
     // we want to serve the help page to the user even if they have the wrong
     // prefix in case they don't know what the prefix is
     else if (messageType === MessageType.PrivateMessage){
-        incrementStat(`hifumi.messages.dm`);
+        incrementStat(`hifumi.messages_seen`, ['dm']);
         return DMCommandHandler(message);
     }
 
@@ -73,7 +72,7 @@ export default async function onMessage(message: Discord.Message){
 
     // right now this only supports 1 char length prefix but we can change that later
     if (guildEnabled && !userIgnored){
-        incrementStat(`hifumi.messages.guilds`);
+        incrementStat(`hifumi.messages_seen`, ['guild']);
         return gb.commandHandler.handler(message);
     }
 }
