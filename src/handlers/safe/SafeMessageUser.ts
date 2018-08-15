@@ -1,6 +1,7 @@
 import {DiscordAPIError, DMChannel, GuildMember, RichEmbed} from "discord.js";
 import {APIErrors} from "../../interfaces/Errors";
 import {debug} from "../../utility/Logging";
+import {incrementStat} from "../logging/datadog";
 
 
 export default function safeMessageUser(member: GuildMember, message : string | RichEmbed, reason ?: string, ban?: boolean) : Promise<void> {
@@ -12,6 +13,7 @@ export default function safeMessageUser(member: GuildMember, message : string | 
     const messageReason : string = reason ? `for reason: ${reason}` : "";
 
     return member.createDM().then((channel: DMChannel) => {
+        incrementStat('hifumi.users_DMed');
         return channel.send(message);
     }).then(() => {
         return void debug.info(`Messaged user ${member.user.username} because:\n${messageReason}`);

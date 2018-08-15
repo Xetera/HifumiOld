@@ -1,11 +1,12 @@
 import {DiscordAPIError, Message} from "discord.js";
 import {APIErrors} from "../../interfaces/Errors";
 import {debug} from "../../utility/Logging";
+import { incrementStat} from "../logging/datadog";
 
 
 export default function safeDeleteMessage(message : Message, timeout?: number) : Promise<Message|void>{
-
     return message.delete(timeout).then((message : Message) => {
+        incrementStat('hifumi.messages.deleted');
         return message;
     }).catch(error => {
         if (error instanceof DiscordAPIError){

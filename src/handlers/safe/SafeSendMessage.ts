@@ -3,6 +3,7 @@ import {DiscordAPIError, Message, MessageOptions, RichEmbed, VoiceChannel} from 
 import {APIErrors} from "../../interfaces/Errors";
 import {debug} from '../../utility/Logging'
 import safeDeleteMessage from "./SafeDeleteMessage";
+import {incrementStat} from "../logging/datadog";
 
 export default function safeSendMessage
 (channel : Discord.Channel, message: string | number  | RichEmbed | MessageOptions, deleteAfter?: number){
@@ -26,6 +27,7 @@ export default function safeSendMessage
                 safeDeleteMessage(message,deleteAfter * 1000);
                 return message
             }
+            incrementStat('hifumi.messages.sent');
             return message;
         }).catch((err: any)=> {
             if (err instanceof DiscordAPIError){

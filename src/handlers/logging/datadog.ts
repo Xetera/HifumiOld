@@ -9,7 +9,7 @@ export function incrementStat(target: string, tags?: Tags) {
     debug.silly(`Incremented ${target} ${tagOutput}`);
 }
 
-export function distributionStat(target: string, value: number){
+export function distributionStat(target: string, value: number, sampleRate?: number, tags?: Tags){
     gb.stats.distribution(target, value);
     debug.silly(`Recorded distribution for ${target}: ${value}`);
 }

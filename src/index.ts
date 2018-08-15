@@ -36,8 +36,6 @@ import {debug} from "./utility/Logging";
 
     bot.on('messageUpdate', onMessageUpdate);
 
-    bot.on('messageDelete', () => {});
-
 // === === === === GUILD MEMBER === === === === === //
     bot.on('guildMemberAdd', onGuildMemberAdd);
 
