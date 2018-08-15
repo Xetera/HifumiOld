@@ -2,12 +2,11 @@ import * as Discord from 'discord.js'
 import {Cleverbot as Clevertype, Config} from 'clevertype'
 import {debug} from '../utility/Logging'
 import {gb} from "../misc/Globals";
-import { Message, MessageMentions, TextChannel} from "discord.js";
+import { Message, TextChannel} from "discord.js";
 import moment = require("moment");
 import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import safeSendMessage from "../handlers/safe/SafeSendMessage";
-import {formattedTimeString, randRange, sanitizeUserInput, StringUtils} from "../utility/Util";
-import prefixReminderEmbed from "../embeds/misc/prefixReminderEmbed";
+import {formattedTimeString, StringUtils} from "../utility/Util";
 import TokenBucket from "../moderation/TokenBucket";
 
 interface Ignores {
@@ -59,7 +58,7 @@ export class Cleverbot {
             return;
         }
         return;
-
+        /*
         let cleverbotCall = message.isMentioned(bot.user);
         if (cleverbotCall && !message.content.replace(MessageMentions.USERS_PATTERN, '')){
             return void safeSendMessage(message.channel, prefixReminderEmbed(await gb.database.getPrefix(message.guild.id)), 30000);
@@ -100,6 +99,7 @@ export class Cleverbot {
             });
 
         }
+        */
     }
 
     public isUserRepeating(message: Message): boolean {
