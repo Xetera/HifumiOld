@@ -35,6 +35,7 @@ const options = {
 };
 export const debug = winston.createLogger({
     transports: [
+        // @ts-ignore
         new winston.transports.DailyRotateFile(options.file),
         new winston.transports.Console(options.console)
     ],
