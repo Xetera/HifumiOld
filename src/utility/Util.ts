@@ -273,6 +273,9 @@ export async function getPastMessagesReverse(channel: TextChannel, amount: numbe
 }
 
 export function getUrlExtension(url: string){
+    if (!StringUtils.isUrl(url)) {
+        return;
+    }
     const sections = url.split('.');
     if (!sections.length){
         return;
