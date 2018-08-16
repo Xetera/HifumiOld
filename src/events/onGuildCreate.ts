@@ -3,7 +3,7 @@ import {gb} from "../misc/Globals";
 import {debug} from "../utility/Logging";
 
 
-export default async function onGuildCreate(guild : Discord.Guild) {
+export default async function onGuildCreate(guild : Discord.Guild, retry?: number) {
     const database = gb.database;
     /**
      * we don't want to check if it's ready because once we're in a guild
@@ -15,6 +15,11 @@ export default async function onGuildCreate(guild : Discord.Guild) {
         || gb.sleeping
         || !gb
         || !await gb.database.getGuildEnabled(guild.id) || !guild.available) {
+
+        if (retry && retry > 10) {
+            return debug.error(`Tried adding a guild ${guild.name}[${guild.id}] 10 times but failed`);
+        }
+        setTimeout(() => onGuildCreate(guild, retry !== undefined ? retry + 1 : 1), 10000);
         return;
     }
 
