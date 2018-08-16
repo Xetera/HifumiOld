@@ -1,3 +1,5 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
 import {
     getClient,
     setupEnvironment, setupProcess
@@ -16,11 +18,9 @@ import onChannelCreate from "./events/onChannelCreate";
 import onChannelDelete from "./events/onChannelDelete";
 import websocketErrorHandler from "./handlers/process/websocketErrorHandler";
 import websocketWarningHandler from "./handlers/process/websocketWarningHandler";
-import * as dotenv from 'dotenv';
 import {debug} from "./utility/Logging";
 
 (async function main(){
-    dotenv.config();
     setupProcess();
     setupEnvironment();
 
