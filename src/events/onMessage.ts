@@ -67,6 +67,8 @@ export default async function onMessage(message: Discord.Message){
         return;
     }
 
+    incrementStat(`hifumi.messages_seen`, ['guild']);
+
     const prefix = await gb.database.getPrefix(message.guild.id);
 
     if (!message.content.startsWith(prefix)){
@@ -75,7 +77,6 @@ export default async function onMessage(message: Discord.Message){
 
     // right now this only supports 1 char length prefix but we can change that later
     if (guildEnabled && !userIgnored){
-        incrementStat(`hifumi.messages_seen`, ['guild']);
         return gb.commandHandler.handler(message);
     }
 }

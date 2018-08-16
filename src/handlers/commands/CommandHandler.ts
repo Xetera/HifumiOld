@@ -227,7 +227,7 @@ export default class CommandHandler implements indexSignature {
         params.name = name;
         try {
             if (CommandHandler.checkBrokenFunction(command)) {
-                incrementStat(`hifumi.commands.${name}`, ['stupid'])
+                incrementStat(`hifumi.commands.${name}`, ['stupid', name]);
                 return void handleFailedCommand(
                     message.channel,
                     "**Ding!** You've just been struck by the magic of spaghetti code!\n" +
@@ -270,15 +270,15 @@ export default class CommandHandler implements indexSignature {
                 tags.push('stealth');
             }
             tags.push('successful');
-            incrementStat(`hifumi.commands.${name}`, tags);
-            timedStat(`hifumi.commands.response_time`, Date.now() - startTime);
+            incrementStat(`hifumi.commands.${name}`, [...tags, name]);
+            timedStat(`hifumi.commands.response_time`, Date.now() - startTime, undefined, [...tags, name]);
 
             gb.database.incrementCommandCalls(message.guild.id, message.author.id);
         }
         catch (error) {
             debug.error(`Unexpected error while executing ${command}\n` + error.stack);
             tags.push('errored');
-            incrementStat(`hifumi.commands.${name}`, tags);
+            incrementStat(`hifumi.commands.${name}`, [...tags, name]);
         }
     }
 

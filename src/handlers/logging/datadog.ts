@@ -21,11 +21,11 @@ export function distributionStat(target: string, value: number, sampleRate?: num
     debug.silly(`Recorded distribution for ${target}: ${value}`);
 }
 
-export function timedStat(target: string, value: number){
+export function timedStat(target: string, value: number, sampleRate?: number, tags?: Tags){
     if (gb.ENV === Environments.Development) {
         return;
     }
-    gb.stats.timing(target, value);
+    gb.stats.timing(target, value, sampleRate, tags);
     debug.silly(`Recorded timer for ${target}: ${value}`);
 }
 
