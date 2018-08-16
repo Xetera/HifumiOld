@@ -14,9 +14,9 @@
 		"dist/database/subscribers/**/*.js"
 	],
 	"cli": {
-		"entitiesDir": "dist/database/models",
-		"migrationsDir": "dist/database/migrations",
-		"subscribersDir": "dist/database/subscribers"
+		"entitiesDir": "src/database/models",
+		"migrationsDir": "src/database/migrations",
+		"subscribersDir": "src/database/subscribers"
 	},
 	"cache": {
 		"duration": "0"
