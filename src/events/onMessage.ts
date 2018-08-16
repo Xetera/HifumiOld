@@ -60,14 +60,14 @@ export default async function onMessage(message: Discord.Message){
     // we want to serve the help page to the user even if they have the wrong
     // prefix in case they don't know what the prefix is
     else if (messageType === MessageType.PrivateMessage){
-        incrementStat(`hifumi.messages_seen`, ['dm']);
+        incrementStat(`hifumi.messages_seen`, ['type:dm']);
         /**
          * TODO: Redirect commands to regular command handler but add an option to exclude commands
          */
         return;
     }
 
-    incrementStat(`hifumi.messages_seen`, ['guild']);
+    incrementStat(`hifumi.messages_seen`, ['type:guild']);
 
     const prefix = await gb.database.getPrefix(message.guild.id);
 

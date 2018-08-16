@@ -22,7 +22,7 @@ export default async function safeBulkDelete(channel: Channel, messages?:  Messa
         const fetched : Collection<Snowflake, Message> = await channel.fetchMessages({limit: getBulkDeleteCount()});
         const deletedMessages = await channel.bulkDelete(fetched, true);
         debug.info(`Bulk deleted the last ${deletedMessages.size} messages from channel '${channel.name}' in guild ${channel.guild.name}`);
-        distributionStat('hifumi.messages.sent', deletedMessages.size, undefined, ['bulk']);
+        distributionStat('hifumi.messages.deleted', deletedMessages.size, undefined, ['type:bulk']);
         return deletedMessages.size;
     }
 

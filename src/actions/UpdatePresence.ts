@@ -21,8 +21,8 @@ export default async function updatePresence(bot : Discord.Client) : Promise<voi
     gb.allMembers = bot.guilds.reduce((users, guild ) => users + guild.memberCount, 0);
     const servers = bot.guilds.size;
     incrementStat(`hifumi.client.presence_updates`);
-    distributionStat('hifumi.client.member_count', servers);
-    distributionStat('hifumi.client.guild_count', gb.allMembers);
+    distributionStat('hifumi.client.member_count', gb.allMembers);
+    distributionStat('hifumi.client.guild_count', servers);
     //HifumiAPI.postStats(bot, gb.allMembers, guilds.length);
     bot.user.setActivity(`out for ${gb.allMembers} users | $help`, {
         type: 'WATCHING'

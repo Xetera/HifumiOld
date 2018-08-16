@@ -5,7 +5,7 @@ import 'winston-daily-rotate-file'
 
 const options = {
     file: {
-        level: 'silly',
+        level: process.env.FILE_LOG_LEVEL || 'silly',
         filename: `hifumi-%DATE%.log`,
         dirname: process.env.LOG_DIR || './logs',
         datePattern: 'YYYY-MM-DD',
@@ -14,7 +14,7 @@ const options = {
         maxFiles: '21d',
     },
     console: {
-        level: 'silly',
+        level: process.env.CONSOLE_LOG_LEVEL || 'info',
         handleExceptions: true,
         json: false,
         colorize: true,
