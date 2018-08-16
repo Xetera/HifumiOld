@@ -1,19 +1,17 @@
 import * as Discord from'discord.js'
 import {gb} from "../misc/Globals";
 import * as winston from "winston";
-import * as path from 'path'
+import 'winston-daily-rotate-file'
 
 const options = {
     file: {
         level: 'silly',
-        // TODO: Switch this entire portion to Logstash later
-        filename: path.join((process.env.LOGGING_DIR || './logs/'), `${new Date().toISOString().split('T').shift()}.log`),
-        handleExceptions: true,
-        timestamp: true,
-        json: true,
-        maxsize: 5242880, // 5MB
-        maxFiles: 5,
-        colorize: false,
+        filename: `hifumi-%DATE%.log`,
+        dirname: process.env.LOG_DIR || './logs',
+        datePattern: 'YYYY-MM-DD',
+        zippedArchive: true,
+        maxsize: '20m',
+        maxFiles: '21d',
     },
     console: {
         level: 'silly',
@@ -37,8 +35,7 @@ const options = {
 };
 export const debug = winston.createLogger({
     transports: [
-        new winston.transports.File(options.file),
-
+        new winston.transports.DailyRotateFile(options.file),
         new winston.transports.Console(options.console)
     ],
     exitOnError: false,
