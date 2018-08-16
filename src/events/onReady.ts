@@ -42,6 +42,8 @@ export default async function onReady(bot: Client): Promise<void> {
     gb.trackList = instances.trackList;
     gb.stats = instances.stats;
     gb.trackList.initializeGuilds();
+    gb.debugEval = instances.debugEval;
+
     incrementStat(`hifumi.client.logins`);
     setInterval(() => updatePresence(bot), 1000 * 60 * 10);
 }
