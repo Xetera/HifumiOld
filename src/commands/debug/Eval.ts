@@ -34,7 +34,7 @@ export default async function run(message: Message, input: [string]){
 
     let response;
     try {
-        response = gb.eval(message, req);
+        response = gb.debugEval(message, req);
     }
     catch (err) {
         response = err.toString();

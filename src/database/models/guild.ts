@@ -23,7 +23,7 @@ export class Guild {
     @Column()
     name: string;
 
-    @Column('character', {default: '$', length: 1})
+    @Column('character', {default: process.env.DEFAULT_PREFIX || '$', length: 1})
     prefix: string;
 
     @Column({default: true})
