@@ -38,19 +38,18 @@ fi
 
 # getting the current branch name from git
 current_branch=$( git rev-parse --abbrev-ref HEAD )
-target_branch="master"
+target_branch="staging"
 
 if [[ $current_branch != $target_branch ]]; then
-    echo -e "$info Current branch is not $target_branch, attempting to checkout to master..."
+    echo -e "$info Current branch is not $target_branch, attempting to checkout..."
 
-    checkout={ git checkout master } &> /dev/null
+    checkout={git checkout master} &> /dev/null
     errored=$( grep "error" <<< $checkout )
 
     if [[ -z $errored ]]; then
         echo -e "$error Could not checkout to $target_branch branch, exiting deployment!"
         exit 1
     fi
-
 fi
 
 echo $current_branch

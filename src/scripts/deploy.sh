@@ -9,29 +9,28 @@ SECONDS=0
 
 log() {
     out+="$@\n"
-    printf "$out"
 }
 
 send_webhook () {
     # Sends the event hook based on the event received
-    
+
     # Uses global variables:
     # $event - Type of embed, (Error | Success)
     # $title - Title of the embed
     # $out   - The current error log
-    
+
     local username=${username:-"Digital Ocean Webhook Worker"}
     local pass_color=3066993
     local fail_color=15158332
-    
-    local timestamp=$(date --utc +%FT%TZ)
+
+    local timestamp=$( date --utc +%FT%TZ )
     local avatar=${avatar:-"https://peachsalmanac.com/wp-content/uploads/2017/08/Hifumi-new-game-768x614.jpg"}
-    
+
     if [[ -z "$WEBHOOK_URL" ]]; then
         echo -e "$error 'WEBHOOK_URL' env variable was not set, cannot notify discord server."
         return 1
     fi
-    
+
     if [[ "$event" == "Error" ]]; then
         echo -e "$info The request is failing"
         local color=$fail_color
@@ -43,10 +42,10 @@ send_webhook () {
         local embed_icon="https://cdn.discordapp.com/emojis/312314752711786497.png"
         local footer="Deployment successful! Hifumi has been restarted."
     fi
-    
+
     log ""
     log "Build #$deploys was completed in $SECONDS seconds."
-    
+
     local data='{
         "username": "'"$username"'",
         "avatar_url": "'"https://peachsalmanac.com/wp-content/uploads/2017/08/Hifumi-new-game-768x614.jpg"'",
@@ -65,7 +64,7 @@ send_webhook () {
                 "timestamp": "'"$timestamp"'"
         } ]
     }'
-    
+
     (curl --fail --progress-bar -A "Hifumi-API-Webhook" -H Content-Type:application/json -H X-Author:Xetera#9596 -d "$data" "$WEBHOOK_URL" \
     && echo -e "$info Successfully sent webhook request.") \
     || echo -e "$error Unable to send webhook request."
@@ -88,23 +87,25 @@ echo -e "$info Received request to post a webhook."
 
 if [[ $redis_enabled -eq 1 ]]; then
     echo -e "$info Fetching deploy count from Redis"
-    
+
     {
         typeset -i deploys=$( redis-cli get number_of_deployments )
     } || handle_missing_redis
-    
+
     # we can safely increment this number at this point
-    
+
     # if the number is not found, casting it to an int
     # will return a 0 which will correctly get incremented to 1
     redis-cli set number_of_deployments $((deploys + 1))
 fi
 
 # Hard fetching:
-# git fetch --all
-# git reset --hard origin/master
+echo -e "$info Fetching all from github."
+git fetch --all
 
-# Deployment:iu
+echo -e "$info Hard resetting branch to origin."
+git reset --hard origin/staging
+
 echo -e "$info Compiling files..."
 
 # typescript CLI is pretty formatter by default, we don't want that
@@ -119,7 +120,7 @@ echo -e "$info Compiling files..."
 tsc_result=$( tsc --pretty false | tr -d '\r')
 
 if [[ ! -z $tsc_result ]]; then
-    echo -e "$error Compilation error received from tsc"
+    echo -e "$error Compilation error received from tsc."
     event="Error"
     title="Compilation Error"
     log "Encountered an error while running the command **tsc**"
@@ -129,10 +130,10 @@ if [[ ! -z $tsc_result ]]; then
     exit 1
 fi
 
-pm2 restart hifumi
+echo -e "$info Restarting Hifumi and delaying confirmation 5 secs to check process"
 
-echo -e "$info Sleeping for 5 seconds to confirm PM2 status..."
-sleep 5
+pm2 restart hifumi
+# pm2 will sleep the process here for 5 seconds so we don't have to
 
 status=$( pm2 status | awk '/hifumi/ {print $10}' )
 
@@ -141,28 +142,16 @@ if [[ $status != "online" ]]; then
     event="Error"
     title="PM2 startup error"
     log "**Hifumi** process on PM2 was not found to be online after" \
-    "waiting for 5 seconds, check the server logs for more info."
+    "waiting for 5 seconds."
+    log "Check the server logs for more info."
     send_webhook
     exit 1
 fi
 
+# Everything good at this point
+echo -e "$success Build successful, notifying Discord server."
+event="Success"
+title="Fetched, built and reloaded successfully!"
+log "Hifumi should be up and running now!"
 
-# event="Success"
-# title="Fetched, built and reloaded successfully!"
-# log "\xF0\x9F\x91\x8C"
-
-# send_webhook
-
-# name=$(hostname)
-# if [[ name != "$required_hostname" ]]; then
-#     echo -e "$error Host was expected to be 'hifumi' but is instead '$name"
-#     exit 1
-# fi
-
-# fetch_status=git fetch
-# echo $fetch_status
-# required_hostname=${required_hostname:-"hifumi"}
-# event="Error"
-# title="Error fetching updates from master branch"
-# description="Could not merge "
-# send_webhook "\${event}" "\${title}" "\${description}"
+send_webhook
