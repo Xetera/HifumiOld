@@ -1,9 +1,7 @@
 {
 	"type": "postgres",
 	"url": "postgresql:///discord_test",
-	"synchronize": true,
 	"logging": true,
-	"dropSchema": true,
 	"entities": [
 		"dist/database/models/**/*.js"
 	],

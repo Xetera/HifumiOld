@@ -71,12 +71,12 @@ export class Database {
         });
     }
 
-    public getCache(){
+    public getCache() {
         const redisString: string | undefined = process.env['REDISCLOUS_URL'] || process.env['REDIS_URL'];
         if (redisString) {
-             return  {
+            return {
                 type: 'redis',
-                duration: 1000000,
+                duration: 10000,
                 options: {
                     // setting via gb.ENV creates problems with docker
                     url: redisString
@@ -285,6 +285,7 @@ export class Database {
                 id: guild.id
             });
         }).catch(err => {
+            debug.error(err)
             return Promise.reject(err);
         })
     }

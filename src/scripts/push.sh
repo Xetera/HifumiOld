@@ -52,4 +52,6 @@ if [[ $current_branch != $target_branch ]]; then
     fi
 fi
 
-echo $current_branch
+(curl --fail -XPOST --progress-bar -A "Hifumi-API-Webhook" -H Content-Type:application:json -H Authorization:$auth -H X-Author:Xetera#9596 "$API_ENDPOINT" \
+    && echo -e "$success Successfully sent build request.") \
+    || echo -e "$error Unable to send build request."
