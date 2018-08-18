@@ -108,16 +108,15 @@ git reset --hard origin/staging
 
 echo -e "$info Compiling files..."
 
-# typescript CLI is pretty formatter by default, we don't want that
+# NOTE:
+# typescript CLI < 3.0.* is pretty formatted by default which messes up
+# the output. To circumvent this you have to add a ( -- pretty false )
+# flag to get raw output. This is not a problem with 3.0+
 
-# IMPORTANT: Windows is shitty. because this script is meant to be
-# used in my regular work environment (which unfortunately is windows)
-# we have to specifically remove the carriage returns if we want to
-# concat this response to a string otherwise it carries over the (",)
-# portion of the stdout to the embed which messed up everything
-
-# god I hate Windows...
-tsc_result=$( tsc --pretty false | tr -d '\r')
+# To fix issues with this line in windows you pipe the output into =>  | tr -d '\r'
+# because the line endings are different and carry the last line over with
+# a carriage return character.
+tsc_result=$( tsc --p /root/Hifumi )
 
 if [[ ! -z $tsc_result ]]; then
     echo -e "$error Compilation error received from tsc."
