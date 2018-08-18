@@ -14,7 +14,11 @@ log() {
 
 send_webhook () {
     # Sends the event hook based on the event received
-    # [Must be passed with a \${} input]
+    
+    # Uses global variables:
+    # $event - Type of embed, (Error | Success)
+    # $title - Title of the embed
+    # $out   - The current error log
     
     local username=${username:-"Digital Ocean Webhook Worker"}
     local pass_color=3066993
@@ -41,7 +45,7 @@ send_webhook () {
     fi
     
     log ""
-    log "This build (# $deploys) was completed in $SECONDS seconds."
+    log "Build #$deploys was completed in $SECONDS seconds."
     
     local data='{
         "username": "'"$username"'",
@@ -84,6 +88,7 @@ echo -e "$info Received request to post a webhook."
 
 if [[ $redis_enabled -eq 1 ]]; then
     echo -e "$info Fetching deploy count from Redis"
+    
     {
         typeset -i deploys=$( redis-cli get number_of_deployments )
     } || handle_missing_redis
@@ -111,7 +116,7 @@ echo -e "$info Compiling files..."
 # portion of the stdout to the embed which messed up everything
 
 # god I hate Windows...
-# tsc_result=$( tsc --pretty false | tr -d '\r')
+tsc_result=$( tsc --pretty false | tr -d '\r')
 
 if [[ ! -z $tsc_result ]]; then
     echo -e "$error Compilation error received from tsc"
@@ -124,15 +129,29 @@ if [[ ! -z $tsc_result ]]; then
     exit 1
 fi
 
+pm2 restart hifumi
 
-event="Success"
-title="Hifumi Deployed Successfully"
-log "Everything seems to be in order, captain!"
+echo -e "$info Sleeping for 5 seconds to confirm PM2 status..."
+sleep 5
+
+status=$( pm2 status | awk '/hifumi/ {print $10}' )
+
+if [[ $status != "online" ]]; then
+    echo -e "$error Could not successfully start up pm2 after 5 seconds"
+    event="Error"
+    title="PM2 startup error"
+    log "**Hifumi** process on PM2 was not found to be online after" \
+    "waiting for 5 seconds, check the server logs for more info."
+    send_webhook
+    exit 1
+fi
+
+
+# event="Success"
+# title="Fetched, built and reloaded successfully!"
+# log "\xF0\x9F\x91\x8C"
 
 # send_webhook
-
-# pm2 restart hifumi
-
 
 # name=$(hostname)
 # if [[ name != "$required_hostname" ]]; then
