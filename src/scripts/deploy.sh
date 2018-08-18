@@ -99,6 +99,7 @@ if [[ $redis_enabled -eq 1 ]]; then
     redis-cli set number_of_deployments $((deploys + 1))
 fi
 
+cd /root/Hifumi
 # Hard fetching:
 echo -e "$info Fetching all from github."
 git fetch --all
