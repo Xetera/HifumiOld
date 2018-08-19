@@ -21,7 +21,7 @@ export function distributionStat(target: string, value: number, sampleRate?: num
     } else if (!gb.stats) {
         return debug.info(`Cannot record ${target} stats, datadog client not ready.`)
     }
-    gb.stats.distribution(target, value);
+    gb.stats.distribution(target, value, sampleRate, tags);
     debug.silly(`Recorded distribution for ${target}: ${value}`);
 }
 
