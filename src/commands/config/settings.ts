@@ -9,7 +9,6 @@ import {handleInvalidParameters} from "../../handlers/commands/invalidCommandHan
 import {hints} from "../self/hints";
 import {getOnOff} from "../../utility/Util";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
-import missingAdminEmbed from "../../embeds/permissions/missingAdminEmbed";
 import _setStrikeLimit from "../moderation/_setStrikeLimit";
 import {reactions} from "./reactions";
 import {setMemberTracking} from "./tracking";
@@ -19,6 +18,7 @@ import setInviteBan from "./_setInviteBan";
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../decorators/expects";
 import {UserPermissions} from "../../handlers/commands/command.interface";
+import {missingAdminEmbed} from "../../embeds/permissions";
 
 export default async function settings(message : Message, input: [(string | undefined), (string | undefined)]) {
     const [setting, choice] = input;

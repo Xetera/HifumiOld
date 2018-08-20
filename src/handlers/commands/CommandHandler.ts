@@ -15,16 +15,18 @@ import {Command} from "./Command";
 import glob = require('glob')
 import {UserPermissions} from "./command.interface";
 import safeSendMessage from "../safe/SafeSendMessage";
-import missingAdminEmbed from "../../embeds/permissions/missingAdminEmbed";
-import missingModEmbed from "../../embeds/permissions/missingModEmbed";
-import missingGuildOwnerEmbed from "../../embeds/permissions/missingGuildOwnerEmbed";
-import missingSelfPermission from "../../embeds/permissions/missingSelfPermission";
 import {handleFailedCommand} from "../../embeds/commands/commandExceptionEmbed";
 import {debug} from "../../utility/Logging";
 import {GuildMember, Message, PermissionResolvable, TextChannel} from "discord.js";
 import {Environments} from "../../events/systemStartup";
 import {handleFatalErrorGracefully} from "../process/fatal";
 import {incrementStat, timedStat} from "../logging/datadog";
+import {
+    missingAdminEmbed,
+    missingGuildOwnerEmbed,
+    missingModEmbed,
+    missingSelfPermission
+} from "../../embeds/permissions";
 
 export interface CommandParameters extends Instance {
     message: Discord.Message;

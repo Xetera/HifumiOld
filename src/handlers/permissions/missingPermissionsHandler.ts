@@ -1,8 +1,8 @@
 import {Channel, GuildMember, RichEmbed, TextChannel} from "discord.js";
 import {isMissingMessagingPermissions} from "../../utility/Util";
-import missingPermissionsEmbed from "../../embeds/permissions/missingPermissionsEmbed";
 import {debug} from "../../utility/Logging";
 import safeSendMessage from "../safe/SafeSendMessage";
+import {missingPermissionsEmbed} from "../../embeds/permissions";
 
 /**
  * Checks and handles the missing talk permission for text channels
