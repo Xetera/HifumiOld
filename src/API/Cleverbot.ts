@@ -6,7 +6,6 @@ import * as CleverbotIO from 'cleverbot.io'
 // import moment = require("moment");
 // import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import safeSendMessage from "../handlers/safe/SafeSendMessage";
-import {StringUtils} from "../utility/Util";
 import TokenBucket from "../moderation/TokenBucket";
 import prefixReminderEmbed from "../embeds/misc/prefixReminderEmbed";
 
