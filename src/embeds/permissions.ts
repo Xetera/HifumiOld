@@ -2,7 +2,7 @@ import {Channel, Guild, PermissionResolvable, RichEmbed} from "discord.js";
 import {random} from "../utility/Util";
 import {missingPermissionsEmbedColor} from "../utility/Settings";
 import {gb} from "../misc/Globals";
-import ReactionManager from "../handlers/internal/reactions/reactionManager";
+import {canSendReactions, giggle, shy, sorry} from "../handlers/internal/reactions/reactionManager";
 
 export async function missingAdminEmbed(guild: Guild): Promise<RichEmbed> {
     const embed = new RichEmbed()
@@ -11,7 +11,7 @@ export async function missingAdminEmbed(guild: Guild): Promise<RichEmbed> {
         .setColor(missingPermissionsEmbedColor);
 
     if (await gb.database.getReactions(guild.id)){
-        embed.setThumbnail(ReactionManager.getInstance().sorry[0])
+        embed.setThumbnail(sorry[0])
     }
     return embed;
 
@@ -29,7 +29,7 @@ export async function missingModEmbed(guild: Guild): Promise<RichEmbed>{
         .setDescription(`Nice try, that was super adorable.`)
         .setColor(missingPermissionsEmbedColor);
     if (await gb.database.getReactions(guild.id)){
-        embed.setThumbnail(ReactionManager.getInstance().giggle);
+        embed.setThumbnail(giggle);
     }
     return embed;
 }
@@ -67,8 +67,8 @@ export async function missingSelfPermission(guild: Guild, permission: Permission
         .setDescription(
             `I need these permissions for that command: ${permissions}`
         );
-    if (await ReactionManager.canSendReactions(guild.id)){
-        embed.setThumbnail(random(ReactionManager.getInstance().shy))
+    if (await canSendReactions(guild.id)){
+        embed.setThumbnail(random(shy))
     }
     return embed;
 

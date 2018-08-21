@@ -1,6 +1,6 @@
 import {Message, RichEmbed} from "discord.js";
 import {gb} from "../../misc/Globals";
-import ReactionManager from "../../handlers/internal/reactions/reactionManager";
+import {crying} from "../../handlers/internal/reactions/reactionManager";
 import safeSendMessage from "../../handlers/safe/SafeSendMessage";
 import {Command} from "../../handlers/commands/Command";
 import {ArgType} from "../../decorators/expects";
@@ -13,7 +13,7 @@ async function run(message: Message): Promise<any> {
         .setFooter(`I still love you though <3`);
 
     if (await gb.database.getReactions(message.guild.id)){
-        embed.setThumbnail(ReactionManager.getInstance().crying)
+        embed.setThumbnail(crying)
     }
     safeSendMessage(message.channel, embed);
 

@@ -2,7 +2,7 @@ import {GuildMember, RichEmbed} from "discord.js";
 import {Offense} from "../../moderation/interfaces";
 import {formattedTimeString} from "../../utility/Util";
 import {getMuteTime} from "../../utility/Settings";
-import ReactionManager from "../../handlers/internal/reactions/reactionManager";
+import {apology} from "../../handlers/internal/reactions/reactionManager";
 
 export default function unmuteDMEmbed(member: GuildMember, reason: string | Offense, duration?: number | string): RichEmbed{
     let reasonMessage;
@@ -24,6 +24,6 @@ export default function unmuteDMEmbed(member: GuildMember, reason: string | Offe
         .addField(`Mute Reason`, reasonMessage, true)
         // if we don't have a given duration then we know that it's just the default mute action duration
         .setTimestamp()
-        .setImage(ReactionManager.getInstance().apology)
+        .setImage(apology)
         .setFooter('Hifumi')
 }

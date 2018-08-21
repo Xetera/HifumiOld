@@ -1,5 +1,5 @@
 import {RichEmbed, TextChannel, VoiceChannel} from "discord.js";
-import ReactionManager from "../../handlers/internal/reactions/reactionManager";
+import {canSendReactions, sorry} from "../../handlers/internal/reactions/reactionManager";
 
 export default async function conflictOnChannelResolveEmbed(channels: TextChannel[] & VoiceChannel[], identifier: string){
     const channelArray = channels.map(c => `**Channel:** ${c.name}${c.parent ? '\n   **Category:** ' + c.parent.name : ''}\n`);
@@ -18,6 +18,6 @@ export default async function conflictOnChannelResolveEmbed(channels: TextChanne
         .setTitle(`Multiple channels found`)
         .setDescription(`I found multiple channels with the name **${identifier}** but I don't know which one you want!\n\n${channelString}`)
         .setFooter(`This message expires in 20 seconds.`);
-    await ReactionManager.canSendReactions(channels[0].guild.id) ? embed.setThumbnail(ReactionManager.getInstance().sorry[1]) : '';
+    await canSendReactions(channels[0].guild.id) ? embed.setThumbnail(sorry[1]) : '';
     return embed;
 }

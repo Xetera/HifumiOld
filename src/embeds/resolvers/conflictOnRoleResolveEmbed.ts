@@ -1,5 +1,5 @@
 import {RichEmbed, Role} from "discord.js";
-import ReactionManager from "../../handlers/internal/reactions/reactionManager";
+import {canSendReactions, sorry} from "../../handlers/internal/reactions/reactionManager";
 
 export default async function conflictOnRoleResolveEmbed(channels: Role[], identifier: string){
     const channelArray = channels.map(c => `**Role:** ${c.name}${c.name ? '\n   **Position:** ' + c.position : ''}\n`);
@@ -18,6 +18,6 @@ export default async function conflictOnRoleResolveEmbed(channels: Role[], ident
         .setTitle(`Multiple channels found`)
         .setDescription(`I found multiple roles with the name **${identifier}** but I don't know which one you want!\n\n${channelString}`)
         .setFooter(`This message expires in 20 seconds. `);
-    await ReactionManager.canSendReactions(channels[0].guild.id) ? embed.setThumbnail(ReactionManager.getInstance().sorry[1]) : '';
+    await canSendReactions(channels[0].guild.id) ? embed.setThumbnail(sorry[1]) : '';
     return embed;
 }

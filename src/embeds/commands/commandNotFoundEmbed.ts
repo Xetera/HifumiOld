@@ -1,8 +1,8 @@
 import {Channel, RichEmbed, TextChannel} from "discord.js";
 import lavenshteinDistance from "../../utility/LavenshteinDistance";
-import ReactionManager from "../../handlers/internal/reactions/reactionManager";
 import {gb} from "../../misc/Globals";
 import {Command} from "../../handlers/commands/Command";
+import {canSendReactions, mad, weary} from "../../handlers/internal/reactions/reactionManager";
 
 export default async function commandNotFoundEmbed(channel: Channel, commandName: string, pool?: string[]){
     if (!(channel instanceof TextChannel)){
@@ -28,19 +28,19 @@ export default async function commandNotFoundEmbed(channel: Channel, commandName
     if (suggestion ===  'to spam me like some kind of dummy'){
         reaction = 'HUH?!';
         didYouMean += ` ${suggestion}?!`;
-        image = (ReactionManager.getInstance().mad);
+        image = (mad);
     }
     else {
         reaction = 'Huh?';
         didYouMean += ` **${suggestion}**?`;
-        image = (ReactionManager.getInstance().weary);
+        image = (weary);
     }
     const embed = new RichEmbed()
         .addField(reaction, didYouMean)
         .setColor('#ffdd51')
         .setFooter(`=> ${await gb.database.getPrefix(channel.guild.id)}hints off <= to disable hints`);
 
-    if (await ReactionManager.canSendReactions(channel.guild.id)){
+    if (await canSendReactions(channel.guild.id)){
         embed.setThumbnail(image);
     }
     return embed;

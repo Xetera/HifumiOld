@@ -1,5 +1,5 @@
 import {GuildMember, RichEmbed} from "discord.js";
-import ReactionManager from "../../handlers/internal/reactions/reactionManager";
+import {canSendReactions, sorry} from "../../handlers/internal/reactions/reactionManager";
 
 export default async function conflictOnNameResolveEmbed(members: GuildMember[], identifier: string){
     const memberArray = members.map(m => `${m.user.username}#${m.user.discriminator} ${m.nickname != null ? `**Nick:** ${m.nickname}` : ''}`);
@@ -17,6 +17,6 @@ export default async function conflictOnNameResolveEmbed(members: GuildMember[],
         .setTitle(`Multiple users found`)
         .setDescription(`I found multiple users with the name **${identifier}** but I don't know which one you want!\n\n${memberString}`)
         .setFooter(`This message expires in 20 seconds.`);
-    await ReactionManager.canSendReactions(members[0].guild.id) ? embed.setThumbnail(ReactionManager.getInstance().sorry[1]) : '';
+    await canSendReactions(members[0].guild.id) ? embed.setThumbnail(sorry[1]) : '';
     return embed;
 }
