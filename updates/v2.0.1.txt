@@ -1,0 +1,8 @@
+**Fixed Chatting, you can talk to Hifumi again**
+Unfortunately it's _significantly_ slower than the previous solution, but this really shouldn't be going away any time soon.
+
+**Macros now have a cooldown**
+No spamerino pls
+
+**A ton of other dev stuff**
+Very little is relevant to users, but if you're interested you can check out the source.
