@@ -25,6 +25,16 @@ export function distributionStat(target: string, value: number, sampleRate?: num
     debug.silly(`Recorded distribution for ${target}: ${value}`);
 }
 
+export function histogramStat(target: string, value: number, sampleRate?: number, tags?: Tags){
+    if (gb.ENV === Environments.Development) {
+        return;
+    } else if (!gb.stats) {
+        return debug.info(`Cannot record ${target} stats, datadog client not ready.`)
+    }
+    gb.stats.histogram(target, value, sampleRate, tags);
+    debug.silly(`Recorded distribution for ${target}: ${value}`);
+}
+
 export function timedStat(target: string, value: number, sampleRate?: number, tags?: Tags){
     if (gb.ENV === Environments.Development) {
         return;
