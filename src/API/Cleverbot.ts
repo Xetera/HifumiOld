@@ -8,14 +8,7 @@ import * as CleverbotIO from "cleverbot.io";
 import safeSendMessage from "../handlers/safe/SafeSendMessage";
 import TokenBucket from "../moderation/TokenBucket";
 import prefixReminderEmbed from "../embeds/misc/prefixReminderEmbed";
-import * as Redis from "redis";
-import { promisify } from "util";
-
-export const redis = Redis.createClient();
-
-const getAsync = promisify(redis.get).bind(redis);
-const setAsync = promisify(redis.set).bind(redis);
-const delAsync = promisify(redis.del).bind(redis);
+import { redis } from "../handlers/internal/redis";
 
 export class Cleverbot {
     cleverbot: CleverbotIO;
@@ -43,7 +36,9 @@ export class Cleverbot {
     }
 
     private replaceKeyword(phrase: string): string {
-        return phrase.replace(this.identifier, "cleverbot");
+        return phrase
+            .replace(this.identifier, "cleverbot")
+            .replace(MessageMentions.USERS_PATTERN, "");
     }
 
     public async checkMessage(
@@ -62,7 +57,7 @@ export class Cleverbot {
         let cleverbotCall = message.isMentioned(bot.user);
         if (
             cleverbotCall &&
-            !message.content.replace(MessageMentions.USERS_PATTERN, "")
+            message.content.replace(MessageMentions.USERS_PATTERN, "") === ""
         ) {
             return void safeSendMessage(
                 message.channel,
@@ -111,7 +106,7 @@ export class Cleverbot {
             //     return;
             // }
             const redisKey = `cleverbot:throttles:${message.author.id}`;
-            const onHold = await getAsync(redisKey);
+            const onHold = await redis.get(redisKey);
 
             if (onHold) {
                 /**
@@ -124,7 +119,7 @@ export class Cleverbot {
             /**
              * Key expires in 60 seconds in case something goes wrong
              */
-            await setAsync(redisKey, true, "EX", 60);
+            await redis.set(redisKey, true, "EX", 60);
 
             // debug.info(`[${message.member.guild}]::${message.channel.name}::<${message.author.username}> cleverbot call`);
             await message.channel.startTyping();
@@ -133,7 +128,7 @@ export class Cleverbot {
                     // sometimes randomly the messages are empty for no reason
                     await message.channel.stopTyping(true);
                     await message.reply(resp);
-                    await delAsync(redisKey);
+                    await redis.del(redisKey);
                 }
             );
         }
