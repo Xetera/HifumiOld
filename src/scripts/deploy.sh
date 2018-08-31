@@ -108,6 +108,7 @@ echo -e "$info Hard resetting branch to origin."
 git reset --hard origin/staging
 
 echo -e "$info Compiling files..."
+npm install
 
 # NOTE:
 # typescript CLI < 3.0.* is pretty formatted by default which messes up

@@ -1,27 +1,26 @@
 language: node_js
 node_js:
-- stable
+    - stable
 
 cache:
-  directories:
-  - node_modules
+    directories:
+        - node_modules
 
 before_script:
-  - npm run setup
-  - npm install codecov -g
-  - npm run build
+    - npm run setup
+    - npm install codecov -g
+    - npm run build
 
 script:
-
-  - npm test
+    - npm test
 
 after_success:
-  - codecov
-  - wget https://raw.githubusercontent.com/k3rn31p4nic/travis-ci-discord-webhook/master/send.sh
-  - chmod +x send.sh
-  - ./send.sh success $WEBHOOK_URL
+    - codecov
+    - wget https://raw.githubusercontent.com/Xetera/travis-ci-discord-webhook/master/send.sh
+    - chmod +x send.sh
+    - ./send.sh success $WEBHOOK_URL
 
 after_failure:
-  - wget https://raw.githubusercontent.com/k3rn31p4nic/travis-ci-discord-webhook/master/send.sh
-  - chmod +x send.sh
-  - ./send.sh failure $WEBHOOK_URL
+    - wget https://raw.githubusercontent.com/Xetera/travis-ci-discord-webhook/master/send.sh
+    - chmod +x send.sh
+    - ./send.sh failure $WEBHOOK_URL
