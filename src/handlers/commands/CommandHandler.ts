@@ -46,11 +46,6 @@ export interface CommandParameters extends Instance {
     expect: (ArgOptions | ArgOptions[])[];
     name: string;
 }
-
-interface indexSignature {
-    [method: string]: CommandParameters;
-}
-
 interface UserInputData {
     stealth: boolean;
     command: string;
@@ -61,7 +56,7 @@ function isMessage(message: any): message is Discord.Message {
     return <Discord.Message>message.content !== undefined;
 }
 
-export default class CommandHandler implements indexSignature {
+export default class CommandHandler {
     [method: string]: any;
 
     commands: Command[] = [];
@@ -132,13 +127,15 @@ export default class CommandHandler implements indexSignature {
     public static async parseInput(
         message: Discord.Message
     ): Promise<UserInputData | undefined> {
-        let args: string[] = [];
+        if (!isMessage(message)) {
+            throw new TypeError(`'${message}' is not a Message object.`);
+        }
         const prefix = await gb.database.getPrefix(message.guild.id);
+
         // removing excess whitespace between words that can't be removed with .trim()
         const messageContent = message.content.replace(/ +/g, " ").trim();
-        if (isMessage(message)) args = messageContent.split(" ");
-        else throw new TypeError(`'${message}' is not a Message object.`);
 
+        let args: string[] = messageContent.split(" ");
         let input: string | undefined = args.shift()!;
 
         // detecting stealth command
@@ -148,6 +145,9 @@ export default class CommandHandler implements indexSignature {
         };
 
         if (input === prefix || input === prefix + prefix) {
+            /**
+             * Commands with just a prefix are not valid commands
+             */
             return;
         } else if (input.substring(0, 2) === prefix + prefix) {
             out.stealth = true;
@@ -212,9 +212,9 @@ export default class CommandHandler implements indexSignature {
         }
 
         // User input is not a command, checking macros
-        const macros: Macro[] = await gb.database.getMacros(message.guild.id);
-        const targetMacro: Macro | undefined = macros.find(
-            macro => macro.macro_name === inputData.command
+        const targetMacro: Macro | undefined = await gb.database.getMacro(
+            message.guild.id,
+            inputData.command
         );
         if (targetMacro) {
             /**
@@ -235,14 +235,22 @@ export default class CommandHandler implements indexSignature {
         // User input is not a command OR a macro, checking if guild has hints enabled
         const hints = await gb.database.getCommandHints(message.guild.id);
         if (hints) {
+            /**
+             * Getting possible choices
+             */
+            const macros = await gb.database.getMacros(message.guild.id);
+
             safeSendMessage(
                 message.channel,
                 await commandNotFoundEmbed(
                     message.channel,
                     inputData.command,
-                    macros.map(macro => macro.macro_name)
+                    macros.map(m => m.macro_name)
                 ),
-                30
+                /**
+                 * Delete after: 10
+                 */
+                10
             );
         }
         await message.channel.stopTyping();
@@ -446,6 +454,9 @@ export default class CommandHandler implements indexSignature {
     private async sendMacro(message: Message, macro: Macro): Promise<boolean> {
         gb.database.incrementMacroCalls(message.guild.id, message.author.id);
         const content = await buildMacro(macro);
+        /**
+         * Wtf am I doing here, this is disgusting
+         */
         const isPureMessage =
             typeof content[0] !== "object" &&
             (!content[1] || typeof content[1] !== "object");
