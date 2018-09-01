@@ -14,5 +14,5 @@ export const command: Command = new Command({
     examples: ["{{prefix}}source"],
     category: "Info",
     expects: [{ type: ArgType.None }],
-    run: run
+    run
 });
