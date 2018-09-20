@@ -30,7 +30,7 @@
 
 * Moderation: 🚫 Get all your moderators on the same page
     * _**Anti-Spam**_ Hifumi automatically removes messages and mutes people when she detects spamming.
-    * _**Invite Filtering**_ Invites are automatically removed and added to a users history, offenders are banned after 5 invites by default or a custom value if needed.
+    * _**Invite Filtering**_ Invites are automatically removed and added to a user's history, offenders are banned after 5 invites by default or a custom value if needed.
     * _**New Member Tracking**_ To combat raiders, she has an option to track people who have joined in the past 5 minutes more closely. Banning on 2 invites instead of the custom limit (if invites are not allowed) and banning on detecting first spam instead of muting.
     * `$history`- Pull up a user's history with information on their previous strikes, notes, invites, mutes and join dates.
     * `$strike` - Warn members when they break rules anonymously, adding to their total strikes (or not with `$warn`), strikes are automatically expire after 2 weeks, users who go past the strike limit of the server are banned automatically
