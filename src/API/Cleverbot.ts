@@ -2,12 +2,11 @@ import * as Discord from 'discord.js'
 import {Cleverbot as Clevertype, Config} from 'clevertype'
 import {debug} from '../utility/Logging'
 import {gb} from "../misc/Globals";
-import { Message, MessageMentions, TextChannel} from "discord.js";
+import { Message, TextChannel} from "discord.js";
 import moment = require("moment");
 import {handleFailedCommand} from "../embeds/commands/commandExceptionEmbed";
 import safeSendMessage from "../handlers/safe/SafeSendMessage";
-import {formattedTimeString, randRange, sanitizeUserInput, StringUtils} from "../utility/Util";
-import prefixReminderEmbed from "../embeds/misc/prefixReminderEmbed";
+import {formattedTimeString,  StringUtils} from "../utility/Util";
 import TokenBucket from "../moderation/TokenBucket";
 
 interface Ignores {
@@ -59,47 +58,6 @@ export class Cleverbot {
             return;
         }
         return;
-
-        let cleverbotCall = message.isMentioned(bot.user);
-        if (cleverbotCall && !message.content.replace(MessageMentions.USERS_PATTERN, '')){
-            return void safeSendMessage(message.channel, prefixReminderEmbed(await gb.database.getPrefix(message.guild.id)), 30000);
-        }
-
-        const chatChannelId = await gb.database.getChatChannel(message.guild.id);
-
-        if (message.channel.id === chatChannelId || cleverbotCall || message.isMentioned(bot.user)) {
-
-            if (!gb.database.ready) {
-                safeSendMessage(message.channel, `😰 give me some time to get set up first.`);
-                return void debug.info(`Got message from ${message.guild.name} but the DB hasn't finished caching.`);
-            }
-
-            // don't respond to messages not meant for me
-            if (message.mentions.users.size !== 0 && !message.isMentioned(bot.user))
-                return;
-            else if (message.content.startsWith('-') || message.content.startsWith(await gb.database.getPrefix(message.guild.id)))
-                return;
-            else if (this.isRateLimited(message.member.id, message)){
-                return;
-            }
-
-            message.react('👀');
-            if (this.isUserRepeating(message)){
-                // to make it feel like it's still cleverbot
-                setTimeout(() => {
-                    return void safeSendMessage(message.channel, sanitizeUserInput(message.content));
-                }, randRange(1500, 3000));
-                return;
-            }
-
-            debug.info(`[${message.member.guild}]::${message.channel.name}::<${message.author.username}> cleverbot call`);
-
-            this.say(message, message.content, message.member.id).then(async(resp : string) => {
-                // sometimes randomly the messages are empty for no reason
-                message.channel.send(resp);
-            });
-
-        }
     }
 
     public isUserRepeating(message: Message): boolean {
