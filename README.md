@@ -149,6 +149,7 @@ This script is set on a cron job of regular intervals, and an X amount of backup
 
 A backup-restoration script is available to restore the latest backup if necessary.
 
+```
 ## Setting Up Hifumi
 Coming soon...
 
