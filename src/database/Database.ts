@@ -82,7 +82,7 @@ export class Database {
                 }
             }
         }
-        debug.warning(
+        debug.warn(
             `'REDIS_URL' environment variable was not found, caching will be done (sub-optimally) in postgres instead`
         );
         return {

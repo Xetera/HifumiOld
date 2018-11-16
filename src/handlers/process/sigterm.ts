@@ -5,7 +5,7 @@ import {createWarningEmbed} from "./processWarningEmbed";
 
 export function catchSigterm(notifyOwner: boolean){
     process.once('SIGTERM', () => {
-        debug.warning(`SIGTERM RECEIVED, RESTARTING...`);
+        debug.warn(`SIGTERM RECEIVED, RESTARTING...`);
         const owner : User | undefined = gb.bot.users.get(gb.ownerID);
         if (!owner || !notifyOwner) {
             debug.error('Could not fetch bot owner to send sigterm embed.');

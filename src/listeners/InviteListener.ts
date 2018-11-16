@@ -36,7 +36,7 @@ export default async function inviteListener(message: Message){
     if (valid)
         return;
 
-    debug.warning(`${message.author.username} in ${message.guild} sent an invite link.`);
+    debug.warn(`${message.author.username} in ${message.guild} sent an invite link.`);
     incrementStat(`hifumi.moderation.invites.seen`)
     return deleteInvite(message)
 }

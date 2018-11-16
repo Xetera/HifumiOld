@@ -1,15 +1,15 @@
 import safeMessageUser from "./SafeMessageUser";
 import {DiscordAPIError, GuildMember, RichEmbed} from "discord.js";
-import {debug} from "../../actions/Actions";
 import {APIErrors} from "../../interfaces/Errors";
 import {getOnBanMessageSnipeCount} from "../../utility/Settings";
 import {gb} from "../../misc/Globals";
 import {incrementStat} from "../logging/datadog";
+import {debug} from "../../utility/Logging";
 
 export default async function safeBanUser(member : GuildMember, reason: string, banMessage?: string|RichEmbed) : Promise<void>{
     const memberName : string = member.nickname||member.user.username;
     if (!member.bannable || !member.guild.me.hasPermission("BAN_MEMBERS")){
-        debug.warning(
+        debug.warn(
             `Could not ban ${memberName} from ` +
             `${member.guild.name}, missing ban permissions.`
         );
@@ -31,12 +31,12 @@ export default async function safeBanUser(member : GuildMember, reason: string, 
         // LogManager.logBan(member.guild, member.user);
     }).catch((err : DiscordAPIError) => {
         if (err.message === APIErrors.MISSING_PERMISSIONS){
-            debug.warning(
+            debug.warn(
                 `Could not ban ${memberName} from ` +
                 `${member.guild.name}, missing permissions.`
             );
         }
-        debug.warning(`Error while banning user ${member.user.username}`);
+        debug.warn(`Error while banning user ${member.user.username}`);
         return Promise.reject(err);
     });
 }
