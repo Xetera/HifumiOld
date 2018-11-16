@@ -71,7 +71,7 @@ export class Database {
     }
 
     public getCache(){
-        const redisString: string | undefined = process.env['REDISCLOUS_URL'] || process.env['REDIS_URL'];
+        const redisString: string | undefined = process.env['REDISCLOUD_URL'] || process.env['REDIS_URL'];
         if (redisString) {
              return  {
                 type: 'redis',
