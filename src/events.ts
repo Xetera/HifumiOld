@@ -1,11 +1,10 @@
 import { Client, Message } from "discord.js";
 import * as R from 'ramda';
-import { fromEvent, merge, Observable, Subject } from "rxjs";
+import { fromEvent, merge, Observable } from "rxjs";
 import { filter, flatMap, map, partition, share, tap } from "rxjs/operators";
-import { handleCommand, handleUnavailableDmCommand, transformMessage$ } from "./command_handler";
-import { logger, logMessage } from "./loggers";
+import { handleUnavailableDmCommand } from "./command_handler";
+import { logger } from "./loggers";
 import { contextStream$ } from "./streams";
-
 
 export const handleEvents = (bot: Client) => {
   const ctx = {
@@ -21,9 +20,8 @@ export const handleEvents = (bot: Client) => {
   ).subscribe();
 };
 
-
 export const isGuildMessage = (message: Message) => Boolean(message.guild);
-export const canHandleAsGuildMessage = (message: Message) => message.content === 'test';
+export const canHandleAsGuildMessage = (message: Message) => true;
 
 export const splitMessageTypes = partition(isGuildMessage);
 export const splitGuildSpecific = partition(canHandleAsGuildMessage);
@@ -37,7 +35,7 @@ const handleReady = (obs$: Observable<{}>, bot: Client) => obs$.pipe(
 
 const isMessageValid = R.allPass([
   (m: Message) => !m.author.bot,
-  (m: Message) => m.content.startsWith('$')
+  (m: Message) => m.content.startsWith('+')
 ]);
 
 const filterMessage = (message$: Observable<Message>) => {

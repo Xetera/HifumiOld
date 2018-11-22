@@ -16,4 +16,5 @@ interface Context extends SemiContext {
 interface Command {
   readonly names: string[];
   readonly run: (ctx: Context) => CommandReturn;
+  readonly dmDisabled?: boolean;
 }
