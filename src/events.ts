@@ -1,18 +1,24 @@
 import { Client, Message } from "discord.js";
 import * as R from 'ramda';
 import { fromEvent, merge, Observable, Subject } from "rxjs";
-import { filter, flatMap, partition, share, tap } from "rxjs/operators";
-import { handleCommand, handleUnavailableDmCommand } from "./command_handler";
+import { filter, flatMap, map, partition, share, tap } from "rxjs/operators";
+import { handleCommand, handleUnavailableDmCommand, transformMessage$ } from "./command_handler";
 import { logger, logMessage } from "./loggers";
+import { contextStream$ } from "./streams";
 
-export const msgStream$ = new Subject<Message>();
 
 export const handleEvents = (bot: Client) => {
+  const ctx = {
+    bot,
+  };
   const ready$ = fromEvent(bot, 'ready');
   handleReady(ready$, bot);
 
   const message$: Observable<Message> = fromEvent(bot, 'message');
-  handleMessage(message$).subscribe(handleCommand);
+  filterMessage(message$).pipe(
+    map(message => ({ ...ctx, message })),
+    tap(context => contextStream$.next(context))
+  ).subscribe();
 };
 
 
@@ -21,7 +27,6 @@ export const canHandleAsGuildMessage = (message: Message) => message.content ===
 
 export const splitMessageTypes = partition(isGuildMessage);
 export const splitGuildSpecific = partition(canHandleAsGuildMessage);
-
 
 const handleReady = (obs$: Observable<{}>, bot: Client) => obs$.pipe(
   tap(() => logger.info('Client is ready')),
@@ -35,7 +40,7 @@ const isMessageValid = R.allPass([
   (m: Message) => m.content.startsWith('$')
 ]);
 
-const handleMessage = (message$: Observable<Message>) => {
+const filterMessage = (message$: Observable<Message>) => {
   const validMessage$ = message$.pipe(filter(isMessageValid));
 
   const [guildMessage$, dmMessage$] = splitMessageTypes(validMessage$);
@@ -52,12 +57,7 @@ const handleMessage = (message$: Observable<Message>) => {
   const [nonGuildSpecificDm$, unavailableCommand$] = splitGuildSpecific(loggedDmMessages$);
   unavailableCommand$.subscribe(msg => handleUnavailableDmCommand(msg));
 
-  const availableCommand$ = merge(loggedGuildMessages$, nonGuildSpecificDm$);
-
-  return availableCommand$.pipe(
-    tap(() => console.log('in last pipe')),
-    tap(msg => msgStream$.next(msg))
-  );
+  return merge(loggedGuildMessages$, nonGuildSpecificDm$);
 };
 
 
