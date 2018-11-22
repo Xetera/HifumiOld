@@ -1,17 +1,27 @@
 import { Client, Message } from "discord.js";
 import * as R from 'ramda';
 import { fromEvent, merge, Observable, Subject } from "rxjs";
-import { filter, flatMap, map, mergeMap, partition, share, tap } from "rxjs/operators";
-import { handleCommand } from "./command_handler";
+import { filter, flatMap, partition, share, tap } from "rxjs/operators";
+import { handleCommand, handleUnavailableDmCommand } from "./command_handler";
 import { logger, logMessage } from "./loggers";
 
 export const msgStream$ = new Subject<Message>();
+
+export const handleEvents = (bot: Client) => {
+  const ready$ = fromEvent(bot, 'ready');
+  handleReady(ready$, bot);
+
+  const message$: Observable<Message> = fromEvent(bot, 'message');
+  handleMessage(message$).subscribe(handleCommand);
+};
+
 
 export const isGuildMessage = (message: Message) => Boolean(message.guild);
 export const canHandleAsGuildMessage = (message: Message) => message.content === 'test';
 
 export const splitMessageTypes = partition(isGuildMessage);
 export const splitGuildSpecific = partition(canHandleAsGuildMessage);
+
 
 const handleReady = (obs$: Observable<{}>, bot: Client) => obs$.pipe(
   tap(() => logger.info('Client is ready')),
@@ -21,7 +31,8 @@ const handleReady = (obs$: Observable<{}>, bot: Client) => obs$.pipe(
 });
 
 const isMessageValid = R.allPass([
-  (m: Message) => !m.author.bot
+  (m: Message) => !m.author.bot,
+  (m: Message) => m.content.startsWith('$')
 ]);
 
 const handleMessage = (message$: Observable<Message>) => {
@@ -30,7 +41,7 @@ const handleMessage = (message$: Observable<Message>) => {
   const [guildMessage$, dmMessage$] = splitMessageTypes(validMessage$);
 
   const loggedGuildMessages$ = guildMessage$.pipe(
-    tap(msg => logger.info(`[FROM]: ${msg.guild.name}: ${msg.content}`)),
+    tap(msg => logger.info(`[${msg.guild.name}]: ${msg.author.username}: ${msg.content}`)),
   );
 
   const loggedDmMessages$ = dmMessage$.pipe(
@@ -39,21 +50,17 @@ const handleMessage = (message$: Observable<Message>) => {
   );
 
   const [nonGuildSpecificDm$, unavailableCommand$] = splitGuildSpecific(loggedDmMessages$);
-  unavailableCommand$.subscribe(message => message.reply('This command cannot be used in dms.'));
+  unavailableCommand$.subscribe(msg => handleUnavailableDmCommand(msg));
 
   const availableCommand$ = merge(loggedGuildMessages$, nonGuildSpecificDm$);
 
-  availableCommand$.subscribe(message => msgStream$.next(message));
+  return availableCommand$.pipe(
+    tap(() => console.log('in last pipe')),
+    tap(msg => msgStream$.next(msg))
+  );
 };
 
 
-export const handleEvents = (bot: Client) => {
-  const ready$ = fromEvent(bot, 'ready');
-  handleReady(ready$, bot);
-
-  const message$: Observable<Message> = fromEvent(bot, 'message');
-  handleMessage(message$);
-};
 
 
 

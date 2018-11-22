@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "setup": "npm install",
-    "build": "tsc & ",
+    "build": "tsc",
     "build-watch": "tsc --watch",
     "test": "mocha src/tests/*.js",
     "start": "nodemon",
@@ -22,7 +22,7 @@
     "glob": "^7.1.2",
     "gm": "^1.23.1",
     "hot-shots": "^5.9.0",
-    "inversify": "^4.13.0",
+    "immutable": "^4.0.0-rc.12",
     "moment": "^2.22.1",
     "nodemon": "^1.17.3",
     "pg": "^7.4.1",
