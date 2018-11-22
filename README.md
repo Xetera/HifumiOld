@@ -1,3 +1,11 @@
+<div align="center">
+    <img src="https://img.shields.io/travis/Xetera/Hifumi.svg?label=Travis%20CI"> 
+    <img src="https://img.shields.io/website/http/hifumi.io/home.svg?label=hifumi.io">
+    <a href="https://discordbots.org/bot/372615866652557312" >
+        <img src="https://discordbots.org/api/widget/status/372615866652557312.svg" alt="Hifumi" />
+    </a>
+    <img src="https://img.shields.io/discord/414334929002823680.svg?label=Support%20Server">
+</div>
 <a href="https://discordapp.com/oauth2/authorize?client_id=372615866652557312&scope=bot&permissions=268463300">
     <img src="assets/banners/hifumi_new.png">
 </a>
@@ -22,7 +30,7 @@
 
 * Moderation: 🚫 Get all your moderators on the same page
     * _**Anti-Spam**_ Hifumi automatically removes messages and mutes people when she detects spamming.
-    * _**Invite Filtering**_ Invites are automatically removed and added to a users history, offenders are banned after 5 invites by default or a custom value if needed.
+    * _**Invite Filtering**_ Invites are automatically removed and added to a user's history, offenders are banned after 5 invites by default or a custom value if needed.
     * _**New Member Tracking**_ To combat raiders, she has an option to track people who have joined in the past 5 minutes more closely. Banning on 2 invites instead of the custom limit (if invites are not allowed) and banning on detecting first spam instead of muting.
     * `$history`- Pull up a user's history with information on their previous strikes, notes, invites, mutes and join dates.
     * `$strike` - Warn members when they break rules anonymously, adding to their total strikes (or not with `$warn`), strikes are automatically expire after 2 weeks, users who go past the strike limit of the server are banned automatically
@@ -83,7 +91,8 @@ The addition of a new command _only_ requires that a variable called `command` i
 #### Parsing
 Before commands are called, information is parsed in `src/parsers/argParse.ts`.
 
-All command requirements like arguments and user/client permissions are declared in the **Command** object that is exported and parsed before calling the command.
+All command requirements like arguments and user/client permissions are declared in the **Command** object that is exported and parsed 
+before calling the command.
 
 A command is only called if these requirements are met.
 
@@ -91,7 +100,37 @@ All necessary arguments are passed into the `run` function's second parameter as
 
 [More info...](https://github.com/Xetera/Hifumi/blob/master/src/commands/README.md)
 
+#### API
+
+##### Anime 
+Anime information is all taken from [AniList](https://anilist.co/) using graphql.
+
+**"Wait a minute, anilist? How are you getting such accurate anime search results?!"**
+
+Heh, as much as I love anilist and their API, unfortunately their search engine <sup>soon to be changed™</sup> is really bad.
+To get around this we use MAL instead... except not really. MAL's API is still either down or not working properly, also their API is  
+from the stone ages so instead we only use the search hinting endpoint.
+
+<img src="https://i.imgur.com/QFRs0Gu.png" height="200">
+
+This search function for MAL seems to be operating independently from the rest of their API, you don't need any sort of authorization to 
+make a request to the endpoint AND there's virtually no rate limiting. Plus, due to the nature of the search 
+function, the responses are usually blazing fast.
+
+`https://myanimelist.net/search/prefix.json?type=[all|manga|anime]&keyword=[url encoded query here]`
+
+<img src="https://i.imgur.com/kBTCwhm.png" height="300">
+
+The information that's returned is mostly irrelevant except for the order of the `items` array which represents the closest match
+and the `id` property. Because AniList is so awesome, almost all of their entries also contain the MAL id of anime entries, meaning 
+that all that's left to do is query AniList using the mal_id and that's it!
+
+The only caveat is that sometimesMAL will return results based on popularity and not search match so it's necessary to go through all 
+the results and look for a perfect case-insensitive match before we pull the first result in case a user searches for 
+**Sword Art Online** or **New Game!!**.
+
 ### Database
+
 [TypeORM](https://github.com/typeorm/typeorm) is used for all database transactions.
 
 A Redis cache layer is used to speed up common actions like fetching guild prefixes.
@@ -110,6 +149,7 @@ This script is set on a cron job of regular intervals, and an X amount of backup
 
 A backup-restoration script is available to restore the latest backup if necessary.
 
+```
 ## Setting Up Hifumi
 Coming soon...
 

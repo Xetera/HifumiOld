@@ -1,66 +1,49 @@
-import {
-    getClient,
-    setupEnvironment, setupProcess
-} from "./events/systemStartup";
-import 'reflect-metadata';
-import onReady from './events/onReady'
-import onMessage from './events/onMessage'
-import onGuildMemberAdd from "./events/onGuildMemberAdd";
-import onGuildMemberRemove from "./events/onGuildMemberRemove";
-import onGuildCreate from "./events/onGuildCreate";
-import onMessageUpdate from "./events/onMessageUpdate";
-import onGuildMemberUpdate from "./events/onGuildMemberUpdate";
-import onGuildUpdate from "./events/onGuildUpdate";
-import {LogManager} from "./handlers/logging/logManager";
-import onChannelCreate from "./events/onChannelCreate";
-import onChannelDelete from "./events/onChannelDelete";
-import websocketErrorHandler from "./handlers/process/websocketErrorHandler";
-import websocketWarningHandler from "./handlers/process/websocketWarningHandler";
+import { Client, Message } from 'discord.js';
 import * as dotenv from 'dotenv';
-import {debug} from "./utility/Logging";
+import { fromEvent, Observable } from "rxjs";
+import { handleEvents } from "./events";
 
-(async function main(){
-    dotenv.config();
-    setupProcess();
-    setupEnvironment();
+(async () => {
+  dotenv.config();
+  const bot = new Client();
+  bot.login(process.env.BOT_TOKEN);
 
-    const bot = getClient();
+  const context = {
+    bot,
+  };
 
-    debug.info(`Logging in...`);
-    bot.login(process.env['BOT_TOKEN']);
+  handleEvents(bot);
 
-    bot.on('ready',() =>  onReady(bot));
 
 // === === === === MESSAGE === === === === === //
-    bot.on('message', onMessage);
-
-    bot.on('messageUpdate', onMessageUpdate);
-
-    bot.on('messageDelete', () => {});
-
-// === === === === GUILD MEMBER === === === === === //
-    bot.on('guildMemberAdd', onGuildMemberAdd);
-
-    bot.on('guildMemberRemove', onGuildMemberRemove);
-
-    bot.on('guildMemberUpdate', onGuildMemberUpdate);
-
-// === === === === GUILD === === === === === //
-    bot.on('guildUpdate', onGuildUpdate);
-
-    bot.on('guildCreate', onGuildCreate);
-
-    bot.on('guildBanAdd', LogManager.logBan);
-
-    bot.on('guildBanRemove', LogManager.logUnban);
-
-// === === === === CHANNEL === === === === === //
-    bot.on('channelCreate', onChannelCreate);
-
-    bot.on('channelDelete',onChannelDelete);
-
-// === === === === EXCEPTIONS === === === === === //
-    bot.on('error', websocketErrorHandler);
-
-    bot.on('warn', websocketWarningHandler);
+//   bot.on('messageUpdate', onMessageUpdate);
+//
+//   bot.on('messageDelete', () => {
+//   });
+//
+// // === === === === GUILD MEMBER === === === === === //
+//   bot.on('guildMemberAdd', onGuildMemberAdd);
+//
+//   bot.on('guildMemberRemove', onGuildMemberRemove);
+//
+//   bot.on('guildMemberUpdate', onGuildMemberUpdate);
+//
+// // === === === === GUILD === === === === === //
+//   bot.on('guildUpdate', onGuildUpdate);
+//
+//   bot.on('guildCreate', onGuildCreate);
+//
+//   bot.on('guildBanAdd', LogManager.logBan);
+//
+//   bot.on('guildBanRemove', LogManager.logUnban);
+//
+// // === === === === CHANNEL === === === === === //
+//   bot.on('channelCreate', onChannelCreate);
+//
+//   bot.on('channelDelete', onChannelDelete);
+//
+// // === === === === EXCEPTIONS === === === === === //
+//   bot.on('error', websocketErrorHandler);
+//
+//   bot.on('warn', websocketWarningHandler);
 })();

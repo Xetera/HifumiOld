@@ -1,0 +1,53 @@
+{
+	"defaultSeverity": "error",
+	"extends": [
+		"tslint:latest",
+		"tslint-config-prettier",
+		"tslint-eslint-rules",
+		"tslint-immutable"
+	],
+	"linterOptions": {
+		"exclude": [
+			"api/generated/prisma.ts",
+			"node_modules"
+		]
+	},
+	"rules": {
+		"indent": [
+			true,
+			"spaces",
+			2
+		],
+		"no-constant-condition": true,
+		"no-console": false,
+		"interface-name": [
+			true,
+			"never-prefix"
+		],
+		"object-curly-spacing": true,
+		"object-literal-sort-keys": false,
+		"semicolon": [
+			true,
+			"always"
+		],
+		"only-arrow-functions": true,
+
+		"no-var-keyword": true,
+		"typedef": [
+			true,
+			"call-signature"
+		],
+		"no-submodule-imports": false,
+		"readonly-keyword": true,
+		"no-eval": true,
+		"no-parameter-reassignment": true,
+		"no-let": true,
+		"no-loop-statement": true,
+		"no-object-mutation": true,
+		"no-delete": true,
+		"no-method-signature": true
+	},
+	"rulesDirectory": [
+		"node_modules/tslint-eslint-rules/dist/rules"
+	]
+}

@@ -6,3 +6,4 @@ refactor.json
 /dist
 src/commands/Help.json
 .env
+/log
