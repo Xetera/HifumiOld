@@ -2,9 +2,10 @@ import { Client, Message } from "discord.js";
 import * as R from 'ramda';
 import { fromEvent, merge, Observable } from "rxjs";
 import { filter, flatMap, map, partition, share, tap } from "rxjs/operators";
-import { handleUnavailableDmCommand } from "./command_handler";
+import { handleUnavailableDmCommand, PREFIX } from "./command_handler";
 import { logger } from "./loggers";
 import { contextStream$ } from "./streams";
+import { SemiContext } from "./types";
 
 export const handleEvents = (bot: Client) => {
   const ctx = {
@@ -16,8 +17,7 @@ export const handleEvents = (bot: Client) => {
   const message$: Observable<Message> = fromEvent(bot, 'message');
   filterMessage(message$).pipe(
     map(message => ({ ...ctx, message })),
-    tap(context => contextStream$.next(context))
-  ).subscribe();
+  ).subscribe((context: SemiContext) => contextStream$.next(context));
 };
 
 export const isGuildMessage = (message: Message) => Boolean(message.guild);
@@ -29,13 +29,11 @@ export const splitGuildSpecific = partition(canHandleAsGuildMessage);
 const handleReady = (obs$: Observable<{}>, bot: Client) => obs$.pipe(
   tap(() => logger.info('Client is ready')),
   flatMap(() => bot.generateInvite()),
-).subscribe(inv => {
-  logger.info(inv);
-});
+).subscribe(logger.info);
 
 const isMessageValid = R.allPass([
   (m: Message) => !m.author.bot,
-  (m: Message) => m.content.startsWith('+')
+  (m: Message) => m.content.startsWith(PREFIX)
 ]);
 
 const filterMessage = (message$: Observable<Message>) => {

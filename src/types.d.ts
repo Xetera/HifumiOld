@@ -1,6 +1,8 @@
-import { Client, Message, RichEmbed } from "discord.js";
+import { Client, Message } from "discord.js";
+import { List, Record } from "immutable";
 
-export type CommandReturn = string | RichEmbed | Error | undefined | void;
+export type CommandReturn = any;
+export type UserID = string;
 
 interface SemiContext {
   readonly bot: Client;
@@ -8,13 +10,29 @@ interface SemiContext {
 }
 
 interface Context extends SemiContext {
-  readonly args: string[];
+  readonly args: List<string>;
   readonly input: string;
+  readonly command?: Command;
 }
 
 
-interface Command {
+type Commands = List<Command>;
+interface CommandInput {
+  /**
+   * Names the command goes by, first is
+   */
   readonly names: string[];
   readonly run: (ctx: Context) => CommandReturn;
   readonly dmDisabled?: boolean;
+  readonly debounce?: number;
+}
+
+interface Command {
+  /**
+   * Names the command goes by, first is
+   */
+  readonly names: List<string>;
+  readonly run: (ctx: Context) => CommandReturn;
+  readonly dmDisabled?: boolean;
+  readonly debounce?: number;
 }

@@ -7,13 +7,10 @@ cache:
   - node_modules
 
 before_script:
-  - npm run setup
-  - npm install codecov -g
-  - npm run build
+- npm install
 
 script:
-
-  - npm test
+- npm test
 
 after_success:
-  - codecov
+- codecov

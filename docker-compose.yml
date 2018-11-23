@@ -1,26 +1,30 @@
 version: '3'
 services:
-  bot:
-    build: .
-    volumes:
-    - .:/src
-    working_dir: /src
-    links:
-    - redis
-    environment:
-      - ENV=DEVELOPMENT
-      - DATABASE_URL=postgres://postgres:@host.docker.internal:5432/discord_test
-      - REDISCLOUD_URL=redis://host.docker.internal:6379
-    depends_on:
-      - "postgres"
-      - "redis"
-    tty: true
+  #  bot:
+  #    build: .
+  #    volumes:
+  #    - .:/src
+  #    working_dir: /src
+  #    links:
+  #    - redis
+  #    environment:
+  #      - ENV=DEVELOPMENT
+  #      - DATABASE_URL=postgres://postgres:@host.docker.internal:5432/discord_test
+  #      - REDISCLOUD_URL=redis://host.docker.internal:6379
+  #    depends_on:
+  #      - "postgres"
+  #      - "redis"
+  #    tty: true
   redis:
+    container_name: hifumi_redis
     image: redis
+    ports:
+      - "6379:6379"
   postgres:
+    container_name: hifumi_postgres
     image: postgres:10.3
     restart: always
     environment:
-      - POSTGRES_DB=discord_test
-      - POSTGRES_USER=hifumi
-      - POSTGRES_PASSWORD=eagle_jump
+    - POSTGRES_DB=discord_test
+    - POSTGRES_USER=hifumi
+    - POSTGRES_PASSWORD=eagle_jump

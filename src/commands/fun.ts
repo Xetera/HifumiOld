@@ -1,15 +1,19 @@
+import { List } from "immutable";
+import { createCommand } from "../command";
 import { Command, Context } from "../types";
+import { CommandError } from "../utils";
 
-const owo: Command = {
-  names: ['owo'],
-  run: (ctx: Context) => {
+const owo: Command = createCommand({
+  names: List(['owo']),
+  run: async (ctx: Context) => {
     const input = ctx.args.join(' ');
     if (!input) {
-      return 'owo?';
+      throw new CommandError('What am I supposed to owo? Dummy...');
     }
-    return input.replace(/[rl]/g, 'w');
+    return ctx.message.channel.send(input.replace(/[rl]/g, 'w'));
   },
-  dmDisabled: false
-};
+  dmDisabled: false,
+  debounce: 5
+});
 
-export default [owo];
+export default { owo };
