@@ -17,22 +17,23 @@ interface Context extends SemiContext {
 
 
 type Commands = List<Command>;
-interface CommandInput {
+interface BaseCommand {
   /**
    * Names the command goes by, first is
    */
-  readonly names: string[];
   readonly run: (ctx: Context) => CommandReturn;
   readonly dmDisabled?: boolean;
   readonly debounce?: number;
+  readonly description: string;
 }
 
-interface Command {
+interface CommandInput extends BaseCommand {
+  readonly names: string[];
+}
+
+interface Command extends BaseCommand {
   /**
    * Names the command goes by, first is
    */
   readonly names: List<string>;
-  readonly run: (ctx: Context) => CommandReturn;
-  readonly dmDisabled?: boolean;
-  readonly debounce?: number;
 }

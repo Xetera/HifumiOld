@@ -2,7 +2,7 @@ import { Client, Message } from "discord.js";
 import * as R from 'ramda';
 import { fromEvent, merge, Observable } from "rxjs";
 import { filter, flatMap, map, partition, share, tap } from "rxjs/operators";
-import { handleUnavailableDmCommand, PREFIX } from "./command_handler";
+import { commandRegistry$, handleUnavailableDmCommand, PREFIX } from "./command_handler";
 import { logger } from "./loggers";
 import { contextStream$ } from "./streams";
 import { SemiContext } from "./types";
@@ -21,6 +21,8 @@ export const handleEvents = (bot: Client) => {
 };
 
 export const isGuildMessage = (message: Message) => Boolean(message.guild);
+
+// TODO: implement
 export const canHandleAsGuildMessage = (message: Message) => true;
 
 export const splitMessageTypes = partition(isGuildMessage);

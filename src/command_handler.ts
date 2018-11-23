@@ -1,25 +1,19 @@
 import { Message } from "discord.js";
 import * as glob from 'glob';
-import { Collection, List } from "immutable";
+import { Collection, List, Stack } from "immutable";
 import * as R from "ramda";
-import { BehaviorSubject, combineLatest, concat, from, iif, Observable, of, pipe } from "rxjs";
+import { BehaviorSubject, from, Observable, of, ReplaySubject } from "rxjs";
 import {
-  concatMap,
-  debounce,
-  filter,
-  first,
+  filter, first,
   flatMap,
-  groupBy,
-  map, mapTo, publish,
-  scan,
-  share,
-  switchMap,
+  map, mapTo,
+  switchMap, take, takeLast,
   tap,
   withLatestFrom
 } from "rxjs/operators";
 import { promisify } from "util";
 import { logger } from "./loggers";
-import { isUserRateLimited, rateLimitForCommand } from "./redis";
+import { isUserRateLimited, rateLimitForCommand, removeRateLimit } from "./redis";
 import { contextStream$ } from "./streams";
 import { Command, Commands, Context, SemiContext } from "./types";
 import { CommandError, filterAndHandle, filterAsync } from "./utils";
@@ -38,7 +32,7 @@ export const handleUnavailableDmCommand = (msg: Message) =>
  * @param commands
  */
 export const findCommand = (input: string, commands: Commands) => commands.find(
-  command => command.names.includes(input)
+  (command: Command) => command.names.includes(input)
 );
 
 export const contextHasValidCommand = (ctx: Context) => Boolean(ctx.command);
@@ -52,6 +46,7 @@ export const rateLimitCommand$ = (message$: Observable<Context>) => message$.pip
     filter(isRateLimited => !isRateLimited),
     mapTo(ctx)
   )),
+  tap(() => console.log('not rate limited')),
   tap((ctx: Context) => rateLimitForCommand(ctx.message.author.id, ctx.command!)),
 ) as Observable<Context>;
 
@@ -68,29 +63,23 @@ export const transformMessageContext$ = (message$: Observable<SemiContext>): Obs
   })
 );
 
-export const commandRegistry$ = new BehaviorSubject(List()).pipe(
-  flatMap(
-    () => globAsync(COMMANDS_LOCATION, { absolute: true })
-  ),
-  flatMap(
-    paths => paths.map(path =>
-      List(Object.values(require(path).default))
-    )
-  ),
-) as BehaviorSubject<Commands>;
+// R.chain = flatMap
+const commandRegistry = globAsync(COMMANDS_LOCATION, { absolute: true })
+  .then(
+    R.chain((path: string) => Object.values(require(path).default))
+  ).then(List) as Promise<Commands>;
 
-export const runCommand = async (ctx: Context, command: Command) => {
-  try {
-    await command.run(ctx);
-  } catch (e) {
-    if (e instanceof CommandError) {
-      logger.info('Invalid command usage');
-      return ctx.message.channel.send(`🚫 ${e.message}`, { disableEveryone: true });
-    }
-    logger.error(`Something went wrong with the function ${ctx.input}`);
-    return ctx.message.channel.send(`Oh no... Something unexpected happened while trying to do that`);
+export const commandRegistry$ = from(commandRegistry) as Observable<Commands>;
+
+export const runCommand = async (ctx: Context, command: Command) => command.run(ctx).catch((e: Error) => {
+  if (e instanceof CommandError) {
+    logger.info('Invalid command usage');
+    removeRateLimit(ctx.message.author.id, command);
+    return ctx.message.channel.send(`🚫 ${e.message}`, { disableEveryone: true });
   }
-};
+  logger.error(`Something went wrong with the function ${ctx.input}`);
+  return ctx.message.channel.send(`Oh no... Something unexpected happened while trying to do that`);
+});
 
 export const handleValidCommandRequest = (ctx: Context) => {
   console.log('handling command!');

@@ -4,7 +4,8 @@
 		"tslint:latest",
 		"tslint-config-prettier",
 		"tslint-eslint-rules",
-		"tslint-immutable"
+		"tslint-immutable",
+		"rxjs-tslint-rules"
 	],
 	"linterOptions": {
 		"exclude": [

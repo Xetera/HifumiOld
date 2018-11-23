@@ -4,8 +4,9 @@ import { Command, Context } from "../types";
 import { CommandError } from "../utils";
 
 const owo: Command = createCommand({
-  names: List(['owo']),
-  run: async (ctx: Context) => {
+  names: ['owo'],
+  description: 'Owoifies your message',
+  run: (ctx: Context) => {
     const input = ctx.args.join(' ');
     if (!input) {
       throw new CommandError('What am I supposed to owo? Dummy...');
@@ -13,7 +14,7 @@ const owo: Command = createCommand({
     return ctx.message.channel.send(input.replace(/[rl]/g, 'w'));
   },
   dmDisabled: false,
-  debounce: 5
+  // debounce: 5
 });
 
 export default { owo };
