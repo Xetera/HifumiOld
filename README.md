@@ -49,8 +49,10 @@
 
 **Without Docker**
 1. install [Redis](https://redis.io/topics/quickstart)
-2. install [Postgres](https://www.postgresql.org/download/)
-3. `npm install`
-4. copy .env.example to .env
-5. `npm start`
+2. get redis working on its default port
+3. install [Postgres](https://www.postgresql.org/download/)
+4. get postgres up and working on its default port
+5. `npm install`
+6. copy .env.example to .env
+7. `npm start`
 
