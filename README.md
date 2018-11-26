@@ -30,6 +30,7 @@
 
 <div align="center">
     <img height="64" src="https://rynop.files.wordpress.com/2016/09/ts.png?w=816" title="Typescript">
+    <img height="64" src="http://reactivex.io/favicon.ico" title="Rxjs">
     <img height="64" src="https://dashboard.snapcraft.io/site_media/appmedia/2016/11/postgresql-icon-256x256.jpg.png" title="Postgres">
     <img height="64" src="https://cdn.iconscout.com/public/images/icon/free/png-256/redis-open-source-logo-data-structure-399889f24f4505b1-256x256.png" title="Redis">
     <img height="64" src="https://camo.githubusercontent.com/e8293376c6ea1d2181eb2fa6f878acd806cf0114/68747470733a2f2f64317136663061656c7830706f722e636c6f756466726f6e742e6e65742f70726f647563742d6c6f676f732f36343464326631352d633564622d343733312d613335332d6163653632333538343166612d72656769737472792e706e67" title="Docker">
