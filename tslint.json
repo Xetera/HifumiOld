@@ -7,10 +7,10 @@
 		"tslint-immutable",
 		"rxjs-tslint-rules"
 	],
-	"linterOptions": {
+	"cliOptions": {
 		"exclude": [
-			"api/generated/prisma.ts",
-			"node_modules"
+			"node_modules",
+			"src/__tests__"
 		]
 	},
 	"rules": {
@@ -19,6 +19,7 @@
 			"spaces",
 			2
 		],
+		"max-classes-per-file": false,
 		"no-constant-condition": true,
 		"no-console": false,
 		"interface-name": [

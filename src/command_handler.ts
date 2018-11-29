@@ -2,12 +2,11 @@ import { Message } from "discord.js";
 import * as glob from 'glob';
 import { Collection, List, Stack } from "immutable";
 import * as R from "ramda";
-import { BehaviorSubject, from, Observable, of, ReplaySubject } from "rxjs";
+import { from, Observable, of, ReplaySubject } from "rxjs";
 import {
-  filter, first,
-  flatMap,
+  filter,
   map, mapTo,
-  switchMap, take, takeLast,
+  switchMap,
   tap,
   withLatestFrom
 } from "rxjs/operators";
@@ -15,8 +14,8 @@ import { promisify } from "util";
 import { logger } from "./loggers";
 import { isUserRateLimited, rateLimitForCommand, removeRateLimit } from "./redis";
 import { contextStream$ } from "./streams";
-import { Command, Commands, Context, SemiContext } from "./types";
-import { CommandError, filterAndHandle, filterAsync } from "./utils";
+import { Command, Commands, Context, SemiContext } from "./types/types";
+import { CommandError } from "./utils";
 
 const globAsync = promisify(glob);
 
@@ -71,15 +70,23 @@ const commandRegistry = globAsync(COMMANDS_LOCATION, { absolute: true })
 
 export const commandRegistry$ = from(commandRegistry) as Observable<Commands>;
 
-export const runCommand = async (ctx: Context, command: Command) => command.run(ctx).catch((e: Error) => {
-  if (e instanceof CommandError) {
-    logger.info('Invalid command usage');
-    removeRateLimit(ctx.message.author.id, command);
-    return ctx.message.channel.send(`🚫 ${e.message}`, { disableEveryone: true });
+export const runCommand = async (ctx: Context, command: Command) => {
+  const handleError = (e: Error) => {
+    if (e instanceof CommandError) {
+      logger.info('Invalid command usage');
+      removeRateLimit(ctx.message.author.id, command);
+      return ctx.message.channel.send(`🚫 ${e.message}`, { disableEveryone: true });
+    }
+    logger.error(`Something went wrong with the function ${ctx.input}`);
+    return ctx.message.channel.send(`Oh no... Something unexpected happened while trying to do that`);
+  };
+
+  try {
+    await command.run(ctx);
+  } catch (e) {
+    handleError(e);
   }
-  logger.error(`Something went wrong with the function ${ctx.input}`);
-  return ctx.message.channel.send(`Oh no... Something unexpected happened while trying to do that`);
-});
+};
 
 export const handleValidCommandRequest = (ctx: Context) => {
   console.log('handling command!');

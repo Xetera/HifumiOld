@@ -3,13 +3,15 @@ import * as R from 'ramda';
 import { fromEvent, merge, Observable } from "rxjs";
 import { filter, flatMap, map, partition, share, tap } from "rxjs/operators";
 import { commandRegistry$, handleUnavailableDmCommand, PREFIX } from "./command_handler";
+import { conn, loadGuilds } from "./db";
 import { logger } from "./loggers";
 import { contextStream$ } from "./streams";
-import { SemiContext } from "./types";
+import { SemiContext } from "./types/types";
 
-export const handleEvents = (bot: Client) => {
+export const handleEvents = async (bot: Client) => {
+  const db = await conn;
   const ctx = {
-    bot,
+    bot, db
   };
   const ready$ = fromEvent(bot, 'ready');
   handleReady(ready$, bot);
@@ -31,7 +33,10 @@ export const splitGuildSpecific = partition(canHandleAsGuildMessage);
 const handleReady = (obs$: Observable<{}>, bot: Client) => obs$.pipe(
   tap(() => logger.info('Client is ready')),
   flatMap(() => bot.generateInvite()),
-).subscribe(logger.info);
+).subscribe((url) => {
+  loadGuilds(bot);
+  logger.info(url);
+});
 
 const isMessageValid = R.allPass([
   (m: Message) => !m.author.bot,
@@ -57,8 +62,3 @@ const filterMessage = (message$: Observable<Message>) => {
 
   return merge(loggedGuildMessages$, nonGuildSpecificDm$);
 };
-
-
-
-
-

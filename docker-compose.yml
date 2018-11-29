@@ -24,7 +24,16 @@ services:
     container_name: hifumi_postgres
     image: postgres:10.3
     restart: always
+    build:
+      dockerfile: Dockerfile
+      context: .
+    ports:
+      - "${TYPEORM_PORT}:5432"
     environment:
-    - POSTGRES_DB=discord_test
+    - POSTGRES_DB=hifumi
     - POSTGRES_USER=hifumi
     - POSTGRES_PASSWORD=eagle_jump
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:

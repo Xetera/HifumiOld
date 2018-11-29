@@ -3,6 +3,7 @@ import { List } from "immutable";
 import { Observable } from "rxjs";
 import { Connection } from "typeorm";
 import { Url } from "url";
+import { ArgType, ArgTypes, Arguments } from "./parser";
 
 export type CommandReturn = Promise<any> | Observable<any> | void ;
 export type CommandCanRun = Promise<boolean> | Observable<boolean> | boolean;
@@ -23,7 +24,8 @@ interface Context extends SemiContext {
 type Commands = List<Command>;
 
 interface BaseCommand {
-  readonly run: (ctx: Context) => CommandReturn;
+  readonly run: (ctx: Context, arguments: any) => CommandReturn;
+  readonly expects?: Array<ArgTypes | ArgType>;
   readonly canRun?: (ctx: Context) => CommandCanRun;
   readonly dmDisabled?: boolean;
   readonly debounce?: number;
@@ -42,16 +44,3 @@ interface Command extends BaseCommand {
    */
   readonly names: List<string>;
 }
-
-type Word = string;
-type Phrase = string;
-
-type Argument = Channel
-  | GuildMember
-  | User
-  | number
-  | Url
-  | Word
-  | Phrase;
-
-type Arguments = Argument[];

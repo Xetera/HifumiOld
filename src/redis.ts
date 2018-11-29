@@ -1,6 +1,6 @@
 import * as rd from 'redis';
 import { promisify } from "util";
-import { Command, UserID } from "./types";
+import { Command, UserID } from "./types/types";
 
 export const keyRateLimit = (commandName: string, id: string) => `ratelimit:${commandName}:${id}`;
 
