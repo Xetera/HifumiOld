@@ -4,8 +4,8 @@ import { Connection, createConnection } from "typeorm";
 export const conn = (!process.env.TEST && createConnection({
   username: process.env.TYPEORM_USERNAME,
   password: process.env.TYPEORM_PASSWORD,
-  database: 'discord_test',
-  port: 5431,
+  database: process.env.TYPEORM_DATABASE,
+  port: Number(process.env.TYPEORM_PORT) || 5431,
   type: 'postgres',
   entities: ['dist/entity/*.js'],
   migrations: ['dist/migrations/*.js'],

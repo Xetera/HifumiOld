@@ -1,18 +1,36 @@
 import { Client, Message } from "discord.js";
+import { Node } from 'lavalink';
 import * as R from 'ramda';
-import { fromEvent, merge, Observable } from "rxjs";
+import { fromEvent, merge, Observable, pipe } from "rxjs";
 import { filter, flatMap, map, partition, share, tap } from "rxjs/operators";
+import { Connection } from "typeorm";
 import { commandRegistry$, handleUnavailableDmCommand, PREFIX } from "./command_handler";
-import { conn, loadGuilds } from "./db";
+import { conn } from "./db";
 import { logger } from "./loggers";
+import { redis } from "./redis";
 import { contextStream$ } from "./streams";
 import { SemiContext } from "./types/types";
 
 export const handleEvents = async (bot: Client) => {
   const db = await conn;
-  const ctx = {
-    bot, db
-  };
+  const voice = new Node({
+    password: 'youshallnotpass',
+    userID: '381033323851415552',
+    shardCount: 0,
+    hosts: {
+      rest: 'http://localhost:8080',
+      ws: 'http://localhost:8080'
+    },
+    send: (guildID: string, packet: any) => {
+      if (!bot.guilds.has(guildID)) {
+        throw new Error('Cannot send a packet to this shard');
+      }
+      // @ts-ignore
+      return bot.ws.send(packet);
+    }
+  });
+  const ctx = { bot, db, voice };
+
   const ready$ = fromEvent(bot, 'ready');
   handleReady(ready$, bot);
 
@@ -20,6 +38,15 @@ export const handleEvents = async (bot: Client) => {
   filterMessage(message$).pipe(
     map(message => ({ ...ctx, message })),
   ).subscribe((context: SemiContext) => contextStream$.next(context));
+
+  const edit$: Observable<[Message, Message]> = fromEvent(bot, 'messageUpdate');
+
+  const raw$ = fromEvent(bot, 'raw');
+  raw$.subscribe((pk: any) => {
+    if (pk.t === 'VOICE_STATE_UPDATE') { voice.voiceStateUpdate(pk.d); }
+    if (pk.t === 'VOICE_SERVER_UPDATE') { voice.voiceServerUpdate(pk.d); }
+  });
+  // edit$.pipe(map(([first]) => filterMessage(first))).subscribe()
 };
 
 export const isGuildMessage = (message: Message) => Boolean(message.guild);
@@ -34,7 +61,7 @@ const handleReady = (obs$: Observable<{}>, bot: Client) => obs$.pipe(
   tap(() => logger.info('Client is ready')),
   flatMap(() => bot.generateInvite()),
 ).subscribe((url) => {
-  loadGuilds(bot);
+  // loadGuilds(bot);
   logger.info(url);
 });
 

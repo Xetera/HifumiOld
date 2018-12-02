@@ -1,5 +1,5 @@
 import { Channel, GuildMember, Message, MessageMentions } from "discord.js";
-import { Map } from 'immutable';
+import { List, Map } from 'immutable';
 import * as R from "ramda";
 import { PREFIX } from "../command_handler";
 import { ArgParseCategory, ArgType, ArgTypes, Arguments, ParsedCommandInput, ParserContext } from "../types/parser";
@@ -9,7 +9,10 @@ const underscore = (input: string) => input.replace(' ', '_');
 const compareInsensitive = (first: string, second: string) =>
   R.toLower(first) === R.toLower(second);
 
-const getChannel = (chunk: string, message: Message) => {
+const getChannel = (chunk: string | undefined, message: Message) => {
+  if (!chunk) {
+    return;
+  }
   const channelMention = chunk.match(MessageMentions.CHANNELS_PATTERN);
 
   if (channelMention) {
@@ -21,7 +24,10 @@ const getChannel = (chunk: string, message: Message) => {
   );
 };
 
-const getMember = (chunk: string, message: Message) => {
+const getMember = (chunk: string | undefined, message: Message) => {
+  if (!chunk) {
+    return;
+  }
   const memberMention = chunk.match(MessageMentions.USERS_PATTERN);
 
   if (memberMention) {
@@ -38,24 +44,24 @@ const getMember = (chunk: string, message: Message) => {
 
 const categories = Map<ArgType, ArgParseCategory<Arguments>>([
   [ArgType.Number, {
-    is: ({ chunks, cursor }) => !isNaN(Number(chunks[cursor])),
-    to: ({ chunks, cursor }): number => Number(chunks[cursor]),
+    is: ({ chunks, cursor }) => !isNaN(Number(chunks.get(cursor))),
+    to: ({ chunks, cursor }): number => Number(chunks.get(cursor)),
     toString: () => `number`
   }],
   [ArgType.Word, {
     is: ({ chunks, cursor }) => true,
-    to: ({ chunks, cursor }): string => chunks[cursor],
+    to: ({ chunks, cursor }): string => chunks.get(cursor)!,
     toString: () => `word`
   }],
   [ArgType.Phrase, {
-    is: ({ chunks, cursor }) => chunks.slice(cursor).length > 0,
+    is: ({ chunks, cursor }) => chunks.slice(cursor).size > 0,
     to: ({ chunks, cursor }): string => chunks.slice(cursor).join(' '),
     toString: () => `phrase`
   }],
   [ArgType.Channel, {
-    is: ({ message, chunks, cursor }) => Boolean(getChannel(chunks[cursor], message)),
+    is: ({ message, chunks, cursor }) => Boolean(getChannel(chunks.get(cursor), message)),
     to: ({ chunks, cursor, message }): Channel => {
-      const chunk = chunks[cursor];
+      const chunk = chunks.get(cursor);
       const channel = getChannel(chunk, message);
       if (!channel) {
         throw new Error(`Expected ${chunk} to be a channel.`);
@@ -65,9 +71,9 @@ const categories = Map<ArgType, ArgParseCategory<Arguments>>([
     toString: () => `channel`
   }],
   [ArgType.GuildMember, {
-    is: ({ chunks, cursor, message }) => Boolean(getMember(chunks[cursor], message)),
+    is: ({ chunks, cursor, message }) => Boolean(getMember(chunks.get(cursor), message)),
     to: ({ chunks, cursor, message }): GuildMember => {
-      const chunk = chunks[cursor];
+      const chunk = chunks.get(cursor);
       const member = getMember(chunk, message);
       if (!member) {
         throw new Error(`Expected ${chunk} to be a guild member.`);
@@ -82,32 +88,35 @@ const categories = Map<ArgType, ArgParseCategory<Arguments>>([
 
 const categoryStrings = categories
   .valueSeq()
-  .map(category => category.toString())
-  .toArray();
+  .map(category => category.toString());
 
-export const processWords = (ctx: ParserContext, targetArray: Array<ArgType | ArgTypes>): Array<Arguments | undefined> => {
-  if (ctx.cursor >= targetArray.length) {
+export const processWords = (ctx: ParserContext, targetArray: List<ArgType | ArgTypes>): List<Arguments | undefined> => {
+  if (ctx.cursor >= targetArray.size) {
     return ctx.output;
   }
   const out = {
     ...ctx,
     cursor: ctx.cursor + 1,
   };
-  const temp = targetArray[ctx.cursor];
-  const targets: ArgTypes = Array.isArray(temp) ? temp : [temp];
-  const optional = targets.length > 1;
-  const word = ctx.chunks[ctx.cursor];
-  const match = targets.find((target: ArgType) => categories.get(target)!.is(ctx));
+  const temp = targetArray.get(ctx.cursor);
+  const targets = List.isList(temp) ? temp : List([temp]);
+  const optional = targets.size > 1;
+  const word = ctx.chunks.get(ctx.cursor);
+  const match = targets.find(target =>
+    target && categories.get(target)!.is(ctx) || false
+  );
 
   if (!match && optional) {
     // Still have to push undefined to make sure
     // arg indexes don't shift when optional
     return processWords({
       ...out,
-      output: [...ctx.output, undefined]
+      output: ctx.output.push(undefined)
     }, targetArray);
   } else if (!match) {
-    const expected = targets.map(target => categoryStrings[target]);
+    const expected = targets.map(target =>
+      target && categoryStrings.get(target)
+    );
     throw new ArgumentError(`Expected ${word} to be a ${expected.join(' or ')}`);
   }
 
@@ -116,25 +125,25 @@ export const processWords = (ctx: ParserContext, targetArray: Array<ArgType | Ar
 
   return processWords({
     ...out,
-    output: [...ctx.output, output]
+    output: ctx.output.push(output)
   }, targetArray);
 };
 
-const extractContent = (message: Message) => message.content
+const extractContent = (message: Message) => List(message.content
   .trim()
   .slice(PREFIX.length)
-  .split(/\s+/);
+  .split(/\s+/));
 
-export const processInput = (message: Message, targetArray: Array<ArgType | ArgTypes>): ParsedCommandInput => {
+export const processInput = (message: Message, targetArray: List<ArgType | ArgTypes>): ParsedCommandInput => {
   const [commandName, ...chunks] = extractContent(message);
   if (!chunks.length) {
-    return { commandName, output: [] };
+    return { commandName, output: List() };
   }
   const seed = {
     message,
     cursor: 0,
-    chunks,
-    output: []
+    chunks: List(chunks),
+    output: List()
   };
   const output = processWords(seed, targetArray);
   return { commandName, output };

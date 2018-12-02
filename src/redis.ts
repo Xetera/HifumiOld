@@ -7,12 +7,15 @@ export const keyRateLimit = (commandName: string, id: string) => `ratelimit:${co
 /**
  * Redis client, should not be initialized while testing
  */
-const client = rd.createClient() as rd.RedisClient;
+export const redis = rd.createClient() as rd.RedisClient;
 
-const getAsync = promisify(client.get).bind(client);
-const existsAsync = promisify(client.exists).bind(client);
-const setAsync = promisify(client.set).bind(client);
-const delAsync = promisify(client.del).bind(client);
+export const lrangeAsync = promisify(redis.lrange).bind(redis);
+export const lpushAsync = promisify(redis.lpush).bind(redis);
+export const rpopAsync = promisify(redis.rpop).bind(redis);
+export const getAsync = promisify(redis.get).bind(redis);
+export const existsAsync = promisify(redis.exists).bind(redis);
+export const setAsync = promisify(redis.set).bind(redis);
+export const delAsync = promisify(redis.del).bind(redis);
 
 export const isUserRateLimited = (userId: UserID, command: Command): Promise<boolean> => command.debounce
   ? existsAsync(keyRateLimit(command.names.first(), userId))
@@ -24,7 +27,7 @@ export const rateLimitForCommand = async (userId: UserID, command: Command): Pro
     return;
   }
   const keyName = keyRateLimit(names.first(), userId);
-  return setAsync(keyName, debounce, 'EX', debounce);
+  return setAsync(keyName, '1', 'EX', debounce);
 };
 
 export const removeRateLimit = (userId: UserID, command: Command) => command.debounce

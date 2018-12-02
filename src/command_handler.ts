@@ -2,7 +2,7 @@ import { Message } from "discord.js";
 import * as glob from 'glob';
 import { Collection, List, Stack } from "immutable";
 import * as R from "ramda";
-import { from, Observable, of, ReplaySubject } from "rxjs";
+import { from, Observable, of, pipe, ReplaySubject } from "rxjs";
 import {
   filter,
   map, mapTo,
@@ -12,10 +12,12 @@ import {
 } from "rxjs/operators";
 import { promisify } from "util";
 import { logger } from "./loggers";
+import { processInput } from "./parsers/argparse";
 import { isUserRateLimited, rateLimitForCommand, removeRateLimit } from "./redis";
 import { contextStream$ } from "./streams";
 import { Command, Commands, Context, SemiContext } from "./types/types";
 import { CommandError } from "./utils";
+import { converge, filterAndHandle } from "./rxjs";
 
 const globAsync = promisify(glob);
 
@@ -36,6 +38,13 @@ export const findCommand = (input: string, commands: Commands) => commands.find(
 
 export const contextHasValidCommand = (ctx: Context) => Boolean(ctx.command);
 
+export const commandCanRun = async (ctx: Context) => {
+  if (!ctx.command || !ctx.command.canRun) {
+    return true;
+  }
+  return ctx.command.canRun(ctx);
+};
+
 /**
  * Checks and sets the rate limiting for commands if it needs one
  * @param message$
@@ -54,11 +63,15 @@ export const transformMessageContext$ = (message$: Observable<SemiContext>): Obs
   withLatestFrom(commandRegistry$),
   map(([ctx, commands]: [SemiContext, Commands]) => {
     const { message } = ctx;
-    const [commandWithPrefix, ...leftover] = message.content.split(/\s+/);
-    const args = List(leftover);
+    const [commandWithPrefix] = message.content.split(/\s+/);
     const input = commandWithPrefix.slice(1);
     const command = findCommand(input, commands);
-    return { ...ctx, args, input, command };
+    const out = { ...ctx, input, command };
+    if (command) {
+      const { output } = processInput(message, command.expects || List());
+      return { ...out, args: output };
+    }
+    return { ...out, args: List() };
   })
 );
 
@@ -78,24 +91,45 @@ export const runCommand = async (ctx: Context, command: Command) => {
       return ctx.message.channel.send(`🚫 ${e.message}`, { disableEveryone: true });
     }
     logger.error(`Something went wrong with the function ${ctx.input}`);
+    logger.error(e);
     return ctx.message.channel.send(`Oh no... Something unexpected happened while trying to do that`);
   };
 
   try {
-    await command.run(ctx);
+    await command.run(ctx, ctx.args);
   } catch (e) {
     handleError(e);
   }
 };
 
-export const handleValidCommandRequest = (ctx: Context) => {
-  console.log('handling command!');
-  return runCommand(ctx, ctx.command!);
+export const handleValidCommandRequest = async (ctx: Context) => {
+  if (ctx.command && ctx.command.pre) {
+    await ctx.command.pre(ctx);
+  }
+
+  await runCommand(ctx, ctx.command!);
+
+  if (ctx.command && ctx.command.post) {
+    await ctx.command.post(ctx);
+  }
 };
 
+export const handleInvalidCommandRequest = (ctx: Context) => {
+  if (ctx.command && ctx.command.onFail) {
+    return ctx.command.onFail(ctx);
+  }
+};
+
+const separateInvalidRequest = (handler: (ctx: Context) => any) => (obs: Observable<Context>) => obs.pipe(
+  switchMap((ctx: Context) => converge(commandCanRun(ctx)).pipe(
+    filterAndHandle(Boolean, () => handler(ctx)),
+    mapTo(ctx)
+  ))
+);
 
 contextStream$.pipe(
   transformMessageContext$,
   filter(contextHasValidCommand),
-  rateLimitCommand$
+  separateInvalidRequest(handleInvalidCommandRequest),
+  rateLimitCommand$,
 ).subscribe(handleValidCommandRequest);

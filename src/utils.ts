@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { List } from "immutable";
+import { from, Observable, of } from "rxjs";
 
 export class CommandError extends Error {
   constructor(...args: any[]) {
@@ -23,17 +24,20 @@ export const random = <T>(input: string | List<T>) => {
   return target.get(Math.floor(Math.random() * target.size))!;
 };
 
-export const quote = (str: string) => `\`${str}\``;
+export const quote = (str: string) =>
+  `\`${str}\``;
+export const wrapCode = (str: string | number, lang?: string): string =>
+  `\`\`\`${lang || ''}\n${str}\n\`\`\``;
 
 export const HASTEBIN_ENDPOINT = 'https://hastebin.com/documents';
 
 export const postToHastebin = (output: string) =>
-  axios.post(HASTEBIN_ENDPOINT, output).then(
+  axios.post(HASTEBIN_ENDPOINT, output, { timeout: 1000 }).then(
     res => `https://hastebin.com/${res.data.key}`,
-    () => `[Whoops, had a problem reaching the hastebin servers!]`
+    () => `[Whoops, I couldn't reach the hastebin servers for some reason]`
   );
 
-export const removeToken = (input: string) => {
+export const removeToken = (input: any) => {
   if (!process.env.BOT_TOKEN) {
     throw new CommandError(
       "Token environment variable was not set, could not " +
@@ -41,5 +45,13 @@ export const removeToken = (input: string) => {
       "use eval make sure the BOT_TOKEN environment variable is set correctly."
     );
   }
-  return input.replace(process.env.BOT_TOKEN, '[token removed]');
+  return String(input).replace(process.env.BOT_TOKEN, '[token removed]');
+};
+
+
+
+export const liftP = (fn: any) => {
+  return (...args: any[]) => {
+    return Promise.all(args).then((x) => fn.apply(null, x));
+  };
 };

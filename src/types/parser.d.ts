@@ -1,4 +1,5 @@
 import { Channel, GuildMember, Message, User } from "discord.js";
+import { List } from "immutable";
 import { Url } from "url";
 
 interface CategoryInput {
@@ -26,17 +27,17 @@ declare const enum ArgType {
   Phrase = 6
 }
 
-type ArgTypes = ArgType[];
+type ArgTypes = List<ArgType>;
 
 interface ParserContext {
   readonly message: Message;
-  readonly chunks: string[];
+  readonly chunks: List<string>;
   readonly cursor: number;
-  readonly output: Array<Arguments | undefined>;
+  readonly output: List<Arguments | undefined>;
 }
 
 interface ParsedCommandInput {
-  readonly output: Array<Arguments | undefined>;
+  readonly output: List<Arguments | undefined>;
   readonly commandName: string;
 }
 

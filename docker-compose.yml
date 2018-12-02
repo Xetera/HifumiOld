@@ -1,25 +1,25 @@
 version: '3'
 services:
-  #  bot:
-  #    build: .
-  #    volumes:
-  #    - .:/src
-  #    working_dir: /src
-  #    links:
-  #    - redis
-  #    environment:
-  #      - ENV=DEVELOPMENT
-  #      - DATABASE_URL=postgres://postgres:@host.docker.internal:5432/discord_test
-  #      - REDISCLOUD_URL=redis://host.docker.internal:6379
-  #    depends_on:
-  #      - "postgres"
-  #      - "redis"
-  #    tty: true
+#  gateway:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile.gateway
+#    environment:
+#    - ENV=DEVELOPMENT
+#    - REDIS_URL=j
+  lavalink:
+    container_name: lavalink
+    image: fredboat/lavalink:master
+    ports:
+      - "8080:8080"
+    volumes:
+      - lavalink:/opt/Lavalink
+      - ${PWD}/lavalink.yml:/opt/Lavalink/application.yml
   redis:
     container_name: hifumi_redis
     image: redis
     ports:
-      - "6379:6379"
+    - "6379:6379"
   postgres:
     container_name: hifumi_postgres
     image: postgres:10.3
@@ -28,12 +28,13 @@ services:
       dockerfile: Dockerfile
       context: .
     ports:
-      - "${TYPEORM_PORT}:5432"
+    - "${TYPEORM_PORT}:5432"
     environment:
     - POSTGRES_DB=hifumi
     - POSTGRES_USER=hifumi
     - POSTGRES_PASSWORD=eagle_jump
     volumes:
-      - pgdata:/var/lib/postgresql/data
+    - pgdata:/var/lib/postgresql/data
 volumes:
   pgdata:
+  lavalink:

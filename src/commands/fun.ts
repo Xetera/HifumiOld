@@ -1,7 +1,7 @@
+import { List } from "immutable";
 import { createCommand } from "../command";
 import { Command, Context } from "../types/types";
 import { CommandError, quote, random } from "../utils";
-import { List } from "immutable";
 
 const owo: Command = createCommand({
   names: ['owo'],
@@ -29,12 +29,22 @@ const responses = List([
 const eightball: Command = createCommand({
   names: ['8ball', '8b'],
   description: 'Predicts your future',
-  run: (ctx: Context, [age]: [number]) => {
+  run: async (ctx: Context) => {
     const choice = random(responses);
-    return void ctx.message.channel.send(
-      `🎱 | I have received your answer, ${ctx.message.author.username}: ${quote(choice)}`
-    );
+    // return void ctx.message.channel.send(
+    //   `🎱 | I have received your answer, ${ctx.message.author.username}: ${quote(choice)}`
+    // );
+
+    const message = await ctx.message.channel.fetchMessage('myboysid');
+    const msg = {
+      ...ctx.message,
+      channel: {
+        ...ctx.message.channel,
+        send: message.edit.bind(message)
+      }
+    };
+    // ctx.message.channel.send()
   }
 });
 
-export default { owo };
+export default { owo, eightball };

@@ -6,6 +6,7 @@
   "scripts": {
     "setup": "npm install",
     "build": "tsc",
+    "gateway": "node dist/gateway.js",
     "test": "tsc && jest",
     "start": "nodemon",
     "migrate": "typeorm migration:run"
@@ -14,18 +15,23 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.18.0",
+    "date-fns": "^1.29.0",
     "discord.js": "^11.2.1",
     "dotenv": "^6.0.0",
     "glob": "^7.1.2",
     "hot-shots": "^5.9.0",
     "immutable": "^4.0.0-rc.12",
+    "lavalink": "^2.3.0",
     "moment": "^2.22.1",
+    "opusscript": "0.0.6",
     "pg": "^7.4.1",
     "ramda": "^0.26.0",
     "redis": "^2.8.0",
     "rxjs": "^6.3.3",
+    "simple-youtube-api": "^5.1.1",
     "typeorm": "^0.2.9",
-    "winston": "^3.0.0"
+    "winston": "^3.0.0",
+    "ws": "^6.1.2"
   },
   "devDependencies": {
     "@types/dotenv": "^4.0.3",
