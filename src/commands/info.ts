@@ -79,4 +79,16 @@ const test = createCommand({
   }
 });
 
-export default { help, test };
+const ping = createCommand({
+  names: ['ping'],
+  description: 'shows my ping',
+  run: ctx => ctx.message.channel.send('...Checking ping')
+    .then(msg => {
+      const sent = msg as Message;
+      return sent.edit(
+        `Pong! 🏓 That took me ${sent.createdTimestamp - ctx.message.createdTimestamp}ms`
+      );
+    })
+});
+
+export default { help, test, ping };

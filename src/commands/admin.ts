@@ -1,10 +1,10 @@
-import { merge, Observable, of, pipe } from "rxjs";
+import { merge, of } from "rxjs";
 import { catchError, flatMap, map, partition, share } from "rxjs/operators";
-import { inspect } from "util";
 import { createCommand } from "../command";
 import { ArgType } from "../types/parser";
-import { Command, Context } from "../types/types";
+import { Context } from "../types/types";
 import { postToHastebin, removeToken, wrapCode } from "../utils";
+import { parseDSLInput } from "../parsers/embedParse";
 
 const canPost = (input: string) =>
   input.length < 1950;
@@ -51,5 +51,14 @@ const customEval = createCommand({
   }
 });
 
+const embed = createCommand({
+  names: ['embed'],
+  description: "Tests",
+  expects: [ArgType.Phrase],
+  run: (ctx: Context, [args]) => parseDSLInput(args)
+    .then(JSON.stringify)
+    .then(o => ctx.message.channel.send(o))
+});
 
-export default { customEval };
+
+export default { customEval, embed };
