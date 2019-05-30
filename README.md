@@ -11,6 +11,8 @@
 </a>
 <hr>
 
+**This repository is archived  and the bot is no longer operational, the new Hifumi bot can be found in https://github.com/moedevs/hifumi**
+
 <table style="width:100%">
   <tr>
     <td><strong>Prefix:</strong> $</td>
